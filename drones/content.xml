@@ -1,0 +1,1092 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ode SYSTEM "content.dtd">
+<ode xmlns="http://www.intef.es/xsd/ode" version="2.0">
+<userPreferences>
+  <userPreference>
+    <key>theme</key>
+    <value>zen</value>
+  </userPreference>
+</userPreferences>
+<odeResources>
+  <odeResource>
+    <key>odeId</key>
+    <value>20260515101921PRAELK</value>
+  </odeResource>
+  <odeResource>
+    <key>odeVersionId</key>
+    <value>20260515101921CQYH2J</value>
+  </odeResource>
+  <odeResource>
+    <key>exe_version</key>
+    <value>4.0.0</value>
+  </odeResource>
+</odeResources>
+<odeProperties>
+  <odeProperty>
+    <key>pp_title</key>
+    <value>Drones educativos ¡...al vuelo!</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_subtitle</key>
+    <value>Una aproximación a los drones educativos para mentes y manos inquietas</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_author</key>
+    <value>Daniel Gastelú</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_description</key>
+    <value>Guía elemental de robótica aérea y programación física diseñada para transformar el código virtual en acciones tridimensionales mediante drones educativos. El material aborda la enseñanza del pensamiento computacional mediante el uso de drones educativos (DJI Tello y CoDrone EDU), integrando protocolos de seguridad y mantenimiento con desafíos prácticos de vuelo. Su enfoque pedagógico utiliza la navegación en ejes X, Y y Z para reforzar conceptos de geometría y lógica a través de la experimentación y la resolución de problemas. </value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_lang</key>
+    <value>es</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_license</key>
+    <value>creative commons: attribution - share alike 4.0</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_licenseUrl</key>
+    <value>https://creativecommons.org/licenses/by-sa/4.0/</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_theme</key>
+    <value>zen</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_exelearning_version</key>
+    <value>v4.0.0</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_modified</key>
+    <value>1778850996499</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_addExeLink</key>
+    <value>true</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_addPagination</key>
+    <value>false</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_addSearchBox</key>
+    <value>false</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_addAccessibilityToolbar</key>
+    <value>false</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_addMathJax</key>
+    <value>false</value>
+  </odeProperty>
+  <odeProperty>
+    <key>exportSource</key>
+    <value>true</value>
+  </odeProperty>
+  <odeProperty>
+    <key>pp_globalFont</key>
+    <value>default</value>
+  </odeProperty>
+</odeProperties>
+<odeNavStructures>
+<odeNavStructure>
+  <odePageId>page-mp6xyciw-jmm9q7gj6</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>¿Con ganas de volar?</pageName>
+  <odeNavStructureOrder>0</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>¿Con ganas de volar?</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>¿Con ganas de volar?</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value>¿Con ganas de volar?</value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xyciw-jmm9q7gj6</odePageId>
+      <odeBlockId>block-1777989818404-kkzt17anx</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xyciw-jmm9q7gj6</odePageId>
+          <odeBlockId>block-1777989818404-kkzt17anx</odeBlockId>
+          <odeIdeviceId>idevice-1777989818396-mo232r40b</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p><span style="background-color: #fbeeb8;"><strong>¡De la Pantalla al Cielo: El desafío de hackear la gravedad!</strong></span></p>
+<p><strong><audio width="300" height="40" controls="controls" src="{{context_path}}/content/resources/dron_001ElevenLabs_2026-05-05T16_31_35_Melanie - Warm, Clear and Professional_pvc_sp100_s30_sb43_se57_b_m2.mp3"></audio></strong></p>
+<p><strong><img src="{{context_path}}/content/resources/TELLO_000Gemini_Generated_Image_8393eg8393eg8393.png" width="800" height="436" alt="imagen de gimansio con cintas y obstáculos diversos para vuelos de drones. Tres estudiantes con dispositivos en mando controlan algunos vuelos" /></strong></p>
+<p>¿Alguna vez han sentido que tienen el control total de un mundo virtual? Hoy vamos a llevar ese poder a la realidad, pero con un giro importante: no vamos a usar un joystick para "jugar", vamos a usar código para volar.</p>
+<p>Tener un dron frente a ustedes no es solo tener un juguete tecnológico; es tener un robot explorador que solo entiende un lenguaje: la lógica. El desafío que tenemos por delante no es simplemente hacer que se eleve, sino convertirnos en los arquitectos de su movimiento.</p>
+<p>Y si hay errores, revisar, pensar, corregir... ¡y volver a volar!</p>
+<p><strong>El error es nuestro amigo en este camino de aprendizaje, y la paciencia su hermana inseparable (ya entenderás luego). </strong></p>
+<p>(narración generada con eleven Labs)</p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1777989818396-mo232r40b","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p><span style=\"background-color: #fbeeb8;\"><strong>¡De la Pantalla al Cielo: El desafío de hackear la gravedad!</strong></span></p>\n<p><strong><audio width=\"300\" height=\"40\" controls=\"controls\" src=\"{{context_path}}/content/resources/dron_001ElevenLabs_2026-05-05T16_31_35_Melanie - Warm, Clear and Professional_pvc_sp100_s30_sb43_se57_b_m2.mp3\"></audio></strong></p>\n<p><strong><img src=\"{{context_path}}/content/resources/TELLO_000Gemini_Generated_Image_8393eg8393eg8393.png\" width=\"800\" height=\"436\" alt=\"imagen de gimansio con cintas y obstáculos diversos para vuelos de drones. Tres estudiantes con dispositivos en mando controlan algunos vuelos\" /></strong></p>\n<p>¿Alguna vez han sentido que tienen el control total de un mundo virtual? Hoy vamos a llevar ese poder a la realidad, pero con un giro importante: no vamos a usar un joystick para \"jugar\", vamos a usar código para volar.</p>\n<p>Tener un dron frente a ustedes no es solo tener un juguete tecnológico; es tener un robot explorador que solo entiende un lenguaje: la lógica. El desafío que tenemos por delante no es simplemente hacer que se eleve, sino convertirnos en los arquitectos de su movimiento.</p>\n<p>Y si hay errores, revisar, pensar, corregir... ¡y volver a volar!</p>\n<p><strong>El error es nuestro amigo en este camino de aprendizaje, y la paciencia su hermana inseparable (ya entenderás luego). </strong></p>\n<p>(narración generada con eleven Labs)</p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycj3-8dlw6takr</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>¿Un desafío?</pageName>
+  <odeNavStructureOrder>1</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>¿Un desafío?</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>¿Un desafío?</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value></value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycj3-8dlw6takr</odePageId>
+      <odeBlockId>block-1777989908365-f4uwl5raz</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycj3-8dlw6takr</odePageId>
+          <odeBlockId>block-1777989908365-f4uwl5raz</odeBlockId>
+          <odeIdeviceId>idevice-1777989908357-nz8psheft</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p><audio width="300" height="40" controls="controls" src="{{context_path}}/content/resources/dron002ElevenLabs_2026-05-05T16_42_39_Melanie - Warm, Clear and Professional_pvc_sp100_s30_sb43_se57_b_m2.mp3"></audio></p>
+<p>¿Por qué programar un dron es el siguiente nivel?<br />Tu código cobra vida: aquí no hay "Game Over" virtual o "de mentiritas"... Si tu conjunto de instrucciones es preciso, el dron danzará en el aire; si hay un error en la lógica, verás en tiempo real cómo el plan de vuelo necesita un ajuste (¡y eso es parte de la diversión!).</p>
+<p><strong>Dominar las tres dimensiones: ya la acción no ocurre en una pantalla... ¡ocurre en un volumen tridimensional!</strong></p>
+<p>Hoy, sus comandos tienen que entender la altura, la rotación y la traslación. Estamos programando en el mundo real.<br />De usuarios a creadores: Cualquiera puede volar un dron con un control remoto, pero muy pocos pueden enseñarle a un dron a realizar una misión de rescate, una coreografía o un patrullaje de forma autónoma.</p>
+<p><br /></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1777989908357-nz8psheft","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p><audio width=\"300\" height=\"40\" controls=\"controls\" src=\"{{context_path}}/content/resources/dron002ElevenLabs_2026-05-05T16_42_39_Melanie - Warm, Clear and Professional_pvc_sp100_s30_sb43_se57_b_m2.mp3\"></audio></p>\n<p>¿Por qué programar un dron es el siguiente nivel?<br />Tu código cobra vida: aquí no hay \"Game Over\" virtual o \"de mentiritas\"... Si tu conjunto de instrucciones es preciso, el dron danzará en el aire; si hay un error en la lógica, verás en tiempo real cómo el plan de vuelo necesita un ajuste (¡y eso es parte de la diversión!).</p>\n<p><strong>Dominar las tres dimensiones: ya la acción no ocurre en una pantalla... ¡ocurre en un volumen tridimensional!</strong></p>\n<p>Hoy, sus comandos tienen que entender la altura, la rotación y la traslación. Estamos programando en el mundo real.<br />De usuarios a creadores: Cualquiera puede volar un dron con un control remoto, pero muy pocos pueden enseñarle a un dron a realizar una misión de rescate, una coreografía o un patrullaje de forma autónoma.</p>\n<p><br /></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycj5-xq0mm3rwm</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>Pensando en 3D</pageName>
+  <odeNavStructureOrder>2</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Pensando en 3D</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Pensando en 3D</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value></value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycj5-xq0mm3rwm</odePageId>
+      <odeBlockId>block-1777990323689-ijn8bpqc5</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycj5-xq0mm3rwm</odePageId>
+          <odeBlockId>block-1777990323689-ijn8bpqc5</odeBlockId>
+          <odeIdeviceId>idevice-1777990323680-b40pghoy5</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p><strong><audio width="300" height="40" controls="controls" src="{{context_path}}/content/resources/dron003ElevenLabs_2026-05-05T16_50_30_Melanie - Warm, Clear and Professional_pvc_sp100_s30_sb43_se57_b_m2.mp3"></audio></strong></p>
+<p><strong>El "Superpoder" del Pensamiento Computacional</strong><br />Para que ese dron despegue y cumpla su misión, vamos a tener que pensar "fuera de la caja".</p>
+<p>¿Qué instrucción se necesita para girar 90 grados?</p>
+<p>En la imagen los tres ejes espaciales. Amarillo hacia el frente (ubicacion de la visual de la cámara), verde hacia la izquierda y rojo hacia arriba.</p>
+<p><img src="{{context_path}}/content/resources/dron vectoresGemini_Generated_Image_ujl4pfujl4pfujl4.png" width="400" height="300" alt="" /></p>
+<p>Reconocer patrones: ¿Cómo podemos repetir movimientos para crear figuras geométricas en el aire? Un cuadrado, o un triángulo equilátero ya son más interesantes en el aire. Y ni hablar de un cubo, con aristas a recorrer y vértices donde detenerse... pero eso es para otro momento. </p>
+<p>Depuración (Debugging) constante: Si el dron no aterriza donde esperábamos, ¿en qué línea de código está el misterio?</p>
+<p>El cielo ya no es el límite, es nuestro tablero de juegos. Preparen sus mentes, ajusten sus bloques de instrucciones y prepárense para ver cómo sus ideas despegan del suelo.</p>
+<p>¿Están listos para la misión de hoy? ¡A programar!</p>
+<p><br /></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1777990323680-b40pghoy5","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p><strong><audio width=\"300\" height=\"40\" controls=\"controls\" src=\"{{context_path}}/content/resources/dron003ElevenLabs_2026-05-05T16_50_30_Melanie - Warm, Clear and Professional_pvc_sp100_s30_sb43_se57_b_m2.mp3\"></audio></strong></p>\n<p><strong>El \"Superpoder\" del Pensamiento Computacional</strong><br />Para que ese dron despegue y cumpla su misión, vamos a tener que pensar \"fuera de la caja\".</p>\n<p>¿Qué instrucción se necesita para girar 90 grados?</p>\n<p>En la imagen los tres ejes espaciales. Amarillo hacia el frente (ubicacion de la visual de la cámara), verde hacia la izquierda y rojo hacia arriba.</p>\n<p><img src=\"{{context_path}}/content/resources/dron vectoresGemini_Generated_Image_ujl4pfujl4pfujl4.png\" width=\"400\" height=\"300\" alt=\"\" /></p>\n<p>Reconocer patrones: ¿Cómo podemos repetir movimientos para crear figuras geométricas en el aire? Un cuadrado, o un triángulo equilátero ya son más interesantes en el aire. Y ni hablar de un cubo, con aristas a recorrer y vértices donde detenerse... pero eso es para otro momento. </p>\n<p>Depuración (Debugging) constante: Si el dron no aterriza donde esperábamos, ¿en qué línea de código está el misterio?</p>\n<p>El cielo ya no es el límite, es nuestro tablero de juegos. Preparen sus mentes, ajusten sus bloques de instrucciones y prepárense para ver cómo sus ideas despegan del suelo.</p>\n<p>¿Están listos para la misión de hoy? ¡A programar!</p>\n<p><br /></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycj7-j67gjyzrb</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>Características de los drones</pageName>
+  <odeNavStructureOrder>3</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Características de los drones</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Características de los drones</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value></value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycj7-j67gjyzrb</odePageId>
+      <odeBlockId>block-1777991221083-5h5r7d9us</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycj7-j67gjyzrb</odePageId>
+          <odeBlockId>block-1777991221083-5h5r7d9us</odeBlockId>
+          <odeIdeviceId>idevice-1777991221071-nuwm735i5</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p>A diferencia de los drones de carreras o los que graban películas, los drones educativos están hechos para aprender con ellos. Son como pequeños robots voladores diseñados para ser resistentes, seguros y, sobre todo, para obedecer tus líneas de código.</p>
+<p><img src="{{context_path}}/content/resources/TELLO_002Gemini_Generated_Image_swggwfswggwfswgg.png" width="800" height="436" alt="imagen descriptiva de jovenes y una pista de vuelo sin obstáculos" /></p>
+<ul>
+<li><strong>1. ¿Qué los hace especiales?</strong>
+<ul>
+<li>Tú les dices qué hacer: Puedes programarlos usando bloques (como en Scratch) si estás empezando, o con texto (Python) si ya eres un experto.</li>
+<li>Tienen "ojos" inteligentes: Usan sensores especiales (barómetros y/o cámaras inferiores) para quedarse quietos en el aire sin necesidad de GPS.</li>
+<li>Llevan "armadura": Son livianos y tienen protectores que cubren las hélices por completo. Esto evita que se rompan (o rompan algo) si chocan.</li>
+<li>Conexión directa: El dron crea su propia red Wi-Fi para que conectes tu tablet o computadora sin cables.</li>
+</ul>
+</li>
+<li><strong>2. ¿Por qué volamos generalmente bajo techo?</strong>
+<ul>
+<li>Aunque parezca divertido volar afuera, estos drones prefieren estar en el aula por tres razones:
+<ul>
+<li>El viento es su enemigo: Como son tan livianos, una brisa suave puede llevárselos lejos.</li>
+<li>Pisos con texturas; sus sensores leen el suelo para ubicarse. Un salón bien iluminado es el lugar perfecto para que no se "pierdan".</li>
+<li>Seguridad total; volar en clase es más seguro y no necesitamos permisos especiales de aviación ni arriesgamos efectos indeseados sobre vecinos y us provacidad.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li> <strong>3. Guía de mantenimiento (¡Cuida tu equipo!)</strong><br />Para que el dron dure todo el año (y más, en lo posible), sigue estas reglas de oro:
+<ul>
+<li>Baterías: Nunca las guardes calientes después de volar. Si se quedan sin carga mucho tiempo, se pueden arruinar. ¡Cárgalas siempre con supervisión!</li>
+<li>Motores limpios: Revisa que no tengan pelos, hilos o polvo en el eje de las hélices. Si algo se enreda, el motor se esfuerza de más y se quema.</li>
+<li>Hélices sanas: Si ves una hélice doblada o con una grieta, no despegues. Una hélice rota hace que el dron vuele mal.</li>
+</ul>
+</li>
+<li><strong>4. Seguridad: Antes de despegar</strong><br />Tu "pista de aterrizaje y despegue" debe cumplir con estas reglas para evitar accidentes:
+<ul>
+<li>Distancia social: Nadie puede estar a menos de 2 metros del dron cuando va a arrancar o volar. Si es necesario delimitar el espacio de vuelo con cintas en el suelo o con cordeles atados a sillas, como armando un "corralito". </li>
+<li>Piso despejado: Quita mochilas, cables o cualquier cosa con la que el dron pueda tropezar.</li>
+<li>Poner límites también de altura: Programa siempre considerando una altura máxima (por ejemplo, 2 metros) para no chocar con el techo o las luces.</li>
+<li>Cuidado con ventiladores de techo, aires acondicionados o ventanas abiertas. Tenerlos apagados y evitar corrientes de aire.</li>
+<li>Buena luz: No vueles a oscuras ni cerca de espejos; los sensores se confunden y el dron puede volverse inestable. </li>
+</ul>
+</li>
+</ul>
+<p><strong>¿Listo para el despegue? Recuerda que no solo volarás, ¡estarás programando la tecnología que vuela al mismo tiempo que cuidas la seguridad!</strong></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1777991221071-nuwm735i5","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p>A diferencia de los drones de carreras o los que graban películas, los drones educativos están hechos para aprender con ellos. Son como pequeños robots voladores diseñados para ser resistentes, seguros y, sobre todo, para obedecer tus líneas de código.</p>\n<p><img src=\"{{context_path}}/content/resources/TELLO_002Gemini_Generated_Image_swggwfswggwfswgg.png\" width=\"800\" height=\"436\" alt=\"imagen descriptiva de jovenes y una pista de vuelo sin obstáculos\" /></p>\n<ul>\n<li><strong>1. ¿Qué los hace especiales?</strong>\n<ul>\n<li>Tú les dices qué hacer: Puedes programarlos usando bloques (como en Scratch) si estás empezando, o con texto (Python) si ya eres un experto.</li>\n<li>Tienen \"ojos\" inteligentes: Usan sensores especiales (barómetros y/o cámaras inferiores) para quedarse quietos en el aire sin necesidad de GPS.</li>\n<li>Llevan \"armadura\": Son livianos y tienen protectores que cubren las hélices por completo. Esto evita que se rompan (o rompan algo) si chocan.</li>\n<li>Conexión directa: El dron crea su propia red Wi-Fi para que conectes tu tablet o computadora sin cables.</li>\n</ul>\n</li>\n<li><strong>2. ¿Por qué volamos generalmente bajo techo?</strong>\n<ul>\n<li>Aunque parezca divertido volar afuera, estos drones prefieren estar en el aula por tres razones:\n<ul>\n<li>El viento es su enemigo: Como son tan livianos, una brisa suave puede llevárselos lejos.</li>\n<li>Pisos con texturas; sus sensores leen el suelo para ubicarse. Un salón bien iluminado es el lugar perfecto para que no se \"pierdan\".</li>\n<li>Seguridad total; volar en clase es más seguro y no necesitamos permisos especiales de aviación ni arriesgamos efectos indeseados sobre vecinos y us provacidad.</li>\n</ul>\n</li>\n</ul>\n</li>\n<li> <strong>3. Guía de mantenimiento (¡Cuida tu equipo!)</strong><br />Para que el dron dure todo el año (y más, en lo posible), sigue estas reglas de oro:\n<ul>\n<li>Baterías: Nunca las guardes calientes después de volar. Si se quedan sin carga mucho tiempo, se pueden arruinar. ¡Cárgalas siempre con supervisión!</li>\n<li>Motores limpios: Revisa que no tengan pelos, hilos o polvo en el eje de las hélices. Si algo se enreda, el motor se esfuerza de más y se quema.</li>\n<li>Hélices sanas: Si ves una hélice doblada o con una grieta, no despegues. Una hélice rota hace que el dron vuele mal.</li>\n</ul>\n</li>\n<li><strong>4. Seguridad: Antes de despegar</strong><br />Tu \"pista de aterrizaje y despegue\" debe cumplir con estas reglas para evitar accidentes:\n<ul>\n<li>Distancia social: Nadie puede estar a menos de 2 metros del dron cuando va a arrancar o volar. Si es necesario delimitar el espacio de vuelo con cintas en el suelo o con cordeles atados a sillas, como armando un \"corralito\". </li>\n<li>Piso despejado: Quita mochilas, cables o cualquier cosa con la que el dron pueda tropezar.</li>\n<li>Poner límites también de altura: Programa siempre considerando una altura máxima (por ejemplo, 2 metros) para no chocar con el techo o las luces.</li>\n<li>Cuidado con ventiladores de techo, aires acondicionados o ventanas abiertas. Tenerlos apagados y evitar corrientes de aire.</li>\n<li>Buena luz: No vueles a oscuras ni cerca de espejos; los sensores se confunden y el dron puede volverse inestable. </li>\n</ul>\n</li>\n</ul>\n<p><strong>¿Listo para el despegue? Recuerda que no solo volarás, ¡estarás programando la tecnología que vuela al mismo tiempo que cuidas la seguridad!</strong></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycj8-78dbnn37f</odePageId>
+  <odeParentPageId>page-mp6xycj7-j67gjyzrb</odeParentPageId>
+  <pageName>DJI Tello Edu</pageName>
+  <odeNavStructureOrder>0</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>DJI Tello Edu</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>DJI Tello Edu</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value></value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycj8-78dbnn37f</odePageId>
+      <odeBlockId>block-1777993953479-qripb0dkl</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycj8-78dbnn37f</odePageId>
+          <odeBlockId>block-1777993953479-qripb0dkl</odeBlockId>
+          <odeIdeviceId>idevice-1777993953467-5son9gc2s</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p><iframe width="560" height="315" src="https://www.youtube.com/embed/gFWYqHgu7is?si=SDSixJD2yxfbscQl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen"></iframe></p>
+<h3>¡Conquista el Aire con DroneBlocks y tu DJI Tello! 🚀</h3>
+<p>¿Qué es DroneBlocks?<br /></p>
+<p>Es la herramienta perfecta para darle "superpoderes" a tu dron DJI Tello. Al igual que otros sistemas de bloques, DroneBlocks te permite crear misiones de vuelo increíbles simplemente arrastrando bloques de colores. Cada bloque es una instrucción y el conjunto de instrucciones es el guión o algoritmo que el dron cumplirá. </p>
+<p>Es el punto de partida perfecto si es tu primera vez programando o si querés convertirte en una persona experta en vuelo de drones .</p>
+<p>Es ideal para aprender la lógica de la programación sin tener que preocuparte por escribir código difícil al principio. Podés programar desde un despegue básico hasta complejas acrobacias y misiones de exploración, viendo cómo tus ideas cobran vida en el mundo real.</p>
+<p><strong>Cómo instalarlo en tu computadora</strong><br />A diferencia de otras aplicaciones, DroneBlocks es muy fácil de tener en tu PC con Windows 11. Solo tienes que seguir estos pasos:</p>
+<ul>
+<li>Abre la Microsoft Store en tu computadora.</li>
+<li>Busca la aplicación llamada "DroneBlocks".</li>
+<li>Haz clic en "Instalar". ¡Y listo! Ya tienes tu centro de control listo para despegar.<br /></li>
+</ul>
+<p>En el caso de Windows, para que la comunicación ocurra sin problemas hay que configurar por única vez el firewall de Windows para que acepte la regla de aceptar comunicaciones entre DroneBlocks y el dron. Consulta al poite o a los docentes facilitadores de los equipos para que lo tengan en cuenta.  </p>
+<p><strong>📡 Cómo conectar tu dron</strong><br />Para que la acción ocurra, tu computadora y tu Tello deben hablar el mismo idioma. Sigue este protocolo:</p>
+<p>Enciende tu DJI Tello: Presiona el botón lateral y espera a que las luces parpadeen.<br />Busca la señal: En la configuración de Wi-Fi de tu Windows 11, busca la red que empiece con "TELLO-" y conéctate a ella.<br />Abre DroneBlocks: Una vez conectado al Wi-Fi del dron, abre la app que instalaste. Verás que el indicador de estado cambia a "Conectado".<br /> <br /><strong>🔗 ¡A programar!</strong><br />Una vez dentro de la aplicación:</p>
+<p>Selecciona, arriba a la derecha en "Menu" la opción "Switch to metric units" y pasará todos los bloques de distancia a "centímetros".<br />Explora los bloques y en una libreta comienza a armar tu vocabulario;</p>
+<p>"Takeoff" es Despegar</p>
+<p>"Land" es Aterrizar... explorá y descubrí el significado de los restantes bloques en "Navigation". allí estará lo básico para iniciar.</p>
+<p>¡Crea tu ruta! Añade giros, subidas y movimientos.<br />No olvides terminar siempre con el bloque "Land" (Aterrizar) para un final de misión seguro.<br />¿Todo listo en la pista de despegue? ¡Es hora de ver tu código volar! 🚁💨</p>
+<p><span style="font-size: 10pt;">(Esta página contiene material en español generado con asistencia de Gemini para lectura de público juvenil. Se revisó y adaptó posteriormente con ajustes técnicos)</span></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1777993953467-5son9gc2s","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p><iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/gFWYqHgu7is?si=SDSixJD2yxfbscQl\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen=\"allowfullscreen\"></iframe></p>\n<h3>¡Conquista el Aire con DroneBlocks y tu DJI Tello! 🚀</h3>\n<p>¿Qué es DroneBlocks?<br /></p>\n<p>Es la herramienta perfecta para darle \"superpoderes\" a tu dron DJI Tello. Al igual que otros sistemas de bloques, DroneBlocks te permite crear misiones de vuelo increíbles simplemente arrastrando bloques de colores. Cada bloque es una instrucción y el conjunto de instrucciones es el guión o algoritmo que el dron cumplirá. </p>\n<p>Es el punto de partida perfecto si es tu primera vez programando o si querés convertirte en una persona experta en vuelo de drones .</p>\n<p>Es ideal para aprender la lógica de la programación sin tener que preocuparte por escribir código difícil al principio. Podés programar desde un despegue básico hasta complejas acrobacias y misiones de exploración, viendo cómo tus ideas cobran vida en el mundo real.</p>\n<p><strong>Cómo instalarlo en tu computadora</strong><br />A diferencia de otras aplicaciones, DroneBlocks es muy fácil de tener en tu PC con Windows 11. Solo tienes que seguir estos pasos:</p>\n<ul>\n<li>Abre la Microsoft Store en tu computadora.</li>\n<li>Busca la aplicación llamada \"DroneBlocks\".</li>\n<li>Haz clic en \"Instalar\". ¡Y listo! Ya tienes tu centro de control listo para despegar.<br /></li>\n</ul>\n<p>En el caso de Windows, para que la comunicación ocurra sin problemas hay que configurar por única vez el firewall de Windows para que acepte la regla de aceptar comunicaciones entre DroneBlocks y el dron. Consulta al poite o a los docentes facilitadores de los equipos para que lo tengan en cuenta.  </p>\n<p><strong>📡 Cómo conectar tu dron</strong><br />Para que la acción ocurra, tu computadora y tu Tello deben hablar el mismo idioma. Sigue este protocolo:</p>\n<p>Enciende tu DJI Tello: Presiona el botón lateral y espera a que las luces parpadeen.<br />Busca la señal: En la configuración de Wi-Fi de tu Windows 11, busca la red que empiece con \"TELLO-\" y conéctate a ella.<br />Abre DroneBlocks: Una vez conectado al Wi-Fi del dron, abre la app que instalaste. Verás que el indicador de estado cambia a \"Conectado\".<br /> <br /><strong>🔗 ¡A programar!</strong><br />Una vez dentro de la aplicación:</p>\n<p>Selecciona, arriba a la derecha en \"Menu\" la opción \"Switch to metric units\" y pasará todos los bloques de distancia a \"centímetros\".<br />Explora los bloques y en una libreta comienza a armar tu vocabulario;</p>\n<p>\"Takeoff\" es Despegar</p>\n<p>\"Land\" es Aterrizar... explorá y descubrí el significado de los restantes bloques en \"Navigation\". allí estará lo básico para iniciar.</p>\n<p>¡Crea tu ruta! Añade giros, subidas y movimientos.<br />No olvides terminar siempre con el bloque \"Land\" (Aterrizar) para un final de misión seguro.<br />¿Todo listo en la pista de despegue? ¡Es hora de ver tu código volar! 🚁💨</p>\n<p><span style=\"font-size: 10pt;\">(Esta página contiene material en español generado con asistencia de Gemini para lectura de público juvenil. Se revisó y adaptó posteriormente con ajustes técnicos)</span></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycj8-jjk6l877x</odePageId>
+  <odeParentPageId>page-mp6xycj7-j67gjyzrb</odeParentPageId>
+  <pageName>CoDrone EDU</pageName>
+  <odeNavStructureOrder>1</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>CoDrone EDU</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>CoDrone EDU</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value>CoDrone EDU</value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycj8-jjk6l877x</odePageId>
+      <odeBlockId>block-1777995107745-gpq12f7xz</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycj8-jjk6l877x</odePageId>
+          <odeBlockId>block-1777995107745-gpq12f7xz</odeBlockId>
+          <odeIdeviceId>idevice-1777995107743-8kzgznr8b</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p><iframe width="560" height="315" src="https://www.youtube.com/embed/-qZ1_nAKPEU?si=O_MCmF2iBCM5QIiJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen"></iframe></p>
+<p>Proximamente más referencias - Para ampliar información <a href="https://ceibal.edu.uy/plataformas-y-programas/olimpiada/cat_drones/" target="_blank" title="" rel="noopener">https://ceibal.edu.uy/plataformas-y-programas/olimpiada/cat_drones/</a></p>
+<h3><strong>¡Despega con Blockly! 🚀</strong></h3>
+<p>¿Qué es eso de Blockly?<br />Es tu puerta de entrada al mundo del código para drones CoDrone Edu. Con Blockly, aprendés las bases de la programación de una forma súper visual: arrastrando y soltando bloques de colores. Cada bloque es una instrucción y el conjunto de instrucciones es el guión o algoritmo que el dron cumplirá. </p>
+<p>Es el punto de partida perfecto si es tu primera vez programando o si quieres convertirte en un piloto de drones experto.</p>
+<p>Lo mejor es que los bloques usan un "lenguaje natural" (frases que ya conoces), lo que hace que todo sea mucho más fácil de entender. Además, te prepara para que en el futuro puedas dar el salto a escribir código de texto como todo un profesional. 💻✨</p>
+<p> <strong>¿Cómo puedo entrar?</strong><br />¡Es súper sencillo! <strong>Blockly </strong>es una aplicación online a la que puedes entrar directamente desde Google Chrome. Lo genial es que puedes conectar tu dron directamente desde el navegador, así que:</p>
+<ul>
+<li>Sin descargas aburridas.</li>
+<li>Sin instalaciones complicadas.</li>
+<li>¡Solo entras y empiezas a crear!<br /> <br />🔗 ¡Manos a la obra!<br />Para empezar a programar tu dron, solo tienes que seguir estos pasos:</li>
+</ul>
+<p>Entra en: <a href="https://codrone.robolink.com/edu/blockly" title="">codrone.robolink.com/edu/blockly</a><br />Una vez ahí, haz clic en el ícono de CoDrone EDU.<br />¡Listo! Ya tienes abierto tu espacio de trabajo para empezar la misión.<br />¡Prepara tus algoritmos y que comience el vuelo! 🚁💨</p>
+<p><span style="font-size: 10pt;">(Esta página contiene material adaptado al español de <a href="https://docs.robolink.com/docs/CoDroneEDU/Blockly/Getting-Started">https://docs.robolink.com/docs/CoDroneEDU/Blockly/Getting-Started</a> con asistencia de Gemini para lectura de público juvenil)</span></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1777995107743-8kzgznr8b","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p><iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/-qZ1_nAKPEU?si=O_MCmF2iBCM5QIiJ\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen=\"allowfullscreen\"></iframe></p>\n<p>Proximamente más referencias - Para ampliar información <a href=\"https://ceibal.edu.uy/plataformas-y-programas/olimpiada/cat_drones/\" target=\"_blank\" title=\"\" rel=\"noopener\">https://ceibal.edu.uy/plataformas-y-programas/olimpiada/cat_drones/</a></p>\n<h3><strong>¡Despega con Blockly! 🚀</strong></h3>\n<p>¿Qué es eso de Blockly?<br />Es tu puerta de entrada al mundo del código para drones CoDrone Edu. Con Blockly, aprendés las bases de la programación de una forma súper visual: arrastrando y soltando bloques de colores. Cada bloque es una instrucción y el conjunto de instrucciones es el guión o algoritmo que el dron cumplirá. </p>\n<p>Es el punto de partida perfecto si es tu primera vez programando o si quieres convertirte en un piloto de drones experto.</p>\n<p>Lo mejor es que los bloques usan un \"lenguaje natural\" (frases que ya conoces), lo que hace que todo sea mucho más fácil de entender. Además, te prepara para que en el futuro puedas dar el salto a escribir código de texto como todo un profesional. 💻✨</p>\n<p> <strong>¿Cómo puedo entrar?</strong><br />¡Es súper sencillo! <strong>Blockly </strong>es una aplicación online a la que puedes entrar directamente desde Google Chrome. Lo genial es que puedes conectar tu dron directamente desde el navegador, así que:</p>\n<ul>\n<li>Sin descargas aburridas.</li>\n<li>Sin instalaciones complicadas.</li>\n<li>¡Solo entras y empiezas a crear!<br /> <br />🔗 ¡Manos a la obra!<br />Para empezar a programar tu dron, solo tienes que seguir estos pasos:</li>\n</ul>\n<p>Entra en: <a href=\"https://codrone.robolink.com/edu/blockly\" title=\"\">codrone.robolink.com/edu/blockly</a><br />Una vez ahí, haz clic en el ícono de CoDrone EDU.<br />¡Listo! Ya tienes abierto tu espacio de trabajo para empezar la misión.<br />¡Prepara tus algoritmos y que comience el vuelo! 🚁💨</p>\n<p><span style=\"font-size: 10pt;\">(Esta página contiene material adaptado al español de <a href=\"https://docs.robolink.com/docs/CoDroneEDU/Blockly/Getting-Started\">https://docs.robolink.com/docs/CoDroneEDU/Blockly/Getting-Started</a> con asistencia de Gemini para lectura de público juvenil)</span></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycj9-49lrrzvip</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>Plan de vuelo; primeros pasos</pageName>
+  <odeNavStructureOrder>4</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Plan de vuelo; primeros pasos</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Plan de vuelo; primeros pasos</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value>Plan de vuelo; primeros pasos</value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycj9-49lrrzvip</odePageId>
+      <odeBlockId>block-1778010623302-qj82b2su0</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycj9-49lrrzvip</odePageId>
+          <odeBlockId>block-1778010623302-qj82b2su0</odeBlockId>
+          <odeIdeviceId>idevice-1778010623291-zufhhjuwp</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p>Algunos desafíos<span style="color: #2dc26b;"> </span><span style="color: #3598db;"><strong><span style="color: #2dc26b;">en verde para practicar</span></strong> </span>con solución para copiar y comprobar...  <span style="color: #3598db;"><strong>Luego ejercicios sin resolución en azul.</strong></span></p>
+<p><span style="color: #2dc26b;"><strong>Ejercicio 1: El Portal Invisible</strong></span><br /><span style="color: #2dc26b;">Figura imaginaria: Un rectángulo vertical (subir y bajar en el mismo sitio).</span></p>
+<p><span style="color: #2dc26b;">Objetivo: Aprender a controlar la altitud y la distancia frontal.</span></p>
+<p><span style="color: #2dc26b;">Takeoff: Despegar el dron.</span><br /><span style="color: #2dc26b;">Fly up: Subir 50 cm para alcanzar la altura de los ojos.</span><br /><span style="color: #2dc26b;">Fly forward: Avanzar 100 cm para atravesar el "portal".</span><br /><span style="color: #2dc26b;">Fly down: Bajar 50 cm para estabilizarse.</span><br /><span style="color: #2dc26b;">Land: Aterrizar.</span><br /></p>
+<hr />
+<p><span style="color: #2dc26b;"><strong>Ejercicio 2: El Cuadrado de Precisión</strong></span><br /><span style="color: #2dc26b;">Figura imaginaria: Un cuadrado perfecto en el plano horizontal sin rotar el dron.</span></p>
+<p><span style="color: #2dc26b;">Objetivo: Utilizar movimientos laterales (traslación).</span></p>
+<p><span style="color: #2dc26b;">Takeoff: Despegar el dron.</span><br /><span style="color: #2dc26b;">Fly forward: Avanzar 100 cm.</span><br /><span style="color: #2dc26b;">Fly right: Moverse lateralmente a la derecha 100 cm.</span><br /><span style="color: #2dc26b;">Fly backward: Retroceder 100 cm.</span><br /><span style="color: #2dc26b;">Fly left: Moverse lateralmente a la izquierda 100 cm para volver al punto inicial.</span><br /><span style="color: #2dc26b;">Land: Aterrizar.</span><br /></p>
+<hr />
+<p><strong><span style="color: #2dc26b;">Ejercicio 3: El Escáner 360</span></strong><br /><span style="color: #2dc26b;">Figura imaginaria: Una cruz con un giro completo en el centro.</span></p>
+<p><span style="color: #2dc26b;">Objetivo: Introducir el concepto de Yaw (rotar sobre el propio eje).</span></p>
+<p><span style="color: #2dc26b;">Takeoff: Despegar el dron.</span><br /><span style="color: #2dc26b;">Fly forward: Avanzar 100 cm.</span><br /><span style="color: #2dc26b;">Fly backward: Retroceder 50 cm (quedar en el centro de la línea).</span><br /><span style="color: #2dc26b;">Yaw right: Rotar 360 grados hacia la derecha para observar todo el entorno.</span><br /><span style="color: #2dc26b;">Fly backward: Retroceder los 50 cm restantes.</span><br /><span style="color: #2dc26b;">Land: Aterrizar.</span><br /></p>
+<hr />
+<p><strong><span style="color: #2dc26b;">Ejercicio 4: La Escalera Mecánica</span></strong><br /><span style="color: #2dc26b;">Figura imaginaria: Una escalera que sube peldaño a peldaño.</span></p>
+<p><span style="color: #2dc26b;">Objetivo: Utilizar el bloque Repeat para optimizar el código.</span></p>
+<p><span style="color: #2dc26b;">Takeoff: Despegar el dron.</span><br /><span style="color: #2dc26b;">Repeat 3 times: (Repetir 3 veces lo siguiente)</span><br /><span style="color: #2dc26b;">Fly up: Subir 40 cm.</span><br /><span style="color: #2dc26b;">Fly forward: Avanzar 40 cm.</span><br /><span style="color: #2dc26b;">Fly down: Bajar 120 cm (para compensar la altura subida).</span><br /><span style="color: #2dc26b;">Land: Aterrizar.</span></p>
+<hr />
+<p><strong><span style="color: #2dc26b;">Ejercicio 5: El Cubo Espiral</span></strong><br /><span style="color: #2dc26b;">Figura imaginaria: Un cuadrado que se dibuja mientras el dron va subiendo de nivel.</span></p>
+<p><span style="color: #2dc26b;">Objetivo: Combinar bucles con rotación y ascenso.</span></p>
+<p><span style="color: #2dc26b;">Takeoff: Despegar el dron.</span><br /><span style="color: #2dc26b;">Repeat 4 times: (Repetir 4 veces para cerrar el perímetro)</span><br /><span style="color: #2dc26b;">Fly forward: Avanzar 80 cm.</span><br /><span style="color: #2dc26b;">Yaw right: Rotar 90 grados a la derecha.</span><br /><span style="color: #2dc26b;">Fly up: Subir 30 cm en cada esquina.</span><br /><span style="color: #2dc26b;">Fly down: Bajar 120 cm.</span><br /><span style="color: #2dc26b;">Land: Aterrizar.</span><br /><span style="color: #2dc26b;"> </span><br /><strong><span style="color: #3598db;">Desafíos de Práctica (Sin solución)</span></strong><br /><span style="color: #3598db;">Aquí tienes tres retos para aplicar lo aprendido. Piensa qué bloques necesitas antes de empezar a programar.</span></p>
+<p><strong><span style="color: #3598db;">Desafío 1: El Reloj de Arena</span></strong></p>
+<p><span style="color: #3598db;">Dibuja en el aire dos triángulos que se toquen en un punto central. Deberás usar movimientos hacia adelante, atrás y laterales (left/right) para trazar las diagonales.</span></p>
+<p><strong><span style="color: #3598db;">Desafío 2: La Torre de Control</span></strong></p>
+<p><span style="color: #3598db;">El dron debe subir a 150 cm. Una vez allí, debe realizar 4 giros de Yaw left de 90 grados cada uno, pero entre cada giro, el dron debe hacer un pequeño movimiento de Fly forward y Fly backward para "saludar" en cada dirección.</span></p>
+<p><strong><span style="color: #3598db;">Desafío 3: El Laberinto en "U"</span></strong></p>
+<p><span style="color: #3598db;">Imagina un pasillo en forma de letra "U". El dron debe avanzar, girar para entrar al fondo del pasillo, avanzar lateralmente y luego girar de nuevo para salir. Utiliza el bloque Repeat si encuentras movimientos que se parecen. Establece en el vuelo el tamaño del pasillo según tus condiciones de salón. Opcional, puedes delimitar ese “pasillo en U” con bancos.</span></p>
+<p><span style="color: #3598db;">Desafío 4: El Laberinto en "zig zag"</span></p>
+<p><span style="color: #3598db;">Imagina un pasillo en forma de “zig zag”. El dron debe avanzar, girar para llegar al fondo del pasillo. Se cosndiera cumplido al llegar al final del pasillo y se aterriza. Utiliza el bloque Repeat si encuentras movimientos que se parecen. Establece en el vuelo el tamaño del pasillo según tus condiciones de salón. </span></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1778010623291-zufhhjuwp","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p>Algunos desafíos<span style=\"color: #2dc26b;\"> </span><span style=\"color: #3598db;\"><strong><span style=\"color: #2dc26b;\">en verde para practicar</span></strong> </span>con solución para copiar y comprobar...  <span style=\"color: #3598db;\"><strong>Luego ejercicios sin resolución en azul.</strong></span></p>\n<p><span style=\"color: #2dc26b;\"><strong>Ejercicio 1: El Portal Invisible</strong></span><br /><span style=\"color: #2dc26b;\">Figura imaginaria: Un rectángulo vertical (subir y bajar en el mismo sitio).</span></p>\n<p><span style=\"color: #2dc26b;\">Objetivo: Aprender a controlar la altitud y la distancia frontal.</span></p>\n<p><span style=\"color: #2dc26b;\">Takeoff: Despegar el dron.</span><br /><span style=\"color: #2dc26b;\">Fly up: Subir 50 cm para alcanzar la altura de los ojos.</span><br /><span style=\"color: #2dc26b;\">Fly forward: Avanzar 100 cm para atravesar el \"portal\".</span><br /><span style=\"color: #2dc26b;\">Fly down: Bajar 50 cm para estabilizarse.</span><br /><span style=\"color: #2dc26b;\">Land: Aterrizar.</span><br /></p>\n<hr />\n<p><span style=\"color: #2dc26b;\"><strong>Ejercicio 2: El Cuadrado de Precisión</strong></span><br /><span style=\"color: #2dc26b;\">Figura imaginaria: Un cuadrado perfecto en el plano horizontal sin rotar el dron.</span></p>\n<p><span style=\"color: #2dc26b;\">Objetivo: Utilizar movimientos laterales (traslación).</span></p>\n<p><span style=\"color: #2dc26b;\">Takeoff: Despegar el dron.</span><br /><span style=\"color: #2dc26b;\">Fly forward: Avanzar 100 cm.</span><br /><span style=\"color: #2dc26b;\">Fly right: Moverse lateralmente a la derecha 100 cm.</span><br /><span style=\"color: #2dc26b;\">Fly backward: Retroceder 100 cm.</span><br /><span style=\"color: #2dc26b;\">Fly left: Moverse lateralmente a la izquierda 100 cm para volver al punto inicial.</span><br /><span style=\"color: #2dc26b;\">Land: Aterrizar.</span><br /></p>\n<hr />\n<p><strong><span style=\"color: #2dc26b;\">Ejercicio 3: El Escáner 360</span></strong><br /><span style=\"color: #2dc26b;\">Figura imaginaria: Una cruz con un giro completo en el centro.</span></p>\n<p><span style=\"color: #2dc26b;\">Objetivo: Introducir el concepto de Yaw (rotar sobre el propio eje).</span></p>\n<p><span style=\"color: #2dc26b;\">Takeoff: Despegar el dron.</span><br /><span style=\"color: #2dc26b;\">Fly forward: Avanzar 100 cm.</span><br /><span style=\"color: #2dc26b;\">Fly backward: Retroceder 50 cm (quedar en el centro de la línea).</span><br /><span style=\"color: #2dc26b;\">Yaw right: Rotar 360 grados hacia la derecha para observar todo el entorno.</span><br /><span style=\"color: #2dc26b;\">Fly backward: Retroceder los 50 cm restantes.</span><br /><span style=\"color: #2dc26b;\">Land: Aterrizar.</span><br /></p>\n<hr />\n<p><strong><span style=\"color: #2dc26b;\">Ejercicio 4: La Escalera Mecánica</span></strong><br /><span style=\"color: #2dc26b;\">Figura imaginaria: Una escalera que sube peldaño a peldaño.</span></p>\n<p><span style=\"color: #2dc26b;\">Objetivo: Utilizar el bloque Repeat para optimizar el código.</span></p>\n<p><span style=\"color: #2dc26b;\">Takeoff: Despegar el dron.</span><br /><span style=\"color: #2dc26b;\">Repeat 3 times: (Repetir 3 veces lo siguiente)</span><br /><span style=\"color: #2dc26b;\">Fly up: Subir 40 cm.</span><br /><span style=\"color: #2dc26b;\">Fly forward: Avanzar 40 cm.</span><br /><span style=\"color: #2dc26b;\">Fly down: Bajar 120 cm (para compensar la altura subida).</span><br /><span style=\"color: #2dc26b;\">Land: Aterrizar.</span></p>\n<hr />\n<p><strong><span style=\"color: #2dc26b;\">Ejercicio 5: El Cubo Espiral</span></strong><br /><span style=\"color: #2dc26b;\">Figura imaginaria: Un cuadrado que se dibuja mientras el dron va subiendo de nivel.</span></p>\n<p><span style=\"color: #2dc26b;\">Objetivo: Combinar bucles con rotación y ascenso.</span></p>\n<p><span style=\"color: #2dc26b;\">Takeoff: Despegar el dron.</span><br /><span style=\"color: #2dc26b;\">Repeat 4 times: (Repetir 4 veces para cerrar el perímetro)</span><br /><span style=\"color: #2dc26b;\">Fly forward: Avanzar 80 cm.</span><br /><span style=\"color: #2dc26b;\">Yaw right: Rotar 90 grados a la derecha.</span><br /><span style=\"color: #2dc26b;\">Fly up: Subir 30 cm en cada esquina.</span><br /><span style=\"color: #2dc26b;\">Fly down: Bajar 120 cm.</span><br /><span style=\"color: #2dc26b;\">Land: Aterrizar.</span><br /><span style=\"color: #2dc26b;\"> </span><br /><strong><span style=\"color: #3598db;\">Desafíos de Práctica (Sin solución)</span></strong><br /><span style=\"color: #3598db;\">Aquí tienes tres retos para aplicar lo aprendido. Piensa qué bloques necesitas antes de empezar a programar.</span></p>\n<p><strong><span style=\"color: #3598db;\">Desafío 1: El Reloj de Arena</span></strong></p>\n<p><span style=\"color: #3598db;\">Dibuja en el aire dos triángulos que se toquen en un punto central. Deberás usar movimientos hacia adelante, atrás y laterales (left/right) para trazar las diagonales.</span></p>\n<p><strong><span style=\"color: #3598db;\">Desafío 2: La Torre de Control</span></strong></p>\n<p><span style=\"color: #3598db;\">El dron debe subir a 150 cm. Una vez allí, debe realizar 4 giros de Yaw left de 90 grados cada uno, pero entre cada giro, el dron debe hacer un pequeño movimiento de Fly forward y Fly backward para \"saludar\" en cada dirección.</span></p>\n<p><strong><span style=\"color: #3598db;\">Desafío 3: El Laberinto en \"U\"</span></strong></p>\n<p><span style=\"color: #3598db;\">Imagina un pasillo en forma de letra \"U\". El dron debe avanzar, girar para entrar al fondo del pasillo, avanzar lateralmente y luego girar de nuevo para salir. Utiliza el bloque Repeat si encuentras movimientos que se parecen. Establece en el vuelo el tamaño del pasillo según tus condiciones de salón. Opcional, puedes delimitar ese “pasillo en U” con bancos.</span></p>\n<p><span style=\"color: #3598db;\">Desafío 4: El Laberinto en \"zig zag\"</span></p>\n<p><span style=\"color: #3598db;\">Imagina un pasillo en forma de “zig zag”. El dron debe avanzar, girar para llegar al fondo del pasillo. Se cosndiera cumplido al llegar al final del pasillo y se aterriza. Utiliza el bloque Repeat si encuentras movimientos que se parecen. Establece en el vuelo el tamaño del pasillo según tus condiciones de salón. </span></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycja-o5okcwmag</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>Fuentes - Licencia - Créditos</pageName>
+  <odeNavStructureOrder>5</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Fuentes - Licencia - Créditos</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Fuentes - Licencia - Créditos</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value></value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycja-o5okcwmag</odePageId>
+      <odeBlockId>block-1778012470766-xo9zo5arl</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycja-o5okcwmag</odePageId>
+          <odeBlockId>block-1778012470766-xo9zo5arl</odeBlockId>
+          <odeIdeviceId>idevice-1778012470759-zgfr2wb1s</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p>Pendiente</p>
+<p>citar ilustraciones generadas con Gemini</p>
+<p>citar materiales generados/adaptados de manuales online de Codrone</p>
+<p>citar materiales generados con asistencia de Gemini y posteriormente revisados/editados por el autor.</p>
+<p></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1778012470759-zgfr2wb1s","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p>Pendiente</p>\n<p>citar ilustraciones generadas con Gemini</p>\n<p>citar materiales generados/adaptados de manuales online de Codrone</p>\n<p>citar materiales generados con asistencia de Gemini y posteriormente revisados/editados por el autor.</p>\n<p></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+<odeNavStructure>
+  <odePageId>page-mp6xycjb-rll4jiq2m</odePageId>
+  <odeParentPageId></odeParentPageId>
+  <pageName>Ficha</pageName>
+  <odeNavStructureOrder>6</odeNavStructureOrder>
+  <odeNavStructureProperties>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Ficha</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>visibility</key>
+      <value>true</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>highlight</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>hidePageTitle</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>editableInPage</key>
+      <value>false</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titlePage</key>
+      <value>Ficha</value>
+    </odeNavStructureProperty>
+    <odeNavStructureProperty>
+      <key>titleNode</key>
+      <value></value>
+    </odeNavStructureProperty>
+  </odeNavStructureProperties>
+  <odePagStructures>
+    <odePagStructure>
+      <odePageId>page-mp6xycjb-rll4jiq2m</odePageId>
+      <odeBlockId>block-1778012815240-rq4c31wpb</odeBlockId>
+      <blockName></blockName>
+      <iconName></iconName>
+      <odePagStructureOrder>1</odePagStructureOrder>
+      <odePagStructureProperties>
+        <odePagStructureProperty>
+          <key>visibility</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>teacherOnly</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>allowToggle</key>
+          <value>true</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>minimized</key>
+          <value>false</value>
+        </odePagStructureProperty>
+        <odePagStructureProperty>
+          <key>cssClass</key>
+          <value></value>
+        </odePagStructureProperty>
+      </odePagStructureProperties>
+      <odeComponents>
+        <odeComponent>
+          <odePageId>page-mp6xycjb-rll4jiq2m</odePageId>
+          <odeBlockId>block-1778012815240-rq4c31wpb</odeBlockId>
+          <odeIdeviceId>idevice-1778012815232-qes7jmdnh</odeIdeviceId>
+          <odeIdeviceTypeName>text</odeIdeviceTypeName>
+          <htmlView><![CDATA[<div class="exe-text-template">
+    <p><strong>Título</strong><br />Drones educativos ¡...al vuelo!: Del código al cielo tridimensional.</p>
+<p><strong>Descripción</strong><br />Esta propuesta pedagógica introduce a los estudiantes en el mundo de la robótica aérea y la programación física. A través de la transición del entorno virtual al mundo real, los alumnos aprenden a controlar drones educativos (como DJI Tello y CoDrone EDU) mediante lenguajes de bloques. El contenido abarca desde los fundamentos del pensamiento computacional y la geometría en el espacio (ejes X, Y, Z), hasta protocolos de seguridad, mantenimiento de hardware y la resolución de problemas mediante el ensayo y error (debugging).</p>
+<p><strong>Metas de aprendizaje</strong></p>
+<ul>
+<li>Comprender y aplicar la lógica de programación (algoritmos, bucles y secuencias) para automatizar el movimiento de un objeto en el mundo físico.</li>
+<li>Dominar conceptos espaciales tridimensionales, identificando los ejes de traslación, altura y rotación (Yaw).</li>
+<li>Desarrollar el pensamiento computacional a través de la descomposición de trayectorias complejas en instrucciones simples y la depuración de errores en tiempo real.</li>
+<li>Fomentar la cultura maker (al confeccionar pistas y desafíos) y la responsabilidad, integrando normas de seguridad, cuidado del equipo y mantenimiento técnico de los dispositivos.</li>
+<li>Resolver desafíos geométricos y logísticos diseñando misiones de vuelo autónomas.<br /></li>
+</ul>
+<p><br /></p>
+<p><strong>Palabras clave</strong><br />Drones Educativos<br />Programación por bloques (Blockly/DroneBlocks)<br />Pensamiento Computacional<br />Geometría Espacial<br />Robótica<br />Seguridad Aeronáutica Escolar<br />Debugging (Depuración)<br /></p>
+<p><strong>Nivel educativo / Edad</strong></p>
+<p>Nivel: Educación Primaria (Segundo Ciclo) y Educación Media Básica.<br />Edad recomendada: De 10 a 14 años.<br /></p>
+<p><strong>Área</strong></p>
+<p>Área de Tecnologías y Ciencias de la Computación.<br />Área STEM (Ciencia, Tecnología, Ingeniería y Matemáticas).<br /></p>
+<p>Unidad curricular<br /></p>
+<ul>
+<li>Ciencias computacionales</li>
+<li>Pensamiento Computacional y Programación.<br />Robótica.</li>
+<li>Ciencias Físicas / Geometría (vínculo interdisciplinar con el espacio tridimensional)</li>
+</ul>
+<p>Autor: Daniel Gastelú</p>
+<ul>
+<li>La revisión, adaptación, remix y producción de los contenidos del presente recurso son de exclusiva responsabilidad del o los autores.</li>
+<li>Se ha utilizado IA generativa para texto e imágenes (gemini) y herramienta de síntesis de voz (eleven Labs) para la producción de este contenido.</li>
+</ul>
+<hr />
+<p></p>
+</div>]]></htmlView>
+          <jsonProperties><![CDATA[{"ideviceId":"idevice-1778012815232-qes7jmdnh","textInfoDurationInput":"","textInfoDurationTextInput":"Duración","textInfoParticipantsInput":"","textInfoParticipantsTextInput":"Agrupamiento","textTextarea":"<p><strong>Título</strong><br />Drones educativos ¡...al vuelo!: Del código al cielo tridimensional.</p>\n<p><strong>Descripción</strong><br />Esta propuesta pedagógica introduce a los estudiantes en el mundo de la robótica aérea y la programación física. A través de la transición del entorno virtual al mundo real, los alumnos aprenden a controlar drones educativos (como DJI Tello y CoDrone EDU) mediante lenguajes de bloques. El contenido abarca desde los fundamentos del pensamiento computacional y la geometría en el espacio (ejes X, Y, Z), hasta protocolos de seguridad, mantenimiento de hardware y la resolución de problemas mediante el ensayo y error (debugging).</p>\n<p><strong>Metas de aprendizaje</strong></p>\n<ul>\n<li>Comprender y aplicar la lógica de programación (algoritmos, bucles y secuencias) para automatizar el movimiento de un objeto en el mundo físico.</li>\n<li>Dominar conceptos espaciales tridimensionales, identificando los ejes de traslación, altura y rotación (Yaw).</li>\n<li>Desarrollar el pensamiento computacional a través de la descomposición de trayectorias complejas en instrucciones simples y la depuración de errores en tiempo real.</li>\n<li>Fomentar la cultura maker (al confeccionar pistas y desafíos) y la responsabilidad, integrando normas de seguridad, cuidado del equipo y mantenimiento técnico de los dispositivos.</li>\n<li>Resolver desafíos geométricos y logísticos diseñando misiones de vuelo autónomas.<br /></li>\n</ul>\n<p><br /></p>\n<p><strong>Palabras clave</strong><br />Drones Educativos<br />Programación por bloques (Blockly/DroneBlocks)<br />Pensamiento Computacional<br />Geometría Espacial<br />Robótica<br />Seguridad Aeronáutica Escolar<br />Debugging (Depuración)<br /></p>\n<p><strong>Nivel educativo / Edad</strong></p>\n<p>Nivel: Educación Primaria (Segundo Ciclo) y Educación Media Básica.<br />Edad recomendada: De 10 a 14 años.<br /></p>\n<p><strong>Área</strong></p>\n<p>Área de Tecnologías y Ciencias de la Computación.<br />Área STEM (Ciencia, Tecnología, Ingeniería y Matemáticas).<br /></p>\n<p>Unidad curricular<br /></p>\n<ul>\n<li>Ciencias computacionales</li>\n<li>Pensamiento Computacional y Programación.<br />Robótica.</li>\n<li>Ciencias Físicas / Geometría (vínculo interdisciplinar con el espacio tridimensional)</li>\n</ul>\n<p>Autor: Daniel Gastelú</p>\n<ul>\n<li>La revisión, adaptación, remix y producción de los contenidos del presente recurso son de exclusiva responsabilidad del o los autores.</li>\n<li>Se ha utilizado IA generativa para texto e imágenes (gemini) y herramienta de síntesis de voz (eleven Labs) para la producción de este contenido.</li>\n</ul>\n<hr />\n<p></p>","textFeedbackInput":"Mostrar retroalimentación","textFeedbackTextarea":""}]]></jsonProperties>
+          <odeComponentsOrder>0</odeComponentsOrder>
+          <odeComponentsProperties>
+            <odeComponentsProperty>
+              <key>visibility</key>
+              <value>true</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>teacherOnly</key>
+              <value>false</value>
+            </odeComponentsProperty>
+            <odeComponentsProperty>
+              <key>cssClass</key>
+              <value></value>
+            </odeComponentsProperty>
+          </odeComponentsProperties>
+        </odeComponent>
+      </odeComponents>
+    </odePagStructure>
+  </odePagStructures>
+</odeNavStructure>
+</odeNavStructures>
+</ode>
