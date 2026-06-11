@@ -171,37 +171,34 @@
                 </div>
             </div>
 
-            <!-- Gráfico visual: Representación artística e interactiva de un Exoplaneta -->
+            <!-- Gráfico visual: Imagen de Kepler-186f (Adaptativa y con pie de foto personalizado) -->
             <div class="relative flex justify-center">
-                <div class="relative w-full max-w-md h-[400px] glass-panel rounded-3xl overflow-hidden flex flex-col justify-between p-6 group">
-                    <!-- Efecto hover de fondo -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-neon-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                    <!-- Representación del Planeta (SVG interactivo) -->
-                    <div class="relative w-full h-48 flex items-center justify-center my-auto">
-                        <!-- Estrella lejana -->
-                        <div class="absolute top-4 right-12 w-8 h-8 rounded-full bg-yellow-200 blur-[2px] shadow-[0_0_15px_rgba(253,224,71,0.6)] animate-pulse"></div>
-                        <!-- Planeta -->
-                        <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-slate-950 via-indigo-950 to-cyan-500 relative shadow-2xl ring-2 ring-cyan-400/20 group-hover:scale-105 transition-transform duration-500">
-                            <!-- Anillos del planeta -->
-                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[15px] border-t-2 border-b-2 border-cyan-400/30 rounded-full rotate-[15deg]"></div>
-                            <!-- Brillo atmosférico -->
-                            <div class="absolute inset-0 rounded-full shadow-[inset_-10px_-10px_20px_rgba(6,182,212,0.6)]"></div>
-                        </div>
+                <div class="relative w-full max-w-md glass-panel rounded-3xl overflow-hidden flex flex-col p-6 group transition-all duration-300 hover:border-neon-cyan/40">
+                    <!-- Contenedor de la Imagen con Aspect Ratio controlado -->
+                    <div class="relative w-full h-56 rounded-2xl overflow-hidden mb-4 border border-slate-800 bg-space-deep flex items-center justify-center">
+                        <img 
+                            src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Kepler186f-ComparisonGraphic-20140417.jpg" 
+                            alt="Comparación del sistema Kepler-186f con el de la Tierra" 
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop&q=60';"
+                        />
                     </div>
 
-                    <!-- Datos interactivos en hover -->
-                    <div class="z-10">
-                        <div class="flex justify-between items-end">
+                    <!-- Datos informativos -->
+                    <div class="z-10 flex flex-col justify-between flex-grow">
+                        <div class="flex justify-between items-start">
                             <div>
                                 <span class="text-xs font-semibold bg-neon-cyan/20 text-neon-cyan px-2.5 py-1 rounded-full uppercase">Tipo: Supertierra</span>
                                 <h3 class="text-xl font-bold mt-2 text-white">Kepler-186f</h3>
                             </div>
-                            <span class="text-xs text-slate-400 italic">Ilustración interactiva</span>
                         </div>
-                        <p class="text-xs text-slate-300 mt-3 line-clamp-2 group-hover:line-clamp-none transition-all">
-                            Fue el primer planeta de tamaño similar a la Tierra descubierto en la "zona habitable" de otra estrella. Podría tener agua líquida en su superficie.
+                        <p class="text-xs text-slate-300 mt-3 mb-4 leading-relaxed">
+                            Fue el primer planeta de tamaño similar a la Tierra descubierto en la "zona habitable" de otra estrella. Podría tener agua líquida en su superficie y un ecosistema templado.
                         </p>
+                        <!-- Pie de foto requerido -->
+                        <div class="pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 italic">
+                            Comparación de sistema solar con sistema Kepler
+                        </div>
                     </div>
                 </div>
             </div>
@@ -271,7 +268,7 @@
         </div>
     </section>
 
-    <!-- Sección 3: Simulador Interactivo (Core Component) -->
+    <!-- Sección 3: Simulador Interactivo -->
     <section id="simulador" class="py-20 px-6 max-w-7xl mx-auto">
         <div class="text-center max-w-3xl mx-auto mb-12">
             <div class="inline-block bg-neon-cyan/15 text-neon-cyan text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-2">¡Pruébalo tú mismo!</div>
@@ -293,7 +290,7 @@
                         </span>
                         <div class="flex gap-2">
                             <button id="btn-play" class="bg-neon-cyan hover:bg-neon-cyan/80 text-space-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all">
-                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Pausar
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19h2V5H9v14zm4-14v14h2V5h-2z"/></svg> Pausar
                             </button>
                             <button id="btn-reset" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition-all">
                                 Reiniciar
@@ -304,7 +301,6 @@
                     <!-- Lienzo de Simulación (Canvas) -->
                     <div class="relative bg-space-deep border border-slate-800 rounded-2xl overflow-hidden aspect-[2/1] min-h-[220px] md:min-h-[340px] flex items-center justify-center">
                         <canvas id="canvas-simulation" class="w-full h-full block"></canvas>
-                        <!-- Indicador de zona habitable visual en el fondo (Opcional por JS) -->
                     </div>
                 </div>
 
@@ -366,7 +362,6 @@
                 <div class="glass-panel rounded-3xl p-6 bg-gradient-to-br from-indigo-950/40 to-space-950 border border-indigo-500/20">
                     <h4 class="text-sm font-bold text-neon-blue uppercase tracking-widest mb-2">Lectura de Datos</h4>
                     <div id="telemetry-info" class="space-y-2 text-xs text-slate-300">
-                        <!-- Rellenado dinámicamente por JS -->
                         <p>🪐 <strong>Exoplaneta:</strong> Detectado en tránsito...</p>
                         <p>📉 <strong>Profundidad de caída:</strong> <span class="text-neon-cyan font-semibold" id="telemetry-dip">0.00%</span></p>
                         <p>⏱️ <strong>Duración del Año:</strong> <span class="text-neon-purple font-semibold" id="telemetry-year">---</span></p>
@@ -380,7 +375,7 @@
         </div>
     </section>
 
-    <!-- Sección 4: Los Cazadores de Mundos (Telescopios) -->
+    <!-- Sección 4: Los Cazadores de Mundos (Telescopios con imágenes de referencia) -->
     <section class="py-24 px-6 bg-space-900/50 border-t border-slate-800">
         <div class="max-w-7xl mx-auto">
             <div class="text-center max-w-2xl mx-auto mb-16">
@@ -391,12 +386,20 @@
                 </p>
             </div>
 
-            <!-- Grid de Telescopios -->
+            <!-- Grid de Telescopios con imágenes ilustradas -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Kepler -->
-                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between">
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between overflow-hidden">
                     <div>
-                        <div class="w-12 h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center text-neon-cyan font-bold text-lg mb-6">K</div>
+                        <!-- Imagen de la nave Kepler -->
+                        <div class="w-full h-44 rounded-xl overflow-hidden mb-5 border border-slate-800 bg-slate-950 relative">
+                            <img 
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Kepler_spacecraft_artist_render_%28crop%29.jpg/960px-Kepler_spacecraft_artist_render_%28crop%29.jpg" 
+                                alt="Representación artística del Telescopio Kepler en órbita" 
+                                class="w-full h-full object-cover"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=60';"
+                            />
+                        </div>
                         <h3 class="text-xl font-bold mb-3 text-white">Telescopio Kepler</h3>
                         <p class="text-sm text-slate-300 leading-relaxed mb-4">
                             Lanzado por la NASA en 2009. Fue el pionero absoluto. Observó un parche fijo de más de 150,000 estrellas sin pestañear durante años.
@@ -409,9 +412,17 @@
                 </div>
 
                 <!-- TESS -->
-                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between">
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between overflow-hidden">
                     <div>
-                        <div class="w-12 h-12 rounded-xl bg-neon-blue/20 flex items-center justify-center text-neon-blue font-bold text-lg mb-6">T</div>
+                        <!-- Imagen de la nave TESS -->
+                        <div class="w-full h-44 rounded-xl overflow-hidden mb-5 border border-slate-800 bg-slate-950 relative">
+                            <img 
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Transiting_Exoplanet_Survey_Satellite_artist_concept_%28transparent_background%29.png/960px-Transiting_Exoplanet_Survey_Satellite_artist_concept_%28transparent_background%29.png" 
+                                alt="Concepto artístico del satélite TESS de la NASA" 
+                                class="w-full h-full object-cover"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=400&auto=format&fit=crop&q=60';"
+                            />
+                        </div>
                         <h3 class="text-xl font-bold mb-3 text-white">TESS (NASA)</h3>
                         <p class="text-sm text-slate-300 leading-relaxed mb-4">
                             Lanzado en 2018, es el sucesor de Kepler. A diferencia de este, escanea casi <strong class="text-white">todo el cielo nocturno</strong> buscando planetas en las estrellas más cercanas y brillantes a nosotros.
@@ -424,9 +435,17 @@
                 </div>
 
                 <!-- James Webb -->
-                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between">
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between overflow-hidden">
                     <div>
-                        <div class="w-12 h-12 rounded-xl bg-neon-gold/20 flex items-center justify-center text-neon-gold font-bold text-lg mb-6">W</div>
+                        <!-- Imagen de la nave James Webb -->
+                        <div class="w-full h-44 rounded-xl overflow-hidden mb-5 border border-slate-800 bg-slate-950 relative">
+                            <img 
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/James_Webb_Space_Telescope.jpg/960px-James_Webb_Space_Telescope.jpg" 
+                                alt="El Telescopio Espacial James Webb plegado en el espacio" 
+                                class="w-full h-full object-cover"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=400&auto=format&fit=crop&q=60';"
+                            />
+                        </div>
                         <h3 class="text-xl font-bold mb-3 text-white">James Webb (JWST)</h3>
                         <p class="text-sm text-slate-300 leading-relaxed mb-4">
                             El telescopio espacial más potente de la historia. No solo busca tránsitos, sino que puede "oler" la atmósfera de los exoplanetas analizando la luz filtrada a través de ella.
@@ -607,7 +626,7 @@
                 </button>
             </div>
 
-            <!-- Contenedor de preguntas (Oculto inicialmente) -->
+            <!-- Contenedor de preguntas -->
             <div id="quiz-container" class="hidden mt-6">
                 <div class="flex justify-between text-xs font-bold text-slate-400 mb-4">
                     <span id="quiz-progress">Pregunta 1 de 3</span>
@@ -726,13 +745,11 @@
 
         // Variables de animación
         let planetX = -50;
-        let orbitRadiusY = 0; // Ángulo de paso (plano del tránsito)
         let chartData = [];
         const maxChartPoints = 180;
 
         // Inicializar tamaño del Canvas de manera responsive
         function resizeCanvases() {
-            // Mantener proporciones lógicas aunque el estilo sea responsive por CSS
             canvasSim.width = canvasSim.parentElement.clientWidth;
             canvasSim.height = canvasSim.parentElement.clientHeight;
             canvasChart.width = canvasChart.parentElement.clientWidth;
@@ -795,25 +812,21 @@
         // Bucle de Animación Principal
         function updateAndDraw() {
             if (isPlaying) {
-                // Mover planeta horizontalmente de izquierda a derecha
                 planetX += orbitSpeed * 1.5;
                 if (planetX > canvasSim.width + 50) {
-                    planetX = -50; // Reiniciar órbita
+                    planetX = -50;
                 }
             }
 
-            // --- 1. DIBUJAR EN EL CANVAS DE SIMULACIÓN ---
             ctxSim.clearRect(0, 0, canvasSim.width, canvasSim.height);
 
             const star = getStarConfig();
             const starX = canvasSim.width / 2;
             const starY = canvasSim.height / 2;
 
-            // Dibujar fondo del espacio dentro del canvas
             ctxSim.fillStyle = '#05050d';
             ctxSim.fillRect(0, 0, canvasSim.width, canvasSim.height);
 
-            // Estrellas fijas en el simulador
             ctxSim.fillStyle = 'rgba(255, 255, 255, 0.3)';
             for (let i = 0; i < 25; i++) {
                 let sX = (i * 97) % canvasSim.width;
@@ -821,7 +834,6 @@
                 ctxSim.fillRect(sX, sY, 1.5, 1.5);
             }
 
-            // Dibujar órbita orbital (línea guía)
             ctxSim.strokeStyle = 'rgba(255,255,255,0.06)';
             ctxSim.lineWidth = 1;
             ctxSim.beginPath();
@@ -829,37 +841,27 @@
             ctxSim.lineTo(canvasSim.width, starY);
             ctxSim.stroke();
 
-            // Dibujar Estrella con resplandor
             ctxSim.shadowColor = star.shadow;
             ctxSim.shadowBlur = 30;
             ctxSim.fillStyle = star.color;
             ctxSim.beginPath();
             ctxSim.arc(starX, starY, star.radius, 0, Math.PI * 2);
             ctxSim.fill();
-            ctxSim.shadowBlur = 0; // Resetear sombra para lo siguiente
+            ctxSim.shadowBlur = 0;
 
-            // Calcular solapamiento para ver cuánta luz se bloquea
             let brightness = 100;
-            // Distancia en el eje X entre el planeta y la estrella
             let dist = Math.abs(planetX - starX);
 
-            // El planeta bloquea luz si su distancia es menor que la suma de sus radios
             if (dist < (star.radius + planetSize) && planetX > starX - star.radius && planetX < starX + star.radius) {
-                // Cálculo simple de reducción de luz basado en la porción cubierta
-                // Área del planeta proporcional al área de la estrella
                 let areaRatio = (Math.pow(planetSize, 2) / Math.pow(star.radius, 2)) * 100;
-                
-                // Suavizar la entrada y la salida con una función coseno basada en la distancia
                 let overlapFactor = Math.cos((dist / (star.radius)) * Math.PI / 2);
                 if (overlapFactor < 0) overlapFactor = 0;
 
                 let dip = areaRatio * overlapFactor;
-                // Capamos la caída máxima de brillo para evitar valores imposibles en estrellas pequeñas
                 if (dip > 40) dip = 40; 
                 brightness = 100 - dip;
             }
 
-            // Agregar dato de brillo al array del gráfico de luz
             if (isPlaying) {
                 chartData.push(brightness);
                 if (chartData.length > maxChartPoints) {
@@ -867,23 +869,18 @@
                 }
             }
 
-            // Dibujar el Exoplaneta
-            // Queremos que pase POR DELANTE (tránsito visual)
-            ctxSim.fillStyle = '#090d16'; // Silueta oscura del planeta
-            ctxSim.strokeStyle = 'rgba(6, 182, 212, 0.4)'; // Ligero borde de atmósfera retroiluminada
+            ctxSim.fillStyle = '#090d16';
+            ctxSim.strokeStyle = 'rgba(6, 182, 212, 0.4)';
             ctxSim.lineWidth = 2;
             ctxSim.beginPath();
             ctxSim.arc(planetX, starY, planetSize, 0, Math.PI * 2);
             ctxSim.fill();
             if (planetX > starX - star.radius - planetSize && planetX < starX + star.radius + planetSize) {
-                // Efecto atmósfera iluminada solo cuando transita
                 ctxSim.stroke();
             }
 
-            // --- 2. DIBUJAR EN EL CANVAS DEL GRÁFICO (CURVA DE LUZ) ---
             ctxChart.clearRect(0, 0, canvasChart.width, canvasChart.height);
             
-            // Rejillas guía
             ctxChart.strokeStyle = 'rgba(255,255,255,0.05)';
             ctxChart.lineWidth = 1;
             for(let y = 0; y <= 4; y++) {
@@ -893,24 +890,20 @@
                 ctxChart.lineTo(canvasChart.width, gridY);
                 ctxChart.stroke();
                 
-                // Texto de porcentaje de brillo
                 ctxChart.fillStyle = 'rgba(255,255,255,0.3)';
                 ctxChart.font = '9px Inter';
                 let percentText = (100 - (y * (40 / 4))).toFixed(0) + "%";
                 ctxChart.fillText(percentText, 5, gridY - 2);
             }
 
-            // Dibujar línea del gráfico
             ctxChart.strokeStyle = '#06b6d4';
             ctxChart.lineWidth = 3;
             ctxChart.beginPath();
 
             const stepX = canvasChart.width / maxChartPoints;
             for (let i = 0; i < chartData.length; i++) {
-                // Mapear el brillo (100% - 60%) al eje Y del canvas (ejemplo: 10% a 90% de altura)
                 let val = chartData[i];
-                // Normalizar brillo para que 100% sea arriba y 60% sea abajo
-                let yPercent = (100 - val) / 40; // 0 a 1
+                let yPercent = (100 - val) / 40;
                 let plotY = 10 + yPercent * (canvasChart.height - 20);
                 let plotX = i * stepX;
 
@@ -922,7 +915,6 @@
             }
             ctxChart.stroke();
 
-            // Dibujar indicador vertical rojo de la posición actual de escaneo
             ctxChart.strokeStyle = 'rgba(239, 68, 68, 0.4)';
             ctxChart.lineWidth = 1;
             ctxChart.beginPath();
@@ -930,15 +922,12 @@
             ctxChart.lineTo(canvasChart.width - 2, canvasChart.height);
             ctxChart.stroke();
 
-            // --- 3. ACTUALIZAR PANEL DE TELEMETRÍA ---
             let currentDip = (100 - chartData[chartData.length - 1]).toFixed(2);
             teleDip.textContent = currentDip + "%";
             
-            // Tiempo orbital estimado en base a la velocidad
             let estYear = (365 / orbitSpeed).toFixed(0);
             teleYear.textContent = estYear + " Días Terrestres";
 
-            // Mensaje didáctico de telemetría según los datos
             if (currentDip > 0) {
                 teleStatus.innerHTML = `<span class="text-orange-400">Tránsito Detectado 📉</span>`;
             } else {
@@ -948,7 +937,6 @@
             requestAnimationFrame(updateAndDraw);
         }
 
-        // Lanzar bucle
         updateAndDraw();
 
 
@@ -959,42 +947,37 @@
 
         function updateHabitableZone() {
             const val = parseInt(sliderHabitable.value);
-            // Mover visualmente el planeta
             habitablePlanet.style.left = `${val}px`;
 
-            // Evaluar clima y aplicar estilos a la caja de estado
             if (val < 140) {
-                // Muy caliente
                 habitableStatusBox.className = "mt-6 p-4 rounded-xl text-center text-sm font-semibold bg-red-500/10 border border-red-500/30 text-red-400";
                 habitableStatusBox.innerHTML = `
                     <div class="font-bold text-base mb-1">🔥 ¡Mundo de Lava!</div>
                     <p class="text-xs font-normal text-slate-300">El planeta está tan cerca de la estrella que la temperatura supera los 800°C. El agua líquida hierve al instante. ¡La atmósfera se evapora y no hay posibilidad de vida!</p>
                 `;
-                habitablePlanet.style.backgroundColor = '#ef4444'; // Rojo caliente
+                habitablePlanet.style.backgroundColor = '#ef4444';
                 habitablePlanet.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.7)';
             } else if (val >= 140 && val <= 230) {
-                // Zona Habitable
                 habitableStatusBox.className = "mt-6 p-4 rounded-xl text-center text-sm font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400";
                 habitableStatusBox.innerHTML = `
                     <div class="font-bold text-base mb-1">🌿 ¡Zona Ricitos de Oro Detectada!</div>
                     <p class="text-xs font-normal text-slate-300">¡Felicidades! La distancia es perfecta. El agua líquida puede mantenerse estable en lagos y océanos. Es un excelente candidato para que existan bacterias o plantas exóticas.</p>
                 `;
-                habitablePlanet.style.backgroundColor = '#10b981'; // Verde habitable
+                habitablePlanet.style.backgroundColor = '#10b981';
                 habitablePlanet.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.7)';
             } else {
-                // Muy frío
                 habitableStatusBox.className = "mt-6 p-4 rounded-xl text-center text-sm font-semibold bg-blue-500/10 border border-blue-500/30 text-blue-400";
                 habitableStatusBox.innerHTML = `
                     <div class="font-bold text-base mb-1">❄️ ¡Desierto de Hielo Perpetuo!</div>
                     <p class="text-xs font-normal text-slate-300">Casi no llega radiación ni calor de la estrella. El agua es roca sólida. El planeta está cubierto por un glaciar infinito como una bola de nieve gigante.</p>
                 `;
-                habitablePlanet.style.backgroundColor = '#3b82f6'; // Azul helado
+                habitablePlanet.style.backgroundColor = '#3b82f6';
                 habitablePlanet.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.7)';
             }
         }
 
         sliderHabitable.addEventListener('input', updateHabitableZone);
-        updateHabitableZone(); // Estado inicial
+        updateHabitableZone();
 
 
         // --- CÓDIGO DEL QUIZ INTERACTIVO (TRIVIAL) ---
@@ -1078,7 +1061,6 @@
             const q = quizData[currentQuestionIdx];
             const buttons = quizOptions.querySelectorAll('button');
 
-            // Deshabilitar todas las opciones después de pulsar una
             buttons.forEach((btn, index) => {
                 btn.disabled = true;
                 if (index === q.correct) {
@@ -1088,7 +1070,6 @@
                 }
             });
 
-            // Registrar puntuación
             if (selectedIdx === q.correct) {
                 score++;
                 quizFeedback.className = "mt-6 p-4 rounded-xl text-sm leading-relaxed bg-emerald-500/10 border border-emerald-500/20 text-emerald-300";
