@@ -36,10 +36,6 @@
         .text-shadow-glow {
             text-shadow: 0 0 10px rgba(250, 204, 21, 0.7);
         }
-        /* Ocultar input file nativo */
-        input[type="file"] {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -67,6 +63,9 @@
           const [timer, setTimer] = useState(40);
           const [scores, setScores] = useState({ equipo1: 0, equipo2: 0, equipo3: 0, equipo4: 0 });
 
+          // Estado para el modal de confirmación de salida personalizado (reemplazo de confirm)
+          const [showExitModal, setShowExitModal] = useState(false);
+
           // 1. Generar plantilla Excel para que el usuario la llene
           const handleDownloadTemplate = () => {
               const templateData = [
@@ -86,7 +85,6 @@
               const wsJuego = XLSX.utils.json_to_sheet(templateData);
               const wsConfig = XLSX.utils.json_to_sheet(configData);
               
-              // Ajustar anchos de columna para que se vea mejor
               wsConfig['!cols'] = [{ wch: 25 }, { wch: 30 }];
 
               const wb = XLSX.utils.book_new();
@@ -94,6 +92,37 @@
               XLSX.utils.book_append_sheet(wb, wsConfig, "Configuracion");
               
               XLSX.writeFile(wb, "Plantilla_QuizShow.xlsx");
+          };
+
+          // Iniciar con datos de demostración sobre Astronomía (Playability inmediata)
+          const handleLoadDemo = () => {
+              setErrorMsg('');
+              const demoQuestions = [
+                  { Categoria: "El Sol", Puntos: 100, Pregunta: "¿Qué tipo de objeto celeste es el Sol?", Respuesta: "Una estrella enana amarilla" },
+                  { Categoria: "El Sol", Puntos: 200, Pregunta: "¿Cuál es el gas más abundante en el Sol?", Respuesta: "Hidrógeno (aproximadamente 74%)" },
+                  { Categoria: "El Sol", Puntos: 300, Pregunta: "¿Cuántos minutos tarda la luz solar en llegar a la Tierra?", Respuesta: "Aproximadamente 8 minutos y 20 segundos" },
+                  
+                  { Categoria: "Planetas", Puntos: 100, Pregunta: "¿Cuál es el planeta más grande de nuestro Sistema Solar?", Respuesta: "Júpiter" },
+                  { Categoria: "Planetas", Puntos: 200, Pregunta: "¿Qué planeta tiene el conjunto de anillos más visible y espectacular?", Respuesta: "Saturno" },
+                  { Categoria: "Planetas", Puntos: 300, Pregunta: "¿Cuál es el planeta más cálido del Sistema Solar debido a su denso efecto invernadero?", Respuesta: "Venus" },
+
+                  { Categoria: "La Luna", Puntos: 100, Pregunta: "¿Cuántas fases principales tiene el ciclo lunar?", Respuesta: "4 fases principales (Nueva, Creciente, Llena y Menguante)" },
+                  { Categoria: "La Luna", Puntos: 200, Pregunta: "¿Qué fuerza gravitatoria terrestre provoca la Luna principalmente en los océanos?", Respuesta: "Las mareas" },
+                  { Categoria: "La Luna", Puntos: 300, Pregunta: "¿Cómo se llama el fenómeno cuando la Luna pasa directamente por la sombra de la Tierra?", Respuesta: "Eclipse lunar" },
+
+                  { Categoria: "Cosmología", Puntos: 100, Pregunta: "¿En qué galaxia se encuentra nuestro Sistema Solar?", Respuesta: "La Vía Láctea" },
+                  { Categoria: "Cosmología", Puntos: 200, Pregunta: "¿Cómo se llama la teoría científica más aceptada sobre el origen del universo?", Respuesta: "La teoría del Big Bang" },
+                  { Categoria: "Cosmología", Puntos: 300, Pregunta: "¿Cuál es el exoplaneta rocoso más cercano descubierto a nuestro sistema?", Respuesta: "Próxima Centauri b" }
+              ];
+
+              const demoConfig = {
+                  title: "Quiz de Astronomía",
+                  subtitle: "Demostración Didáctica - Universo Interactivo",
+                  timer: 30
+              };
+
+              // Procesar directamente
+              processExcelData(demoQuestions, demoConfig);
           };
 
           // 2. Leer archivo subido por el usuario
@@ -109,7 +138,6 @@
                       const bstr = evt.target.result;
                       const wb = XLSX.read(bstr, { type: 'binary' });
                       
-                      // Extraer Configuración si existe la hoja
                       let config = { title: "Quiz Show", subtitle: "", timer: 40 };
                       if (wb.SheetNames.includes("Configuracion") || wb.SheetNames.includes("Configuración")) {
                           const sheetName = wb.SheetNames.includes("Configuracion") ? "Configuracion" : "Configuración";
@@ -124,7 +152,6 @@
                           });
                       }
 
-                      // Extraer Preguntas (busca hoja 'Juego' o por defecto usa la primera)
                       const wsJuegoName = wb.SheetNames.includes("Juego") ? "Juego" : wb.SheetNames[0];
                       const wsJuego = wb.Sheets[wsJuegoName];
                       const data = XLSX.utils.sheet_to_json(wsJuego);
@@ -141,16 +168,14 @@
           const processExcelData = (jsonData, config) => {
               let categoriesMap = {};
               let finalQ = null;
-              let hasErrors = false;
 
               jsonData.forEach(row => {
-                  // Flexibilidad en el nombre de las columnas
                   const cat = row.Categoria || row.categoria || row.CATEGORIA;
                   const pts = row.Puntos || row.puntos || row.PUNTOS;
                   const q = row.Pregunta || row.pregunta || row.PREGUNTA;
                   const a = row.Respuesta || row.respuesta || row.RESPUESTA;
 
-                  if (!cat || !pts || !q || !a) return; // Ignorar filas incompletas
+                  if (!cat || !pts || !q || !a) return; 
 
                   if (String(pts).trim().toLowerCase() === 'final') {
                       finalQ = { category: cat, q: q, a: a };
@@ -162,7 +187,6 @@
                   }
               });
 
-              // Convertir el mapa en un Array y ordenar las preguntas por puntos
               const finalGameData = Object.keys(categoriesMap).map(catName => ({
                   category: catName,
                   questions: categoriesMap[catName].sort((a, b) => a.points - b.points)
@@ -173,14 +197,15 @@
                   return;
               }
 
-              // Aplicar configuración leída
               setQuizTitle(config.title || "Quiz Show");
               setQuizSubtitle(config.subtitle || "");
               setDefaultTimer(config.timer || 40);
 
               setGameData(finalGameData);
-              setFinalJeopardy(finalQ || { category: "Pregunta Final", q: "No se definió pregunta final en el Excel.", a: "Sin respuesta." });
+              setFinalJeopardy(finalQ || { category: "Pregunta Final", q: "¿Qué sonda espacial transporta el Disco de Oro con sonidos de la Tierra?", a: "Sonda Voyager" });
               setGameState('playing');
+              setAnsweredState({});
+              setScores({ equipo1: 0, equipo2: 0, equipo3: 0, equipo4: 0 });
           };
 
           useEffect(() => {
@@ -225,6 +250,16 @@
             setScores(prev => ({ ...prev, [team]: prev[team] + amount }));
           };
 
+          // Manejo de salida segura controlada (Reemplazo interactivo del confirm nativo)
+          const triggerExitRequest = () => {
+              setShowExitModal(true);
+          };
+
+          const confirmExitAndReset = () => {
+              setShowExitModal(false);
+              setGameState('menu');
+          };
+
           // Pantalla 1: MENÚ DE CARGA
           if (gameState === 'menu') {
               return (
@@ -239,6 +274,18 @@
                               </h2>
                               
                               <div className="space-y-6">
+                                  {/* Opción Rápida: Demo instantáneo */}
+                                  <div className="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 p-5 rounded-2xl border border-sky-500/30">
+                                      <h3 className="text-lg font-bold mb-1 text-sky-300">¿No tienes un Excel listo?</h3>
+                                      <p className="text-xs text-slate-300 mb-3">Prueba y juega de inmediato con preguntas integradas de Astronomía.</p>
+                                      <button 
+                                          onClick={handleLoadDemo}
+                                          className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-sm rounded-xl shadow-lg transition-transform hover:scale-105"
+                                      >
+                                          ✨ Probar Demo de Astronomía
+                                      </button>
+                                  </div>
+
                                   {/* Paso 1: Plantilla */}
                                   <div className="bg-blue-900/50 p-6 rounded-xl border border-blue-700">
                                       <h3 className="text-xl font-bold mb-2">1. Prepara tus preguntas</h3>
@@ -258,7 +305,7 @@
                                       
                                       <label className="cursor-pointer px-8 py-4 bg-gradient-to-r from-purple-700 to-blue-700 hover:from-purple-600 hover:to-blue-600 font-extrabold text-xl rounded-full shadow-xl border-2 border-purple-400 transition-transform hover:scale-105 inline-block">
                                           🚀 Subir Excel y Jugar
-                                          <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+                                          <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} className="sr-only" />
                                       </label>
                                   </div>
 
@@ -283,7 +330,7 @@
                               src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
                               alt="Logo Uruguay Educa" 
                               className="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-                              onError={(e) => { e.target.style.display = 'none'; }}
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
                             />
                             <span className="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
                               Portal Uruguay Educa (ANEP-DGES) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Preguntas y respuestas responsabilidad de docente aplicador
@@ -297,15 +344,15 @@
           // Pantalla 2: EL JUEGO (Tablero principal)
           const teamKeys = ['equipo1', 'equipo2', 'equipo3', 'equipo4'];
           
-          // Determinar filas basándonos en la categoría con más preguntas
-          const maxQuestions = Math.max(...gameData.map(cat => cat.questions.length));
+          // Determinar filas basándonos en la categoría con más preguntas con validador de seguridad
+          const maxQuestions = gameData.length > 0 ? Math.max(...gameData.map(cat => cat.questions.length)) : 0;
 
           return (
             <div className="min-h-screen font-sans text-white star-bg flex flex-col items-center p-4 select-none">
               {/* HEADER */}
               <header className="text-center my-4 md:my-6 relative w-full">
                 <button 
-                    onClick={() => {if(confirm("¿Seguro que quieres salir? Perderás los puntos.")) setGameState('menu')}}
+                    onClick={triggerExitRequest}
                     className="absolute left-0 top-0 mt-2 ml-4 px-4 py-2 bg-red-900 hover:bg-red-800 text-white font-bold rounded-lg text-sm"
                 >
                     Salir
@@ -324,7 +371,7 @@
               <main className="w-full max-w-[95%] mx-auto flex-grow flex flex-col">
                 <div 
                     className="grid gap-2 bg-blue-950 p-2 rounded-xl border-4 border-blue-800 shadow-2xl"
-                    style={{ gridTemplateColumns: `repeat(${gameData.length}, minmax(0, 1fr))` }}
+                    style={{ gridTemplateColumns: `repeat(${gameData.length || 1}, minmax(0, 1fr))` }}
                 >
                   {/* Categorías */}
                   {gameData.map((cat, i) => (
@@ -351,7 +398,7 @@
                               h-16 md:h-20 lg:h-24 flex items-center justify-center text-2xl md:text-4xl font-extrabold rounded
                               transition-all duration-300
                               ${isAnswered 
-                                ? 'opacity-0 cursor-default' 
+                                ? 'opacity-0 cursor-default pointer-events-none' 
                                 : 'bg-blue-800 text-yellow-400 cursor-pointer hover:bg-blue-600 hover:scale-[1.02] border-2 border-blue-500 shadow-md text-shadow-glow'}
                             `}
                           >
@@ -401,13 +448,40 @@
                       src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
                       alt="Logo Uruguay Educa" 
                       className="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-                      onError={(e) => { e.target.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                     <span className="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
                       Portal Uruguay Educa (ANEP) - Contenidistas de Astronomía 2026 - Herramienta de uso libre
                     </span>
                   </a>
               </footer>
+
+              {/* MODAL DE CONFIRMACIÓN DE SALIDA (Reemplazo accesible de confirm nativo) */}
+              {showExitModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                  <div className="bg-slate-900 border-2 border-red-500 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+                    <span className="text-4xl" aria-hidden="true">⚠️</span>
+                    <h3 className="text-xl font-bold text-white mt-3">¿Seguro que deseas salir?</h3>
+                    <p className="text-sm text-slate-300 mt-2">
+                      Si abandonas el juego actual, perderás todos los puntos acumulados por los equipos.
+                    </p>
+                    <div class="mt-6 flex gap-3 justify-center">
+                      <button 
+                        onClick={confirmExitAndReset}
+                        className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg transition"
+                      >
+                        Sí, Salir
+                      </button>
+                      <button 
+                        onClick={() => setShowExitModal(false)}
+                        className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg transition"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* QUESTION MODAL (Full Screen) */}
               {activeQuestion && (
@@ -429,7 +503,7 @@
                   <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8 max-w-6xl mx-auto w-full relative">
                     <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
                        <div className={`text-6xl md:text-8xl font-mono font-bold drop-shadow-xl transition-colors duration-500 ${
-                          timer === 0 ? 'text-red-500 scale-110' : timer <= 10 ? 'text-orange-400' : 'text-yellow-400'
+                          timer === 0 ? 'text-red-500 scale-110 animate-pulse' : timer <= 10 ? 'text-orange-400' : 'text-yellow-400'
                        }`}>
                           {timer > 0 ? `00:${timer.toString().padStart(2, '0')}` : '¡Time out!'}
                        </div>
