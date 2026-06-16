@@ -332,24 +332,12 @@
         <span id="toast-text" class="text-sm">Notificación</span>
     </div>
 
-    <!-- Pie de Página Estandarizado con Logo -->
-    <footer class="mt-8 mb-4 w-full flex justify-center z-20 px-4">
-        <a 
-          href="https://uruguayeduca.anep.edu.uy/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl w-full px-6 py-4 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
-        >
-          <img 
-            src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
-            alt="Logo Uruguay Educa" 
-            class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-            onerror="this.onerror=null; this.style.display='none';"
-          />
-          <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
-            Portal Uruguay Educa (ANEP-DGES) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Preguntas y respuestas responsabilidad de docente aplicador
-          </span>
-        </a>
+    <!-- Pie de Página -->
+    <footer class="border-t border-slate-900 bg-slate-950 py-4 px-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>(CC) 2026 • Simulador de Fases Lunares para hemisferio sur. Portal Uruguay Educa</p>
+            <p>Diseñado con fines pedagógicos // Lectura Fácil // Con assitencia de Gemini Canva</p>
+        </div>
     </footer>
 
     <script>
@@ -387,6 +375,7 @@
             ctx.fillRect(0, 0, 1024, 512);
 
             // 2. Dibujar continentes simplificados utilizando polígonos orgánicos para realismo visual.
+            // Para dar un aspecto fotorrealista, pintaremos primero playas (arena) y luego el centro verde/marrón.
             ctx.shadowBlur = 0;
 
             function drawContinent(points, beachColor, landColor) {
@@ -662,6 +651,7 @@
         sightLine.computeLineDistances();
         mainScene.add(sightLine);
 
+
         // -------------------------------------------------------------
         // Escena de Primer Plano para ver la Fase del Hemisferio Sur
         // -------------------------------------------------------------
@@ -702,6 +692,7 @@
         // Luz cenicienta tenue en el primer plano
         const phaseAmbient = new THREE.AmbientLight(0x2d3748, 0.15);
         phaseScene.add(phaseAmbient);
+
 
         // -------------------------------------------------------------
         // Datos pedagógicos de las fases lunares
@@ -759,9 +750,13 @@
         // -------------------------------------------------------------
         function updateSimulation() {
             // Calcular el ángulo orbital en radianes a partir de la edad
+            // 0 días = 0 radianes (Luna Nueva, justo frente al sol a la derecha)
+            // 14.77 días = Pi radianes (Luna Llena, opuesta al sol a la izquierda)
             const angle = (moonAge / 29.53) * Math.PI * 2;
 
             // 1. Actualizar posición de la Luna en el simulador espacial
+            // El Sol está a la derecha (+X). La órbita gira en sentido antihorario visto desde el Norte celeste.
+            // Para precisión astronómica le añadimos una inclinación orbital de 5.1 grados respecto a la eclíptica (eje Y)
             const orbitTilt = 0.089; // 5.1 grados en radianes
             moonMesh.position.x = orbitRadius * Math.cos(angle);
             moonMesh.position.z = orbitRadius * Math.sin(angle);
@@ -785,6 +780,11 @@
             }
 
             // 4. Actualizar iluminación del primer plano (Fase en el Sur)
+            // Corregimos la proyección de la luz para la cámara invertida 180° del Hemisferio Sur:
+            // - Día 0 (Luna Nueva): luz desde -Z (detrás de la luna, disco oscuro)
+            // - Día 7.38 (Creciente): luz desde +X (lado izquierdo de la pantalla, forma de "C")
+            // - Día 14.77 (Llena): luz desde +Z (frente a la luna, iluminación 100%)
+            // - Día 22.15 (Menguante): luz desde -X (lado derecho de la pantalla, forma de "D")
             phaseLight.position.set(
                 10 * Math.sin(angle), 
                 0, 
@@ -797,6 +797,8 @@
             moonAgeDisplay.innerText = `Edad: ${moonAge.toFixed(1)} días`;
 
             // Calcular porcentaje de iluminación teórica
+            // 0% en conjunción (0 rad), 100% en oposición (PI rad)
+            // La fórmula de fase es: (1 - cos(angle)) / 2
             const illumPercent = Math.round(((1 - Math.cos(angle)) / 2) * 100);
             moonIlluminationDisplay.innerText = `Iluminación: ${illumPercent}%`;
 
@@ -829,6 +831,7 @@
             phaseRenderer.render(phaseScene, phaseCamera);
         }
 
+
         // -------------------------------------------------------------
         // Controladores de Interacción de la UI y Eventos
         // -------------------------------------------------------------
@@ -846,7 +849,7 @@
             isPlaying = !isPlaying;
             if (isPlaying) {
                 playIcon.className = "fa-solid fa-pause";
-                showToast("Órbita iniciada. Observa el viaje de la Luna al rededor de la Tierra.", "fa-play");
+                showToast("Órbita iniciada. Observa el viaje de la Luna alrededor de la Tierra.", "fa-play");
             } else {
                 playIcon.className = "fa-solid fa-play";
                 showToast("Simulación pausada.", "fa-pause");

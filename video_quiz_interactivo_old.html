@@ -68,131 +68,85 @@
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex flex-col selection:bg-blue-500 selection:text-white">
 
     <!-- PANTALLA DE CONFIGURACIÓN (SETUP) -->
-    <main id="setup-screen" class="min-h-screen flex flex-col justify-between p-4">
-        
-        <!-- Contenido principal de configuración -->
-        <div class="flex-grow flex items-center justify-center w-full my-4">
-            <div class="glass-panel p-8 md:p-12 rounded-3xl w-full max-w-2xl shadow-2xl relative overflow-hidden">
-                <!-- Deco -->
-                <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-blue-500 rounded-full blur-3xl opacity-20"></div>
-                <div class="absolute bottom-[-50px] left-[-50px] w-32 h-32 bg-cyan-500 rounded-full blur-3xl opacity-20"></div>
-                
-                <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-                    Video Quiz Interactivo
-                </h1>
-                <p class="text-slate-300 text-center mb-10 text-lg">
-                    Genera tu plantilla, llénala de preguntas y cárgala para comenzar a jugar.
-                </p>
+    <main id="setup-screen" class="flex-1 flex items-center justify-center p-4">
+        <div class="glass-panel p-8 md:p-12 rounded-3xl w-full max-w-2xl shadow-2xl relative overflow-hidden">
+            <!-- Deco -->
+            <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-blue-500 rounded-full blur-3xl opacity-20"></div>
+            <div class="absolute bottom-[-50px] left-[-50px] w-32 h-32 bg-cyan-500 rounded-full blur-3xl opacity-20"></div>
+            
+            <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+                Video Quiz Interactivo
+            </h1>
+            <p class="text-slate-300 text-center mb-10 text-lg">
+                Genera tu plantilla, llénala de preguntas y cárgala para comenzar a jugar.
+            </p>
 
-                <div class="space-y-6">
-                    <!-- Paso 1 -->
-                    <div class="bg-blue-900/30 p-6 rounded-2xl border border-blue-500/20 transition hover:border-blue-500/50">
-                        <h2 class="text-xl font-bold text-blue-200 mb-2">1. Obtén la plantilla</h2>
-                        <p class="text-sm text-slate-400 mb-4">Descarga el archivo Excel estructurado para añadir tu vídeo y preguntas.</p>
-                        <button onclick="downloadTemplate()" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Descargar Plantilla .xlsx
-                        </button>
-                    </div>
+            <div class="space-y-6">
+                <!-- Paso 1 -->
+                <div class="bg-blue-900/30 p-6 rounded-2xl border border-blue-500/20 transition hover:border-blue-500/50">
+                    <h2 class="text-xl font-bold text-blue-200 mb-2">1. Obtén la plantilla</h2>
+                    <p class="text-sm text-slate-400 mb-4">Descarga el archivo Excel estructurado para añadir tu vídeo y preguntas.</p>
+                    <button onclick="downloadTemplate()" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Descargar Plantilla .xlsx
+                    </button>
+                </div>
 
-                    <!-- Paso 2 -->
-                    <div class="bg-blue-900/30 p-6 rounded-2xl border border-blue-500/20 transition hover:border-blue-500/50">
-                        <h2 class="text-xl font-bold text-blue-200 mb-2">2. Carga tu actividad</h2>
-                        <p class="text-sm text-slate-400 mb-4">Sube el archivo Excel que acabas de completar.</p>
-                        
-                        <div class="relative">
-                            <input type="file" id="excel-file" accept=".xlsx, .xls" class="hidden" onchange="handleFile(event)">
-                            <label for="excel-file" class="w-full flex flex-col items-center justify-center px-4 py-8 bg-black/20 border-2 border-dashed border-blue-400/50 rounded-xl cursor-pointer hover:bg-black/40 hover:border-cyan-400 transition group">
-                                <svg class="w-10 h-10 text-blue-400 group-hover:text-cyan-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                <span class="text-blue-300 font-medium text-lg text-center" id="file-name-display">Haz clic para subir archivo</span>
-                                <span class="text-xs text-slate-500 mt-1">Solo .xlsx</span>
-                            </label>
-                        </div>
+                <!-- Paso 2 -->
+                <div class="bg-blue-900/30 p-6 rounded-2xl border border-blue-500/20 transition hover:border-blue-500/50">
+                    <h2 class="text-xl font-bold text-blue-200 mb-2">2. Carga tu actividad</h2>
+                    <p class="text-sm text-slate-400 mb-4">Sube el archivo Excel que acabas de completar.</p>
+                    
+                    <div class="relative">
+                        <input type="file" id="excel-file" accept=".xlsx, .xls" class="hidden" onchange="handleFile(event)">
+                        <label for="excel-file" class="w-full flex flex-col items-center justify-center px-4 py-8 bg-black/20 border-2 border-dashed border-blue-400/50 rounded-xl cursor-pointer hover:bg-black/40 hover:border-cyan-400 transition group">
+                            <svg class="w-10 h-10 text-blue-400 group-hover:text-cyan-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <span class="text-blue-300 font-medium text-lg text-center" id="file-name-display">Haz clic para subir archivo</span>
+                            <span class="text-xs text-slate-500 mt-1">Solo .xlsx</span>
+                        </label>
                     </div>
+                </div>
 
-                    <!-- Error Message -->
-                    <div id="error-message" class="hidden-element text-red-400 bg-red-900/20 p-4 rounded-xl border border-red-500/20 text-center font-medium">
-                    </div>
+                <!-- Error Message -->
+                <div id="error-message" class="hidden-element text-red-400 bg-red-900/20 p-4 rounded-xl border border-red-500/20 text-center font-medium">
+                </div>
 
-                    <!-- Botón Jugar (Se muestra al cargar válido) -->
-                    <div id="start-container" class="hidden-element text-center pt-4">
-                        <button onclick="startGame()" class="w-full px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-400 hover:to-emerald-300 text-black font-extrabold text-xl rounded-2xl transition shadow-xl shadow-green-500/20 transform hover:scale-105 flex items-center justify-center gap-3">
-                            <svg class="w-7 h-7" fill="solid" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="currentColor" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            INICIAR ACTIVIDAD
-                        </button>
-                    </div>
+                <!-- Botón Jugar (Se muestra al cargar válido) -->
+                <div id="start-container" class="hidden-element text-center pt-4">
+                    <button onclick="startGame()" class="w-full px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-400 hover:to-emerald-300 text-black font-extrabold text-xl rounded-2xl transition shadow-xl shadow-green-500/20 transform hover:scale-105 flex items-center justify-center gap-3">
+                        <svg class="w-7 h-7" fill="solid" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="currentColor" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        INICIAR ACTIVIDAD
+                    </button>
                 </div>
             </div>
         </div>
-
-        <!-- PIE DE PÁGINA (MENÚ CON LOGO) -->
-        <footer class="mt-8 mb-4 w-full flex justify-center z-20">
-            <a 
-              href="https://uruguayeduca.anep.edu.uy/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl px-4 py-3 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
-            >
-              <img 
-                src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
-                alt="Logo Uruguay Educa" 
-                class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-                onerror="this.style.display='none';"
-              />
-              <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
-                Portal Uruguay Educa (ANEP-DGES) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Preguntas y respuestas responsabilidad de docente aplicador
-              </span>
-            </a>
-        </footer>
     </main>
 
     <!-- PANTALLA DE JUEGO -->
-    <main id="game-screen" class="hidden-element flex-1 flex flex-col min-h-screen w-screen absolute inset-0 bg-black z-10 overflow-y-auto justify-between">
+    <main id="game-screen" class="hidden-element flex-1 flex flex-col h-screen w-screen absolute inset-0 bg-black z-10">
         
-        <div class="w-full flex flex-col">
-            <!-- Header -->
-            <header class="glass-panel p-4 md:p-6 flex justify-between items-center z-20">
-                <h2 id="activity-title" class="text-2xl md:text-3xl font-bold text-white truncate max-w-[60%]">Título</h2>
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-xs text-blue-300 uppercase tracking-wider font-bold">Puntuación</p>
-                        <p id="score-display" class="text-3xl md:text-5xl font-black text-cyan-400">0</p>
-                    </div>
-                    <button onclick="exitGame()" class="p-3 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white rounded-xl transition" title="Salir">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
+        <!-- Header -->
+        <header class="glass-panel p-4 md:p-6 flex justify-between items-center z-20">
+            <h2 id="activity-title" class="text-2xl md:text-3xl font-bold text-white truncate max-w-[60%]">Título</h2>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-xs text-blue-300 uppercase tracking-wider font-bold">Puntuación</p>
+                    <p id="score-display" class="text-3xl md:text-5xl font-black text-cyan-400">0</p>
                 </div>
-            </header>
+                <button onclick="exitGame()" class="p-3 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white rounded-xl transition" title="Salir">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </header>
 
-            <!-- Contenedor del video -->
-            <div class="flex-1 flex items-center justify-center p-4 bg-black relative">
-                <div class="video-container max-w-6xl w-full mx-auto shadow-2xl shadow-blue-900/20">
-                    <div id="player-wrapper">
-                        <div id="player"></div>
-                    </div>
+        <!-- Contenedor del video -->
+        <div class="flex-1 flex items-center justify-center p-4 bg-black relative">
+            <div class="video-container max-w-6xl w-full mx-auto shadow-2xl shadow-blue-900/20">
+                <div id="player-wrapper">
+                    <div id="player"></div>
                 </div>
             </div>
         </div>
-
-        <!-- PIE DE PÁGINA (TABLERO JUEGO CON LOGO) -->
-        <footer class="mt-8 mb-4 w-full flex justify-center z-20">
-            <a 
-              href="https://uruguayeduca.anep.edu.uy/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl px-4 py-3 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
-            >
-              <img 
-                src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
-                alt="Logo Uruguay Educa" 
-                class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-                onerror="this.style.display='none';"
-              />
-              <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
-                Portal Uruguay Educa (ANEP) - Contenidistas de Astronomía 2026 - Herramienta de uso libre
-              </span>
-            </a>
-        </footer>
 
         <!-- OVERLAY DE PREGUNTA -->
         <div id="question-overlay" class="hidden-element fixed inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
@@ -494,8 +448,8 @@
             event.target.playVideo();
         }
 
-        // YT.PlayerState.PLAYING == 1
         function onPlayerStateChange(event) {
+            // YT.PlayerState.PLAYING == 1
             if (event.data == 1) {
                 // Iniciar chequeo de tiempo cada 500ms
                 if(timeCheckerInterval) clearInterval(timeCheckerInterval);
@@ -568,7 +522,8 @@
                 timerDisplay.innerText = "0";
                 timerDisplay.classList.remove('time-critical');
                 timerDisplay.style.color = '#ef4444'; // red-500
-                // Al llegar al tiempo 0 no revelar la respuesta. El usuario tendrá que pulsar un botón.
+                // El requerimiento dice: "Al llegar al tiempo 0 no revelar la respuesta. El usuario tendrá que pulsar un botón".
+                // Por lo tanto, se queda esperando interacción con "Ver Respuesta".
             }
         }
 

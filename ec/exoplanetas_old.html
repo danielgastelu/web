@@ -171,7 +171,7 @@
                 </div>
             </div>
 
-            <!-- Gráfico visual: Imagen de Kepler-186f -->
+            <!-- Gráfico visual: Imagen de Kepler-186f (Adaptativa y con pie de foto personalizado) -->
             <div class="relative flex justify-center">
                 <div class="relative w-full max-w-md glass-panel rounded-3xl overflow-hidden flex flex-col p-6 group transition-all duration-300 hover:border-neon-cyan/40">
                     <!-- Contenedor de la Imagen con Aspect Ratio controlado -->
@@ -240,7 +240,7 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta de la curva de luz -->
+                <!-- Tarjeta interactiva: El gráfico de la curva de luz -->
                 <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between border-t-4 border-t-neon-blue">
                     <div>
                         <span class="text-neon-blue text-xs font-bold uppercase tracking-wider">Concepto Clave</span>
@@ -375,7 +375,7 @@
         </div>
     </section>
 
-    <!-- Sección 4: Los Cazadores de Mundos -->
+    <!-- Sección 4: Los Cazadores de Mundos (Telescopios con imágenes de referencia) -->
     <section class="py-24 px-6 bg-space-900/50 border-t border-slate-800">
         <div class="max-w-7xl mx-auto">
             <div class="text-center max-w-2xl mx-auto mb-16">
@@ -460,7 +460,7 @@
         </div>
     </section>
 
-    <!-- Sección 5: ¿Cuántos Exoplanetas conocemos? -->
+    <!-- Sección 5: ¿Cuántos Exoplanetas conocemos? (Contador y Tipos de planetas) -->
     <section id="estadisticas" class="py-24 px-6 max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -700,33 +700,24 @@
         </div>
     </section>
 
-    <!-- PIE DE PÁGINA (CON LOGO URUGUAY EDUCA) -->
-    <footer class="mt-16 mb-8 w-full flex flex-col items-center justify-center gap-6 px-4 z-20">
-        <!-- Fuentes opcionales del documento original -->
-        <div class="text-center text-xs text-slate-500 max-w-2xl leading-relaxed">
-            Fuentes científicas consultadas: <a href="https://exoplanets.nasa.gov" class="text-neon-cyan hover:underline" target="_blank">NASA Exoplanet Archive</a>, ESA, Telescopios TESS, James Webb.
+    <!-- Pie de página y Créditos -->
+    <footer class="bg-space-950 border-t border-slate-800/80 px-6 py-12 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <span class="font-extrabold text-white tracking-wider uppercase">ExoMundo</span>
+                <span class="text-slate-600">|</span>
+                <span>Recurso Educativo para Colegios</span>
+            </div>
+            <div class="text-center md:text-right">
+                <p class="mb-2">Diseño y desarrollo interactivo con propósitos de divulgación científica en Astronomía.</p>
+                <p>Fuentes científicas consultadas: <a href="https://exoplanets.nasa.gov" class="text-neon-cyan hover:underline" target="_blank">NASA Exoplanet Archive</a>, ESA, Telescopios TESS, James Webb.</p>
+            </div>
         </div>
-        <a 
-          href="https://uruguayeduca.anep.edu.uy/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl px-6 py-4 bg-slate-950/40 rounded-2xl border border-cyan-900/30 backdrop-blur-sm group hover:border-neon-cyan/30 transition-all"
-        >
-          <img 
-            src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
-            alt="Logo Uruguay Educa" 
-            class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-            onerror="this.onerror=null; this.style.display='none';"
-          />
-          <span class="text-xs md:text-sm text-cyan-300/60 group-hover:text-neon-cyan text-center sm:text-left transition-colors tracking-wide leading-relaxed">
-            Portal Uruguay Educa (ANEP-DGES) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Preguntas y respuestas responsabilidad de docente aplicador
-          </span>
-        </a>
     </footer>
 
     <!-- Lógica de Simulación Interactiva y Quiz -->
     <script>
-        //        // --- CÓDIGO DEL SIMULADOR DE TRÁNSITO ---
+        // --- CÓDIGO DEL SIMULADOR DE TRÁNSITO ---
         const canvasSim = document.getElementById('canvas-simulation');
         const ctxSim = canvasSim.getContext('2d');
         const canvasChart = document.getElementById('canvas-chart');
@@ -780,7 +771,7 @@
             }
         }
 
-        //        // Eventos de controles
+        // Eventos de controles
         sliderSize.addEventListener('input', (e) => {
             planetSize = parseInt(e.target.value);
             if (planetSize < 14) valSize.textContent = "Pequeño (Rocoso)";
@@ -818,7 +809,7 @@
         }
         resetSimulation();
 
-        //        // Bucle de Animación Principal
+        // Bucle de Animación Principal
         function updateAndDraw() {
             if (isPlaying) {
                 planetX += orbitSpeed * 1.5;
@@ -888,7 +879,7 @@
                 ctxSim.stroke();
             }
 
-            //            ctxChart.clearRect(0, 0, canvasChart.width, canvasChart.height);
+            ctxChart.clearRect(0, 0, canvasChart.width, canvasChart.height);
             
             ctxChart.strokeStyle = 'rgba(255,255,255,0.05)';
             ctxChart.lineWidth = 1;
@@ -949,7 +940,7 @@
         updateAndDraw();
 
 
-        //        // --- CÓDIGO CLIMA EN ZONA HABITABLE ---
+        // --- CÓDIGO CLIMA EN ZONA HABITABLE ---
         const sliderHabitable = document.getElementById('slider-habitable');
         const habitablePlanet = document.getElementById('habitable-planet');
         const habitableStatusBox = document.getElementById('habitable-status-box');
@@ -989,7 +980,7 @@
         updateHabitableZone();
 
 
-        //        // --- CÓDIGO DEL QUIZ INTERACTIVO (TRIVIAL) ---
+        // --- CÓDIGO DEL QUIZ INTERACTIVO (TRIVIAL) ---
         const quizData = [
             {
                 question: "1. ¿Qué es exactamente una 'Curva de Luz'?",
@@ -1066,7 +1057,7 @@
             });
         }
 
-        //        function selectOption(selectedIdx, clickedButton) {
+        function selectOption(selectedIdx, clickedButton) {
             const q = quizData[currentQuestionIdx];
             const buttons = quizOptions.querySelectorAll('button');
 
