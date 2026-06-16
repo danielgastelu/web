@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Astronomía - Recursos Educativos</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Lexend -->
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+      background-color: #030712;
+      background-image:
+          radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+          radial-gradient(white, rgba(255,255,255,.1) 1.5px, transparent 3.5px);
+      background-size: 350px 350px, 200px 200px;
+      background-position: 0 0, 40px 60px;
+    }
+    .text-shadow-glow {
+      text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+    }
+    .card-zoom:hover img {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-slate-950">
+
+  <!-- CABECERA -->
+  <header class="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md sticky top-0 z-40 py-4 px-4 sm:px-6">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      
+      <!-- Marca -->
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-br from-sky-500 to-indigo-600 text-slate-950 rounded-xl shadow-lg shadow-sky-500/10">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.248.58 1.81l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.18 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.3c-.78-.562-.381-1.81.58-1.81h4.907a1 1 0 00.95-.69l1.519-4.674z"></path>
+          </svg>
+        </div>
+        <div class="text-center sm:text-left">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400 block">Plataforma Didáctica</span>
+          <h1 class="text-xl font-extrabold tracking-tight text-white">Universo Interactivo</h1>
+        </div>
+      </div>
+
+      <!-- Enlace ANEP / Uruguay Educa -->
+      <a 
+        href="https://uruguayeduca.anep.edu.uy/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="hidden md:flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 px-4 py-2 rounded-xl border border-slate-800 transition-colors text-xs text-slate-300 hover:text-white"
+      >
+        <span>Portal Uruguay Educa</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+      </a>
+      
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 flex-grow">
+    
+    <!-- Hero / Presentación -->
+    <section class="text-center max-w-3xl mx-auto mb-12">
+      <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-sky-500/10 text-sky-400 rounded-full border border-sky-500/30">
+        Recursos de Astronomía 2026
+      </span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mt-4 mb-4 text-white leading-tight">
+        Explora los Misterios <br class="hidden sm:inline"> del Cosmos
+      </h2>
+      <p class="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl mx-auto">
+        Bienvenido al portal de herramientas interactivas de astronomía. Diseñadas especialmente para estudiantes y docentes de Uruguay, estas aplicaciones combinan simulaciones físicas, gamificación y análisis didáctico.
+      </p>
+    </section>
+
+    <!-- Filtros de Categorías -->
+    <section class="flex flex-wrap justify-center gap-2 mb-10" aria-label="Filtros de recursos">
+      <button onclick="filterResources('all')" id="btn-all" class="filter-btn px-4 py-2 rounded-full text-xs font-bold bg-sky-500 text-slate-950 transition-all shadow-lg shadow-sky-500/10">
+        Todos los recursos
+      </button>
+      <button onclick="filterResources('simuladores')" id="btn-simuladores" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+        🌌 Simuladores 3D
+      </button>
+      <button onclick="filterResources('modulos')" id="btn-modulos" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+        📖 Módulos Educativos
+      </button>
+      <button onclick="filterResources('evaluaciones')" id="btn-evaluaciones" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+        🎮 Trivias y Evaluaciones
+      </button>
+    </section>
+
+    <!-- Rejilla de Recursos -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="resources-grid">
+      
+      <!-- Fases Lunares -->
+      <article data-category="simuladores" class="resource-card group bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-sky-500/30 flex flex-col justify-between">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-400 rounded-md border border-indigo-500/20">Simulador 3D</span>
+            <span class="text-3xl" aria-hidden="true">🌙</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">Simulador de Fases Lunares</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Un simulador interactivo en tres dimensiones adaptado al hemisferio sur. Manipula la posición orbital de la luna y pon a prueba tus conocimientos en astronomía de observación.
+          </p>
+        </div>
+        <div class="px-6 pb-6 pt-2">
+          <a href="ec/luna001.html" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-white text-xs font-bold rounded-xl transition-all shadow-md group-hover:shadow-sky-500/5">
+            <span>Iniciar Simulación</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Contaminación Lumínica -->
+      <article data-category="modulos" class="resource-card group bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-sky-500/30 flex flex-col justify-between">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 rounded-md border border-emerald-500/20">Módulo de Contenido</span>
+            <span class="text-3xl" aria-hidden="true">🔭</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">Contaminación Lumínica</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Aprende sobre las consecuencias de la luz ineficiente en la salud, biodiversidad y el cielo nocturno. Incluye un módulo deslizador comparativo (antes/después) y una trivia gamificada.
+          </p>
+        </div>
+        <div class="px-6 pb-6 pt-2">
+          <a href="ec/contaminacion_luminica.html" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-white text-xs font-bold rounded-xl transition-all shadow-md group-hover:shadow-sky-500/5">
+            <span>Explorar Módulo</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Exoplanetas -->
+      <article data-category="modulos" class="resource-card group bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-sky-500/30 flex flex-col justify-between">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 rounded-md border border-emerald-500/20">Módulo de Contenido</span>
+            <span class="text-3xl" aria-hidden="true">🪐</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">Explorador de Exoplanetas</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Sumérgete en el descubrimiento de mundos más allá de nuestro Sistema Solar. Conoce los principales métodos científicos de búsqueda y pon a prueba tu destreza como exocazador.
+          </p>
+        </div>
+        <div class="px-6 pb-6 pt-2">
+          <a href="ec/exoplanetas.html" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-white text-xs font-bold rounded-xl transition-all shadow-md group-hover:shadow-sky-500/5">
+            <span>Explorar Exoplanetas</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Quiz Show -->
+      <article data-category="evaluaciones" class="resource-card group bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-sky-500/30 flex flex-col justify-between">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-rose-500/15 text-rose-400 rounded-md border border-rose-500/20">Trivia Grupal</span>
+            <span class="text-3xl" aria-hidden="true">🏆</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">Quiz Show Dinámico</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Una plataforma de evaluación tipo Jeopardy para jugar en equipos en el aula. Genera dinámicamente tus preguntas utilizando planillas estándar de Excel descargables.
+          </p>
+        </div>
+        <div class="px-6 pb-6 pt-2">
+          <a href="ec/quizV5.html" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-white text-xs font-bold rounded-xl transition-all shadow-md group-hover:shadow-sky-500/5">
+            <span>Abrir Quiz Show</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Video Quiz -->
+      <article data-category="evaluaciones" class="resource-card group bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-sky-500/30 flex flex-col justify-between">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-rose-500/15 text-rose-400 rounded-md border border-rose-500/20">Video Cuestionario</span>
+            <span class="text-3xl" aria-hidden="true">🎬</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">Video Quiz Interactivo</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Combina contenido audiovisual con interactividad. Sube una plantilla Excel con tiempos específicos y detén automáticamente videos educativos para evaluar a tus estudiantes.
+          </p>
+        </div>
+        <div class="px-6 pb-6 pt-2">
+          <a href="ec/video_quiz_interactivo.html" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-white text-xs font-bold rounded-xl transition-all shadow-md group-hover:shadow-sky-500/5">
+            <span>Lanzar Video Quiz</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </a>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA ESTÁNDAR URUGUAY EDUCA -->
+  <footer class="mt-8 mb-4 w-full flex justify-center z-20 px-4">
+      <a 
+        href="https://uruguayeduca.anep.edu.uy/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl w-full px-6 py-4 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
+      >
+        <img 
+          src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
+          alt="Logo Uruguay Educa" 
+          class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+          onerror="this.onerror=null; this.style.display='none';"
+        />
+        <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
+          Portal Uruguay Educa (ANEP-DGES) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Preguntas y respuestas responsabilidad de docente aplicador
+        </span>
+      </a>
+  </footer>
+
+  <!-- Lógica de Filtrado -->
+  <script>
+    function filterResources(category) {
+      const cards = document.querySelectorAll('.resource-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+      
+      // Actualizar estado activo de los botones de filtro
+      buttons.forEach(btn => {
+        btn.className = "filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white transition-all";
+      });
+      
+      const activeBtn = document.getElementById(`btn-${category}`);
+      if(activeBtn) {
+        activeBtn.className = "filter-btn px-4 py-2 rounded-full text-xs font-bold bg-sky-500 text-slate-950 transition-all shadow-lg shadow-sky-500/10";
+      }
+
+      // Filtrar tarjetas con una transición suave de opacidad
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-category');
+        if (category === 'all' || cardCat === category) {
+          card.classList.remove('hidden');
+          // Forzar reflujo de animación
+          void card.offsetWidth;
+          card.style.opacity = '1';
+        } else {
+          card.style.opacity = '0';
+          card.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
