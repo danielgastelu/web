@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluación Pedagógica: Astrofotografía con Celular</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Lexend para óptima lectura -->
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome para iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+      background-color: #030712;
+      background-image:
+          radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 2px),
+          radial-gradient(white, rgba(255,255,255,.05) 1.5px, transparent 3.5px);
+      background-size: 300px 300px, 150px 150px;
+      background-position: 0 0, 30px 45px;
+    }
+    .neon-border-blue {
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+    }
+    .neon-border-yellow {
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-slate-950">
+
+  <!-- CABECERA -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 py-4 px-4 sm:px-6">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-br from-sky-500 to-indigo-600 text-slate-950 rounded-xl shadow-lg shadow-sky-500/10">
+          <i class="fa-solid fa-camera-retro text-white text-xl"></i>
+        </div>
+        <div class="text-center sm:text-left">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400 block">Informe de Evaluación Didáctica</span>
+          <h1 class="text-lg font-extrabold tracking-tight text-white">Astrofotografía de Bajo Costo</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-3 py-1 bg-sky-500/10 text-sky-400 text-xs font-semibold rounded-full border border-sky-500/30">
+          Rango Objetivo: 12-16 años
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 flex-grow space-y-12">
+    
+    <!-- Hero / Presentación del Análisis -->
+    <section class="bg-gradient-to-r from-slate-950 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 neon-border-blue relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10">
+        <i class="fa-solid fa-user-graduate text-9xl"></i>
+      </div>
+      <div class="max-w-3xl">
+        <span class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-400 rounded-full border border-sky-500/30">
+          Evaluación de Recurso Audiovisual
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white mt-4 mb-3 leading-tight">
+          ¿Es viable la astrofotografía móvil como herramienta de aprendizaje científico?
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Analizamos el tutorial del canal <a href="https://www.youtube.com/@astrofotografiaycafe" target="_blank" class="text-sky-400 hover:underline font-semibold">@astrofotografiaycafe</a> (<em>"Astrofotografía con celular"</em>) para determinar su claridad expositiva, su poder motivador en estudiantes de secundaria (12-16 años) y la factibilidad real de que sigan sus instrucciones de forma autónoma.
+        </p>
+      </div>
+    </section>
+
+    <!-- RÚBRICA DE EVALUACIÓN GENERAL -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Claridad Expositiva -->
+      <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md">Claridad</span>
+            <span class="text-2xl">🧠</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Claridad Expositiva</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            Cómo se explican los conceptos físicos complejos (ISO, tiempo de exposición, RAW frente a JPG, apilado de imágenes) para un público adolescente.
+          </p>
+        </div>
+        <div>
+          <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+            <span>Calificación Pedagógica</span>
+            <span class="font-bold text-sky-400">9.5 / 10</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-sky-500 h-full rounded-full" style="width: 95%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Valor Motivacional -->
+      <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-yellow-500 bg-yellow-500/10 px-2.5 py-1 rounded-md">Motivación</span>
+            <span class="text-2xl">🔥</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Valor Motivacional</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            El enganche de los jóvenes de 12 a 16 años con el uso de tecnologías que ya tienen en el bolsillo para lograr resultados que parecen "imposibles".
+          </p>
+        </div>
+        <div>
+          <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+            <span>Calificación Pedagógica</span>
+            <span class="font-bold text-yellow-500">10 / 10</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-yellow-500 h-full rounded-full" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Factibilidad Práctica -->
+      <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">Factibilidad</span>
+            <span class="text-2xl">⚙️</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Factibilidad Autónoma</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            La probabilidad de que un estudiante pueda replicar el tutorial de forma individual, considerando barreras de equipamiento, software y geografía.
+          </p>
+        </div>
+        <div>
+          <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+            <span>Calificación Pedagógica</span>
+            <span class="font-bold text-emerald-400">7.0 / 10</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full" style="width: 70%"></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ANÁLISIS DETALLADO POR CRITERIO -->
+    <section class="space-y-8">
+      
+      <!-- Criterio 1: Claridad Expositiva -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 sm:p-8">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-comment-dots text-sky-400"></i>
+          1. Claridad Expositiva del Tema
+        </h3>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+          El autor del canal **Astrofotografía y Café** demuestra un talento excepcional para desmitificar la disciplina. Su tono es empático, cercano y sumamente realista. 
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+            <h4 class="text-xs font-bold text-sky-300 uppercase mb-2">Fortalezas Didácticas</h4>
+            <ul class="text-xs text-slate-400 space-y-2 list-disc pl-4">
+              <li><strong>Anclaje en la realidad:</strong> El uso de un teléfono Motorola "golpeado, viejito" (G9 Play) rompe inmediatamente la excusa de la falta de tecnología de punta.</li>
+              <li><strong>Explicación de variables:</strong> Traduce de forma brillante por qué se requiere un ISO alto y un tiempo de exposición largo (sensores pequeños que necesitan forzar la captación de fotones sin crear trazos estelares).</li>
+              <li><strong>Simplificación del apilado:</strong> Explica el concepto de apilamiento (stacking) no con números astronómicos, sino demostrando cómo solo 6 fotos reducen el ruido de forma dramática.</li>
+            </ul>
+          </div>
+          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+            <h4 class="text-xs font-bold text-yellow-500 uppercase mb-2">Desafíos de Comprensión (12-16 años)</h4>
+            <ul class="text-xs text-slate-400 space-y-2 list-disc pl-4">
+              <li><strong>Enfoque manual:</strong> La explicación del foco al infinito (o un poco antes, con el icono de la "montañita") puede resultar abstracta para quienes solo conocen el enfoque táctil automático.</li>
+              <li><strong>Terminología avanzada:</strong> El uso de palabras como *formato DNG (RAW)*, *rango dinámico* o *aberraciones ópticas* requiere un acompañamiento o un glosario previo por parte del docente.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criterio 2: Valor Motivacional para Estudiantes -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 sm:p-8">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-heart-pulse text-rose-400"></i>
+          2. Valor Motivacional para Adolescentes (12-16 años)
+        </h3>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+          Para esta franja etaria, que experimenta la vida fuertemente ligada a las pantallas de sus teléfonos inteligentes y a la creación de contenido visual en redes sociales, **este video tiene un valor motivacional altísimo (10/10)**.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+          <div class="p-4 bg-slate-900/30 rounded-xl border border-slate-800">
+            <div class="text-2xl mb-1">📱</div>
+            <h5 class="text-xs font-bold text-white mb-1">Reapropiación Tecnológica</h5>
+            <p class="text-[11px] text-slate-400">Transforma su principal elemento de distracción (el celular) en un instrumento de indagación científica y exploración estelar.</p>
+          </div>
+          <div class="p-4 bg-slate-900/30 rounded-xl border border-slate-800">
+            <div class="text-2xl mb-1">🪐</div>
+            <h5 class="text-xs font-bold text-white mb-1">Sensación de Maravilla</h5>
+            <p class="text-[11px] text-slate-400">Saber que un móvil de menos de 100€ puede fotografiar la galaxia de Andrómeda o la Vía Láctea despierta un asombro cósmico genuino.</p>
+          </div>
+          <div class="p-4 bg-slate-900/30 rounded-xl border border-slate-800">
+            <div class="text-2xl mb-1">🏆</div>
+            <h5 class="text-xs font-bold text-white mb-1">El Desafío Creador</h5>
+            <p class="text-[11px] text-slate-400">El cierre con el panorama de 37 fotos plantea un desafío de paciencia y tenacidad que apela a la gamificación natural del adolescente.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criterio 3: Viabilidad Práctica -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 sm:p-8">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+          3. ¿Es posible que intenten seguir las instrucciones del video?
+        </h3>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+          La respuesta es **SÍ, pero con reservas y adaptaciones**. Si un estudiante intenta replicar el video exactamente como se muestra, se enfrentará a "barreras de salida" que podrían frustrarlo. A continuación, desglosamos estos obstáculos y proponemos **soluciones pedagógicas**:
+        </p>
+
+        <!-- Tabla de Barreras y Soluciones -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-400 border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-300">
+                <th class="py-3 px-4 font-bold">Obstáculo en el Video</th>
+                <th class="py-3 px-4 font-bold">Impacto en el Estudiante</th>
+                <th class="py-3 px-4 font-bold">Solución o Alternativa Didáctica</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-slate-800 hover:bg-slate-900/20">
+                <td class="py-4 px-4 font-semibold text-white">Lightroom Classic (Software de Pago)</td>
+                <td class="py-4 px-4">No tienen licencias de Adobe en computadoras domésticas.</td>
+                <td class="py-4 px-4 text-emerald-400">Utilizar la app gratuita de <strong>Lightroom Mobile</strong>, <strong>Snapseed</strong> (Google) o <strong>Wavelet</strong> para procesar los DNG directo en el celular.</td>
+              </tr>
+              <tr class="border-b border-slate-800 hover:bg-slate-900/20">
+                <td class="py-4 px-4 font-semibold text-white">Falta de Modo Manual (Pro) en algunos móviles</td>
+                <td class="py-4 px-4">Muchos iPhones o gamas bajas bloquean el tiempo de exposición.</td>
+                <td class="py-4 px-4 text-emerald-400">Instalar aplicaciones de cámara gratuitas que desbloquean el control manual como <strong>Open Camera</strong> (Android) o <strong>Yamera</strong> (iOS).</td>
+              </tr>
+              <tr class="border-b border-slate-800 hover:bg-slate-900/20">
+                <td class="py-4 px-4 font-semibold text-white">Necesidad de Trípode ($8)</td>
+                <td class="py-4 px-4">Puede que no tengan o no puedan comprar uno de inmediato.</td>
+                <td class="py-4 px-4 text-emerald-400">Promover la ingeniería casera: apoyar el celular sobre un vaso, una piedra o construir un soporte estable con cartón o pinzas de ropa.</td>
+              </tr>
+              <tr class="border-b border-slate-800 hover:bg-slate-900/20">
+                <td class="py-4 px-4 font-semibold text-white">Contaminación Lumínica (Bortle)</td>
+                <td class="py-4 px-4">Estudiantes urbanos (ej. Montevideo) verán un cielo completamente naranja.</td>
+                <td class="py-4 px-4 text-emerald-400">Enseñar a usar mapas de contaminación (como *lightpollutionmap.info*) y proponer la captura durante vacaciones, salidas de campo familiares o campamentos liceales.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- COMPROBADOR INTERACTIVO DE FACTIBILIDAD EN EL AULA -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8">
+      <h3 class="text-xl font-bold text-white mb-2">🔎 Comprobador de Viabilidad para tu Grupo</h3>
+      <p class="text-xs text-slate-400 mb-6">Marca los casilleros según las condiciones de tus alumnos para calcular el porcentaje estimado de éxito al replicar la actividad.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="checklist-container">
+        <label class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850 cursor-pointer hover:bg-slate-950/80 transition-all">
+          <input type="checkbox" id="chk-1" onchange="calculateViability()" checked class="mt-1 w-4 h-4 text-sky-500 bg-slate-900 border-slate-800 rounded focus:ring-sky-400">
+          <div>
+            <span class="text-xs font-bold text-white block">Tienen celulares inteligentes</span>
+            <span class="text-[10px] text-slate-400">Cuentan con un smartphone propio o familiar con cámara funcional.</span>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850 cursor-pointer hover:bg-slate-950/80 transition-all">
+          <input type="checkbox" id="chk-2" onchange="calculateViability()" class="mt-1 w-4 h-4 text-sky-500 bg-slate-900 border-slate-800 rounded focus:ring-sky-400">
+          <div>
+            <span class="text-xs font-bold text-white block">Saben instalar aplicaciones gratuitas</span>
+            <span class="text-[10px] text-slate-400">Tienen permiso e internet para bajar apps como Snapseed o Open Camera.</span>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850 cursor-pointer hover:bg-slate-950/80 transition-all">
+          <input type="checkbox" id="chk-3" onchange="calculateViability()" class="mt-1 w-4 h-4 text-sky-500 bg-slate-900 border-slate-800 rounded focus:ring-sky-400">
+          <div>
+            <span class="text-xs font-bold text-white block">Acceso a cielos con baja iluminación</span>
+            <span class="text-[10px] text-slate-400">Viven en zonas del interior, balnearios rurales o tienen salidas de campo programadas.</span>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850 cursor-pointer hover:bg-slate-950/80 transition-all">
+          <input type="checkbox" id="chk-4" onchange="calculateViability()" class="mt-1 w-4 h-4 text-sky-500 bg-slate-900 border-slate-800 rounded focus:ring-sky-400">
+          <div>
+            <span class="text-xs font-bold text-white block">Acompañamiento docente</span>
+            <span class="text-[10px] text-slate-400">El docente les enseñará previamente a estabilizar el celular y ajustar la exposición.</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Resultado dinámico de viabilidad -->
+      <div class="mt-6 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-950/50 p-4 rounded-xl">
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Índice de Éxito Estimado</span>
+          <p class="text-xs text-slate-400 max-w-sm mt-1" id="viability-explanation">Marca más opciones para calcular la viabilidad del ejercicio práctico en tu aula.</p>
+        </div>
+        <div class="text-center sm:text-right">
+          <span class="text-4xl font-black text-sky-400" id="viability-percentage">25%</span>
+          <span class="block text-[10px] text-slate-500 font-bold uppercase mt-1">Factibilidad Práctica</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROPUESTA DIDÁCTICA CON EL VIDEO -->
+    <section class="bg-gradient-to-br from-indigo-950/20 to-slate-950/80 border border-blue-900/30 rounded-3xl p-6 sm:p-8">
+      <h3 class="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
+        <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+        Propuesta Integradora: Reto "Cazadores de Luz" (12-16 años)
+      </h3>
+      <p class="text-sm text-slate-300 leading-relaxed mb-6">
+        Para que los alumnos de secundaria no se frustren y logren conectar el video con el currículo de **Astronomía y Física**, proponemos estructurar una actividad grupal basada en las siguientes fases:
+      </p>
+
+      <div class="space-y-4 text-xs">
+        <!-- Fase 1 -->
+        <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 flex gap-4">
+          <div class="text-lg text-sky-400 font-black shrink-0">Fase 1</div>
+          <div>
+            <h5 class="text-sm font-bold text-white mb-1">Análisis de Conceptos y Configuración en el Aula</h5>
+            <p class="text-slate-400 leading-relaxed">
+              Ver los primeros 10 minutos del video en clase. Discutir qué es el ISO (sensibilidad) y el tiempo de exposición. Descargar una aplicación de cámara manual (como *Open Camera*) y practicar el enfoque manual apuntando a objetos distantes en el patio del centro educativo durante el día.
+            </p>
+          </div>
+        </div>
+
+        <!-- Fase 2 -->
+        <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 flex gap-4">
+          <div class="text-lg text-sky-400 font-black shrink-0">Fase 2</div>
+          <div>
+            <h5 class="text-sm font-bold text-white mb-1">El Desafío de Ingeniería Estabilizadora</h5>
+            <p class="text-slate-400 leading-relaxed">
+              Pedir a los alumnos que creen un soporte casero ultra-estable sin gastar dinero. Puede ser un vaso de plástico con ranuras laterales, un soporte construido con pinzas de madera o legos. Esto estimula el área STEM de diseño e ingeniería.
+            </p>
+          </div>
+        </div>
+
+        <!-- Fase 3 -->
+        <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 flex gap-4">
+          <div class="text-lg text-sky-400 font-black shrink-0">Fase 3</div>
+          <div>
+            <h5 class="text-sm font-bold text-white mb-1">Conexión con el Problema de la Contaminación Lumínica</h5>
+            <p class="text-slate-400 leading-relaxed">
+              Vincular la práctica con el último consejo del video: alejarse de la ciudad. Los alumnos pueden mapear su propio barrio o localidad usando mapas Bortle interactivos y reflexionar sobre la pérdida de cielos oscuros.
+            </p>
+          </div>
+        </div>
+
+        <!-- Fase 4 -->
+        <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 flex gap-4">
+          <div class="text-lg text-sky-400 font-black shrink-0">Fase 4</div>
+          <div>
+            <h5 class="text-sm font-bold text-white mb-1">Exposición y Revelado Abierto</h5>
+            <p class="text-slate-400 leading-relaxed">
+              Compartir los archivos DNG/RAW capturados mediante carpetas compartidas y realizar un taller de revelado en clase utilizando proyectores y herramientas de software libre en la sala de computación (como <strong>Darktable</strong> o <strong>RawTherapee</strong> en lugar de Lightroom).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA ESTÁNDAR URUGUAY EDUCA -->
+  <footer class="mt-8 mb-4 w-full flex justify-center z-20 px-4">
+      <a 
+        href="https://uruguayeduca.anep.edu.uy/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl w-full px-6 py-4 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
+      >
+        <img 
+          src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
+          alt="Logo Uruguay Educa" 
+          class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+          onerror="this.onerror=null; this.style.display='none';"
+        />
+        <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
+          Portal Uruguay Educa (ANEP-DGES) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Análisis elaborado a partir del canal @astrofotografiaycafe
+        </span>
+      </a>
+  </footer>
+
+  <!-- Lógica interactiva para la calculadora de viabilidad -->
+  <script>
+    function calculateViability() {
+      let activeChecks = 0;
+      const chk1 = document.getElementById('chk-1').checked;
+      const chk2 = document.getElementById('chk-2').checked;
+      const chk3 = document.getElementById('chk-3').checked;
+      const chk4 = document.getElementById('chk-4').checked;
+
+      if (chk1) activeChecks++;
+      if (chk2) activeChecks++;
+      if (chk3) activeChecks++;
+      if (chk4) activeChecks++;
+
+      let percent = 0;
+      let expText = "";
+
+      switch (activeChecks) {
+        case 0:
+          percent = 5;
+          expText = "⚠️ Prácticamente inviable. Se requiere al menos un celular e internet para instalar apps básicas.";
+          break;
+        case 1:
+          percent = 25;
+          expText = "❗ Viabilidad muy limitada. Si solo tienen celular, será sumamente difícil lograr tomas sin soporte estable ni software.";
+          break;
+        case 2:
+          percent = 50;
+          expText = "⚡ Viabilidad media. Al contar con herramientas de captura, se pueden intentar los primeros astropaisajes, pero el apoyo del docente será clave.";
+          break;
+        case 3:
+          percent = 75;
+          expText = "⭐ Gran potencial de éxito. Con móviles, apps gratuitas y cielos óptimos, los alumnos conseguirán capturar estrellas y constelaciones.";
+          break;
+        case 4:
+          percent = 100;
+          expText = "🏆 ¡Éxito garantizado! Tu grupo cumple con todos los requisitos tecnológicos, naturales y pedagógicos para replicar la experiencia del video con creces.";
+          break;
+      }
+
+      document.getElementById('viability-percentage').innerText = `${percent}%`;
+      document.getElementById('viability-explanation').innerText = expText;
+    }
+
+    // Inicializar cálculo en carga
+    window.onload = function() {
+      calculateViability();
+    };
+  </script>
+
+</body>
+</html>
