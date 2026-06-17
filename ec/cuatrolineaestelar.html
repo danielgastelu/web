@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuatro en Línea Estelar</title>
+    <!-- Tailwind CSS para el diseño responsivo de primer nivel -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos FontAwesome para botones y controles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fuente Inter para legibilidad premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, #0B1528 0%, #020408 100%);
+            color: #f8fafc;
+        }
+
+        /* Estrellas de fondo animadas */
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .game-interface {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Efectos de brillo de neón según color */
+        .glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.75);
+            border: 2px solid rgba(254, 226, 226, 0.4);
+        }
+        .glow-yellow {
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.75);
+            border: 2px solid rgba(254, 249, 195, 0.4);
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.75);
+            border: 2px solid rgba(220, 252, 231, 0.4);
+        }
+        .glow-blue {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.75);
+            border: 2px solid rgba(219, 234, 254, 0.4);
+        }
+
+        /* Animación física de la caída de la ficha */
+        @keyframes dropToken {
+            0% {
+                transform: translateY(-500px);
+                animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+            }
+            80% {
+                transform: translateY(0);
+                animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
+            }
+            90% {
+                transform: translateY(-15px);
+                animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .token-anim {
+            animation: dropToken 0.5s ease-out forwards;
+        }
+
+        /* Efecto pulsante para el jugador activo */
+        .active-glow {
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px currentColor; }
+            100% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+
+        /* Ocultar barra de scroll de forma elegante */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 select-none relative">
+
+    <!-- Canvas para estrellas de fondo -->
+    <canvas id="stars-canvas"></canvas>
+
+    <div class="game-interface w-full max-w-5xl bg-slate-900/80 backdrop-blur-lg border border-slate-800/80 rounded-3xl shadow-2xl p-4 md:p-8 overflow-hidden">
+        
+        <!-- Pantalla de Configuración Inicial (Visible por defecto) -->
+        <div id="setup-screen" class="space-y-6">
+            <div class="text-center space-y-2">
+                <span class="px-3 py-1 text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full tracking-widest uppercase">Estrategia Estelar</span>
+                <h1 class="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-md">
+                    CUATRO EN LÍNEA
+                </h1>
+                <p class="text-slate-400 text-sm md:text-base max-w-lg mx-auto">
+                    Ajusta los parámetros espaciales, domina la gravedad del tablero de hasta 4 jugadores y vence en cualquier dirección orbital.
+                </p>
+            </div>
+
+            <hr class="border-slate-800" />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Modo de Juego -->
+                <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-800/60 space-y-4">
+                    <label class="block text-sm font-semibold text-slate-300">
+                        <i class="fa-solid fa-gamepad text-indigo-400 mr-2"></i>Modo de Juego
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="btn-mode-cpu" onclick="setGameMode('vs-machine')" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 text-white transition-all duration-300 hover:scale-[1.02]">
+                            <i class="fa-solid fa-robot text-2xl mb-2 text-indigo-400"></i>
+                            <span class="font-bold text-sm">Humano vs Máquina</span>
+                            <span class="text-[10px] text-indigo-300 mt-1">Desafío Inteligente</span>
+                        </button>
+                        <button type="button" id="btn-mode-humans" onclick="setGameMode('vs-humans')" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-400 transition-all duration-300 hover:scale-[1.02] hover:border-slate-700">
+                            <i class="fa-solid fa-users text-2xl mb-2 text-slate-400"></i>
+                            <span class="font-bold text-sm">Humanos</span>
+                            <span class="text-[10px] text-slate-500 mt-1">Multijugador Local</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cantidad de Jugadores -->
+                <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-800/60 space-y-4">
+                    <label class="block text-sm font-semibold text-slate-300">
+                        <i class="fa-solid fa-user-plus text-emerald-400 mr-2"></i>Cantidad de Jugadores
+                    </label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button type="button" id="btn-play-2" onclick="setPlayerCount(2)" class="py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 text-white font-bold text-lg transition-all duration-300 hover:scale-[1.02]">
+                            2 <span class="text-xs block font-normal text-emerald-300 mt-0.5">6 Columnas</span>
+                        </button>
+                        <button type="button" id="btn-play-3" onclick="setPlayerCount(3)" class="py-3 px-4 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-400 font-bold text-lg transition-all duration-300 hover:scale-[1.02] hover:border-slate-700">
+                            3 <span class="text-xs block font-normal text-slate-500 mt-0.5">7 Columnas</span>
+                        </button>
+                        <button type="button" id="btn-play-4" onclick="setPlayerCount(4)" class="py-3 px-4 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-400 font-bold text-lg transition-all duration-300 hover:scale-[1.02] hover:border-slate-700">
+                            4 <span class="text-xs block font-normal text-slate-500 mt-0.5">8 Columnas</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fichas y Asignaciones -->
+            <div class="bg-slate-950/30 p-5 rounded-2xl border border-slate-800/40 space-y-4">
+                <div class="text-xs uppercase font-semibold text-slate-500 tracking-wider">Distribución de Tripulación y Órbitas</div>
+                <div id="players-list-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Dinámico por JS -->
+                </div>
+            </div>
+
+            <button type="button" onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> INICIAR MISIÓN ESPACIAL
+            </button>
+        </div>
+
+        <!-- Pantalla de Juego Activo (Oculta por defecto) -->
+        <div id="game-screen" class="hidden space-y-6">
+            <!-- Header HUD de información rápida -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80">
+                <div class="flex items-center gap-4">
+                    <button onclick="goToSetup()" class="p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition duration-300 text-sm" title="Ajustes de partida">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Configuración
+                    </button>
+                    <button onclick="resetGame()" class="p-3 bg-indigo-900/30 border border-indigo-500/30 hover:bg-indigo-900/60 text-indigo-300 hover:text-white rounded-xl transition duration-300 text-sm" title="Reiniciar tablero">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Reiniciar
+                    </button>
+                </div>
+
+                <!-- Temporizador Central de 15 segundos -->
+                <div class="flex items-center gap-4 bg-slate-900 border border-slate-800 px-6 py-2.5 rounded-2xl relative overflow-hidden min-w-[180px] justify-center">
+                    <div id="timer-progress-bar" class="absolute left-0 bottom-0 h-1 bg-red-500 transition-all duration-100" style="width: 100%;"></div>
+                    <i class="fa-regular fa-clock text-red-400 text-lg animate-pulse"></i>
+                    <div class="text-center">
+                        <span class="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">Tiempo Restante</span>
+                        <span id="timer-display" class="font-mono text-xl font-bold text-red-400">15.0s</span>
+                    </div>
+                </div>
+
+                <!-- Estado del Turno -->
+                <div id="current-player-hud" class="flex items-center gap-3 bg-slate-900/90 px-5 py-2.5 rounded-xl border border-slate-800">
+                    <span class="text-xs text-slate-400 uppercase font-semibold">Turno de:</span>
+                    <div id="hud-player-badge" class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-full glow-red bg-red-500"></div>
+                        <span class="font-bold text-sm">Jugador 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Controles Teclado Directos -->
+            <div class="bg-indigo-950/20 border border-indigo-500/20 px-4 py-2.5 rounded-xl text-center text-xs text-indigo-300/90 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-keyboard text-sm"></i>
+                <span>Presiona las teclas numéricas del <b class="font-bold underline text-white" id="keyboard-legend-start">1</b> al <b class="font-bold underline text-white" id="keyboard-legend-end">6</b> de tu teclado para soltar fichas inmediatamente.</span>
+            </div>
+
+            <!-- Contenedor Principal del Tablero y Listas -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                
+                <!-- Lista de Jugadores / Marcador -->
+                <div class="lg:col-span-1 space-y-3 bg-slate-950/40 p-4 rounded-2xl border border-slate-800/80">
+                    <h3 class="text-xs uppercase font-semibold text-slate-500 tracking-wider mb-2 flex items-center justify-between">
+                        <span>Marcador Estelar</span>
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                    </h3>
+                    <div id="scoreboard-list" class="space-y-2">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Area de Juego / Tablero Connect 4 -->
+                <div class="lg:col-span-3 space-y-2">
+                    <!-- Botones de caída superior / Indicadores clicables -->
+                    <div id="drop-triggers" class="grid gap-2 mb-1 px-2">
+                        <!-- Generado dinámicamente -->
+                    </div>
+
+                    <!-- El Tablero Físico -->
+                    <div class="relative bg-slate-950/80 border-4 border-slate-800 rounded-3xl p-3 shadow-inner shadow-black/80">
+                        <div id="board-grid" class="grid gap-2">
+                            <!-- Celdas generadas por Javascript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla Modal de Fin de Juego (Escondido por defecto) -->
+        <div id="endgame-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-6 rounded-3xl text-center space-y-6 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-16 -top-16 w-36 h-36 bg-blue-500/10 rounded-full blur-2xl"></div>
+                <div class="absolute -left-16 -bottom-16 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl"></div>
+
+                <div id="modal-icon-container" class="mx-auto w-16 h-16 rounded-full flex items-center justify-center text-3xl">
+                    <!-- Icono dinámico -->
+                </div>
+
+                <div class="space-y-2">
+                    <h2 id="modal-title" class="text-3xl font-black">¡Victoria Absoluta!</h2>
+                    <p id="modal-description" class="text-slate-400 text-sm">El jugador ha alineado 4 fichas en órbita diagonal.</p>
+                </div>
+
+                <!-- Recompensa Visual / Token ganador ampliado -->
+                <div id="modal-token-winner" class="w-20 h-20 rounded-full mx-auto animate-bounce flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-full bg-white/20"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="closeModalAndReset()" class="py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl hover:opacity-90 transition duration-300">
+                        Volver a Jugar
+                    </button>
+                    <button onclick="closeModalAndExit()" class="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition duration-300">
+                        Menú Principal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificaciones Flotantes Rápidas (P.ej. Fin de Tiempo) -->
+        <div id="toast" class="hidden fixed top-6 right-6 z-50 transform translate-y-10 opacity-0 transition-all duration-300 bg-red-950 border border-red-500 text-red-200 px-5 py-3 rounded-2xl flex items-center gap-3 shadow-lg">
+            <i class="fa-solid fa-circle-exclamation text-red-400"></i>
+            <div>
+                <b class="block text-xs font-bold uppercase tracking-wider">¡Tiempo Agotado!</b>
+                <span class="text-xs" id="toast-message">Ficha colocada en órbita aleatoria.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SISTEMA DE ESTRELLAS TWINKLING ---
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            generateStars();
+        }
+
+        function generateStars() {
+            stars = [];
+            const count = Math.floor((canvas.width * canvas.height) / 4000);
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    opacity: Math.random(),
+                    speed: 0.005 + Math.random() * 0.015
+                });
+            }
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.globalAlpha = Math.abs(Math.sin(star.opacity));
+                ctx.fill();
+                star.opacity += star.speed;
+            });
+            ctx.globalAlpha = 1.0;
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateStars();
+
+        // --- CONSTANTES DEL JUEGO ---
+        const ROWS = 6;
+        const PLAYER_CONFIGS = [
+            { id: 1, name: "Jugador Rojo", colorClass: "bg-red-500 glow-red", colorHex: "#ef4444", textClass: "text-red-500", keyColor: "red" },
+            { id: 2, name: "Jugador Amarillo", colorClass: "bg-yellow-400 glow-yellow", colorHex: "#eab308", textClass: "text-yellow-400", keyColor: "yellow" },
+            { id: 3, name: "Jugador Verde", colorClass: "bg-green-500 glow-green", colorHex: "#22c55e", textClass: "text-green-500", keyColor: "green" },
+            { id: 4, name: "Jugador Azul", colorClass: "bg-blue-500 glow-blue", colorHex: "#3b82f6", textClass: "text-blue-500", keyColor: "blue" }
+        ];
+
+        // --- ESTADO GLOBAL ---
+        let gameMode = "vs-machine"; // "vs-machine" o "vs-humans"
+        let numPlayers = 2; // de 2 a 4
+        let cols = 6; // Dinámico según numPlayers (2: 6cols, 3: 7cols, 4: 8cols)
+        let players = []; // Jugadores activos en la partida
+        let currentPlayerIndex = 0;
+        let board = []; // Representación 2D: array[row][col]
+        let timerSeconds = 15;
+        let timerInterval = null;
+        let gameActive = false;
+        let winsRecord = { 1: 0, 2: 0, 3: 0, 4: 0 }; // Histórico de victorias por id de jugador
+        let isComputerThinking = false;
+
+        // Iniciar pantalla previa de jugadores
+        updateSetupPreview();
+
+        function setGameMode(mode) {
+            gameMode = mode;
+            // Estilos visuales botones
+            document.getElementById('btn-mode-cpu').className = mode === 'vs-machine' 
+                ? "flex flex-col items-center justify-center p-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 text-white transition-all duration-300 hover:scale-[1.02]"
+                : "flex flex-col items-center justify-center p-4 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-400 transition-all duration-300 hover:scale-[1.02] hover:border-slate-700";
+            
+            document.getElementById('btn-mode-humans').className = mode === 'vs-humans'
+                ? "flex flex-col items-center justify-center p-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 text-white transition-all duration-300 hover:scale-[1.02]"
+                : "flex flex-col items-center justify-center p-4 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-400 transition-all duration-300 hover:scale-[1.02] hover:border-slate-700";
+
+            updateSetupPreview();
+        }
+
+        function setPlayerCount(count) {
+            numPlayers = count;
+            cols = 4 + count; // 2 -> 6, 3 -> 7, 4 -> 8
+
+            for (let i = 2; i <= 4; i++) {
+                const btn = document.getElementById(`btn-play-${i}`);
+                if (i === count) {
+                    btn.className = "py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 text-white font-bold text-lg transition-all duration-300 hover:scale-[1.02]";
+                } else {
+                    btn.className = "py-3 px-4 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-400 font-bold text-lg transition-all duration-300 hover:scale-[1.02] hover:border-slate-700";
+                }
+            }
+
+            updateSetupPreview();
+        }
+
+        function updateSetupPreview() {
+            const container = document.getElementById('players-list-preview');
+            container.innerHTML = '';
+
+            for (let i = 0; i < numPlayers; i++) {
+                const config = PLAYER_CONFIGS[i];
+                let typeLabel = "Humano";
+                let typeIcon = "fa-user";
+                let badgeStyle = "bg-slate-800 text-slate-300";
+
+                if (gameMode === "vs-machine" && i > 0) {
+                    typeLabel = "Máquina";
+                    typeIcon = "fa-robot";
+                    badgeStyle = "bg-indigo-900/50 border border-indigo-500/30 text-indigo-300 animate-pulse";
+                }
+
+                container.innerHTML += `
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full ${config.colorClass} flex items-center justify-center text-xl text-white font-extrabold shadow-lg">
+                            ${i+1}
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-white">${config.name}</div>
+                            <span class="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${badgeStyle}">
+                                <i class="fa-solid ${typeIcon} text-[9px]"></i> ${typeLabel}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function startGame() {
+            // Inicializar Jugadores
+            players = [];
+            for (let i = 0; i < numPlayers; i++) {
+                const config = PLAYER_CONFIGS[i];
+                const isCpu = (gameMode === "vs-machine" && i > 0);
+                players.push({
+                    id: config.id,
+                    name: isCpu ? `Máquina ${i}` : (gameMode === "vs-machine" ? "Tú (Humano)" : `Jugador ${i+1}`),
+                    colorClass: config.colorClass,
+                    colorHex: config.colorHex,
+                    textClass: config.textClass,
+                    isCpu: isCpu
+                });
+            }
+
+            // Actualizar Leyendas
+            document.getElementById('keyboard-legend-start').textContent = "1";
+            document.getElementById('keyboard-legend-end').textContent = cols.toString();
+
+            // Preparar UI del tablero
+            buildBoardUI();
+            resetGame();
+
+            // Ocultar pantalla de setup y mostrar la de juego
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+        }
+
+        function buildBoardUI() {
+            const grid = document.getElementById('board-grid');
+            grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            grid.innerHTML = '';
+
+            // Construir celdas del tablero (6 filas, X columnas)
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < cols; c++) {
+                    grid.innerHTML += `
+                        <div id="cell-${r}-${c}" class="aspect-square bg-slate-900 border border-slate-800/80 rounded-full flex items-center justify-center p-1 relative shadow-inner shadow-black transition-all duration-300">
+                            <!-- El círculo hueco interior de la máscara del tablero -->
+                            <div class="w-full h-full rounded-full bg-slate-950/40 border border-slate-950/20 shadow-inner"></div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Construir los botones superiores clicables para dejar caer fichas
+            const dropTriggers = document.getElementById('drop-triggers');
+            dropTriggers.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            dropTriggers.innerHTML = '';
+
+            for (let c = 0; c < cols; c++) {
+                dropTriggers.innerHTML += `
+                    <button type="button" onclick="handleColInput(${c})" onmouseenter="highlightCol(${c}, true)" onmouseleave="highlightCol(${c}, false)" class="group flex flex-col items-center justify-center py-2 bg-slate-900/30 border border-slate-800/40 hover:bg-slate-800 hover:border-slate-700 rounded-xl transition-all duration-200">
+                        <span class="text-xs font-mono font-bold text-slate-500 group-hover:text-white transition duration-200">${c + 1}</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-600 group-hover:text-indigo-400 group-hover:translate-y-0.5 transition-all duration-200 mt-1"></i>
+                    </button>
+                `;
+            }
+        }
+
+        function highlightCol(col, active) {
+            if (!gameActive || isComputerThinking) return;
+            for (let r = 0; r < ROWS; r++) {
+                const cell = document.getElementById(`cell-${r}-${col}`);
+                if (cell) {
+                    if (active) {
+                        cell.classList.add('bg-slate-800/30', 'border-indigo-500/30');
+                    } else {
+                        cell.classList.remove('bg-slate-800/30', 'border-indigo-500/30');
+                    }
+                }
+            }
+        }
+
+        function resetGame() {
+            // Resetear el array bidimensional
+            board = Array(ROWS).fill(null).map(() => Array(cols).fill(0));
+            
+            // Limpiar UI visual del tablero
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.getElementById(`cell-${r}-${c}`);
+                    if (cell) {
+                        cell.innerHTML = '<div class="w-full h-full rounded-full bg-slate-950/40 border border-slate-950/20 shadow-inner"></div>';
+                    }
+                }
+            }
+
+            currentPlayerIndex = 0;
+            gameActive = true;
+            isComputerThinking = false;
+            updateScoreboard();
+            startTimer();
+            updateHUDActivePlayer();
+        }
+
+        function updateScoreboard() {
+            const list = document.getElementById('scoreboard-list');
+            list.innerHTML = '';
+
+            players.forEach((player, index) => {
+                const wins = winsRecord[player.id] || 0;
+                const isActive = index === currentPlayerIndex;
+                const activeStyle = isActive ? `border-indigo-500 bg-indigo-500/10 active-glow` : `border-slate-800 bg-slate-950/20`;
+
+                list.innerHTML += `
+                    <div style="color: ${player.colorHex}" class="flex items-center justify-between p-3 rounded-xl border-2 ${activeStyle} transition-all duration-300">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-3.5 h-3.5 rounded-full ${player.colorClass}"></div>
+                            <div class="text-sm font-bold truncate max-w-[120px]">${player.name}</div>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 text-white font-mono font-black px-2.5 py-1 rounded-lg text-xs flex items-center gap-1">
+                            <i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                            <span>${wins}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateHUDActivePlayer() {
+            const activePlayer = players[currentPlayerIndex];
+            const badge = document.getElementById('hud-player-badge');
+            
+            badge.innerHTML = `
+                <div class="w-4 h-4 rounded-full ${activePlayer.colorClass}"></div>
+                <span style="color: ${activePlayer.colorHex}" class="font-extrabold text-sm">${activePlayer.name}</span>
+            `;
+        }
+
+        function handleColInput(colIndex) {
+            if (!gameActive || isComputerThinking) return;
+            
+            const activePlayer = players[currentPlayerIndex];
+            if (activePlayer.isCpu) return; // Si es turno de la CPU, ignorar entrada de humanos
+
+            dropToken(colIndex);
+        }
+
+        function dropToken(colIndex) {
+            if (colIndex < 0 || colIndex >= cols) return;
+
+            // Encontrar la fila vacía más baja disponible
+            let rowToPlace = -1;
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][colIndex] === 0) {
+                    rowToPlace = r;
+                    break;
+                }
+            }
+
+            // Si la columna está llena, ignorar movimiento
+            if (rowToPlace === -1) return;
+
+            const activePlayer = players[currentPlayerIndex];
+
+            // Registrar movimiento en lógica de datos
+            board[rowToPlace][colIndex] = activePlayer.id;
+
+            // Actualizar celda gráfica con ficha animada
+            const cell = document.getElementById(`cell-${rowToPlace}-${colIndex}`);
+            if (cell) {
+                cell.innerHTML = `
+                    <div class="w-full h-full rounded-full ${activePlayer.colorClass} token-anim flex items-center justify-center">
+                        <div class="w-2/3 h-2/3 rounded-full bg-white/10 border border-white/20"></div>
+                    </div>
+                `;
+            }
+
+            // Comprobar si hay ganador
+            if (checkWin(rowToPlace, colIndex, activePlayer.id)) {
+                endGame(activePlayer);
+                return;
+            }
+
+            // Comprobar empate (tablero lleno)
+            if (checkDraw()) {
+                endGame(null);
+                return;
+            }
+
+            // Turno finalizado, cambiar al siguiente jugador
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            updateScoreboard();
+            updateHUDActivePlayer();
+            startTimer();
+
+            // Si el siguiente jugador es CPU, activar el cerebro artificial
+            if (players[currentPlayerIndex].isCpu) {
+                triggerComputerTurn();
+            }
+        }
+
+        function checkWin(r, c, playerId) {
+            // Direcciones a evaluar: [delta_fila, delta_col]
+            const directions = [
+                [0, 1],   // Horizontal
+                [1, 0],   // Vertical
+                [1, 1],   // Diagonal hacia abajo-derecha
+                [1, -1]   // Diagonal hacia abajo-izquierda
+            ];
+
+            for (const [dr, dc] of directions) {
+                let count = 1;
+
+                // Buscar en dirección positiva
+                let step = 1;
+                while (true) {
+                    const nr = r + dr * step;
+                    const nc = c + dc * step;
+                    if (nr >= 0 && nr < ROWS && nc >= 0 && nc < cols && board[nr][nc] === playerId) {
+                        count++;
+                        step++;
+                    } else {
+                        break;
+                    }
+                }
+
+                // Buscar en dirección opuesta (negativa)
+                step = 1;
+                while (true) {
+                    const nr = r - dr * step;
+                    const nc = c - dc * step;
+                    if (nr >= 0 && nr < ROWS && nc >= 0 && nc < cols && board[nr][nc] === playerId) {
+                        count++;
+                        step++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (count >= 4) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function checkDraw() {
+            for (let c = 0; c < cols; c++) {
+                if (board[0][c] === 0) return false; // Todavía hay espacio
+            }
+            return true;
+        }
+
+        function triggerComputerTurn() {
+            isComputerThinking = true;
+            clearInterval(timerInterval); // Pausar temporizador mientras la CPU procesa su jugada
+
+            // Simulación física de latencia cerebral (entre 0.8s y 1.4s)
+            const thinkDelay = 800 + Math.random() * 600;
+
+            setTimeout(() => {
+                if (!gameActive) return;
+                const bestCol = computeBestMove();
+                isComputerThinking = false;
+                dropToken(bestCol);
+            }, thinkDelay);
+        }
+
+        function computeBestMove() {
+            const cpuPlayer = players[currentPlayerIndex];
+            const cpuId = cpuPlayer.id;
+
+            // 1. REGLA DE GANANCIA DIRECTA: Si la CPU puede ganar en este turno, hazlo
+            for (let c = 0; c < cols; c++) {
+                const nextRow = getNextAvailableRow(c);
+                if (nextRow !== -1) {
+                    board[nextRow][c] = cpuId;
+                    const wins = checkWin(nextRow, c, cpuId);
+                    board[nextRow][c] = 0; // revertir simulación
+                    if (wins) return c;
+                }
+            }
+
+            // 2. REGLA DE BLOQUEO DE OPONENTES: Si cualquier oponente puede ganar en su siguiente turno, bloquea
+            // Evaluar para cada rival
+            const opponents = players.filter(p => p.id !== cpuId);
+            for (const opponent of opponents) {
+                for (let c = 0; c < cols; c++) {
+                    const nextRow = getNextAvailableRow(c);
+                    if (nextRow !== -1) {
+                        board[nextRow][c] = opponent.id;
+                        const wins = checkWin(nextRow, c, opponent.id);
+                        board[nextRow][c] = 0; // revertir simulación
+                        if (wins) return c;
+                    }
+                }
+            }
+
+            // 3. MOVIMIENTO HEURÍSTICO / ESTRATÉGICO
+            // Preferimos columnas cercanas al centro (el centro da más oportunidades orbitales)
+            const centerCol = Math.floor(cols / 2);
+            let candidates = [];
+            for (let c = 0; c < cols; c++) {
+                if (getNextAvailableRow(c) !== -1) {
+                    candidates.push(c);
+                }
+            }
+
+            // Ordenar candidatos según cercanía al centro
+            candidates.sort((a, b) => {
+                return Math.abs(a - centerCol) - Math.abs(b - centerCol);
+            });
+
+            // Dar preferencia al grupo central de columnas con algo de aleatoriedad
+            if (candidates.length > 0) {
+                // Tomamos las 3 mejores columnas estratégicas y elegimos una
+                const poolSize = Math.min(3, candidates.length);
+                const chosenIdx = Math.floor(Math.random() * poolSize);
+                return candidates[chosenIdx];
+            }
+
+            // Fallback (último recurso)
+            return Math.floor(Math.random() * cols);
+        }
+
+        function getNextAvailableRow(colIndex) {
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][colIndex] === 0) return r;
+            }
+            return -1;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerSeconds = 15;
+            updateTimerUI();
+
+            timerInterval = setInterval(() => {
+                timerSeconds -= 0.1;
+                if (timerSeconds <= 0) {
+                    timerSeconds = 0;
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+                updateTimerUI();
+            }, 100);
+        }
+
+        function updateTimerUI() {
+            const display = document.getElementById('timer-display');
+            const progress = document.getElementById('timer-progress-bar');
+            
+            display.textContent = `${timerSeconds.toFixed(1)}s`;
+            
+            const pct = (timerSeconds / 15) * 100;
+            progress.style.width = `${pct}%`;
+
+            // Cambiar colores si queda poco tiempo
+            if (timerSeconds < 4) {
+                display.className = "font-mono text-xl font-bold text-red-500 animate-bounce";
+                progress.className = "absolute left-0 bottom-0 h-1 bg-red-600 transition-all duration-100";
+            } else if (timerSeconds < 8) {
+                display.className = "font-mono text-xl font-bold text-yellow-400";
+                progress.className = "absolute left-0 bottom-0 h-1 bg-yellow-500 transition-all duration-100";
+            } else {
+                display.className = "font-mono text-xl font-bold text-emerald-400";
+                progress.className = "absolute left-0 bottom-0 h-1 bg-emerald-500 transition-all duration-100";
+            }
+        }
+
+        function handleTimeout() {
+            if (!gameActive) return;
+
+            // Lanzar notificación/Toast de aviso de tiempo expirado
+            const activePlayer = players[currentPlayerIndex];
+            showToast(`¡Tiempo expirado para ${activePlayer.name}! Se ha realizado un lanzamiento aleatorio orbital.`);
+
+            // Encontrar columnas disponibles
+            let availableCols = [];
+            for (let c = 0; c < cols; c++) {
+                if (board[0][c] === 0) {
+                    availableCols.push(c);
+                }
+            }
+
+            if (availableCols.length > 0) {
+                const randomCol = availableCols[Math.floor(Math.random() * availableCols.length)];
+                dropToken(randomCol);
+            }
+        }
+
+        // --- SISTEMA DE NOTIFICACIONES CUSTOM (EVITA ALERT) ---
+        let toastTimeout = null;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            
+            toastMsg.textContent = message;
+            toast.classList.remove('hidden');
+            
+            // Forzar reflow para animación CSS
+            void toast.offsetWidth;
+            
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 4000);
+        }
+
+        // --- MANEJO DEL FINAL DEL JUEGO ---
+        function endGame(winner) {
+            gameActive = false;
+            clearInterval(timerInterval);
+
+            const modal = document.getElementById('endgame-modal');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-description');
+            const iconContainer = document.getElementById('modal-icon-container');
+            const tokenWinner = document.getElementById('modal-token-winner');
+
+            if (winner) {
+                // Sumar victoria al record
+                winsRecord[winner.id] = (winsRecord[winner.id] || 0) + 1;
+                
+                title.textContent = "¡Victoria Orbital!";
+                desc.textContent = `Felicidades, ${winner.name} alineó perfectamente 4 satélites en gravedad estelar.`;
+                title.style.color = winner.colorHex;
+
+                iconContainer.className = "mx-auto w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+                iconContainer.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+
+                tokenWinner.className = `w-16 h-16 rounded-full mx-auto animate-bounce flex items-center justify-center ${winner.colorClass}`;
+                tokenWinner.innerHTML = '<div class="w-10 h-10 rounded-full bg-white/20 border border-white/40"></div>';
+                tokenWinner.style.color = winner.colorHex;
+            } else {
+                title.textContent = "¡Empate en el Espacio!";
+                desc.textContent = "Se han agotado todas las órbitas y columnas sin un alineamiento completo.";
+                title.style.color = "#94a3b8";
+
+                iconContainer.className = "mx-auto w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-slate-800 text-slate-400 border border-slate-700";
+                iconContainer.innerHTML = '<i class="fa-solid fa-handshake"></i>';
+
+                tokenWinner.className = "hidden";
+            }
+
+            // Mostrar el Modal de Victoria/Empate
+            modal.classList.remove('hidden');
+        }
+
+        function closeModalAndReset() {
+            document.getElementById('endgame-modal').classList.add('hidden');
+            resetGame();
+        }
+
+        function closeModalAndExit() {
+            document.getElementById('endgame-modal').classList.add('hidden');
+            goToSetup();
+        }
+
+        function goToSetup() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+        }
+
+        // --- ESCUCHA DE EVENTOS DEL TECLADO PARA FICHAS ---
+        window.addEventListener('keydown', (e) => {
+            if (!gameActive || isComputerThinking) return;
+
+            // Escuchar teclas numéricas correspondientes al número de columnas disponibles en este tablero
+            const key = parseInt(e.key);
+            if (!isNaN(key) && key >= 1 && key <= cols) {
+                // El usuario digita del 1 a n, transformamos a índice 0 a n-1
+                handleColInput(key - 1);
+            }
+        });
+    </script>
+</body>
+</html>
