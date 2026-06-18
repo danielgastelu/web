@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Cósmico - Recursos Educativos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #020513;
+            --card-bg: rgba(10, 16, 45, 0.6);
+            --primary: #00f0ff;
+            --secondary: #ff007f;
+            --text-light: #e0e6ed;
+            --text-muted: #8a9bb2;
+            --neon-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(255, 0, 127, 0.08) 0%, transparent 50%);
+            color: var(--text-light);
+            font-family: 'Exo 2', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Estrellas dinámicas */
+        .stars {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            animation: starsDrift 100s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes starsDrift {
+            from { background-position: 0 0; }
+            to { background-position: -10000px 5000px; }
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0 0 15px 0;
+            text-shadow: var(--neon-shadow);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 3rem auto;
+            max-width: 900px;
+            padding: 0 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper, .filter-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .controls input, .controls select {
+            width: 100%;
+            padding: 16px 20px 16px 45px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            background: rgba(2, 5, 19, 0.8);
+            color: white;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .controls input:focus, .controls select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        main {
+            flex: 1;
+            padding: 0 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-topic {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            display: inline-block;
+            background: rgba(255, 0, 127, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            line-height: 1.3;
+            color: #fff;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex: 1;
+        }
+
+        .card-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 0;
+            background: transparent;
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            font-weight: 600;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .card-link:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: var(--neon-shadow);
+        }
+
+        .status-message {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 240, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: auto;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        footer img {
+            height: 60px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            filter: grayscale(100%) brightness(200%);
+        }
+
+        footer img:hover {
+            opacity: 1;
+            filter: grayscale(0%) brightness(100%);
+            transform: scale(1.05);
+        }
+
+        .footer-text {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        @media (max-width: 768px) {
+            .controls { flex-direction: column; }
+            .search-wrapper, .filter-wrapper { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <header>
+        <h1>Explorador Cósmico</h1>
+        <p class="subtitle">Navega por el universo del conocimiento. Un catálogo interactivo de recursos educativos actualizado en tiempo real.</p>
+    </header>
+
+    <div class="controls">
+        <div class="filter-wrapper">
+            <span class="icon">🪐</span>
+            <select id="topicFilter">
+                <option value="all">Todas las constelaciones (Temas)</option>
+            </select>
+        </div>
+        <div class="search-wrapper">
+            <span class="icon">🛰️</span>
+            <input type="text" id="textSearch" placeholder="Escanear cuadrante (Buscar texto...)">
+        </div>
+    </div>
+
+    <main>
+        <div id="grid" class="grid">
+            <div class="status-message">
+                <div class="loader"></div>
+                <div>Estableciendo conexión con la base de datos central...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <a href="https://uruguayeduca.anep.edu.uy/" target="_blank" rel="noopener noreferrer">
+            <img src="https://uruguayeduca.anep.edu.uy/sites/all/themes/uruguayeduca/logo.png" alt="Uruguay Educa Logo" onerror="this.onerror=null; this.src='https://uruguayeduca.anep.edu.uy/sites/default/files/inline-images/logo-uruguay-educa-2020.png';">
+            <div class="footer-text">Portal Educativo - Uruguay Educa</div>
+        </a>
+    </footer>
+
+    <script>
+        // URL de exportación CSV. Usamos una consulta que intenta traer la hoja "Recursos" o la hoja principal.
+        // Si el archivo tiene la hoja 'Recursos', puedes agregar &gid=ID_DE_LA_HOJA. Por defecto exporta la primera.
+        const sheetUrls = [
+            "https://docs.google.com/spreadsheets/d/1kreViUIlvUqtE76T48OoUXNrbE7QnsLwO2Tey676SK8/export?format=csv",
+            "https://docs.google.com/spreadsheets/d/1kreViUIlvUqtE76T48OoUXNrbE7QnsLwO2Tey676SK8/gviz/tq?tqx=out:csv&sheet=Recursos"
+        ];
+        
+        let catalogData = [];
+        let tKey, topKey, dKey, lKey;
+
+        // Intentar cargar la hoja principal
+        fetchData(sheetUrls[0]);
+
+        function fetchData(url) {
+            Papa.parse(url, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    // Validar si los datos recibidos parecen HTML de error en lugar de CSV
+                    if(results.data.length > 0 && Object.keys(results.data[0]).length === 1 && Object.keys(results.data[0])[0].includes("<!DOCTYPE html>")) {
+                        showError("La base de datos requiere permisos de acceso. Asegúrate de que el documento sea público.");
+                        return;
+                    }
+                    init(results.data);
+                },
+                error: function(error) {
+                    showError("Interferencia en la señal intergaláctica. No se pudo acceder a los datos.");
+                    console.error("Error PapaParse:", error);
+                }
+            });
+        }
+
+        function showError(msg) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = `<div class="status-message" style="color: #ff007f;">
+                <span style="font-size: 3rem;">⚠️</span>
+                <strong>Fallo de Sincronización</strong>
+                <p>${msg}</p>
+            </div>`;
+        }
+
+        function init(data) {
+            if(!data || data.length === 0) {
+                const grid = document.getElementById('grid');
+                grid.innerHTML = '<div class="status-message">El cuadrante está vacío. No hay recursos detectados.</div>';
+                return;
+            }
+            
+            const headers = Object.keys(data[0]);
+            
+            // Detección heurística de columnas independientemente del nombre exacto que tengan en el Excel
+            tKey = headers.find(h => /t[íi]tulo|nombre|recurso/i.test(h)) || headers[0];
+            topKey = headers.find(h => /tema|categor[íi]a|materia|área|tipo/i.test(h)) || (headers.length > 1 ? headers[1] : headers[0]);
+            dKey = headers.find(h => /descripci[óo]n|resumen|detalle|texto/i.test(h)) || (headers.length > 2 ? headers[2] : headers[0]);
+            lKey = headers.find(h => /enlace|url|link|acceso/i.test(h)) || (headers.length > 3 ? headers[3] : headers[0]);
+
+            // Filtrar filas inválidas (sin título)
+            catalogData = data.filter(row => row[tKey] && row[tKey].trim() !== '');
+
+            // Generar filtros dinámicamente
+            const topics = new Set();
+            catalogData.forEach(row => {
+                const val = row[topKey];
+                if(val && val.trim() !== '') {
+                    topics.add(val.trim());
+                }
+            });
+            
+            const topicSelect = document.getElementById('topicFilter');
+            [...topics].sort().forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                topicSelect.appendChild(opt);
+            });
+
+            // Listeners
+            document.getElementById('topicFilter').addEventListener('change', filterData);
+            document.getElementById('textSearch').addEventListener('input', filterData);
+
+            // Render Inicial
+            renderCatalog(catalogData);
+        }
+
+        function filterData() {
+            const selectedTopic = document.getElementById('topicFilter').value;
+            const searchText = document.getElementById('textSearch').value.toLowerCase();
+
+            const filtered = catalogData.filter(row => {
+                const matchTopic = selectedTopic === 'all' || (row[topKey] && row[topKey].trim() === selectedTopic);
+                const textTarget = (row[dKey] || "") + " " + (row[tKey] || "");
+                const matchText = !searchText || textTarget.toLowerCase().includes(searchText);
+                return matchTopic && matchText;
+            });
+
+            renderCatalog(filtered);
+        }
+
+        function renderCatalog(data) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            if(data.length === 0) {
+                grid.innerHTML = '<div class="status-message">No se detectaron formas de vida ni recursos con esos parámetros.</div>';
+                return;
+            }
+
+            data.forEach(row => {
+                const title = row[tKey] || 'Recurso No Identificado';
+                const topic = row[topKey] || 'General';
+                const desc = row[dKey] || 'Sin descripción en los registros.';
+                let link = row[lKey] || '#';
+                
+                if(link !== '#' && !link.match(/^https?:\/\//i)) {
+                    link = 'https://' + link;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-topic">${topic}</div>
+                    <h3 class="card-title">${title}</h3>
+                    <div class="card-desc">${desc}</div>
+                    <a href="${link}" class="card-link" target="_blank" rel="noopener noreferrer">
+                        🚀 Iniciar Misión
+                    </a>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
