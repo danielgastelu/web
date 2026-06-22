@@ -1,47 +1,56 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exoplanetas: Nuevos mundos más allá de nuestro Sol</title>
-    <!-- Tailwind CSS para el diseño responsive y moderno -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        space: {
-                            950: '#030712',
-                            900: '#0b0f19',
-                            800: '#111827',
-                            700: '#1f2937',
-                            deep: '#05050d'
-                        },
-                        neon: {
-                            cyan: '#06b6d4',
-                            blue: '#3b82f6',
-                            purple: '#a855f7',
-                            gold: '#f59e0b'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Paleta de Colores Globales en CSS Nativo */
+        :root {
+            --space-950: #030712;
+            --space-900: #0b0f19;
+            --space-800: #111827;
+            --space-700: #1f2937;
+            --space-deep: #05050d;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --neon-cyan: #06b6d4;
+            --neon-blue: #3b82f6;
+            --neon-purple: #a855f7;
+            --neon-gold: #f59e0b;
+        }
+
+        /* Estilos Base Globales */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #030712;
+            background-color: var(--space-950);
+            color: var(--slate-100);
             overflow-x: hidden;
+            line-height: 1.5;
         }
-        /* Efecto de estrellas de fondo */
+        
+        ::selection {
+            background-color: var(--neon-cyan);
+            color: var(--space-950);
+        }
+
+        /* Fondo Animado Estrellado */
         .stars {
+            position: relative;
             background-image: 
                 radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
                 radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
@@ -54,554 +63,494 @@
             from { background-position: 0 0, 40px 60px, 130px 270px; }
             to { background-position: 550px 1100px, 400px 760px, 380px 1370px; }
         }
-        /* Brillos difusos tipo nebulosa */
-        .nebula-cyan {
+
+        /* Nebulosas Decorativas de Fondo */
+        .nebula-layer {
+            position: absolute;
+            pointer-events: none;
+            z-index: -10;
+            border-radius: 50%;
+        }
+        .nebula-1 {
+            top: 0; left: 0; width: 100%; height: 1000px;
             filter: blur(140px);
             background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
         }
-        .nebula-purple {
-            filter: blur(140px);
-            background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
+
+        /* Estructuras de Maquetación */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
         }
-        /* Glassmorphism */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+        @media(min-width: 768px) {
+            .grid-md-2 { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+        }
+        
+        /* MAQUETACIÓN ESTRICTA DEL SIMULADOR */
+        .grid-sim {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        @media(min-width: 992px) {
+            .grid-sim {
+                grid-template-columns: 7fr 5fr;
+                align-items: start;
+            }
+        }
+
+        /* Paneles Estilo Glassmorphism */
         .glass-panel {
             background: rgba(15, 23, 42, 0.55);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-        .glass-panel-hover {
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+            padding: 1rem 0;
+        }
+        .header-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.125rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--slate-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        nav {
+            display: none;
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            nav { display: flex; }
+        }
+        nav a {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--slate-300);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--neon-cyan); }
+
+        /* Botonera */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-cyan));
+            color: var(--space-950);
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2);
+        }
+        .btn-primary:hover { transform: scale(1.03); }
+        .btn-large { padding: 1rem 2rem; border-radius: 0.75rem; font-size: 0.95rem; }
+        .btn-dark { background: var(--slate-900); color: white; border: 1px solid var(--slate-700); }
+
+        /* Hero */
+        .hero {
+            min-height: 45vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem 0;
+        }
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.85rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+        .pill-dot { width: 0.5rem; height: 0.5rem; background-color: var(--neon-cyan); border-radius: 50%; }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        @media(min-width: 768px) { .hero h1 { font-size: 4rem; } }
+        .hero h1 span {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            background: linear-gradient(to right, var(--neon-cyan), var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Secciones */
+        section.py { padding: 4.5rem 0; }
+        .bg-strip { background-color: rgba(11, 15, 25, 0.5); border-top: 1px solid var(--slate-800); border-bottom: 1px solid var(--slate-800); }
+        .sec-tag { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .tag-purple { color: var(--neon-purple); }
+        .tag-cyan { color: var(--neon-cyan); }
+        .sec-title { font-size: 1.875rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .text-center { text-align: center; }
+        .max-w-3xl { max-width: 48rem; margin: 0 auto; }
+
+        /* Estilos de Contenido Didáctico y Reflexión */
+        .didactic-text { font-size: 0.95rem; color: var(--slate-300); margin-bottom: 1rem; }
+        .reflection-container { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 2rem; }
+        .reflection-card {
+            background: rgba(30, 41, 59, 0.3);
+            border-left: 4px solid var(--neon-cyan);
+            border-radius: 0 1rem 1rem 0;
+            padding: 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--neon-cyan);
+        }
+        .reflection-card h4 { font-size: 1rem; font-weight: 700; color: var(--slate-100); margin-bottom: 0.5rem; }
+        .reflection-card p { font-size: 0.875rem; color: var(--slate-300); }
+
+        /* Componentes del Laboratorio de Controles */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label-wrap { display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.35rem; }
+        .form-select {
+            width: 100%;
+            background: var(--slate-900);
+            border: 1px solid var(--slate-700);
+            border-radius: 0.75rem;
+            padding: 0.65rem 1rem;
+            color: var(--slate-200);
+            font-size: 0.875rem;
+            outline: none;
+        }
+        input[type="range"] {
+            width: 100%;
+            background: var(--slate-800);
+            border-radius: 0.5rem;
+            height: 0.5rem;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        .help-text { font-size: 0.72rem; color: var(--slate-400); margin-top: 0.25rem; line-height: 1.3; }
+
+        /* Canvas Containers */
+        .canvas-container {
+            background: var(--space-deep);
+            border: 1px solid var(--slate-800);
+            border-radius: 1rem;
+            overflow: hidden;
+            width: 100%;
+        }
+        .simulation-box { aspect-ratio: 2 / 1; min-height: 250px; }
+        .chart-box { height: 130px; margin-top: 0.5rem; padding: 0.5rem; }
+        canvas { width: 100%; height: 100%; display: block; }
+
+        /* Telemetría */
+        .telemetry-box {
+            background: linear-gradient(to bottom right, rgba(30, 27, 75, 0.4), var(--space-950));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .telemetry-list { margin-top: 0.5rem; font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
+
+        /* Elementos Gráficos Estáticos Auxiliares */
+        .image-container {
+            width: 100%; height: 200px; border-radius: 1rem; overflow: hidden; margin-bottom: 1rem; background: var(--space-deep);
+        }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .italic-cap { font-size: 0.7rem; color: var(--slate-400); font-style: italic; }
+
+        /* Secciones de Trivia Especializada */
+        .quiz-intro, .quiz-question, .quiz-result { display: flex; flex-direction: column; gap: 1rem; text-align: center; }
+        .quiz-title { font-size: 1.3rem; font-weight: 700; color: var(--slate-100); }
+        .options-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+        .option-btn {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--slate-700);
+            border-radius: 0.75rem;
+            padding: 0.95rem 1.25rem;
+            color: var(--slate-200);
+            text-align: left;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) { border-color: var(--neon-cyan); background: rgba(6, 182, 212, 0.05); }
+        .option-btn:disabled { cursor: not-allowed; }
+        .quiz-emoji { font-size: 3rem; }
+        .hidden { display: none !important; }
+
+        /* Pie de página nativo */
+        .main-footer {
+            margin-top: 4rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 20;
+        }
+        .footer-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            max-width: 900px;
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 1.25rem;
+            text-decoration: none;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glass-panel-hover:hover {
-            background: rgba(15, 23, 42, 0.75);
-            border-color: rgba(6, 182, 212, 0.4);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px 0 rgba(6, 182, 212, 0.15);
+        .footer-card:hover {
+            border-color: rgba(245, 158, 11, 0.35);
+            background: rgba(15, 23, 42, 0.55);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.04);
+        }
+        .footer-logo {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.75;
+            transition: opacity 0.3s ease;
+        }
+        .footer-card:hover .footer-logo { opacity: 1; }
+        .footer-text {
+            font-size: 0.75rem;
+            color: rgba(148, 163, 184, 0.7);
+            text-align: center;
+            line-height: 1.6;
+            letter-spacing: 0.01em;
+            transition: color 0.3s ease;
+        }
+        .footer-card:hover .footer-text { color: var(--slate-200); }
+        @media (min-width: 640px) {
+            .footer-card { flex-direction: row; text-align: left; gap: 1.75rem; }
+            .footer-text { text-align: left; font-size: 0.8rem; }
         }
     </style>
 </head>
-<body class="text-slate-100 selection:bg-neon-cyan selection:text-space-950 stars">
+<body class="stars">
 
-    <!-- Capas de nebulosas de fondo -->
-    <div class="absolute top-0 left-0 w-full h-[1000px] nebula-cyan -z-10 pointer-events-none"></div>
-    <div class="absolute top-[1200px] right-0 w-[500px] h-[500px] nebula-purple -z-10 pointer-events-none"></div>
-    <div class="absolute bottom-[800px] left-10 w-[600px] h-[600px] nebula-cyan -z-10 pointer-events-none"></div>
+    <div class="nebula-layer nebula-1"></div>
 
-    <!-- Encabezado / Barra de Navegación -->
-    <header class="sticky top-0 z-50 bg-space-950/80 backdrop-blur-md border-b border-slate-800/60 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <!-- Icono de telescopio SVG -->
-                <svg class="w-8 h-8 text-neon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <header>
+        <div class="container header-wrap">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--neon-cyan)" stroke-width="2">
                     <path d="M10.05 13.95L3 21M13.95 10.05L21 3M14 21h-4v-4h4v4zM19 13.5L13.5 19" stroke-linecap="round"/>
                     <circle cx="9.5" cy="9.5" r="5.5" stroke-dasharray="2 2"/>
                 </svg>
-                <span class="font-extrabold text-lg tracking-wider bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent uppercase">ExoMundo</span>
+                <span>ExoMundo</span>
             </div>
-            <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-300">
-                <a href="#que-es" class="hover:text-neon-cyan transition-colors">¿Qué son?</a>
-                <a href="#descubrimiento" class="hover:text-neon-cyan transition-colors">¿Cómo se descubren?</a>
-                <a href="#simulador" class="hover:text-neon-cyan transition-colors">Simulador</a>
-                <a href="#estadisticas" class="hover:text-neon-cyan transition-colors">Exploración</a>
-                <a href="#vida" class="hover:text-neon-cyan transition-colors">¿Hay Vida?</a>
-                <a href="#trivial" class="hover:text-neon-cyan transition-colors">Desafío</a>
+            <nav>
+                <a href="#que-es">¿Qué son?</a>
+                <a href="#didactica">Guía Didáctica</a>
+                <a href="#simulador">Laboratorio</a>
+                <a href="#trivia-section">Trivia</a>
             </nav>
-            <a href="#simulador" class="bg-gradient-to-r from-neon-blue to-neon-cyan hover:from-neon-cyan hover:to-neon-blue text-space-950 font-bold px-4 py-2 rounded-full text-xs uppercase tracking-wider shadow-lg shadow-neon-cyan/20 transition-all duration-300 transform hover:scale-105">
-                Probar Simulador
-            </a>
+            <a href="#simulador" class="btn btn-primary">Probar Simulador</a>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-[90vh] flex items-center justify-center px-6 overflow-hidden">
-        <div class="max-w-5xl mx-auto text-center z-10 py-12">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/50 text-xs font-semibold text-neon-cyan mb-8 uppercase tracking-widest animate-pulse">
-                <span class="w-2 h-2 rounded-full bg-neon-cyan"></span> Viaje Interestelar
-            </div>
-            <h1 class="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none mb-6">
-                Exoplanetas
-                <span class="block text-2xl sm:text-4xl md:text-5xl mt-3 font-semibold bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-purple bg-clip-text text-transparent">
-                    nuevos mundos más allá de nuestro Sol
-                </span>
-            </h1>
-            <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-10">
-                ¿Alguna vez has mirado al cielo nocturno y te has preguntado si existen otros mundos girando alrededor de esas estrellas brillantes? La respuesta es <strong class="text-white font-semibold">SÍ</strong>, y los llamamos exoplanetas. ¡Acompáñanos a descubrirlos!
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#que-es" class="bg-slate-900 hover:bg-slate-800 text-white font-medium px-8 py-4 rounded-xl border border-slate-700 hover:border-slate-500 transition-all shadow-xl">
-                    Comenzar el viaje 👇
-                </a>
-                <a href="#simulador" class="bg-gradient-to-r from-neon-purple to-neon-blue hover:from-neon-blue hover:to-neon-purple text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg shadow-neon-purple/20">
-                    Ir al simulador de tránsito 🚀
-                </a>
-            </div>
+    <section class="hero">
+        <div class="container">
+            <div class="pill-badge"><span class="pill-dot"></span> Laboratorio Espacial</div>
+            <h1>Exoplanetas<span>Mundos en estrellas lejanas</span></h1>
+            <p style="max-width: 600px; margin: 0 auto; color: var(--slate-300);">Monitorea y altera propiedades de estrellas distantes. Observa los cambios fotométricos a la izquierda modificando el panel de control a la derecha.</p>
         </div>
-
-        <!-- Decoración del Hero: Un exoplaneta flotando -->
-        <div class="absolute -bottom-20 -right-20 md:right-10 md:bottom-10 w-72 h-72 rounded-full bg-gradient-to-tr from-neon-purple/40 to-transparent -z-10 animate-pulse blur-md"></div>
-        <div class="absolute top-20 left-10 w-40 h-40 rounded-full bg-gradient-to-br from-neon-cyan/20 to-transparent -z-10 animate-bounce blur-sm" style="animation-duration: 10s;"></div>
     </section>
 
-    <!-- Sección 1: ¿Qué es un exoplaneta? -->
-    <section id="que-es" class="py-24 px-6 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section id="que-es" class="py">
+        <div class="container grid-2">
             <div>
-                <div class="text-xs font-bold text-neon-purple uppercase tracking-wider mb-2">Definición Cósmica</div>
-                <h2 class="text-3xl md:text-4xl font-bold mb-6">¿Qué es exactamente un Exoplaneta?</h2>
-                <div class="space-y-6 text-slate-300 text-base leading-relaxed">
-                    <p>
-                        Un <strong class="text-neon-cyan">exoplaneta</strong> (o planeta extrasolar) es un planeta que orbita alrededor de una estrella diferente a nuestro Sol. En resumen: son mundos que pertenecen a otros sistemas solares.
-                    </p>
-                    <p>
-                        Hasta la década de 1990, solo conocíamos los planetas de nuestro propio Sistema Solar (como Marte, Júpiter o Saturno). Pero hoy sabemos que el universo está repleto de planetas. ¡Casi cada estrella que ves en el cielo podría tener al menos un planeta orbitándola!
-                    </p>
-                </div>
-
-                <!-- Tarjeta Interactiva / Datos rápidos -->
-                <div class="grid grid-cols-2 gap-4 mt-8">
-                    <div class="p-4 rounded-xl glass-panel">
-                        <div class="text-2xl font-bold text-neon-cyan">1992</div>
-                        <div class="text-xs text-slate-400">Año del primer descubrimiento confirmado</div>
-                    </div>
-                    <div class="p-4 rounded-xl glass-panel">
-                        <div class="text-2xl font-bold text-neon-purple">Miles</div>
-                        <div class="text-xs text-slate-400">De mundos esperando ser explorados</div>
-                    </div>
+                <div class="sec-tag tag-purple">Detección Fotométrica</div>
+                <h2 class="sec-title">¿Qué es un Exoplaneta?</h2>
+                <p style="color: var(--slate-300); margin-bottom: 1.5rem;">Un exoplaneta es cualquier mundo que orbita una estrella diferente a nuestro Sol. Al estar a distancias descomunales, analizamos la bajada de luz que producen al cruzar frente a su astro rey.</p>
+                <div class="glass-panel" style="padding: 1rem; display: flex; gap: 1rem;">
+                    <div style="flex: 1; text-align: center;"><h3 class="tag-cyan" style="font-size: 1.5rem;">1992</h3><p style="font-size: 0.75rem; color: var(--slate-400);">Primer hallazgo</p></div>
+                    <div style="flex: 1; text-align: center;"><h3 class="tag-purple" style="font-size: 1.5rem;">+5000</h3><p style="font-size: 0.75rem; color: var(--slate-400);">Confirmados</p></div>
                 </div>
             </div>
-
-            <!-- Gráfico visual: Imagen de Kepler-186f -->
-            <div class="relative flex justify-center">
-                <div class="relative w-full max-w-md glass-panel rounded-3xl overflow-hidden flex flex-col p-6 group transition-all duration-300 hover:border-neon-cyan/40">
-                    <!-- Contenedor de la Imagen con Aspect Ratio controlado -->
-                    <div class="relative w-full h-56 rounded-2xl overflow-hidden mb-4 border border-slate-800 bg-space-deep flex items-center justify-center">
-                        <img 
-                            src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Kepler186f-ComparisonGraphic-20140417.jpg" 
-                            alt="Comparación del sistema Kepler-186f con el de la Tierra" 
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop&q=60';"
-                        />
+            <div>
+                <div class="glass-panel">
+                    <div class="image-container">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Kepler186f-ComparisonGraphic-20140417.jpg" alt="Kepler">
                     </div>
+                    <h3 style="margin-bottom: 0.25rem;">Kepler-186f</h3>
+                    <div class="italic-cap">Planeta descubierto en la franja habitable exterior.</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <!-- Datos informativos -->
-                    <div class="z-10 flex flex-col justify-between flex-grow">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="text-xs font-semibold bg-neon-cyan/20 text-neon-cyan px-2.5 py-1 rounded-full uppercase">Tipo: Supertierra</span>
-                                <h3 class="text-xl font-bold mt-2 text-white">Kepler-186f</h3>
+    <section id="didactica" class="py bg-strip">
+        <div class="container">
+            <div class="text-center max-w-3xl" style="margin-bottom: 2.5rem;">
+                <div class="sec-tag tag-purple">Manual del Joven Astrónomo</div>
+                <h2 class="sec-title">Guía de Exploración Cosmic</h2>
+            </div>
+
+            <div class="grid-md-2" style="display: grid;">
+                <div class="glass-panel">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--neon-cyan);">Conceptos Clave para Investigar</h3>
+                    <p class="didactic-text">
+                        <strong>1. ¿En qué consiste un exoplaneta?</strong><br>
+                        Es un planeta que se encuentra fuera de nuestro sistema solar, orbitando una estrella lejana. Dado que las estrellas brillan millones de veces más que sus planetas, los astrónomos usan telescopios espaciales sensibles para registrar el momento exacto en el que el brillo estelar disminuye debido al bloqueo mecánico que ejerce el planeta al cruzar por delante.
+                    </p>
+                    <p class="didactic-text">
+                        <strong>2. La Zona "Ricitos de Oro" (Zona Habitable)</strong><br>
+                        Se define como la región alrededor de una estrella donde el flujo de radiación térmica permite que un planeta rocoso mantenga una temperatura óptima en su superficie: ni tan caliente como para evaporar las atmósferas, ni tan helada como para congelar los océanos. El agua líquida es el pilar de la biología tal como la conocemos.
+                    </p>
+                    <p class="didactic-text">
+                        <strong>3. Relación con la Emisión Energética</strong><br>
+                        La ubicación de esta zona templada depende de la masa y temperatura de la estrella central. Las estrellas masivas y calientes (como las <em>Gigantes Azules</em>) emiten tanta energía que su zona habitable se sitúa a distancias gigantescas. Por el contrario, las estrellas frías y compactas (como las <em>Enanas Rojas</em>) emiten tan poca energía que su zona "Ricitos de Oro" se localiza sumamente cerca de ellas.
+                    </p>
+                </div>
+
+                <div class="glass-panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--neon-purple);">Preguntas para Reflexionar</h3>
+                        <div class="reflection-container">
+                            <div class="reflection-card">
+                                <h4>💡 ¿Qué ocurre con la curva de luz si el planeta está muy cerca o muy lejos de la estrella?</h4>
+                                <p>Si el planeta está muy cerca, completa su traslación velozmente (su año dura pocos días), haciendo que las caídas de brillo en el gráfico fotométrico sean muy frecuentes. Si se encuentra lejos, las caídas de luz tardarán meses o años en registrarse de nuevo.</p>
+                            </div>
+                            <div class="reflection-card">
+                                <h4>💡 ¿Siempre es detectable un exoplaneta mediante la técnica del tránsito?</h4>
+                                <p>No, existe una severa limitación geométrica. Solo podemos registrar tránsitos si la órbita del planeta está perfectamente alineada de canto (a 0 grados de inclinación) con nuestra línea de visión desde la Tierra. Si la órbita está inclinada, el exoplaneta pasa por arriba o por abajo de la estrella sin eclipsarla, volviéndose invisible para esta técnica.</p>
                             </div>
                         </div>
-                        <p class="text-xs text-slate-300 mt-3 mb-4 leading-relaxed">
-                            Fue el primer planeta de tamaño similar a la Tierra descubierto en la "zona habitable" de otra estrella. Podría tener agua líquida en su superficie y un ecosistema templado.
-                        </p>
-                        <!-- Pie de foto requerido -->
-                        <div class="pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 italic">
-                            Comparación de sistema solar con sistema Kepler
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección 2: ¿Cómo se descubren? El Método del Tránsito -->
-    <section id="descubrimiento" class="py-20 px-6 bg-space-900/50 border-y border-slate-800/80">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <div class="text-xs font-bold text-neon-cyan uppercase tracking-wider mb-2">Método Científico</div>
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Cómo descubrimos planetas tan lejanos?</h2>
-                <p class="text-slate-300">
-                    Los exoplanetas están increíblemente lejos y no brillan por sí mismos (solo reflejan la luz de su estrella). ¡Verlos directamente con un telescopio común es casi imposible! Por eso usamos trucos de física muy ingeniosos. El más exitoso es el <strong class="text-white">Método del Tránsito</strong>.
-                </p>
+    <section id="simulador" class="py">
+        <div class="container">
+            <div class="text-center max-w-3xl" style="margin-bottom: 3rem;">
+                <div class="pill-badge">Análisis en Vivo</div>
+                <h2 class="sec-title">Laboratorio de Tránsitos y Habitabilidad</h2>
+                <p style="color: var(--slate-300);">Visualiza de forma síncrona el comportamiento planetario espacial. Ajusta inclinaciones, órbitas y tamaños estelares desde el menú derecho.</p>
             </div>
 
-            <!-- La Analogía Cotidiana -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                <div class="col-span-1 md:col-span-2 glass-panel p-8 rounded-2xl flex flex-col justify-between">
-                    <div>
-                        <div class="inline-flex items-center gap-2 text-neon-gold text-xs font-bold uppercase tracking-wider mb-4">
-                            <!-- Icono de bombilla -->
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                            </svg>
-                            La Analogía de la Lámpara
-                        </div>
-                        <h3 class="text-xl font-bold mb-4">¿Cómo funciona? Piensa en un insecto volando...</h3>
-                        <p class="text-slate-300 leading-relaxed mb-4">
-                            Imagina que estás mirando un farol público gigante a lo lejos por la noche. Si un pequeño insecto (un mosquito o una mosca) vuela y pasa justo por delante de la lámpara, el brillo de la luz disminuirá una cantidad insignificante, casi imperceptible, pero medible con sensores sensibles.
-                        </p>
-                        <p class="text-slate-300 leading-relaxed">
-                            En el espacio ocurre lo mismo: <strong class="text-neon-cyan">La lámpara es la estrella lejana</strong>, y <strong class="text-neon-purple">el insecto es el exoplaneta</strong>. Al pasar delante de ella, bloquea un poquito de su luz. ¡Eso es un tránsito!
-                        </p>
-                    </div>
-                    <div class="mt-6 p-4 bg-slate-900/60 rounded-xl border border-slate-800 text-xs text-slate-400">
-                        📌 <strong>Dato Científico:</strong> El telescopio Kepler de la NASA detectaba caídas en el brillo de hasta un 0.01%, ¡equivalente a ver el paso de una mosca delante de un faro de coche a varios kilómetros de distancia!
-                    </div>
-                </div>
-
-                <!-- Tarjeta de la curva de luz -->
-                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between border-t-4 border-t-neon-blue">
-                    <div>
-                        <span class="text-neon-blue text-xs font-bold uppercase tracking-wider">Concepto Clave</span>
-                        <h3 class="text-xl font-bold mt-2 mb-4">¿Qué es una Curva de Luz?</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Es un gráfico que registra cómo cambia el brillo de una estrella a lo largo del tiempo. 
-                        </p>
-                        <div class="my-6 p-3 bg-slate-950 rounded-lg flex items-center justify-center">
-                            <!-- Mini gráfico SVG representativo -->
-                            <svg class="w-full h-24 text-neon-blue" viewBox="0 0 200 100" fill="none">
-                                <path d="M 10 20 H 70 L 80 80 H 120 L 130 20 H 190" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                <line x1="10" y1="20" x2="190" y2="20" stroke="gray" stroke-dasharray="3 3"/>
-                                <text x="15" y="45" fill="gray" font-size="8">Brillo 100%</text>
-                                <text x="85" y="95" fill="#a855f7" font-size="8">Paso del Planeta</text>
-                                <!-- Flecha indicando el Tránsito -->
-                                <path d="M 100 30 V 65" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#arrow)"/>
-                            </svg>
-                        </div>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Cuando el planeta pasa frente a la estrella, la curva dibuja un <strong class="text-neon-purple">"valle"</strong> o "caída". Estudiando la forma de ese valle, los astrónomos descubren el tamaño del planeta y lo rápido que viaja.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección 3: Simulador Interactivo -->
-    <section id="simulador" class="py-20 px-6 max-w-7xl mx-auto">
-        <div class="text-center max-w-3xl mx-auto mb-12">
-            <div class="inline-block bg-neon-cyan/15 text-neon-cyan text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-2">¡Pruébalo tú mismo!</div>
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">Laboratorio de Tránsitos Planetarios</h2>
-            <p class="text-slate-300">
-                Ajusta los controles para simular tu propio sistema solar. Observa cómo cambia la "Curva de Luz" en tiempo real abajo del simulador mientras el planeta cruza frente a su estrella.
-            </p>
-        </div>
-
-        <!-- Layout del Simulador -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            
-            <!-- Panel del Simulador (Visualización + Gráfico) -->
-            <div class="lg:col-span-8 glass-panel rounded-3xl p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span> Vista Telescópica en Vivo
-                        </span>
-                        <div class="flex gap-2">
-                            <button id="btn-play" class="bg-neon-cyan hover:bg-neon-cyan/80 text-space-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all">
-                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19h2V5H9v14zm4-14v14h2V5h-2z"/></svg> Pausar
-                            </button>
-                            <button id="btn-reset" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition-all">
-                                Reiniciar
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Lienzo de Simulación (Canvas) -->
-                    <div class="relative bg-space-deep border border-slate-800 rounded-2xl overflow-hidden aspect-[2/1] min-h-[220px] md:min-h-[340px] flex items-center justify-center">
-                        <canvas id="canvas-simulation" class="w-full h-full block"></canvas>
-                    </div>
-                </div>
-
-                <!-- Gráfico de Curva de Luz en Tiempo Real -->
-                <div class="mt-6">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Registro del Brillo Estelar (Curva de Luz)</span>
-                    <div class="bg-space-deep border border-slate-800 rounded-2xl p-4 h-36">
-                        <canvas id="canvas-chart" class="w-full h-full block"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Panel de Controles -->
-            <div class="lg:col-span-4 flex flex-col justify-between gap-6">
-                <!-- Controles de Ajustes -->
-                <div class="glass-panel rounded-3xl p-6 space-y-6">
-                    <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
-                        <!-- Icono de engranaje -->
-                        <svg class="w-5 h-5 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        Ajustes del Sistema
-                    </h3>
-
-                    <!-- Slider 1: Tamaño del planeta -->
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-slate-300">Tamaño del Planeta</span>
-                            <span id="val-planet-size" class="text-neon-cyan font-bold">Mediano</span>
-                        </div>
-                        <input id="slider-planet-size" type="range" min="8" max="28" value="16" class="w-full accent-neon-cyan bg-slate-800 rounded-lg appearance-none h-2 cursor-pointer">
-                        <p class="text-[11px] text-slate-400 mt-1">Un planeta más grande bloquea más luz solar y produce un bajón de brillo más profundo.</p>
-                    </div>
-
-                    <!-- Slider 2: Velocidad de órbita -->
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-slate-300">Velocidad Orbital</span>
-                            <span id="val-orbit-speed" class="text-neon-purple font-bold">Normal</span>
-                        </div>
-                        <input id="slider-orbit-speed" type="range" min="1" max="5" step="0.5" value="2.5" class="w-full accent-neon-purple bg-slate-800 rounded-lg appearance-none h-2 cursor-pointer">
-                        <p class="text-[11px] text-slate-400 mt-1">Regula la velocidad del año del planeta. Más velocidad significa tránsitos más cortos y seguidos.</p>
-                    </div>
-
-                    <!-- Selector: Tipo de Estrella -->
-                    <div>
-                        <label class="block text-sm text-slate-300 mb-1">Tipo de Estrella (Temperatura)</label>
-                        <select id="select-star-type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-neon-blue">
-                            <option value="sun" selected>Enana Amarilla (Como nuestro Sol)</option>
-                            <option value="red">Enana Roja (Fría y pequeña)</option>
-                            <option value="blue">Gigante Azul (Muy caliente y masiva)</option>
-                        </select>
-                        <p class="text-[11px] text-slate-400 mt-1">Cambia la estrella para ver cómo interactúa con el planeta.</p>
-                    </div>
-                </div>
-
-                <!-- Tarjeta Científica Informativa -->
-                <div class="glass-panel rounded-3xl p-6 bg-gradient-to-br from-indigo-950/40 to-space-950 border border-indigo-500/20">
-                    <h4 class="text-sm font-bold text-neon-blue uppercase tracking-widest mb-2">Lectura de Datos</h4>
-                    <div id="telemetry-info" class="space-y-2 text-xs text-slate-300">
-                        <p>🪐 <strong>Exoplaneta:</strong> Detectado en tránsito...</p>
-                        <p>📉 <strong>Profundidad de caída:</strong> <span class="text-neon-cyan font-semibold" id="telemetry-dip">0.00%</span></p>
-                        <p>⏱️ <strong>Duración del Año:</strong> <span class="text-neon-purple font-semibold" id="telemetry-year">---</span></p>
-                        <p>💫 <strong>Estado:</strong> <span class="text-emerald-400 font-semibold" id="telemetry-status">Estable</span></p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400">
-                        💡 <strong>Para pensar:</strong> ¿Cómo sabrías si un planeta está demasiado cerca de su estrella basándote solo en la velocidad a la que orbita?
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección 4: Los Cazadores de Mundos -->
-    <section class="py-24 px-6 bg-space-900/50 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center max-w-2xl mx-auto mb-16">
-                <span class="text-xs font-bold text-neon-purple uppercase tracking-wider block mb-2">Telescopios Espaciales</span>
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Los Super-Cazadores de Mundos</h2>
-                <p class="text-slate-300">
-                    Nuestra atmósfera terrestre a menudo distorsiona la luz de las estrellas. Por eso, hemos enviado asombrosas naves espaciales al espacio para capturar curvas de luz perfectas.
-                </p>
-            </div>
-
-            <!-- Grid de Telescopios con imágenes ilustradas -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Kepler -->
-                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between overflow-hidden">
-                    <div>
-                        <!-- Imagen de la nave Kepler -->
-                        <div class="w-full h-44 rounded-xl overflow-hidden mb-5 border border-slate-800 bg-slate-950 relative">
-                            <img 
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Kepler_spacecraft_artist_render_%28crop%29.jpg/960px-Kepler_spacecraft_artist_render_%28crop%29.jpg" 
-                                alt="Representación artística del Telescopio Kepler en órbita" 
-                                class="w-full h-full object-cover"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=60';"
-                            />
-                        </div>
-                        <h3 class="text-xl font-bold mb-3 text-white">Telescopio Kepler</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
-                            Lanzado por la NASA en 2009. Fue el pionero absoluto. Observó un parche fijo de más de 150,000 estrellas sin pestañear durante años.
-                        </p>
-                        <span class="text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2.5 py-1 rounded-full">Descubrió más de 2,600 exoplanetas</span>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-slate-800/60 text-xs text-slate-400 italic">
-                        "¡Kepler nos demostró que hay más planetas que estrellas en la galaxia!"
-                    </div>
-                </div>
-
-                <!-- TESS -->
-                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between overflow-hidden">
-                    <div>
-                        <!-- Imagen de la nave TESS -->
-                        <div class="w-full h-44 rounded-xl overflow-hidden mb-5 border border-slate-800 bg-slate-950 relative">
-                            <img 
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Transiting_Exoplanet_Survey_Satellite_artist_concept_%28transparent_background%29.png/960px-Transiting_Exoplanet_Survey_Satellite_artist_concept_%28transparent_background%29.png" 
-                                alt="Concepto artístico del satélite TESS de la NASA" 
-                                class="w-full h-full object-cover"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=400&auto=format&fit=crop&q=60';"
-                            />
-                        </div>
-                        <h3 class="text-xl font-bold mb-3 text-white">TESS (NASA)</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
-                            Lanzado en 2018, es el sucesor de Kepler. A diferencia de este, escanea casi <strong class="text-white">todo el cielo nocturno</strong> buscando planetas en las estrellas más cercanas y brillantes a nosotros.
-                        </p>
-                        <span class="text-xs font-semibold text-neon-blue bg-neon-blue/10 px-2.5 py-1 rounded-full">Especializado en estrellas vecinas</span>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-slate-800/60 text-xs text-slate-400 italic">
-                        "Encuentra mundos lo suficientemente cercanos para poder estudiarlos a fondo."
-                    </div>
-                </div>
-
-                <!-- James Webb -->
-                <div class="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between overflow-hidden">
-                    <div>
-                        <!-- Imagen de la nave James Webb -->
-                        <div class="w-full h-44 rounded-xl overflow-hidden mb-5 border border-slate-800 bg-slate-950 relative">
-                            <img 
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/James_Webb_Space_Telescope.jpg/960px-James_Webb_Space_Telescope.jpg" 
-                                alt="El Telescopio Espacial James Webb plegado en el espacio" 
-                                class="w-full h-full object-cover"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=400&auto=format&fit=crop&q=60';"
-                            />
-                        </div>
-                        <h3 class="text-xl font-bold mb-3 text-white">James Webb (JWST)</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
-                            El telescopio espacial más potente de la historia. No solo busca tránsitos, sino que puede "oler" la atmósfera de los exoplanetas analizando la luz filtrada a través de ella.
-                        </p>
-                        <span class="text-xs font-semibold text-neon-gold bg-neon-gold/10 px-2.5 py-1 rounded-full">Analiza firmas de gases y agua</span>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-slate-800/60 text-xs text-slate-400 italic">
-                        "Busca gases como oxígeno, metano o dióxido de carbono que puedan indicar vida."
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección 5: ¿Cuántos Exoplanetas conocemos? -->
-    <section id="estadisticas" class="py-24 px-6 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <!-- Contador interactivo a la izquierda -->
-            <div class="lg:col-span-5 text-center lg:text-left">
-                <div class="text-xs font-bold text-neon-cyan uppercase tracking-wider mb-2">Cifras del Espacio</div>
-                <h2 class="text-3xl md:text-4xl font-bold mb-6">Un Censo Cósmico en Crecimiento</h2>
-                <p class="text-slate-300 mb-8 leading-relaxed">
-                    El número de planetas confirmados aumenta casi todas las semanas a medida que los científicos analizan las gigantescas bases de datos de los telescopios.
-                </p>
-
-                <!-- Gran Contador de Impacto -->
-                <div class="p-8 rounded-3xl glass-panel relative overflow-hidden inline-block w-full max-w-sm">
-                    <div class="absolute -right-10 -bottom-10 w-32 h-32 rounded-full bg-neon-cyan/10 blur-xl"></div>
-                    <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Planetas Confirmados</div>
-                    <div class="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-blue" id="live-planet-counter">
-                        5,600+
-                    </div>
-                    <p class="text-xs text-slate-400 mt-4">
-                        *Cifra aproximada actualizada. ¡Y hay miles más que son candidatos en espera de confirmación!
-                    </p>
-                </div>
-            </div>
-
-            <!-- Tipos de exoplanetas a la derecha -->
-            <div class="lg:col-span-7">
-                <h3 class="text-xl font-bold mb-6 text-white text-center lg:text-left">Los "Zoológicos" de Exoplanetas</h3>
-                <p class="text-slate-300 mb-8 text-center lg:text-left text-sm">
-                    Hemos descubierto planetas tan extraños que harían parecer aburrida a la ciencia ficción. Al agruparlos, los científicos los dividen en estas categorías:
-                </p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- Tarjeta: Jupíteres Calientes -->
-                    <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 flex gap-4 items-start">
-                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">🔥</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Jupíteres Calientes</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Gigantes de gas masivos que orbitan ridículamente cerca de sus estrellas. ¡Su año puede durar solo unas horas y sus nubes pueden llover metal líquido!</p>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta: Supertierras -->
-                    <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 flex gap-4 items-start">
-                        <div class="w-10 h-10 rounded-lg bg-neon-cyan/20 text-neon-cyan flex items-center justify-center shrink-0">🌍</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Supertierras</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Planetas rocosos más grandes que la Tierra pero más pequeños que Neptuno. Algunos podrían ser mundos totalmente cubiertos por océanos globales.</p>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta: Neptunos Helados -->
-                    <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 flex gap-4 items-start">
-                        <div class="w-10 h-10 rounded-lg bg-neon-blue/20 text-neon-blue flex items-center justify-center shrink-0">❄️</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Neptunianos</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Planetas gaseosos de tamaño mediano parecidos a Neptuno o Urano, con atmósferas heladas de hidrógeno y helio situados lejos de su calor estelar.</p>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta: Mundos Rocosos pequeños -->
-                    <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 flex gap-4 items-start">
-                        <div class="w-10 h-10 rounded-lg bg-neon-purple/20 text-neon-purple flex items-center justify-center shrink-0">🪨</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Mundos Rocosos</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">De tamaño similar a la Tierra o Venus. Son los más difíciles de detectar porque bloquean poquísima luz, ¡pero son los mejores candidatos para buscar vida!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Sección 6: La Zona Habitable (Interactiva) -->
-    <section id="vida" class="py-20 px-6 bg-space-900/50 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="grid-sim">
                 
-                <!-- Explicación -->
-                <div>
-                    <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Búsqueda de Vida</div>
-                    <h2 class="text-3xl md:text-4xl font-bold mb-6">La Zona "Ricitos de Oro"</h2>
-                    <p class="text-slate-300 leading-relaxed mb-6">
-                        Para que exista vida tal como la conocemos, un planeta necesita <strong class="text-white">agua líquida</strong> en su superficie. Para ello, el planeta no puede estar ni muy cerca de su estrella (donde el agua se evaporaría) ni muy lejos (donde se congelaría por completo).
-                    </p>
-                    <p class="text-slate-300 leading-relaxed mb-6">
-                        A esta región templada ideal la llamamos científicamente <strong class="text-neon-cyan">Zona Habitable</strong> o, de manera divertida, la "Zona Ricitos de Oro" (¡en honor al cuento de la sopa que no debía estar ni muy fría ni muy caliente!).
-                    </p>
-                    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
-                        ⭐ <strong>¿Sabías que?</strong> La posición de la zona habitable depende del tamaño y calor de la estrella. En estrellas pequeñas y frías, ¡esta zona está pegadísima a ellas!
-                    </div>
-                </div>
-
-                <!-- Minijuego/Interacción: Zona Habitable -->
-                <div class="glass-panel p-6 rounded-3xl">
-                    <h3 class="text-lg font-bold text-white mb-4 text-center">Explorador de Clima Planetario</h3>
-                    <p class="text-xs text-slate-400 text-center mb-6">Arrastra el deslizador para posicionar al exoplaneta y ver si tiene las condiciones correctas para albergar vida.</p>
-                    
-                    <!-- Simulación de Zona Habitable -->
-                    <div class="relative bg-space-deep border border-slate-800 rounded-2xl h-48 overflow-hidden flex items-center justify-center p-4">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="glass-panel" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; font-weight:700; color: var(--slate-400);">🔴 MONITOR TELESCÓPICO OPTIMIZADO</span>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button id="btn-play" class="btn btn-primary" style="border-radius: 0.5rem; padding: 0.4rem 1rem;">Pausar</button>
+                                <button id="btn-reset" class="btn btn-dark" style="border-radius: 0.5rem; padding: 0.4rem 1rem;">Reiniciar</button>
+                            </div>
+                        </div>
                         
-                        <!-- Sol central -->
-                        <div class="absolute left-6 w-12 h-12 rounded-full bg-yellow-300 shadow-[0_0_20px_#f59e0b] z-10 flex items-center justify-center">
-                            <span class="text-[10px] text-yellow-900 font-bold">Estrella</span>
-                        </div>
-
-                        <!-- Zonas visuales coloreadas de fondo -->
-                        <div class="absolute inset-y-0 left-[60px] right-0 flex">
-                            <!-- Zona Caliente (Rojo) -->
-                            <div class="w-[25%] h-full bg-red-600/10 border-r border-dashed border-red-500/30 flex items-center justify-center">
-                                <span class="text-[9px] text-red-400 font-semibold rotate-90 md:rotate-0">Muy Caliente</span>
-                            </div>
-                            <!-- Zona Habitable (Verde) -->
-                            <div class="w-[35%] h-full bg-emerald-500/15 border-r border-dashed border-emerald-500/30 flex items-center justify-center">
-                                <span class="text-[9px] text-emerald-400 font-semibold rotate-90 md:rotate-0">¡Zona Habitable!</span>
-                            </div>
-                            <!-- Zona Fría (Azul) -->
-                            <div class="w-[40%] h-full bg-blue-600/10 flex items-center justify-center">
-                                <span class="text-[9px] text-blue-400 font-semibold rotate-90 md:rotate-0">Muy Frío</span>
-                            </div>
-                        </div>
-
-                        <!-- El Planeta Desplazable (Visual) -->
-                        <div id="habitable-planet" class="absolute w-8 h-8 rounded-full bg-slate-400 transition-all duration-200 z-20 flex items-center justify-center shadow-lg" style="left: 180px;">
-                            <span class="text-xs">🪐</span>
+                        <div class="canvas-container simulation-box">
+                            <canvas id="canvas-simulation"></canvas>
                         </div>
                     </div>
 
-                    <!-- Deslizador de Posición -->
-                    <div class="mt-6">
-                        <input id="slider-habitable" type="range" min="80" max="360" value="180" class="w-full accent-emerald-400 bg-slate-800 rounded-lg appearance-none h-2 cursor-pointer">
-                        <div class="flex justify-between text-xs font-bold mt-2">
-                            <span class="text-red-400">Cerca de la estrella</span>
-                            <span class="text-emerald-400">Distancia Media</span>
-                            <span class="text-blue-400">Lejos de la estrella</span>
+                    <div class="glass-panel">
+                        <span style="font-size: 0.75rem; font-weight:700; color: var(--slate-400); display: block; margin-bottom: 0.25rem;">📉 REGISTRO FOTOMÉTRICO (CURVA DE LUZ)</span>
+                        <div class="canvas-container chart-box">
+                            <canvas id="canvas-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="glass-panel">
+                        <h3 style="font-size: 1rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--slate-800); padding-bottom: 0.5rem; color: var(--slate-200);">Controles del Sistema</h3>
+
+                        <div class="form-group">
+                            <div class="form-label-wrap">
+                                <span>Inclinación Órbita (i)</span>
+                                <span id="val-orbit-incl" class="tag-cyan" style="font-weight: 700;">20°</span>
+                            </div>
+                            <input id="slider-orbit-incl" type="range" min="0" max="30" value="20">
+                            <p class="help-text">Ángulo respecto al observador. A 0° pasa exactamente por el centro de la estrella central.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-label-wrap">
+                                <span>Distancia de la Estrella</span>
+                                <span id="val-orbit-dist" class="tag-purple" style="font-weight: 700;">Media</span>
+                            </div>
+                            <input id="slider-orbit-dist" type="range" min="40" max="170" value="100">
+                            <p class="help-text">Modifica el radio orbital. Determina qué tan expuesto está el planeta a la radiación térmica.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-label-wrap">
+                                <span>Radio del Exoplaneta</span>
+                                <span id="val-planet-size" style="color: var(--neon-gold); font-weight: 700;">Mediano</span>
+                            </div>
+                            <input id="slider-planet-size" type="range" min="6" max="22" value="13">
+                            <p class="help-text">Planetas de mayor masa bloquean una fracción de fotones más notable.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label-wrap">Clase Lumínica de Estrella</label>
+                            <select id="select-star-type" class="form-select">
+                                <option value="sun" selected>Enana Amarilla (Tipo Sol - Zonas Estándar)</option>
+                                <option value="red">Enana Roja (Pequeña/Fría - Zonas Contraídas)</option>
+                                <option value="blue">Gigante Azul (Masiva/Caliente - Zonas Expandidas)</option>
+                            </select>
+                            <p class="help-text">Cambiar el tamaño y masa de la estrella recalcula automáticamente los límites templados (verde).</p>
                         </div>
                     </div>
 
-                    <!-- Estado del Planeta -->
-                    <div id="habitable-status-box" class="mt-6 p-4 rounded-xl text-center text-sm font-semibold transition-all">
-                        <!-- Rellenado por JS -->
+                    <div class="glass-panel telemetry-box">
+                        <h4 class="sec-tag tag-cyan">Lecturas de Instrumentos</h4>
+                        <div class="telemetry-list">
+                            <div>📉 <strong>Caída de Brillo:</strong> <span id="telemetry-dip" class="tag-cyan" style="font-weight:700;">0.00%</span></div>
+                            <div>🌡️ <strong>Condición Térmica:</strong> <span id="telemetry-zone" style="font-weight:700; padding: 0.1rem 0.4rem; border-radius:4px;">Analizando...</span></div>
+                        </div>
                     </div>
                 </div>
 
@@ -609,525 +558,509 @@
         </div>
     </section>
 
-    <!-- Sección 7: Desafío Exopolitrivial (Quiz) -->
-    <section id="trivial" class="py-24 px-6 max-w-4xl mx-auto">
-        <div class="glass-panel rounded-3xl p-8 border border-neon-cyan/20 relative">
-            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-neon-cyan to-neon-blue text-space-950 font-black px-6 py-2 rounded-full text-sm uppercase tracking-widest shadow-lg shadow-neon-cyan/35">
-                Desafío Exocazador
-            </div>
-
-            <div id="quiz-intro" class="text-center mt-6">
-                <h2 class="text-2xl md:text-3xl font-bold mb-4">¿Estás listo para unirte a la NASA?</h2>
-                <p class="text-slate-300 mb-8 max-w-lg mx-auto">
-                    Demuestra que has prestado atención a la infografía y conviértete en un astrónomo experto respondiendo a este pequeño quiz interactivo de 3 preguntas.
-                </p>
-                <button id="btn-start-quiz" class="bg-neon-cyan hover:bg-neon-cyan/80 text-space-950 font-black px-8 py-4 rounded-xl shadow-lg transition-all transform hover:scale-105 uppercase tracking-wide">
-                    ¡Comenzar Cuestionario!
-                </button>
-            </div>
-
-            <!-- Contenedor de preguntas -->
-            <div id="quiz-container" class="hidden mt-6">
-                <div class="flex justify-between text-xs font-bold text-slate-400 mb-4">
-                    <span id="quiz-progress">Pregunta 1 de 3</span>
-                    <span id="quiz-score">Puntuación: 0/3</span>
+    <section id="trivia-section" class="py bg-strip">
+        <div class="container" style="max-width: 680px;">
+            <div class="glass-panel">
+                <div id="trivia-intro" class="quiz-intro">
+                    <div class="quiz-emoji">🚀</div>
+                    <h3 class="quiz-title">Desafío de Autoevaluación Científica</h3>
+                    <p style="font-size: 0.9rem; color: var(--slate-300);">Pon a prueba tus conocimientos sobre fotometría astronómica, órbitas tridimensionales y habitabilidad estelar extrasolar.</p>
+                    <button id="btn-start-trivia" class="btn btn-primary" style="margin-top: 0.5rem; padding: 0.8rem 2rem;">Comenzar Misión</button>
                 </div>
 
-                <!-- Barra de Progreso Visual -->
-                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mb-6">
-                    <div id="quiz-progress-bar" class="h-full bg-neon-cyan transition-all" style="width: 33.3%"></div>
+                <div id="trivia-question" class="quiz-question hidden">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--slate-400);">
+                        <span id="trivia-progress">Pregunta 1 de 7</span>
+                        <span id="trivia-score-live">Puntuación: 0</span>
+                    </div>
+                    <h3 id="trivia-text" class="quiz-title" style="text-align: left; margin-top: 0.5rem; font-size: 1.15rem; line-height: 1.4;">Cargando...</h3>
+                    <div id="trivia-options" class="options-list"></div>
+                    
+                    <div id="trivia-feedback" class="hidden" style="margin-top: 1.25rem; padding: 1rem 1.25rem; border-radius: 0.75rem; font-size: 0.88rem; text-align: left; line-height: 1.45;"></div>
+                    
+                    <button id="btn-next-trivia" class="btn btn-primary hidden" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 0.5rem;">Siguiente pregunta ➡️</button>
                 </div>
 
-                <!-- Pregunta -->
-                <h3 id="quiz-question" class="text-lg md:text-xl font-bold mb-6 text-white">Pregunta de prueba...</h3>
-
-                <!-- Opciones -->
-                <div id="quiz-options" class="space-y-3">
-                    <!-- Rellenado dinámicamente -->
+                <div id="trivia-result" class="quiz-result hidden">
+                    <div id="trivia-result-emoji" class="quiz-emoji">🏆</div>
+                    <h3 id="trivia-result-title" class="quiz-title">Evaluación Completa</h3>
+                    <p id="trivia-result-text" style="font-size: 0.95rem; color: var(--slate-300); margin-bottom: 1rem; line-height: 1.5;"></p>
+                    <button id="btn-restart-trivia" class="btn btn-dark" style="padding: 0.75rem 1.75rem; border-radius: 0.5rem;">Reiniciar Trivia 🔄</button>
                 </div>
-
-                <!-- Botón Continuar / Explicación -->
-                <div id="quiz-feedback" class="hidden mt-6 p-4 rounded-xl text-sm leading-relaxed border"></div>
-                <div class="flex justify-end mt-6">
-                    <button id="btn-next-quiz" class="hidden bg-slate-100 hover:bg-white text-space-950 font-bold px-6 py-2.5 rounded-lg transition-all text-sm">
-                        Siguiente Pregunta ➡️
-                    </button>
-                </div>
-            </div>
-
-            <!-- Pantalla Final del Quiz -->
-            <div id="quiz-result" class="hidden text-center mt-6 py-8">
-                <div class="text-5xl mb-4" id="quiz-result-emoji">🏆</div>
-                <h3 class="text-2xl font-bold mb-2 text-white" id="quiz-result-title">¡Excelente Trabajo!</h3>
-                <p class="text-slate-300 mb-6" id="quiz-result-text">Has respondido correctamente a todas las preguntas.</p>
-                <button id="btn-restart-quiz" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all">
-                    Intentarlo de nuevo 🔄
-                </button>
             </div>
         </div>
     </section>
 
-    <!-- Sección 8: Curiosidades Asombrosas -->
-    <section class="py-16 px-6 max-w-7xl mx-auto">
-        <div class="text-center max-w-2xl mx-auto mb-12">
-            <h2 class="text-2xl md:text-3xl font-bold text-white">Curiosidades de Mundos Extraños</h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Curiosidad 1 -->
-            <div class="p-6 rounded-2xl glass-panel-hover glass-panel flex flex-col justify-between">
-                <div class="text-neon-cyan text-3xl mb-4">💎</div>
-                <h4 class="font-bold text-base text-white mb-2">55 Cancri e: El planeta diamante</h4>
-                <p class="text-xs text-slate-300 leading-relaxed">
-                    Es una Supertierra tan densa y rica en carbono que los científicos estiman que al menos una tercera parte de su masa total podría estar compuesta de diamante puro bajo una intensa presión.
-                </p>
-            </div>
-            <!-- Curiosidad 2 -->
-            <div class="p-6 rounded-2xl glass-panel-hover glass-panel flex flex-col justify-between">
-                <div class="text-neon-purple text-3xl mb-4">☔</div>
-                <h4 class="font-bold text-base text-white mb-2">HD 189733b: Lluvia de cristal soplado</h4>
-                <p class="text-xs text-slate-300 leading-relaxed">
-                    Tiene un color azul cobalto precioso, pero no te engañes: es un infierno donde el viento sopla a 8,700 km/h y las lluvias son de cristales de silicato que caen de forma lateral.
-                </p>
-            </div>
-            <!-- Curiosidad 3 -->
-            <div class="p-6 rounded-2xl glass-panel-hover glass-panel flex flex-col justify-between">
-                <div class="text-neon-gold text-3xl mb-4">🕶️</div>
-                <h4 class="font-bold text-base text-white mb-2">TrES-2b: Más oscuro que el carbón</h4>
-                <p class="text-xs text-slate-300 leading-relaxed">
-                    Este exoplaneta absorbe el 99% de la luz solar que recibe, haciéndolo el mundo más oscuro jamás registrado. ¡Es menos reflectante que la pintura negra acrílica o el carbón vegetal!
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- PIE DE PÁGINA (CON LOGO URUGUAY EDUCA) -->
-    <footer class="mt-16 mb-8 w-full flex flex-col items-center justify-center gap-6 px-4 z-20">
-        <!-- Fuentes opcionales del documento original -->
-        <div class="text-center text-xs text-slate-500 max-w-2xl leading-relaxed">
-            Fuentes científicas consultadas: <a href="https://exoplanets.nasa.gov" class="text-neon-cyan hover:underline" target="_blank">NASA Exoplanet Archive</a>, ESA, Telescopios TESS, James Webb.
-        </div>
-        <a 
-          href="https://uruguayeduca.anep.edu.uy/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl px-6 py-4 bg-slate-950/40 rounded-2xl border border-cyan-900/30 backdrop-blur-sm group hover:border-neon-cyan/30 transition-all"
-        >
+    <footer class="main-footer container">
+        <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener noreferrer" class="footer-card">
           <img 
             src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
             alt="Logo Uruguay Educa" 
-            class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+            class="footer-logo"
             onerror="this.onerror=null; this.style.display='none';"
           />
-          <span class="text-xs md:text-sm text-cyan-300/60 group-hover:text-neon-cyan text-center sm:text-left transition-colors tracking-wide leading-relaxed">
-            Portal Uruguay Educa (ANEP-DGES-EDyTIC) - Contenidistas de Astronomía 2026 - Herramienta de uso libre. - Desarrollado con asistencia de IA.
-          </span>
+          <p class="footer-text">
+            Portal Uruguay Educa (ANEP-DGES-EDyTIC) — Contenidistas de Astronomía 2026. Herramienta educativa interactiva de uso libre desarrollada con asistencia de IA. Las preguntas y respuestas en las actividades asociadas son responsabilidad del docente aplicador.
+          </p>
         </a>
     </footer>
 
-    <!-- Lógica de Simulación Interactiva y Quiz -->
     <script>
-        //        // --- CÓDIGO DEL SIMULADOR DE TRÁNSITO ---
         const canvasSim = document.getElementById('canvas-simulation');
         const ctxSim = canvasSim.getContext('2d');
         const canvasChart = document.getElementById('canvas-chart');
         const ctxChart = canvasChart.getContext('2d');
 
-        // Inputs del DOM
+        // Controles de interfaz
+        const sliderIncl = document.getElementById('slider-orbit-incl');
+        const sliderDist = document.getElementById('slider-orbit-dist');
         const sliderSize = document.getElementById('slider-planet-size');
-        const valSize = document.getElementById('val-planet-size');
-        const sliderSpeed = document.getElementById('slider-orbit-speed');
-        const valSpeed = document.getElementById('val-orbit-speed');
-        const selectStarType = document.getElementById('select-star-type');
+        const selectStar = document.getElementById('select-star-type');
         const btnPlay = document.getElementById('btn-play');
         const btnReset = document.getElementById('btn-reset');
 
-        // Telemetría
-        const teleDip = document.getElementById('telemetry-dip');
-        const teleYear = document.getElementById('telemetry-year');
-        const teleStatus = document.getElementById('telemetry-status');
+        // Etiquetas informativas
+        const lblIncl = document.getElementById('val-orbit-incl');
+        const lblDist = document.getElementById('val-orbit-dist');
+        const lblSize = document.getElementById('val-planet-size');
+        const telemetryDip = document.getElementById('telemetry-dip');
+        const telemetryZone = document.getElementById('telemetry-zone');
 
-        // Estado del simulador
-        let isPlaying = true;
-        let planetSize = parseInt(sliderSize.value); // Radio del planeta
-        let orbitSpeed = parseFloat(sliderSpeed.value);
-        let starType = selectStarType.value; // 'sun', 'red', 'blue'
-
-        // Variables de animación
-        let planetX = -50;
-        let chartData = [];
-        const maxChartPoints = 180;
-
-        // Inicializar tamaño del Canvas de manera responsive
-        function resizeCanvases() {
+        // Ajuste fluido de lienzos canvas
+        function resizeLayout() {
             canvasSim.width = canvasSim.parentElement.clientWidth;
             canvasSim.height = canvasSim.parentElement.clientHeight;
             canvasChart.width = canvasChart.parentElement.clientWidth;
             canvasChart.height = canvasChart.parentElement.clientHeight;
         }
-        window.addEventListener('resize', resizeCanvases);
-        resizeCanvases();
+        window.addEventListener('resize', resizeLayout);
+        resizeLayout();
 
-        // Configuración de la estrella según el tipo
-        function getStarConfig() {
-            switch(starType) {
-                case 'red':
-                    return { radius: 35, color: '#f87171', shadow: '#ef4444', temp: 'Fría (~3,000°C)', name: 'Enana Roja' };
-                case 'blue':
-                    return { radius: 65, color: '#93c5fd', shadow: '#3b82f6', temp: 'Caliente (~15,000°C)', name: 'Gigante Azul' };
-                case 'sun':
-                default:
-                    return { radius: 50, color: '#fef08a', shadow: '#eab308', temp: 'Templada (~5,500°C)', name: 'Enana Amarilla' };
-            }
-        }
+        // Estados del sistema físico
+        let isRunning = true;
+        let planetAngle = 0;
+        let lightHistory = [];
+        const maxHistoryPoints = 150;
 
-        //        // Eventos de controles
+        let orbitIncl = parseInt(sliderIncl.value);
+        let orbitRadius = parseInt(sliderDist.value);
+        let planetRadius = parseInt(sliderSize.value);
+        let starType = selectStar.value;
+
+        // Escuchadores de Sliders
+        sliderIncl.addEventListener('input', (e) => {
+            orbitIncl = parseInt(e.target.value);
+            lblIncl.textContent = `${orbitIncl}°`;
+        });
+
+        sliderDist.addEventListener('input', (e) => {
+            orbitRadius = parseInt(e.target.value);
+            if(orbitRadius < 75) lblDist.textContent = "Cercana";
+            else if(orbitRadius < 130) lblDist.textContent = "Media";
+            else lblDist.textContent = "Lejana";
+        });
+
         sliderSize.addEventListener('input', (e) => {
-            planetSize = parseInt(e.target.value);
-            if (planetSize < 14) valSize.textContent = "Pequeño (Rocoso)";
-            else if (planetSize < 22) valSize.textContent = "Mediano (Neptuniano)";
-            else valSize.textContent = "Grande (Gigante Gaseoso)";
+            planetRadius = parseInt(e.target.value);
+            if(planetRadius < 11) lblSize.textContent = "Tipo Mercurio";
+            else if(planetRadius < 17) lblSize.textContent = "Tipo Tierra";
+            else lblSize.textContent = "Tipo Júpiter";
         });
 
-        sliderSpeed.addEventListener('input', (e) => {
-            orbitSpeed = parseFloat(e.target.value);
-            if (orbitSpeed < 2) valSpeed.textContent = "Lenta (Año Largo)";
-            else if (orbitSpeed < 4) valSpeed.textContent = "Normal";
-            else valSpeed.textContent = "Rápida (Año Corto)";
-        });
-
-        selectStarType.addEventListener('change', (e) => {
+        selectStar.addEventListener('change', (e) => {
             starType = e.target.value;
-            resetSimulation();
         });
 
         btnPlay.addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            btnPlay.innerHTML = isPlaying ? 
-                `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19h2V5H9v14zm4-14v14h2V5h-2z"/></svg> Pausar` : 
-                `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Iniciar`;
+            isRunning = !isRunning;
+            btnPlay.textContent = isRunning ? "Pausar" : "Reanudar";
         });
 
-        btnReset.addEventListener('click', resetSimulation);
+        btnReset.addEventListener('click', () => {
+            planetAngle = 0;
+            lightHistory = [];
+        });
 
-        function resetSimulation() {
-            planetX = -50;
-            chartData = [];
-            for (let i = 0; i < maxChartPoints; i++) {
-                chartData.push(100);
-            }
-        }
-        resetSimulation();
-
-        //        // Bucle de Animación Principal
-        function updateAndDraw() {
-            if (isPlaying) {
-                planetX += orbitSpeed * 1.5;
-                if (planetX > canvasSim.width + 50) {
-                    planetX = -50;
-                }
+        // Bucle Principal de Renderizado Animado
+        function drawSystemLoop() {
+            if (isRunning) {
+                let speedFactor = 0.12 * Math.pow(90 / orbitRadius, 1.5);
+                planetAngle += speedFactor;
+                if (planetAngle > Math.PI * 2) planetAngle -= Math.PI * 2;
             }
 
+            const cx = canvasSim.width / 2;
+            const cy = canvasSim.height / 2;
             ctxSim.clearRect(0, 0, canvasSim.width, canvasSim.height);
 
-            const star = getStarConfig();
-            const starX = canvasSim.width / 2;
-            const starY = canvasSim.height / 2;
+            let starRadius = 40;
+            let starColor = "#f59e0b"; 
+            let zoneCalienteMax = 70;
+            let zoneHabitableMax = 120;
+            let zoneFriaMax = 180;
 
-            ctxSim.fillStyle = '#05050d';
-            ctxSim.fillRect(0, 0, canvasSim.width, canvasSim.height);
-
-            ctxSim.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            for (let i = 0; i < 25; i++) {
-                let sX = (i * 97) % canvasSim.width;
-                let sY = (i * 123) % canvasSim.height;
-                ctxSim.fillRect(sX, sY, 1.5, 1.5);
+            if (starType === 'red') {
+                starRadius = 22;
+                starColor = "#ef4444"; 
+                zoneCalienteMax = 40;
+                zoneHabitableMax = 75;
+                zoneFriaMax = 120;
+            } else if (starType === 'blue') {
+                starRadius = 58;
+                starColor = "#3b82f6"; 
+                zoneCalienteMax = 115;
+                zoneHabitableMax = 160;
+                zoneFriaMax = 220;
             }
 
-            ctxSim.strokeStyle = 'rgba(255,255,255,0.06)';
-            ctxSim.lineWidth = 1;
+            const inclRad = (orbitIncl * Math.PI) / 180;
+            const aspectY = Math.sin(inclRad); 
+
+            if (aspectY > 0) {
+                ctxSim.beginPath();
+                ctxSim.ellipse(cx, cy, zoneCalienteMax, zoneCalienteMax * aspectY, 0, 0, Math.PI * 2);
+                ctxSim.fillStyle = 'rgba(239, 68, 68, 0.12)';
+                ctxSim.fill();
+
+                ctxSim.beginPath();
+                ctxSim.ellipse(cx, cy, zoneHabitableMax, zoneHabitableMax * aspectY, 0, 0, Math.PI * 2);
+                ctxSim.fillStyle = 'rgba(16, 185, 129, 0.15)';
+                ctxSim.fill();
+                
+                ctxSim.globalCompositeOperation = 'destination-out';
+                ctxSim.beginPath();
+                ctxSim.ellipse(cx, cy, zoneCalienteMax, zoneCalienteMax * aspectY, 0, 0, Math.PI * 2);
+                ctxSim.fill();
+                ctxSim.globalCompositeOperation = 'source-over';
+
+                ctxSim.beginPath();
+                ctxSim.ellipse(cx, cy, zoneFriaMax, zoneFriaMax * aspectY, 0, 0, Math.PI * 2);
+                ctxSim.strokeStyle = 'rgba(59, 130, 246, 0.1)';
+                ctxSim.lineWidth = 12;
+                ctxSim.stroke();
+            } else {
+                ctxSim.lineWidth = 8;
+                ctxSim.strokeStyle = 'rgba(239, 68, 68, 0.2)';
+                ctxSim.beginPath(); ctxSim.moveTo(cx - zoneCalienteMax, cy); ctxSim.lineTo(cx + zoneCalienteMax, cy); ctxSim.stroke();
+                
+                ctxSim.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+                ctxSim.beginPath(); ctxSim.moveTo(cx - zoneHabitableMax, cy); ctxSim.lineTo(cx - zoneCalienteMax, cy); ctxSim.stroke();
+                ctxSim.beginPath(); ctxSim.moveTo(cx + zoneCalienteMax, cy); ctxSim.lineTo(cx + zoneHabitableMax, cy); ctxSim.stroke();
+            }
+
             ctxSim.beginPath();
-            ctxSim.moveTo(0, starY);
-            ctxSim.lineTo(canvasSim.width, starY);
+            if (aspectY > 0) {
+                ctxSim.ellipse(cx, cy, orbitRadius, orbitRadius * aspectY, 0, 0, Math.PI * 2);
+            } else {
+                ctxSim.moveTo(cx - orbitRadius, cy);
+                ctxSim.lineTo(cx + orbitRadius, cy);
+            }
+            ctxSim.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctxSim.lineWidth = 1.5;
             ctxSim.stroke();
 
-            ctxSim.shadowColor = star.shadow;
-            ctxSim.shadowBlur = 30;
-            ctxSim.fillStyle = star.color;
-            ctxSim.beginPath();
-            ctxSim.arc(starX, starY, star.radius, 0, Math.PI * 2);
-            ctxSim.fill();
-            ctxSim.shadowBlur = 0;
+            const planetX = cx + Math.cos(planetAngle) * orbitRadius;
+            const planetY = cy + Math.sin(planetAngle) * orbitRadius * aspectY;
 
-            let brightness = 100;
-            let dist = Math.abs(planetX - starX);
+            const isBehindStar = Math.sin(planetAngle) < 0;
 
-            if (dist < (star.radius + planetSize) && planetX > starX - star.radius && planetX < starX + star.radius) {
-                let areaRatio = (Math.pow(planetSize, 2) / Math.pow(star.radius, 2)) * 100;
-                let overlapFactor = Math.cos((dist / (star.radius)) * Math.PI / 2);
-                if (overlapFactor < 0) overlapFactor = 0;
-
-                let dip = areaRatio * overlapFactor;
-                if (dip > 40) dip = 40; 
-                brightness = 100 - dip;
+            if (isBehindStar) {
+                renderPlanet(ctxSim, planetX, planetY, planetRadius);
+                renderCentralStar(ctxSim, cx, cy, starRadius, starColor);
+            } else {
+                renderCentralStar(ctxSim, cx, cy, starRadius, starColor);
+                renderPlanet(ctxSim, planetX, planetY, planetRadius);
             }
 
-            if (isPlaying) {
-                chartData.push(brightness);
-                if (chartData.length > maxChartPoints) {
-                    chartData.shift();
+            let brightnessValue = 1.0;
+
+            if (!isBehindStar) {
+                const distanceToCore = Math.hypot(planetX - cx, planetY - cy);
+                const contactRadius = starRadius + planetRadius;
+
+                if (distanceToCore < contactRadius) {
+                    const overlapRatio = Math.max(0, Math.min(1, (contactRadius - distanceToCore) / (planetRadius * 2)));
+                    const maxPossibleDip = (planetRadius * planetRadius) / (starRadius * starRadius);
+                    brightnessValue = 1.0 - (maxPossibleDip * overlapRatio * 0.95);
                 }
             }
 
-            ctxSim.fillStyle = '#090d16';
-            ctxSim.strokeStyle = 'rgba(6, 182, 212, 0.4)';
-            ctxSim.lineWidth = 2;
-            ctxSim.beginPath();
-            ctxSim.arc(planetX, starY, planetSize, 0, Math.PI * 2);
-            ctxSim.fill();
-            if (planetX > starX - star.radius - planetSize && planetX < starX + star.radius + planetSize) {
-                ctxSim.stroke();
+            if (brightnessValue < 0.15) brightnessValue = 0.15;
+
+            if (isRunning) {
+                lightHistory.push(brightnessValue);
+                if (lightHistory.length > maxHistoryPoints) lightHistory.shift();
             }
 
-            //            ctxChart.clearRect(0, 0, canvasChart.width, canvasChart.height);
-            
-            ctxChart.strokeStyle = 'rgba(255,255,255,0.05)';
-            ctxChart.lineWidth = 1;
-            for(let y = 0; y <= 4; y++) {
-                let gridY = (canvasChart.height - 20) * (y / 4) + 10;
-                ctxChart.beginPath();
-                ctxChart.moveTo(0, gridY);
-                ctxChart.lineTo(canvasChart.width, gridY);
-                ctxChart.stroke();
-                
-                ctxChart.fillStyle = 'rgba(255,255,255,0.3)';
-                ctxChart.font = '9px Inter';
-                let percentText = (100 - (y * (40 / 4))).toFixed(0) + "%";
-                ctxChart.fillText(percentText, 5, gridY - 2);
-            }
+            renderLightCurveChart(ctxChart, canvasChart.width, canvasChart.height, lightHistory);
 
-            ctxChart.strokeStyle = '#06b6d4';
-            ctxChart.lineWidth = 3;
-            ctxChart.beginPath();
+            const totalDipPct = ((1.0 - brightnessValue) * 100).toFixed(2);
+            telemetryDip.textContent = `${totalDipPct}%`;
 
-            const stepX = canvasChart.width / maxChartPoints;
-            for (let i = 0; i < chartData.length; i++) {
-                let val = chartData[i];
-                let yPercent = (100 - val) / 40;
-                let plotY = 10 + yPercent * (canvasChart.height - 20);
-                let plotX = i * stepX;
-
-                if (i === 0) {
-                    ctxChart.moveTo(plotX, plotY);
-                } else {
-                    ctxChart.lineTo(plotX, plotY);
-                }
-            }
-            ctxChart.stroke();
-
-            ctxChart.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-            ctxChart.lineWidth = 1;
-            ctxChart.beginPath();
-            ctxChart.moveTo(canvasChart.width - 2, 0);
-            ctxChart.lineTo(canvasChart.width - 2, canvasChart.height);
-            ctxChart.stroke();
-
-            let currentDip = (100 - chartData[chartData.length - 1]).toFixed(2);
-            teleDip.textContent = currentDip + "%";
-            
-            let estYear = (365 / orbitSpeed).toFixed(0);
-            teleYear.textContent = estYear + " Días Terrestres";
-
-            if (currentDip > 0) {
-                teleStatus.innerHTML = `<span class="text-orange-400">Tránsito Detectado 📉</span>`;
+            if (orbitRadius <= zoneCalienteMax) {
+                telemetryZone.textContent = "🔥 Zona Caliente (Inhabitable)";
+                telemetryZone.style.backgroundColor = "rgba(239, 68, 68, 0.2)";
+                telemetryZone.style.color = "#ef4444";
+            } else if (orbitRadius > zoneCalienteMax && orbitRadius <= zoneHabitableMax) {
+                telemetryZone.textContent = "🍀 Zona Ricitos de Oro (Habitable)";
+                telemetryZone.style.backgroundColor = "rgba(16, 185, 129, 0.2)";
+                telemetryZone.style.color = "#34d399";
             } else {
-                teleStatus.innerHTML = `<span class="text-emerald-400">Búsqueda Activa... 🛰️</span>`;
+                telemetryZone.textContent = "❄️ Zona Fría (Inhabitable)";
+                telemetryZone.style.backgroundColor = "rgba(59, 130, 246, 0.2)";
+                telemetryZone.style.color = "#60a5fa";
             }
 
-            requestAnimationFrame(updateAndDraw);
+            requestAnimationFrame(drawSystemLoop);
         }
 
-        updateAndDraw();
-
-
-        //        // --- CÓDIGO CLIMA EN ZONA HABITABLE ---
-        const sliderHabitable = document.getElementById('slider-habitable');
-        const habitablePlanet = document.getElementById('habitable-planet');
-        const habitableStatusBox = document.getElementById('habitable-status-box');
-
-        function updateHabitableZone() {
-            const val = parseInt(sliderHabitable.value);
-            habitablePlanet.style.left = `${val}px`;
-
-            if (val < 140) {
-                habitableStatusBox.className = "mt-6 p-4 rounded-xl text-center text-sm font-semibold bg-red-500/10 border border-red-500/30 text-red-400";
-                habitableStatusBox.innerHTML = `
-                    <div class="font-bold text-base mb-1">🔥 ¡Mundo de Lava!</div>
-                    <p class="text-xs font-normal text-slate-300">El planeta está tan cerca de la estrella que la temperatura supera los 800°C. El agua líquida hierve al instante. ¡La atmósfera se evapora y no hay posibilidad de vida!</p>
-                `;
-                habitablePlanet.style.backgroundColor = '#ef4444';
-                habitablePlanet.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.7)';
-            } else if (val >= 140 && val <= 230) {
-                habitableStatusBox.className = "mt-6 p-4 rounded-xl text-center text-sm font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400";
-                habitableStatusBox.innerHTML = `
-                    <div class="font-bold text-base mb-1">🌿 ¡Zona Ricitos de Oro Detectada!</div>
-                    <p class="text-xs font-normal text-slate-300">¡Felicidades! La distancia es perfecta. El agua líquida puede mantenerse estable en lagos y océanos. Es un excelente candidato para que existan bacterias o plantas exóticas.</p>
-                `;
-                habitablePlanet.style.backgroundColor = '#10b981';
-                habitablePlanet.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.7)';
-            } else {
-                habitableStatusBox.className = "mt-6 p-4 rounded-xl text-center text-sm font-semibold bg-blue-500/10 border border-blue-500/30 text-blue-400";
-                habitableStatusBox.innerHTML = `
-                    <div class="font-bold text-base mb-1">❄️ ¡Desierto de Hielo Perpetuo!</div>
-                    <p class="text-xs font-normal text-slate-300">Casi no llega radiación ni calor de la estrella. El agua es roca sólida. El planeta está cubierto por un glaciar infinito como una bola de nieve gigante.</p>
-                `;
-                habitablePlanet.style.backgroundColor = '#3b82f6';
-                habitablePlanet.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.7)';
-            }
+        function renderCentralStar(ctx, x, y, radius, color) {
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = color;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.shadowBlur = 0;
         }
 
-        sliderHabitable.addEventListener('input', updateHabitableZone);
-        updateHabitableZone();
+        function renderPlanet(ctx, x, y, radius) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = "#a855f7";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        function renderLightCurveChart(ctx, w, h, history) {
+            ctx.clearRect(0, 0, w, h);
+            ctx.beginPath();
+            ctx.moveTo(0, h * 0.2);
+            ctx.lineTo(w, h * 0.2);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (history.length === 0) return;
+
+            ctx.beginPath();
+            const pxStep = w / maxHistoryPoints;
+
+            for (let i = 0; i < history.length; i++) {
+                const lx = i * pxStep;
+                const value = history[i];
+                const ly = h * 0.2 + (1.0 - value) * (h * 2.2);
+
+                if (i === 0) ctx.moveTo(lx, ly);
+                else ctx.lineTo(lx, ly);
+            }
+
+            ctx.strokeStyle = "var(--neon-cyan)";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+
+        requestAnimationFrame(drawSystemLoop);
 
 
-        //        // --- CÓDIGO DEL QUIZ INTERACTIVO (TRIVIAL) ---
-        const quizData = [
+        // --- ACTUALIZACIÓN DE LA TRIVIA INTERACTIVA (7 PREGUNTAS CON RETROALIMENTACIÓN) ---
+        const triviaData = [
             {
-                question: "1. ¿Qué es exactamente una 'Curva de Luz'?",
-                options: [
-                    "La trayectoria curva que sigue un planeta para esquivar asteroides.",
-                    "Un gráfico que muestra cómo varía el brillo de una estrella a lo largo del tiempo.",
-                    "La luz del arcoíris que emiten las atmósferas exóticas al calentarse."
-                ],
-                correct: 1,
-                explain: "¡Correcto! Los astrónomos no ven los planetas directamente, sino que observan la caída de la luz de la estrella en el gráfico de curva de luz para saber que un exoplaneta ha transitado."
-            },
-            {
-                question: "2. Si descubrimos que la caída en el brillo de una estrella es MUY profunda, ¿qué nos dice esto sobre el exoplaneta?",
-                options: [
-                    "Que el exoplaneta es de un tamaño muy grande.",
-                    "Que el planeta viaja extremadamente rápido.",
-                    "Que es un planeta frío y cubierto de nieve."
+                q: "¿Qué representa rigurosamente una 'curva de luz' en la investigación de exoplanetas?",
+                a: [
+                    "Un gráfico astronómico que muestra cómo cambia el brillo percibido de una estrella a lo largo del tiempo.",
+                    "El arco brillante de plasma que se desprende de una gigante gaseosa.",
+                    "La estela refractada al analizar la atmósfera de un cometa helado."
                 ],
                 correct: 0,
-                explain: "¡Buen ojo! Cuanto más grande sea el tamaño del exoplaneta en comparación con su estrella, más cantidad de superficie estelar cubrirá y, por tanto, creará un dip o caída de luz más profunda."
+                exp: "La curva de luz registra la fotometría de la estrella. Cuando un planeta cruza frente a ella, bloquea mecánicamente parte de sus fotones, generando una caída medible."
             },
             {
-                question: "3. ¿Por qué es importante estudiar la 'Zona Habitable'?",
-                options: [
-                    "Porque es el único lugar donde los telescopios espaciales pueden recargar sus baterías solares.",
-                    "Porque allí la gravedad es cero y los astronautas pueden flotar de manera estable.",
-                    "Porque allí los planetas tienen la temperatura justa para albergar agua líquida, ideal para la vida."
+                q: "¿Qué ocurre con las caídas en la curva de luz si el exoplaneta está sumamente cerca de su estrella?",
+                a: [
+                    "Son muy poco frecuentes debido a que el año del exoplaneta es larguísimo.",
+                    "Son muy frecuentes y repetitivas, ya que completa su órbita en muy poco tiempo.",
+                    "La curva de luz se mantiene plana porque la gravedad de la estrella absorbe el planeta."
+                ],
+                correct: 1,
+                exp: "A menor distancia orbital, mayor es la velocidad según las leyes de Kepler. Su año dura pocos días y, por tanto, transita con una frecuencia muy alta."
+            },
+            {
+                q: "¿Por qué hay exoplanetas reales que no pueden ser detectados por el método del tránsito?",
+                a: [
+                    "Porque las estrellas bloquean la señal electromagnética de radio.",
+                    "Se debe a que el exoplaneta está compuesto únicamente de gases pesados transparentes.",
+                    "Porque sus órbitas están inclinadas respecto a la visual terrestre y nunca bloquean la luz de su estrella desde nuestra perspectiva."
                 ],
                 correct: 2,
-                explain: "¡Exacto! El agua líquida es el ingrediente universal para la vida. La zona habitable es la región 'templada' perfecta donde el agua no se congela ni se evapora."
+                exp: "Limitación geométrica: si la órbita está inclinada desde nuestra perspectiva en la Tierra, el planeta pasará por arriba o por debajo del disco estelar sin eclipsarlo."
+            },
+            {
+                q: "¿Cómo se desplaza la posición de la Zona Ricitos de Oro en una estrella Gigante Azul?",
+                a: [
+                    "Se expande hacia órbitas muy lejanas debido a la inmensa cantidad de energía térmica que irradia esa estrella.",
+                    "Se contrae pegándose a la superficie de la estrella porque es muy fría.",
+                    "Desaparece por completo del sistema solar debido a la radiación ultravioleta."
+                ],
+                correct: 0,
+                exp: "Al ser astros hipercalientes y masivos que emiten flujos energéticos colosales, la distancia de seguridad térmica para albergar agua líquida se aleja radicalmente."
+            },
+            {
+                q: "¿De qué manera influye directamente el radio (tamaño) del exoplaneta en el gráfico fotométrico?",
+                a: [
+                    "Un planeta con mayor radio genera una caída de brillo mucho más profunda en la curva de luz.",
+                    "Los planetas de gran envergadura aumentan el brillo estelar por efecto espejo.",
+                    "El tamaño del planeta solo altera el color de la estrella, no la intensidad lumínica."
+                ],
+                correct: 0,
+                exp: "Cuanto más grande sea el planeta, mayor porción del disco estelar cubrirá durante el tránsito, restando un porcentaje de luz más amplio y visible."
+            },
+            {
+                q: "¿A qué hace referencia científica la expresión popular de la zona \"Ricitos de Oro\"?",
+                a: [
+                    "A los yacimientos abundantes de metales pesados áureos en la corteza planetaria.",
+                    "A planetas cuyas órbitas reflejan un destello dorado visible a través de filtros cromáticos.",
+                    "A la franja orbital donde las condiciones climáticas no son ni muy calientes ni muy frías, sino ideales para el agua líquida."
+                ],
+                correct: 2,
+                exp: "Proviene del famoso cuento infantil. Representa el equilibrio perfecto de irradiación térmica para impedir tanto la congelación como la evaporación de los océanos."
+            },
+            {
+                q: "Si analizamos una estrella Enana Roja (pequeña y de baja emisión), ¿dónde se ubicará su zona habitable?",
+                a: [
+                    "En una órbita extremadamente cercana a la estrella, mucho más comprimida que en nuestro Sistema Solar.",
+                    "A la misma distancia exacta que separa a la Tierra de nuestro Sol (1 UA).",
+                    "En los bordes externos del sistema, más allá de los cinturones de asteroides congelados."
+                ],
+                correct: 0,
+                exp: "Debido a que las enanas rojas irradian muy poca energía térmica, los exoplanetas deben orbitar sumamente cerca de ellas para calentarse lo suficiente."
             }
         ];
 
-        let currentQuestionIdx = 0;
-        let score = 0;
+        let currentTriviaIdx = 0;
+        let triviaScore = 0;
 
-        const quizIntro = document.getElementById('quiz-intro');
-        const quizContainer = document.getElementById('quiz-container');
-        const quizResult = document.getElementById('quiz-result');
-        const btnStartQuiz = document.getElementById('btn-start-quiz');
-        const btnNextQuiz = document.getElementById('btn-next-quiz');
-        const btnRestartQuiz = document.getElementById('btn-restart-quiz');
+        const triviaIntro = document.getElementById('trivia-intro');
+        const triviaQuestion = document.getElementById('trivia-question');
+        const triviaResult = document.getElementById('trivia-result');
+        
+        const btnStartTrivia = document.getElementById('btn-start-trivia');
+        const btnNextTrivia = document.getElementById('btn-next-trivia');
+        const btnRestartTrivia = document.getElementById('btn-restart-trivia');
+        
+        const triviaText = document.getElementById('trivia-text');
+        const triviaOptions = document.getElementById('trivia-options');
+        const triviaProgress = document.getElementById('trivia-progress');
+        const triviaScoreLive = document.getElementById('trivia-score-live');
+        const triviaFeedback = document.getElementById('trivia-feedback');
 
-        const quizProgress = document.getElementById('quiz-progress');
-        const quizScoreText = document.getElementById('quiz-score');
-        const quizProgressBar = document.getElementById('quiz-progress-bar');
-        const quizQuestion = document.getElementById('quiz-question');
-        const quizOptions = document.getElementById('quiz-options');
-        const quizFeedback = document.getElementById('quiz-feedback');
-
-        btnStartQuiz.addEventListener('click', () => {
-            quizIntro.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            loadQuestion();
+        btnStartTrivia.addEventListener('click', () => {
+            triviaIntro.classList.add('hidden');
+            triviaQuestion.classList.remove('hidden');
+            loadTriviaQuestion();
         });
 
-        function loadQuestion() {
-            const q = quizData[currentQuestionIdx];
-            quizProgress.textContent = `Pregunta ${currentQuestionIdx + 1} de ${quizData.length}`;
-            quizScoreText.textContent = `Puntuación: ${score}/${quizData.length}`;
-            quizProgressBar.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
-
-            quizQuestion.textContent = q.question;
-            quizOptions.innerHTML = '';
-            quizFeedback.classList.add('hidden');
-            btnNextQuiz.classList.add('hidden');
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 rounded-xl border border-slate-800 bg-space-deep/80 hover:bg-slate-900/60 hover:border-slate-600 transition-all text-sm font-medium focus:outline-none";
-                btn.textContent = opt;
-                btn.addEventListener('click', () => selectOption(idx, btn));
-                quizOptions.appendChild(btn);
+        function loadTriviaQuestion() {
+            const current = triviaData[currentTriviaIdx];
+            triviaProgress.textContent = `Pregunta ${currentTriviaIdx + 1} de ${triviaData.length}`;
+            triviaScoreLive.textContent = `Puntuación: ${triviaScore}`;
+            triviaText.textContent = current.q;
+            
+            // Limpiar estados previos
+            triviaFeedback.classList.add('hidden');
+            btnNextTrivia.classList.add('hidden');
+            triviaOptions.innerHTML = '';
+            
+            current.a.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.addEventListener('click', () => checkTriviaAnswer(index));
+                triviaOptions.appendChild(button);
             });
         }
 
-        //        function selectOption(selectedIdx, clickedButton) {
-            const q = quizData[currentQuestionIdx];
-            const buttons = quizOptions.querySelectorAll('button');
-
-            buttons.forEach((btn, index) => {
+        function checkTriviaAnswer(selectedIdx) {
+            const current = triviaData[currentTriviaIdx];
+            const buttons = triviaOptions.querySelectorAll('.option-btn');
+            
+            // Bloquear clics adicionales
+            buttons.forEach((btn, idx) => {
                 btn.disabled = true;
-                if (index === q.correct) {
-                    btn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-400');
-                } else if (index === selectedIdx) {
-                    btn.classList.add('bg-red-500/20', 'border-red-500', 'text-red-400');
+                if (idx === current.correct) {
+                    // Confirmación visual de la respuesta correcta siempre en VERDE
+                    btn.style.backgroundColor = "rgba(16, 185, 129, 0.25)";
+                    btn.style.borderColor = "var(--neon-cyan)";
+                    btn.style.color = "#34d399";
                 }
             });
 
-            if (selectedIdx === q.correct) {
-                score++;
-                quizFeedback.className = "mt-6 p-4 rounded-xl text-sm leading-relaxed bg-emerald-500/10 border border-emerald-500/20 text-emerald-300";
+            if (selectedIdx === current.correct) {
+                triviaScore++;
+                triviaFeedback.style.backgroundColor = "rgba(16, 185, 129, 0.1)";
+                triviaFeedback.style.border = "1px solid rgba(16, 185, 129, 0.3)";
+                triviaFeedback.style.color = "#34d399";
+                triviaFeedback.innerHTML = `<strong>✨ ¡Respuesta Correcta!</strong><br>${current.exp}`;
             } else {
-                quizFeedback.className = "mt-6 p-4 rounded-xl text-sm leading-relaxed bg-red-500/10 border border-red-500/20 text-red-300";
+                // Confirmación visual de respuesta incorrecta en ROJO
+                buttons[selectedIdx].style.backgroundColor = "rgba(239, 68, 68, 0.25)";
+                buttons[selectedIdx].style.borderColor = "#ef4444";
+                buttons[selectedIdx].style.color = "#f87171";
+                
+                triviaFeedback.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+                triviaFeedback.style.border = "1px solid rgba(239, 68, 68, 0.3)";
+                triviaFeedback.style.color = "#f87171";
+                triviaFeedback.innerHTML = `<strong>❌ Respuesta Incorrecta</strong><br>${current.exp}`;
             }
 
-            quizFeedback.innerHTML = `<strong>Explicación Científica:</strong> ${q.explain}`;
-            quizFeedback.classList.remove('hidden');
-            btnNextQuiz.classList.remove('hidden');
+            // Mostrar la devolución y activar la opción de pasar de diapositiva
+            triviaFeedback.classList.remove('hidden');
+            btnNextTrivia.classList.remove('hidden');
+            triviaScoreLive.textContent = `Puntuación: ${triviaScore}`;
         }
 
-        btnNextQuiz.addEventListener('click', () => {
-            currentQuestionIdx++;
-            if (currentQuestionIdx < quizData.length) {
-                loadQuestion();
+        btnNextTrivia.addEventListener('click', () => {
+            currentTriviaIdx++;
+            if (currentTriviaIdx < triviaData.length) {
+                loadTriviaQuestion();
             } else {
-                showResults();
+                showTriviaResults();
             }
         });
 
-        function showResults() {
-            quizContainer.classList.add('hidden');
-            quizResult.classList.remove('hidden');
+        function showTriviaResults() {
+            triviaQuestion.classList.add('hidden');
+            triviaResult.classList.remove('hidden');
 
-            const emoji = document.getElementById('quiz-result-emoji');
-            const title = document.getElementById('quiz-result-title');
-            const text = document.getElementById('quiz-result-text');
+            const emoji = document.getElementById('trivia-result-emoji');
+            const title = document.getElementById('trivia-result-title');
+            const text = document.getElementById('trivia-result-text');
 
-            if (score === quizData.length) {
-                emoji.textContent = "🏆👑";
-                title.textContent = "¡Increíble, eres un Exocazador Experto!";
-                text.textContent = `Has acertado las ${score} de ${quizData.length} preguntas de la misión. ¡Tu telescopio está calibrado perfectamente!`;
-            } else if (score >= 1) {
-                emoji.textContent = "🚀💫";
-                title.textContent = "¡Buen Intento, Cadete Espacial!";
-                text.textContent = `Has obtenido ${score} de ${quizData.length} puntos. Tienes potencial para trabajar en la NASA, repasa un poco más y serás invencible.`;
+            // Mecanismo evaluativo condicional estricto
+            if (triviaScore < 4) {
+                emoji.textContent = "📡🛰️";
+                title.textContent = "Misión Incompleta";
+                text.textContent = `Has obtenido ${triviaScore} de ${triviaData.length} aciertos. Te recomendamos volver a revisar el contenido didáctico de la guía, experimentar con las variables físicas en el laboratorio interactivo e intentarlo nuevamente para mejorar tus marcas.`;
+            } else if (triviaScore === 4 || triviaScore === 5) {
+                emoji.textContent = "🚀🌌";
+                title.textContent = "¡Buen trabajo!";
+                text.textContent = `¡Felicidades! Lograste un total de ${triviaScore} de ${triviaData.length} aciertos. Demuestras un gran entendimiento sobre la mecánica geométrica de los eclipses y el cálculo térmico estelar.`;
             } else {
-                emoji.textContent = "🛸💤";
-                title.textContent = "¡Oh, te perdiste en el Espacio profundo!";
-                text.textContent = `Puntuación: ${score}/${quizData.length}. ¡No te preocupes! Incluso a los astrónomos más famosos se les escapaban los tránsitos. ¡Inténtalo de nuevo!`;
+                // Felicitación vigorosa (6 o 7 aciertos)
+                emoji.textContent = "🏆🛸🪐";
+                title.textContent = "¡Magnífico! ¡Nivel Astrofísico de Élite!";
+                text.textContent = `¡Impresionante desempeño! Has completado con éxito ${triviaScore} de ${triviaData.length} aciertos perfectos. Recibe una felicitación vigorosa por dominar con absoluta precisión el comportamiento lumínico, el impacto de la inclinación órbita-observador y las zonas habitables del cosmos.`;
             }
         }
 
-        btnRestartQuiz.addEventListener('click', () => {
-            currentQuestionIdx = 0;
-            score = 0;
-            quizResult.classList.add('hidden');
-            quizIntro.classList.remove('hidden');
+        btnRestartTrivia.addEventListener('click', () => {
+            currentTriviaIdx = 0;
+            triviaScore = 0;
+            triviaResult.classList.add('hidden');
+            triviaIntro.classList.remove('hidden');
         });
     </script>
 </body>
