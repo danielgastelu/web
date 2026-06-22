@@ -743,31 +743,26 @@
 
   </main>
 
-  <!-- PIE DE IMAGEN ESTÁTICO (SIEMPRE OSCURO CON LOGOS REQUERIDOS) -->
-  <footer class="bg-slate-950 text-slate-400 py-6 border-t border-slate-900 relative mt-auto" id="pie-fijo">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      
-      <!-- Logo Uruguay Educa ficticio premium en CSS / SVG -->
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center font-black text-white text-xs">U</div>
-        <div class="text-left">
-          <span class="text-xs font-bold text-white block">UruguayEduca</span>
-          <span class="text-[9px] text-slate-500 uppercase tracking-widest font-mono">Portal Educativo</span>
-        </div>
-      </div>
-
-      <p class="text-sm tracking-wide font-mono text-slate-300" id="pie-para-actualizar">
-        pie para actualizar
-      </p>
-
-      <div class="text-right hidden md:block">
-        <p class="text-[10px] text-slate-600">
-          Módulo interactivo de Astronomía. Cumple con los lineamientos REA. Diseñado para un óptimo aprendizaje libre de distracciones.
-        </p>
-      </div>
-
-    </div>
+  <!-- PIE DE PÁGINA ESTÁNDAR URUGUAY EDUCA -->
+  <footer class="mt-8 mb-4 w-full flex justify-center z-20 px-4">
+      <a 
+        href="https://uruguayeduca.anep.edu.uy/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl w-full px-6 py-4 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
+      >
+        <img 
+          src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
+          alt="Logo Uruguay Educa" 
+          class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+          onerror="this.onerror=null; this.style.display='none';"
+        />
+        <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
+          Portal Uruguay Educa (ANEP-DGES-EDyTIC) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Preguntas y respuestas en trivias responsabilidad de docente aplicador
+        </span>
+      </a>
   </footer>
+
 
   <!-- SCRIPT PARA INTERACTIVIDAD, SIMULADOR Y TRIVIA -->
   <script>
