@@ -24,7 +24,7 @@
     }
   </script>
 
-  <!-- Tipografía Lexend para facilitar la lectura a estudiantes con TDAH -->
+  <!-- Tipografía Lexend para facilitar la lectura a estudiantes con TDAH y pautas DUA -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght=300;400;500;600;700;800&display=swap');
     
@@ -46,7 +46,7 @@
       transition: opacity 0.5s ease;
     }
 
-    /* Animación para el quiz */
+    /* Animación para estrellas de autoevaluación ganadas */
     @keyframes star-pulse {
       0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.7)); }
       50% { transform: scale(1.25); filter: drop-shadow(0 0 12px rgba(250, 204, 21, 1)); }
@@ -64,10 +64,10 @@
     Saltar al contenido principal
   </a>
 
-  <!-- FONDO CÓSMICO DE ESTRELLAS DECORATIVO -->
+  <!-- FONDO CÓSMICO DE ESTRELLAS DECORATIVO (Se oculta en modo claro) -->
   <div class="space-bg opacity-100" id="space-starfield" aria-hidden="true">
     <svg class="w-full h-full opacity-35" xmlns="http://www.w3.org/2000/svg">
-      <!-- Estrellas simuladas -->
+      <!-- Estrellas simuladas celestes y blancas -->
       <circle cx="15%" cy="20%" r="1" fill="#fff" />
       <circle cx="28%" cy="40%" r="1.5" fill="#c084fc" opacity="0.8"/>
       <circle cx="48%" cy="15%" r="1" fill="#fff" />
@@ -85,7 +85,7 @@
   <header class="sticky top-0 z-40 backdrop-blur-md bg-opacity-95 transition-colors border-b border-slate-800 dark:bg-darkbg/90 bg-lightbg/90 dark:border-slate-800 border-slate-300 py-4 px-4 sm:px-6">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       
-      <!-- Título de la Suite -->
+      <!-- Logo de la suite educativa -->
       <div class="flex items-center gap-3">
         <div class="p-2 bg-purple-600 text-white rounded-lg shadow-md" aria-hidden="true">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +98,7 @@
         </div>
       </div>
 
-      <!-- Selector de Modo Claro/Oscuro -->
+      <!-- Conmutador de modo claro/oscuro estructurado -->
       <div class="flex items-center gap-2">
         <span class="text-xs font-semibold hidden md:inline dark:text-slate-400 text-slate-600">Modo de Vista:</span>
         <button 
@@ -128,41 +128,38 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main id="contenido-principal" class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
 
-    <!-- INTRODUCCIÓN GENERAL -->
+    <!-- INTRODUCCIÓN GENERAL (ESTRUCTURA CONSTELACIONES V2) -->
     <section class="mb-12">
       <div class="text-center max-w-3xl mx-auto mb-8">
         <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/30">
-          ¿Qué son las Constelaciones?
+          Mirando el cielo desde hace miles de años
         </span>
         <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight">
-          Dibujos en la Oscuridad del Espacio
+          Las Constelaciones: Dibujos Imaginarios en el Cielo
         </h2>
         <p class="text-base sm:text-lg dark:text-slate-300 text-slate-800 leading-relaxed font-light">
-          A simple vista, las estrellas parecen estar cerca unas de otras, como si estuvieran pintadas sobre una esfera celeste. Sin embargo, esto es una <strong>ilusión óptica</strong> de nuestra perspectiva. En realidad, se encuentran a distancias descomunales en el espacio tridimensional y no tienen ninguna conexión física entre sí.
+          Antes de que existieran los mapas, los satélites o los teléfonos celulares, las personas observaban el cielo para orientarse, medir el paso del tiempo y contar historias. Al mirar las estrellas, diferentes pueblos imaginaron figuras formadas por grupos de astros brillantes. A esas figuras las llamamos <strong>constelaciones</strong>.
         </p>
       </div>
 
-      <!-- TARJETAS DE DEFINICIÓN Y PERSPECTIVA -->
+      <!-- DESTACADO PEDAGÓGICO DUA -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 shadow-sm">
           <h3 class="text-sm font-bold uppercase text-purple-400 mb-2 flex items-center gap-2">
-            <span>💡</span> Clave Científica (NASA)
+            <span>💡</span> Idea Clave
           </h3>
-          <p class="text-sm dark:text-slate-300 text-slate-700 leading-relaxed mb-3">
-            Las constelaciones son agrupaciones <strong>totalmente aparentes</strong> de estrellas. Son creaciones de la imaginación humana para ayudarnos a memorizar y dividir el cielo nocturno.
-          </p>
-          <p class="text-xs dark:text-slate-400 text-slate-500">
-            Dos estrellas de una misma constelación que desde la Tierra vemos juntas pueden estar separadas por cientos de años luz de profundidad entre sí.
+          <p class="text-sm dark:text-slate-300 text-slate-700 leading-relaxed">
+            Las constelaciones <strong>no son objetos reales</strong>. Son mapas imaginarios creados por distintas culturas para reconocer regiones del cielo. Las estrellas que parecen estar juntas desde la Tierra pueden encontrarse a enormes distancias unas de otras en la profundidad del espacio sideral.
           </p>
         </div>
 
-        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 flex flex-col justify-between">
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 shadow-sm flex flex-col justify-between">
           <div>
             <h3 class="text-sm font-bold uppercase text-purple-400 mb-2 flex items-center gap-2">
-              <span>📖</span> Para tu Cuaderno
+              <span>✍️</span> Analogía didáctica
             </h3>
             <p class="text-sm dark:text-slate-300 text-slate-700 leading-relaxed">
-              <strong>Efecto Perspectiva:</strong> Las estrellas forman figuras únicamente porque las vemos alineadas desde la posición específica de la Tierra en nuestra galaxia. Si viajáramos a otro sistema estelar, las figuras se romperían por completo.
+              Podemos pensar en las constelaciones como si fueran los juegos de <strong>unir puntos en una hoja de papel</strong>. Los puntos brillantes son las estrellas de fondo y nuestras líneas imaginarias forman las figuras en la mente.
             </p>
           </div>
         </div>
@@ -171,25 +168,25 @@
 
     <!-- SIMULADOR INTERACTIVO DE PERSPECTIVA 3D DE CONSTELACIONES -->
     <section class="mb-12">
-      <div class="p-6 sm:p-8 rounded-3xl bg-slate-900 dark:bg-slate-950/40 border-2 dark:border-purple-500/20 border-slate-300">
+      <div class="p-6 sm:p-8 rounded-3xl bg-slate-900 dark:bg-slate-950/40 border-2 dark:border-purple-500/20 border-slate-300 shadow-xl">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           <div class="lg:col-span-5">
             <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/30">
-              Simulador Interactivo 3D
+              Laboratorio Exploratorio 3D
             </span>
             <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900">
               Orión en Tres Dimensiones
             </h3>
             <p class="text-xs dark:text-slate-300 text-slate-800 leading-relaxed mb-4">
-              Usa el control deslizante para rotar tu cámara en el espacio profundo. Verás cómo las estrellas de la famosa constelación de <strong>Orión</strong> se separan en el espacio, revelando sus verdaderas e inmensas distancias de profundidad.
+              Usa el control de abajo para rotar la perspectiva de la constelación. Verás que la forma del "reloj de arena" o el cazador con su cinturón ("Las Tres Marías") solo existe desde la Tierra (Ángulo 0°). ¡Al rotarlo se desvela la inmensa profundidad espacial!
             </p>
 
-            <!-- Control interactivo -->
+            <!-- Control del Slider para DUA -->
             <div class="bg-slate-950/70 p-5 rounded-2xl border border-slate-800 space-y-4">
               <div>
                 <div class="flex justify-between items-center mb-2">
-                  <label for="depth-slider" class="text-xs font-bold text-white">Ángulo de Observación:</label>
+                  <label id="depth-slider-label" for="depth-slider" class="text-xs font-bold text-white">Ángulo de Observación:</label>
                   <span id="angle-display" class="text-xs font-mono font-bold text-purple-400">Desde la Tierra (0°)</span>
                 </div>
                 <input 
@@ -200,29 +197,29 @@
                   value="0" 
                   oninput="updateAstroSim(this.value)"
                   class="w-full accent-purple-500 h-2 bg-slate-800 rounded-lg cursor-pointer"
+                  aria-labelledby="depth-slider-label"
                 >
               </div>
 
               <div class="p-3 bg-purple-950/20 border border-purple-900/30 rounded-xl">
                 <p class="text-[10px] dark:text-slate-400 text-slate-600 leading-relaxed">
-                  📢 <strong>Prueba esto:</strong> Al mover el slider a la derecha, la cámara gira de lado. Notarás que el Cinturón de Orión (Las Tres Marías) se desarma por completo porque cada estrella está a una distancia real distinta de nosotros. Tierra a la derecha del simulador al rotar 90 grados.
+                  📢 <strong>Observa:</strong> La estrella central del cinturón, <strong>Alnilam</strong>, se encuentra a 1340 años luz, mientras que las de sus costados están mucho más cerca de la Tierra. Al rotarla se evidencia el efecto de profundidad. Tierra a la derecha del simulador al rotar 90 grados.
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- Lienzo de visualización -->
+          <!-- Lienzo de visualización interactiva del Canvas -->
           <div class="lg:col-span-7 flex flex-col items-center">
             <div class="relative w-full aspect-square max-w-[380px] rounded-2xl overflow-hidden border-2 border-purple-500/40 bg-slate-950 shadow-2xl">
               <canvas id="constellation-canvas" class="w-full h-full block bg-slate-950"></canvas>
               
-              <!-- Etiquetas flotantes -->
               <div class="absolute top-3 left-3 bg-slate-900/80 px-2.5 py-1 rounded-md text-[9px] text-purple-400 font-bold border border-slate-800">
                 Lienzo de Perspectiva Espacial
               </div>
             </div>
             <p class="text-[11px] text-slate-500 mt-2 text-center">
-              * Desliza el control superior para orbitar alrededor del modelo 3D de las estrellas de Orión.
+              * Desliza el control para orbitar la cámara alrededor de la constelación de Orión.
             </p>
           </div>
 
@@ -230,126 +227,127 @@
       </div>
     </section>
 
-    <!-- HISTORIA DE LAS CONSTELACIONES (ORÍGENES HASTA GRECIA) -->
+    <!-- LAS 88 CONSTELACIONES Y SU CLASIFICACIÓN -->
     <section class="mb-16">
       <div class="text-center mb-10">
-        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 rounded-full border border-indigo-500/30">
-          Viaje en el Tiempo
+        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/30">
+          Clasificación Astronómica
         </span>
         <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 dark:text-white text-slate-900">
-          Los Orígenes: De Mesopotamia a Grecia
+          ¿Cuántas Constelaciones Existen?
         </h3>
         <p class="text-sm dark:text-slate-400 text-slate-700 mt-2 max-w-xl mx-auto">
-          Hace miles de años, sin luz eléctrica ni pantallas, las civilizaciones antiguas usaron las estrellas para escribir leyendas, marcar estaciones de cultivo y guiar su rumbo.
+          En 1930, la Unión Astronómica Internacional (UAI) estableció de forma definitiva las 88 constelaciones oficiales que dividen geométricamente todo nuestro firmamento.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         
-        <!-- MESOPOTAMIA -->
-        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400 rounded-full border border-orange-500/30">
-                La Cuna de la Astronomía
-              </span>
-              <span class="text-2xl" aria-hidden="true">🌾</span>
-            </div>
-            <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">La Antigua Mesopotamia</h4>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-              En la cuenca de los ríos Éufrates y Tigris, cazadores y agricultores crearon las constelaciones más antiguas conocidas, bautizándolas de acuerdo con la fauna local y sus actividades diarias. 
-            </p>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-2">
-              Nombres como <strong>Escorpión</strong>, <strong>Toro</strong> y <strong>Cáncer</strong> nacieron de su rica imaginación. Además, vinculaban la salida de los astros con estaciones climáticas o ciclos de cosecha.
-            </p>
+        <!-- BOREALES -->
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-xl">❄️</span>
+            <h4 class="font-bold dark:text-white text-slate-900">Boreales (36)</h4>
           </div>
-          <div class="p-3 bg-orange-500/10 rounded-xl border border-orange-500/20 text-[10px] dark:text-orange-300 text-orange-800 font-mono">
-            📌 Mapa histórico de la Mesopotamia
-          </div>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
+            Son las constelaciones situadas en el hemisferio celeste norte. Eran las únicas visibles para los antiguos astrónomos europeos y griegos, como la Osa Mayor y la Osa Menor.
+          </p>
         </div>
 
-        <!-- EL EQUILIBRIO DE LIBRA -->
-        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/30">
-                La Balanza del Tiempo
-              </span>
-              <span class="text-2xl" aria-hidden="true">⚖️</span>
-            </div>
-            <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">El Origen de la Balanza (Libra)</h4>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-              Originalmente, las estrellas de la constelación de Libra formaban parte de las pinzas del enorme Escorpión mesopotámico. Sin embargo, en el siglo III a.C., surgió la necesidad de definir un nuevo símbolo de balance.
-            </p>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
-              En la época griega, cuando el Sol entraba en esta región celeste, ocurría el <strong>equinoccio</strong> (momentos del año en que el día y la noche duran exactamente lo mismo). La Balanza fue introducida en el cielo para representar este equilibrio perfecto de la luz y la oscuridad.
-            </p>
+        <!-- AUSTRALES -->
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-xl">⚓</span>
+            <h4 class="font-bold dark:text-white text-slate-900">Australes (52)</h4>
           </div>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
+            Son visibles principalmente desde el hemisferio sur de la Tierra. Como Uruguay se encuentra ubicado en el sur, estas son las estrellas que decoran nuestras noches de campo.
+          </p>
         </div>
 
-        <!-- MITOS GRIEGOS -->
-        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/30">
-                Mitología Heroica
-              </span>
-              <span class="text-2xl" aria-hidden="true">🛡️</span>
-            </div>
-            <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">Leyendas del Cielo Griego</h4>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-              Los griegos adoptaron el legado mesopotámico y tejieron hermosas historias en el cielo. La constelación de <strong>Andrómeda</strong> conmemora a la princesa etíope encadenada a una roca marina para apaciguar a la monstruosa <strong>Ballena (Cetus)</strong>.
-            </p>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
-              Cerca de ella yace el héroe <strong>Perseo</strong>, quien la rescató tras decapitar a la Gorgona Medusa utilizando su cabeza para petrificar al monstruo marino, dando origen además al caballo alado <strong>Pegaso</strong>.
-            </p>
+        <!-- ECUATORIALES -->
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-xl">🌐</span>
+            <h4 class="font-bold dark:text-white text-slate-900">Ecuatoriales</h4>
           </div>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
+            Varias de ellas se extienden a lo largo de la línea del ecuador celeste, sirviendo de puente observacional y pudiendo contemplarse desde ambos lados de nuestro planeta.
+          </p>
         </div>
 
       </div>
     </section>
 
-    <!-- LA HISTORIA DE LA CABELLERA DE BERENICE -->
+    <!-- GRANDES EXPONENTES DE LA MITOLOGÍA CELESTE -->
     <section class="mb-16">
-      <div class="p-6 sm:p-10 rounded-3xl dark:bg-slate-900/40 bg-white border dark:border-slate-800 border-slate-300">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          <div class="lg:col-span-5">
-            <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-pink-500/10 text-pink-500 rounded-full border border-pink-500/30">
-              Leyenda Histórica de Alejandría
-            </span>
-            <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight">
-              La Cabellera de Berenice
-            </h3>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-              Esta es una de las pocas constelaciones que conmemora un hecho y un personaje histórico real. Berenice era la esposa del faraón Ptolomeo III Evergetes de Egipto (fundador de la célebre Biblioteca de Alejandría).
-            </p>
-            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-              Cuando el rey marchó a una peligrosa campaña militar, Berenice prometió a la diosa del amor sacrificar su hermosa cabellera si su esposo regresaba con vida. Al concretarse el feliz retorno, la reina cumplió su voto y depositó sus cabellos en el templo. Sin embargo, al día siguiente, el cabello desapareció misteriosamente, provocando la ira del faraón.
+      <div class="text-center mb-10">
+        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/30">
+          Historias y Mitología
+        </span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 dark:text-white text-slate-900">
+          Historias grabadas con Luz en el Firmamento
+        </h3>
+        <p class="text-sm dark:text-slate-400 text-slate-700 mt-2 max-w-xl mx-auto">
+          Los antiguos griegos adoptaron el legado de la Mesopotamia y tejieron hermosas leyendas asociadas a los nombres estelares.
+        </p>
+      </div>
+
+      <!-- Cuadrícula de Mitos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Orión y Escorpio -->
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400 rounded-full border border-orange-500/30">
+                La eterna persecución
+              </span>
+              <span class="text-2xl" aria-hidden="true">🦂</span>
+            </div>
+            <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">Orión vs Escorpio</h4>
+            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-3">
+              Según el mito griego, el gigante cazador <strong>Orión</strong> era tan orgulloso de su puntería y fuerza que desafió a los propios dioses del Olimpo. Como castigo, le enviaron un descomunal escorpión para derrotarlo.
             </p>
             <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
-              Para salvar a los guardias del templo de una muerte segura, el astrónomo de la corte, Conon de Samos, declaró con ingenio que la ofrenda había complacido tanto a la diosa que esta la había llevado directamente al firmamento, señalando un modesto grupo de estrellas brillantes que hoy conocemos formalmente como <strong>Coma Berenices</strong>.
+              Por eso, en el cielo los encontramos en posiciones diametralmente opuestas: cuando <strong>Orión</strong> se oculta por el oeste, su eterno enemigo <strong>Escorpio</strong> asoma brillante por el este. ¡Nunca coinciden en el cielo al mismo tiempo!
             </p>
           </div>
-
-          <!-- Representación Visual Estelar -->
-          <div class="lg:col-span-7 overflow-hidden rounded-2xl bg-slate-950 aspect-video flex flex-col justify-between border dark:border-slate-800 border-slate-300">
-            <div class="p-4 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs">
-              <span class="font-bold text-pink-400">✨ Coma Berenices</span>
-              <span class="text-[10px] text-slate-400">Siglo III a.C.</span>
-            </div>
-            <div class="flex-grow p-6 flex flex-col items-center justify-center text-center">
-              <span class="text-4xl mb-3 animate-pulse" aria-hidden="true">💫</span>
-              <blockquote class="text-sm italic dark:text-slate-300 text-slate-200 max-w-md leading-relaxed">
-                "No te enojes, mi rey... La diosa ha tomado los hermosos cabellos de Berenice y los ha convertido en una nueva constelación en el firmamento para que todo el mundo admire su devoción."
-              </blockquote>
-            </div>
-            <div class="p-3 bg-slate-950 border-t border-slate-800 text-[10px] text-slate-500 text-center">
-              * Adaptación del poema del geógrafo Eratóstenes y el erudito Catulo.
-            </div>
-          </div>
-
         </div>
+
+        <!-- Andrómeda y Perseo -->
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/30">
+                Héroes y Monstruos
+              </span>
+              <span class="text-2xl" aria-hidden="true">🛡️</span>
+            </div>
+            <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">Andrómeda y Perseo</h4>
+            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-3">
+              La princesa Andrómeda fue encadenada a una roca marina para aplacar al terrible monstruo enviado por Poseidón, la Ballena (Cetus).
+            </p>
+            <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
+              El heroico Perseo, volando sobre el caballo alado Pegaso tras vencer a la gorgona Medusa, logró rescatar a la bella princesa petrificando a la bestia marina al mostrarle la cabeza decapitada de la Gorgona.
+            </p>
+          </div>
+        </div>
+
+        <!-- La Cabellera de Berenice -->
+        <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300 md:col-span-2">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">💫</span>
+            <h4 class="text-lg font-bold dark:text-white text-slate-900">La Cabellera de Berenice: Un Hecho Histórico Real</h4>
+          </div>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-3">
+            Berenice II fue reina de Egipto durante el siglo III a.C. Cuando su esposo, el faraón Ptolomeo III Evergetes, partió a la guerra, ella prometió cortar su hermosa cabellera y donarla al templo de la diosa Afrodita si su esposo volvía con vida.
+          </p>
+          <div class="p-4 bg-purple-500/5 border border-purple-800/20 rounded-xl text-xs dark:text-slate-300 text-slate-800">
+            <strong>La intervención del astrónomo:</strong> Tras el regreso triunfal del faraón, la cabellera desapareció misteriosamente del templo. Para evitar la furia del rey, el astrónomo de la corte, <strong>Conon de Samos</strong>, declaró ingeniosamente que los cabellos habían complacido tanto a la diosa que esta los había subido al cielo, señalando un modesto grupo de estrellas que hoy en día conocemos de forma oficial como <strong>Coma Berenices</strong>.
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -360,24 +358,22 @@
           Zodiaco Astronómico
         </span>
         <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 dark:text-white text-slate-900">
-          El Camino del Sol: La Banda Zodiacal
+          El Camino del Sol y las 13 Constelaciones
         </h3>
         <p class="text-sm dark:text-slate-400 text-slate-700 mt-2 max-w-xl mx-auto">
-          ¿Sabías que para la astronomía el zodiaco es simplemente la franja del cielo por donde viaja de forma aparente el Sol a lo largo del año? Conoce la verdad científica detrás de este trayecto.
+          Para la ciencia de la astronomía, las constelaciones zodiacales son aquellas que el Sol atraviesa de forma aparente en su recorrido anual por la eclíptica.
         </p>
       </div>
 
-      <!-- Cuadrícula explicativa del Zodiaco -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         
         <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
           <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-3 flex items-center gap-2">
             <span class="text-purple-500">☀️</span> ¿Por qué no vemos las estrellas zodiacales de día?
           </h4>
-          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-3">
-            A medida que la Tierra órbita alrededor del Sol, este parece posicionarse delante de diferentes constelaciones a lo largo de los meses. Sin embargo, dado que es de día, la intensa luz solar nos impide observar las estrellas situadas detrás de él.
-          </p>
           <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
+            A medida que la Tierra gira alrededor del Sol, este parece posicionarse delante de diferentes constelaciones a lo largo de los meses. Sin embargo, dado que es de día, la intensa luz dispersada por nuestra atmósfera nos impide observar las estrellas situadas detrás de él.
+            <br><br>
             Por ello, a medianoche del mismo mes, podemos ver con perfecta claridad la constelación zodiacal situada en el extremo <strong>diametralmente opuesto</strong> en el espacio. El Sol alcanzará esa misma constelación exactamente medio año después.
           </p>
         </div>
@@ -391,73 +387,126 @@
           </p>
           
           <div class="flex flex-wrap gap-1.5 mt-4">
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">1. Piscis</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">2. Aries</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">3. Tauro</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">4. Géminis</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">5. Cáncer</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">6. Leo</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">7. Virgo</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">8. Libra</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">9. Escorpio</span>
-            <span class="px-2 py-1 bg-purple-600 text-white rounded text-[9px] font-bold">🌟 10. Ofiuco</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">11. Sagitario</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">12. Capricornio</span>
-            <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-bold">13. Acuario</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">1. Piscis</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">2. Aries</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">3. Tauro</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">4. Géminis</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">5. Cáncer</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">6. Leo</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">7. Virgo</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">8. Libra</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">9. Escorpio</span>
+            <span class="px-2.5 py-1 bg-purple-600 text-white rounded text-[9px] font-bold">🌟 10. Ofiuco</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">11. Sagitario</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">12. Capricornio</span>
+            <span class="px-2.5 py-1 bg-slate-800 rounded text-[9px] font-bold">13. Acuario</span>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- EL CATÁLOGO MODERNO: PTOLEMAICO Y HEMISFERIO SUR -->
+    <!-- EL CIELO AUSTRAL Y EL SUR GEOGRÁFICO -->
     <section class="mb-16">
       <div class="text-center mb-10">
-        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/30">
-          La Unificación del Cielo
+        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/30">
+          Uruguay en el Espacio
         </span>
         <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 dark:text-white text-slate-900">
-          La Cartografía del Cielo Completo
+          La Cruz del Sur y la Navegación
         </h3>
         <p class="text-sm dark:text-slate-400 text-slate-700 mt-2 max-w-xl mx-auto">
-          El mapa estelar tardó siglos en completarse. Desde el hemisferio norte se observaba una mitad del universo, pero los navegantes europeos debieron explorar los mares del sur para descubrir un cielo totalmente nuevo.
+          Para los habitantes del hemisferio sur, la constelación más pequeña de las 88 reconocidas oficialmente es la más útil para orientarnos.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- Ptolomeo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">📜</span>
-            <h4 class="font-bold dark:text-white text-slate-900">El Almagesto de Claudio Ptolomeo</h4>
-          </div>
+          <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">Crux: La Cruz del Sur</h4>
           <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-            En el siglo II d.C., en Alejandría (Egipto), el astrónomo Claudio Ptolomeo compiló el catálogo estelar clásico más importante: <strong>El Almagesto</strong>. Basándose en registros anteriores de Hiparco, describió con rigor técnico <strong>48 constelaciones</strong> visibles desde su latitud del norte. Su obra se mantuvo vigente por más de mil años en la ciencia.
+            Marinos, exploradores y viajeros la utilizaron durante siglos para orientarse antes de la existencia de los sistemas modernos de posicionamiento por satélite (GPS).
           </p>
+          <div class="p-4 bg-cyan-500/10 rounded-xl border border-cyan-500/20 text-xs">
+            <strong>Cómo encontrar el Sur:</strong> Si prolongamos la línea imaginaria de su mástil o palo mayor unas 4 veces y media desde la estrella Acrux (su base), y luego bajamos una plomada vertical directa hacia el horizonte, hallaremos con absoluta precisión el punto cardinal <strong>SUR</strong> geográfico.
+          </div>
         </div>
 
-        <!-- El Cielo Austral -->
         <div class="p-6 rounded-2xl dark:bg-slate-900/50 bg-white border dark:border-slate-800 border-slate-300">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="text-2xl">🧭</span>
-            <h4 class="font-bold dark:text-white text-slate-900">La Exploración del Cielo Austral</h4>
-          </div>
+          <h4 class="text-lg font-bold dark:text-white text-slate-900 mb-2">Constelaciones de los Pueblos Originarios</h4>
           <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mb-4">
-            A partir del siglo XVI, los navegantes que exploraban las regiones templadas del sur (como Magallanes) trazaron nuevas figuras como la célebre <strong>Cruz del Sur</strong>. 
+            No todas las culturas imaginaron las mismas figuras. Mientras los antiguos griegos veían héroes y monstruos, muchos pueblos originarios de América veían animales y plantas de su entorno cotidiano.
           </p>
           <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed">
-            Astrónomos como Johann Bayer (1603) crearon figuras basadas en fauna exótica (Tucán, Camaleón). Más tarde, Louis de Lacaille (1750) bautizó grupos estelares en honor a instrumentos científicos de su época: Telescopio, Microscopio y Compás.
+            Incluso identificaban <strong>"constelaciones oscuras"</strong>: figuras no formadas por estrellas brillantes, sino por las siluetas de las nubes densas de polvo interestelar oscuro que bloquean la luz de la Vía Láctea (representando llamas, aves o serpientes).
           </p>
         </div>
+      </div>
+    </section>
 
+    <!-- EL INCREÍBLE RETRASO DE LA LUZ ESTELAR -->
+    <section class="mb-16">
+      <div class="p-6 sm:p-8 rounded-3xl bg-indigo-950/20 dark:bg-slate-900/60 border-2 border-indigo-500/30">
+        <div class="flex flex-col md:flex-row gap-6 items-center">
+          <div class="text-4xl" aria-hidden="true">⏱️</div>
+          <div>
+            <h3 class="text-lg font-bold dark:text-white text-slate-900">Un Dato Sorprendente: Observar el cielo es mirar el pasado</h3>
+            <p class="text-xs dark:text-slate-300 text-slate-800 leading-relaxed mt-2">
+              La luz de algunas estrellas visibles a simple vista tarda cientos de años en llegar hasta nosotros debido a las distancias astronómicas del universo. Esto significa que cuando observamos ciertas constelaciones, estamos captando luz que salió de esas estrellas mucho antes de que nacieran nuestros bisabuelos. ¡Estamos contemplando el pasado cósmico!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREGUNTAS PARA PENSAR (COLLAPSIBLE ACCORDION DUA) -->
+    <section class="mb-16">
+      <div class="text-center mb-10">
+        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/30">
+          Reflexiones del Cuaderno
+        </span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 dark:text-white text-slate-900">
+          Preguntas para pensar en clase
+        </h3>
+        <p class="text-sm dark:text-slate-400 text-slate-700 mt-2 max-w-xl mx-auto">
+          Pon a prueba tu mente antes de iniciar el juego de trivia. Haz clic sobre cada pregunta para descubrir su respuesta sugerida.
+        </p>
       </div>
 
-      <!-- Unión Astronómica Internacional -->
-      <div class="mt-8 p-6 rounded-2xl dark:bg-purple-950/10 bg-purple-500/5 border dark:border-purple-800/20 border-purple-200 text-xs">
-        <p class="leading-relaxed">
-          🌌 <strong>Las 88 Constelaciones Oficiales:</strong> Culturas de todo el mundo (mayas, incas, chinos, polinesios) crearon sus propios mapas. Sin embargo, en 1930, la <strong>Unión Astronómica Internacional (UAI)</strong> estandarizó de forma oficial las <strong>88 constelaciones</strong> vigentes hoy en día. Cada una tiene fronteras geométricas precisas que cubren la esfera celeste en su totalidad sin dejar huecos libres.
-        </p>
+      <div class="max-w-3xl mx-auto space-y-4">
+        
+        <!-- Pregunta 1 -->
+        <details class="group p-4 rounded-xl border dark:border-slate-800 border-slate-300 dark:bg-slate-900/30 bg-white">
+          <summary class="flex justify-between items-center font-bold text-sm dark:text-white text-slate-900 cursor-pointer focus:outline-none focus:text-purple-400">
+            <span>🤔 1. ¿Por qué las constelaciones no son objetos reales sino figuras imaginarias?</span>
+            <span class="transition-transform group-open:rotate-180 text-purple-500">▼</span>
+          </summary>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mt-3 pt-3 border-t dark:border-slate-800 border-slate-200">
+            Porque las estrellas que las forman están situadas a distancias abismales de profundidad unas de otras en la galaxia y no se atraen físicamente entre sí. La constelación es una ilusión producida exclusivamente por la perspectiva visual de nuestro planeta Tierra.
+          </p>
+        </details>
+
+        <!-- Pregunta 2 -->
+        <details class="group p-4 rounded-xl border dark:border-slate-800 border-slate-300 dark:bg-slate-900/30 bg-white">
+          <summary class="flex justify-between items-center font-bold text-sm dark:text-white text-slate-900 cursor-pointer focus:outline-none focus:text-purple-400">
+            <span>🤔 2. ¿Cuál es la diferencia entre una constelación austral y una boreal?</span>
+            <span class="transition-transform group-open:rotate-180 text-purple-500">▼</span>
+          </summary>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mt-3 pt-3 border-t dark:border-slate-800 border-slate-200">
+            Las constelaciones boreales se encuentran situadas en el hemisferio celeste norte y se aprecian desde allí. Las australes están situadas en el hemisferio celeste sur y son visibles principalmente por los observadores de estas latitudes del sur.
+          </p>
+        </details>
+
+        <!-- Pregunta 3 -->
+        <details class="group p-4 rounded-xl border dark:border-slate-800 border-slate-300 dark:bg-slate-900/30 bg-white">
+          <summary class="flex justify-between items-center font-bold text-sm dark:text-white text-slate-900 cursor-pointer focus:outline-none focus:text-purple-400">
+            <span>🤔 3. ¿Por qué podemos decir que al observar las estrellas estamos observando el pasado?</span>
+            <span class="transition-transform group-open:rotate-180 text-purple-500">▼</span>
+          </summary>
+          <p class="text-xs dark:text-slate-300 text-slate-700 leading-relaxed mt-3 pt-3 border-t dark:border-slate-800 border-slate-200">
+            La luz viaja a una velocidad finita en el espacio ($300.000\text{ km/s}$). Si la estrella se encuentra a 500 años luz de nosotros, la luz que captan nuestros ojos en este instante exacto salió de la estrella hace 500 años. Si esa estrella explotara hoy, tardaríamos 5 siglos enteros en enterarnos.
+          </p>
+        </details>
+
       </div>
     </section>
 
@@ -479,7 +528,7 @@
             
             <a href="https://prezi.com/jclplahm2k-v/la-constelacion-de-orion/" target="_blank" class="w-full sm:w-auto px-4 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2">
               <span>📊 Presentación Prezi: La Constelación de Orión</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
             </a>
           </div>
 
@@ -631,15 +680,29 @@
 
   </main>
 
-  <!-- PIE DE IMAGEN ESTÁTICO (SIEMPRE OSCURO) -->
+  <!-- PIE DE IMAGEN ESTÁTICO (SIEMPRE OSCURO CON LOGOS REQUERIDOS) -->
   <footer class="bg-slate-950 text-slate-400 py-6 border-t border-slate-900 relative mt-auto" id="pie-fijo">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Logo Uruguay Educa ficticio premium en CSS / SVG -->
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center font-black text-white text-xs">U</div>
+        <div class="text-left">
+          <span class="text-xs font-bold text-white block">UruguayEduca</span>
+          <span class="text-[9px] text-slate-500 uppercase tracking-widest font-mono">Portal Educativo</span>
+        </div>
+      </div>
+
       <p class="text-sm tracking-wide font-mono text-slate-300" id="pie-para-actualizar">
         pie para actualizar
       </p>
-      <p class="text-[10px] text-slate-600 mt-2">
-        Módulo interactivo de Astronomía. Cumple con los lineamientos REA. Diseñado para un óptimo aprendizaje libre de distracciones.
-      </p>
+
+      <div class="text-right hidden md:block">
+        <p class="text-[10px] text-slate-600">
+          Módulo interactivo de Astronomía. Cumple con los lineamientos REA. Diseñado para un óptimo aprendizaje libre de distracciones.
+        </p>
+      </div>
+
     </div>
   </footer>
 
