@@ -331,6 +331,10 @@
         <i id="toast-icon" class="fa-solid fa-circle-check text-blue-400 text-lg"></i>
         <span id="toast-text" class="text-sm">Notificación</span>
     </div>
+    
+    <div class="w-full text-center px-4 mt-6 z-20 relative text-sm text-slate-300">
+        Para saber más, consulta el contenido de referencia <a href="https://aulas.uruguayeduca.edu.uy/course/view.php?id=107&section=4" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline transition-colors">Fases de la Luna</a> del Prof. Héctor Roldós en Portal Uruguay Educa.
+    </div>
 
     <!-- Pie de Página Estandarizado con Logo -->
     <footer class="mt-8 mb-4 w-full flex justify-center z-20 px-4">
@@ -368,8 +372,7 @@
         const btnPlay = document.getElementById('btn-play');
         const playIcon = document.getElementById('play-icon');
 
-        /* 
-           Función para generar una textura de la Tierra de forma procedimental (Canvas 2D).
+        /* Función para generar una textura de la Tierra de forma procedimental (Canvas 2D).
            Esto nos ahorra llamadas CORS externas de imágenes y asegura que el simulador sea 100% autónomo.
         */
         function createProceduralEarthTexture() {
@@ -457,8 +460,7 @@
             return new THREE.CanvasTexture(canvas);
         }
 
-        /* 
-           Función para generar textura de la Luna (con cráteres, mares y relieves sutiles).
+        /* Función para generar textura de la Luna (con cráteres, mares y relieves sutiles).
         */
         function createProceduralMoonTexture() {
             const canvas = document.createElement('canvas');
@@ -671,8 +673,7 @@
         const phaseCamera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
         phaseCamera.position.set(0, 0, 9); // Cámara frontal mirando a la Luna en plano directo
         
-        /* 
-           CLAVE DEL HEMISFERIO SUR:
+        /* CLAVE DEL HEMISFERIO SUR:
            Para ver la Luna desde la perspectiva del hemisferio sur mirando al cielo Norte,
            la Luna se ve "patas arriba" e invertida de izquierda a derecha en comparación con el norte.
            Simulamos esto rotando nuestra cámara física 180 grados sobre su eje óptico (Roll).
