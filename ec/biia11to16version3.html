@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los orígenes de la observación del cielo - Astronomía</title>
+    <!-- Fuentes para alta legibilidad -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Modo Oscuro (Por defecto) */
+            --bg-color: #07111f;
+            --surface-color: #112240;
+            --surface-hover: #1e3a68;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --correct-color: #22c55e;
+            --incorrect-color: #ef4444;
+            --star-color: #fbbf24;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        .light-mode {
+            /* Modo Claro (Gris claro ~70% blanco) */
+            --bg-color: #e5e7eb;
+            --surface-color: #ffffff;
+            --surface-hover: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --accent-color: #0284c7;
+            --accent-hover: #0369a1;
+            --correct-color: #16a34a;
+            --incorrect-color: #dc2626;
+            --border-color: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Atkinson Hyperlegible', 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+            font-size: 18px;
+        }
+
+        /* Estrellas de fondo para el modo oscuro */
+        .stars-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        .light-mode .stars-bg {
+            opacity: 0;
+        }
+
+        /* Barra de progreso */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background-color: var(--accent-color);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.2s ease-out;
+        }
+
+        /* Botones de Accesibilidad Fijos */
+        .accessibility-panel {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            background: var(--surface-color);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            align-items: center;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        
+        button:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-icon:hover {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px 40px 20px;
+        }
+
+        /* Tipografía y Encabezados */
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        h1 { font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.8rem; margin-top: 2.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.3rem; color: var(--text-primary); }
+        
+        p { margin-bottom: 1.2rem; text-align: justify; }
+
+        .lead {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Índice / Menú */
+        .toc {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc li { margin-bottom: 10px; }
+        .toc a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+            transform: translateX(5px);
+        }
+
+        /* Tarjetas de Curiosidades */
+        .did-you-know {
+            background-color: var(--surface-color);
+            border-left: 5px solid var(--star-color);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+        }
+        .did-you-know h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--star-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tarjetas Interactivas (Flip Cards) */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 2rem 0;
+        }
+        .flip-card {
+            background-color: transparent;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner, .flip-card:focus-visible .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+        .flip-card-front {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+        }
+        .flip-card-back {
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+            transform: rotateY(180deg);
+        }
+        .card-icon { font-size: 3rem; margin-bottom: 10px; }
+
+        /* Contenedor de Video Responsivo */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Tooltips accesibles */
+        .tooltip {
+            border-bottom: 2px dashed var(--accent-color);
+            cursor: help;
+            position: relative;
+            font-weight: 600;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 5px;
+        }
+
+        /* Sección de Recursos */
+        .resources-box {
+            background-color: var(--surface-hover);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        .resources-box ul { padding-left: 20px; margin-bottom: 15px;}
+        .resources-box li { margin-bottom: 15px; }
+        .resources-box a { color: var(--accent-color); font-weight: bold; }
+
+        /* Cuestionario Interactivo */
+        .quiz-section {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 4rem;
+            border: 2px solid var(--accent-color);
+            text-align: center;
+        }
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stars-display {
+            font-size: 1.5rem;
+            color: var(--star-color);
+            background: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-btn {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            text-align: left;
+            font-size: 1.1rem;
+            border-radius: 8px;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-color);
+            background-color: var(--surface-hover);
+        }
+        .option-btn.correct {
+            background-color: rgba(34, 197, 94, 0.2);
+            border-color: var(--correct-color);
+        }
+        .option-btn.incorrect {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: var(--incorrect-color);
+        }
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Caja de Retroalimentación */
+        .feedback-box {
+            display: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+            animation: fadeIn 0.4s;
+        }
+        .feedback-box.show { display: block; }
+        .feedback-box.correct-bg {
+            background-color: rgba(34, 197, 94, 0.1);
+            border-left: 5px solid var(--correct-color);
+        }
+        .feedback-box.incorrect-bg {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 5px solid var(--incorrect-color);
+        }
+        .feedback-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .btn-continue {
+            background-color: var(--accent-color);
+            color: white;
+            margin-top: 15px;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+        }
+        .btn-continue:hover { background-color: var(--accent-hover); }
+
+        .quiz-result {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .quiz-result.show { display: block; }
+        .final-stars { font-size: 3rem; margin: 20px 0; letter-spacing: 5px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========================================================
+           Footer Permanente Oscuro 
+           (Inmune a los estilos del modo claro)
+           ======================================================== */
+        .dark-footer-wrapper {
+            background-color: #07111f !important; /* Siempre oscuro */
+            color: #cbd5e1 !important; /* Texto claro */
+            margin-top: 4rem;
+            padding: 3rem 20px;
+            width: 100%;
+            border-top: 2px solid #334155;
+        }
+        .dark-footer-wrapper .main-footer {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .dark-footer-wrapper .footer-card {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #94a3b8 !important; /* Gris intermedio */
+            transition: color 0.2s;
+        }
+        .dark-footer-wrapper .footer-card:hover {
+            color: #f8fafc !important; /* Blanco al pasar el ratón */
+        }
+        .dark-footer-wrapper .footer-logo {
+            max-width: 250px;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5)) !important; /* Sombra persistente, sin invertir */
+        }
+        .dark-footer-wrapper .footer-text {
+            font-size: 0.95rem;
+            max-width: 650px;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .accessibility-panel {
+                top: auto;
+                bottom: 15px;
+                right: 50%;
+                transform: translateX(50%);
+                width: 90%;
+                justify-content: space-around;
+            }
+            .container { padding-bottom: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fondo estrellado animado mediante canvas/CSS -->
+    <div class="stars-bg" id="stars-container"></div>
+
+    <!-- Barra de progreso -->
+    <div id="progress-bar"></div>
+
+    <!-- Panel de Accesibilidad (Fijo) -->
+    <div class="accessibility-panel">
+        <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema claro u oscuro">
+            <span id="theme-icon">☀️</span> <span class="hidden-mobile">Modo Claro</span>
+        </button>
+        <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 5px;"></div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div id="audio-controls">
+                <button id="btn-play" class="btn-icon" aria-label="Reproducir lectura">🔊 Leer</button>
+                <button id="btn-pause" class="btn-icon" aria-label="Pausar lectura" style="display: none;">⏸️ Pausa</button>
+                <button id="btn-stop" class="btn-icon" aria-label="Detener lectura" style="display: none;">⏹️ Fin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <main class="container readable-content" id="main-content">
+        
+        <header>
+            <p style="color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;">Serie: Grandes ideas de la Astronomía</p>
+            <h1>Los orígenes de la observación del cielo</h1>
+            <p class="lead">¡Te damos la bienvenida a este viaje espacial! Descubre cómo la humanidad comenzó a observar el cielo y por qué el movimiento de los astros transformó nuestra forma de vivir para siempre.</p>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-secondary);">
+                <span>⏱️ Tiempo estimado de lectura: ~8 minutos</span>
+            </div>
+        </header>
+
+        <!-- Índice interactivo -->
+        <nav class="toc" aria-label="Índice de contenidos">
+            <h3>📑 Índice interactivo</h3>
+            <ul>
+                <li><a href="#tema-1">1. El cielo: el primer misterio de la humanidad</a></li>
+                <li><a href="#tema-2">2. Las Constelaciones: dibujos con estrellas</a></li>
+                <li><a href="#tema-3">3. El cielo en el arte y la cultura</a></li>
+                <li><a href="#tema-4">4. Los calendarios y la agricultura</a></li>
+                <li><a href="#tema-5">5. Navegando con ayuda de las estrellas</a></li>
+                <li><a href="#recursos">🚀 Para saber más (Recursos y videos)</a></li>
+                <li><a href="#cuestionario">⭐ Desafío: ¡Gana tus estrellas!</a></li>
+            </ul>
+        </nav>
+
+        <!-- Sección 1 -->
+        <section id="tema-1">
+            <h2>1. El cielo: el primer misterio de la humanidad</h2>
+            <p>La <span class="tooltip" data-tooltip="Ciencia que estudia los planetas, estrellas y galaxias.">Astronomía</span> es una de las ciencias más antiguas del mundo. Se dedica a estudiar los objetos del espacio, cómo se mueven y qué sucede más allá de la Tierra.</p>
+            <p>Mucho antes de inventar los telescopios, nuestros antepasados ya observaban el cielo a simple vista. Comprender los ciclos del Sol, de la Luna y de los planetas fue el primer gran esfuerzo humano por encontrar un orden en la naturaleza.</p>
+            <p>Al principio, muchas culturas antiguas creían que los astros eran dioses o seres mágicos. Sin embargo, pronto descubrieron que mirar el cielo tenía una gran utilidad práctica: funcionaba como un enorme y exacto reloj que les servía para medir el tiempo y organizar la vida de sus comunidades.</p>
+
+            <div class="did-you-know">
+                <h3>💡 ¿Sabías que...?</h3>
+                <p>Las primeras personas no escribían sus descubrimientos en libros. Los científicos han encontrado registros astronómicos tallados en huesos de animales o pintados en las paredes de cuevas prehistóricas, con miles de años de antigüedad.</p>
+            </div>
+        </section>
+
+        <!-- Sección 2 -->
+        <section id="tema-2">
+            <h2>2. Las Constelaciones: dibujos con estrellas</h2>
+            <p>Al mirar el cielo en una noche despejada, nuestro cerebro tiende a buscar formas uniendo los puntos luminosos. A estos dibujos imaginarios de estrellas los llamamos <strong>constelaciones</strong>.</p>
+            <p>Es importante saber que las estrellas de una constelación no están realmente cerca unas de otras en el espacio; algunas están muchísimo más lejos que otras. Solo parecen formar un dibujo porque las vemos juntas desde nuestra posición en la Tierra.</p>
+            
+            <p>A lo largo de la historia, distintas culturas imaginaron figuras diferentes en el mismo cielo. ¡Toca las tarjetas para descubrirlo!</p>
+
+            <!-- Actividad interactiva: Tarjetas -->
+            <div class="cards-grid" tabindex="0">
+                <div class="flip-card" tabindex="0" aria-label="Griegos antiguos">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-icon">🏛️</div>
+                            <h3>Antiguos Griegos</h3>
+                            <p>Toca para girar</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Unían las estrellas para dibujar a los héroes y monstruos de sus mitos, como el gran cazador <strong>Orión</strong> o el enorme <strong>Escorpión</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" tabindex="0" aria-label="Mayas y Nativos">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-icon">🐆</div>
+                            <h3>Culturas Nativas</h3>
+                            <p>Toca para girar</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Pueblos como los mayas veían en el cielo a animales muy importantes para su entorno, como jaguares, serpientes y aves sagradas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" tabindex="0" aria-label="Pueblos del Sur">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-icon">🦙</div>
+                            <h3>Pueblos del Sur</h3>
+                            <p>Toca para girar</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>En Sudamérica y Australia, muchos pueblos no unían estrellas brillantes, sino que miraban las manchas oscuras del cielo para formar animales como la llama cósmica.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p>En el año 1922, los astrónomos de todo el mundo se pusieron de acuerdo y dividieron el cielo en <strong>88 regiones oficiales</strong>. Así, las constelaciones dejaron de ser solo cuentos antiguos y pasaron a ser un mapa exacto para que los científicos ubiquen galaxias y planetas de forma rápida.</p>
+        </section>
+
+        <!-- Sección 3 -->
+        <section id="tema-3">
+            <h2>3. El cielo en el arte y la cultura</h2>
+            <p>El cielo nocturno, inmenso y silencioso, siempre ha despertado asombro y curiosidad. Esta emoción inspiró a personas de todas las épocas, convirtiendo al espacio en un tema central para el arte humano.</p>
+            <ul>
+                <li>🎨 <strong>En la pintura:</strong> Desde objetos de bronce antiguos hasta el famoso cuadro "La noche estrellada" del pintor Vincent van Gogh, el arte ha intentado atrapar la belleza de las estrellas.</li>
+                <li>🎬 <strong>En las historias:</strong> Una gran cantidad de libros, canciones y películas tratan sobre viajes espaciales y galaxias lejanas.</li>
+            </ul>
+            <p>El arte nos ayuda a conectar con el universo de una forma emocionante. Además, nos recuerda algo muy importante: no importa de qué país seamos, todos compartimos exactamente el mismo cielo.</p>
+        </section>
+
+        <!-- Sección 4 -->
+        <section id="tema-4">
+            <h2>4. Los calendarios y la agricultura</h2>
+            <p>Cuando los seres humanos dejaron de ser nómadas y empezaron a plantar sus propios alimentos, observar el cielo se volvió vital. Para tener buenas cosechas, necesitaban predecir cuándo llegarían las lluvias o el frío. Por eso, guiándose por el movimiento del Sol, crearon los primeros calendarios.</p>
+            
+            <div class="did-you-know">
+                <h3>🌊 El aviso del río Nilo</h3>
+                <p>En el antiguo Egipto, los agricultores vigilaban muy de cerca a <strong>Sirio</strong>, la estrella más brillante de la noche. Sabían que justo cuando Sirio aparecía en el cielo un poco antes del amanecer, el gran río Nilo estaba a punto de inundarse. Esa inundación era necesaria porque dejaba la tierra mojada y perfecta para sembrar la comida de todo el año.</p>
+            </div>
+        </section>
+
+        <!-- Sección 5 -->
+        <section id="tema-5">
+            <h2>5. Navegando con ayuda de las estrellas</h2>
+            <p>Mucho antes de que se inventara el GPS o las brújulas modernas, viajar en barco por el océano era muy peligroso. Sin montañas ni costas a la vista, los marineros podían perderse fácilmente. Su única guía segura estaba arriba: el cielo.</p>
+            
+            <p>A esta técnica se la conoce como <strong>navegación astronómica</strong>. Durante la noche, utilizaban estrellas específicas como si fueran faros:</p>
+            <ul>
+                <li>🧭 <strong>En el norte:</strong> Los marineros buscaban la <em>Estrella Polar</em>, ya que siempre se mantiene quieta señalando exactamente hacia el norte.</li>
+                <li>🧭 <strong>En el sur:</strong> Como no tenían una estrella polar, se guiaban buscando la famosa constelación de la <em>Cruz del Sur</em>.</li>
+            </ul>
+            <p>Esta forma de guiarse mirando los astros es tan confiable que, incluso hoy en día, se les enseña a los marineros profesionales por si las computadoras de sus grandes barcos llegan a fallar.</p>
+        </section>
+
+        <!-- Recursos Externos y Video -->
+        <section id="recursos" class="resources-box">
+            <h2>🚀 Para saber más</h2>
+            <p>Si quieres seguir aprendiendo sobre el espacio de forma divertida, te recomendamos estos sitios educativos:</p>
+            <ul>
+                <li><a href="https://spaceplace.nasa.gov/sp/" target="_blank" rel="noopener">Nasa Space Place (en español)</a>: Sitio de la NASA con artículos fáciles de entender y juegos del sistema solar.</li>
+                <li><a href="https://www.esa.int/kids/es/home" target="_blank" rel="noopener">ESA Kids</a>: Página de la Agencia Espacial Europea con noticias y curiosidades sobre el universo.</li>
+                <li><a href="https://uruguayeduca.anep.edu.uy/" target="_blank" rel="noopener">Portal UruguayEduca - Sección Astronomía</a>: Materiales educativos sobre el cielo que vemos todos los días.</li>
+            </ul>
+
+            <h3 style="margin-top: 30px;">📺 Video Recomendado</h3>
+            <p>Te invitamos a ver este genial video del canal educativo "CuriosaMente". Te explicará con dibujos animados muy divertidos cómo la humanidad fue inventando los nombres de las estrellas a lo largo de los años. ¡Dale play!</p>
+            
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/i3L22D0tCQQ" title="¿De dónde vienen los nombres de las constelaciones? - CuriosaMente" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <h3 style="margin-top: 30px;">🕹️ Explora el cielo desde tu computadora</h3>
+            <p>Para ver cómo lucen las constelaciones o imaginar que viajas en el tiempo, te sugerimos usar la página <a href="https://stellarium-web.org/" target="_blank" rel="noopener">Stellarium Web</a>. Es un planetario gratuito en internet donde puedes buscar tu ciudad y ver qué estrellas la iluminan esta misma noche.</p>
+        </section>
+
+        <!-- Cuestionario Interactivo gamificado -->
+        <section id="cuestionario" class="quiz-section" aria-live="polite">
+            <div id="quiz-container">
+                <h2>⭐ Desafío Espacial</h2>
+                <div class="quiz-header">
+                    <span>Pregunta <span id="q-current">1</span> de <span id="q-total">7</span></span>
+                    <div class="stars-display" aria-label="Estrellas obtenidas">
+                        Estrellas: <span id="star-count">0</span> ⭐
+                    </div>
+                </div>
+
+                <div id="question-block">
+                    <p class="question-text" id="question-text">Cargando pregunta...</p>
+                    <div class="options-grid" id="options-grid">
+                        <!-- Opciones generadas por JS -->
+                    </div>
+                </div>
+
+                <div id="feedback-box" class="feedback-box">
+                    <div class="feedback-title" id="feedback-title"></div>
+                    <p id="feedback-text"></p>
+                    <button class="btn-continue" id="btn-continue">Entendido, continuar ➡️</button>
+                </div>
+            </div>
+
+            <div id="quiz-result" class="quiz-result">
+                <h2>¡Misión Astronómica Completada!</h2>
+                <div class="final-stars" id="final-stars"></div>
+                <h3 id="final-title" style="color: var(--accent-color);"></h3>
+                <p id="final-message"></p>
+                <button class="btn-continue" style="max-width: 200px; margin: 20px auto;" onclick="resetQuiz()">🔄 Jugar de nuevo</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Permanente Oscuro -->
+    <div class="dark-footer-wrapper">
+        <footer class="main-footer">
+            <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener noreferrer" class="footer-card">
+              <img 
+                src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
+                alt="Logo Uruguay Educa" 
+                class="footer-logo"
+                onerror="this.onerror=null; this.style.display='none';"
+              />
+              <p class="footer-text">
+                Portal Uruguay Educa (ANEP-DGES-EDyTIC) — Contenidistas de Astronomía 2026. Herramienta educativa interactiva de uso libre desarrollada con asistencia de IA.
+              </p>
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script de lógica: Tema, Audio, Progreso, Estrellas y Cuestionario -->
+    <script>
+        // === GENERADOR DE ESTRELLAS DE FONDO ===
+        function createStars() {
+            const container = document.getElementById('stars-container');
+            const numStars = 100;
+            for(let i=0; i<numStars; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.backgroundColor = 'white';
+                star.style.borderRadius = '50%';
+                star.style.opacity = Math.random() * 0.8 + 0.2;
+                container.appendChild(star);
+            }
+        }
+        createStars();
+
+        // === CAMBIO DE TEMA OSCURO/CLARO ===
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        function setTheme(isLight) {
+            if(isLight) {
+                body.classList.add('light-mode');
+                themeIcon.textContent = '🌙';
+                themeBtn.querySelector('.hidden-mobile').textContent = 'Modo Oscuro';
+                localStorage.setItem('astroTheme', 'light');
+            } else {
+                body.classList.remove('light-mode');
+                themeIcon.textContent = '☀️';
+                themeBtn.querySelector('.hidden-mobile').textContent = 'Modo Claro';
+                localStorage.setItem('astroTheme', 'dark');
+            }
+        }
+
+        // Leer preferencia almacenada
+        const savedTheme = localStorage.getItem('astroTheme');
+        if(savedTheme === 'light') { setTheme(true); }
+
+        themeBtn.addEventListener('click', () => {
+            setTheme(!body.classList.contains('light-mode'));
+        });
+
+        // === BARRA DE PROGRESO DE LECTURA ===
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        };
+
+        // === AUDIOGUÍA (SpeechSynthesis API) ===
+        const btnPlay = document.getElementById('btn-play');
+        const btnPause = document.getElementById('btn-pause');
+        const btnStop = document.getElementById('btn-stop');
+        let synth = window.speechSynthesis;
+        let utterance = null;
+
+        function extractText() {
+            // Filtra componentes interactivos para no generar ruido en la locución
+            const main = document.getElementById('main-content').cloneNode(true);
+            const removes = main.querySelectorAll('.toc, .quiz-section, .accessibility-panel, .video-wrapper');
+            removes.forEach(el => el.remove());
+            return main.innerText || main.textContent;
+        }
+
+        function initAudio() {
+            if(!synth) {
+                btnPlay.style.display = 'none';
+                return;
+            }
+            
+            btnPlay.addEventListener('click', () => {
+                if (synth.paused) {
+                    synth.resume();
+                } else if (!synth.speaking) {
+                    utterance = new SpeechSynthesisUtterance(extractText());
+                    utterance.lang = 'es-ES'; // Castellano
+                    utterance.rate = 0.9; // Velocidad reducida para mejor comprensión
+                    
+                    utterance.onend = () => {
+                        resetAudioBtns();
+                    };
+                    synth.speak(utterance);
+                }
+                btnPlay.style.display = 'none';
+                btnPause.style.display = 'inline-flex';
+                btnStop.style.display = 'inline-flex';
+            });
+
+            btnPause.addEventListener('click', () => {
+                if(synth.speaking && !synth.paused) {
+                    synth.pause();
+                    btnPause.style.display = 'none';
+                    btnPlay.style.display = 'inline-flex';
+                    btnPlay.innerHTML = '▶️ Continuar';
+                }
+            });
+
+            btnStop.addEventListener('click', () => {
+                synth.cancel();
+                resetAudioBtns();
+            });
+        }
+
+        function resetAudioBtns() {
+            btnPlay.style.display = 'inline-flex';
+            btnPlay.innerHTML = '🔊 Leer';
+            btnPause.style.display = 'none';
+            btnStop.style.display = 'none';
+        }
+
+        initAudio();
+
+        // === CUESTIONARIO INTERACTIVO GAMIFICADO ===
+        // Ajustado para tener vocabulario más sencillo
+        const quizData = [
+            {
+                q: "¿Qué es lo que estudia la Astronomía?",
+                options: [
+                    "El clima y las nubes de la Tierra.",
+                    "Los planetas, las estrellas y otros objetos del espacio.",
+                    "La historia de los dioses antiguos."
+                ],
+                correct: 1,
+                explanation: "¡Muy bien! La Astronomía es una ciencia antigua dedicada a estudiar los astros del universo y cómo se mueven."
+            },
+            {
+                q: "¿Para qué le servía mirar el cielo a las personas de la antigüedad?",
+                options: [
+                    "Para inventar nuevos colores de pintura.",
+                    "Para tener un reloj exacto y saber cuándo sembrar sus alimentos.",
+                    "Para descubrir cómo respirar bajo el agua."
+                ],
+                correct: 1,
+                explanation: "¡Excelente! El cielo funcionaba como un gran reloj natural que les ayudaba a organizar su vida y saber cuándo cultivar."
+            },
+            {
+                q: "¿Qué son realmente las 'constelaciones'?",
+                options: [
+                    "Planetas muy grandes que están pegados.",
+                    "Lugares en el cielo donde siempre llueve.",
+                    "Dibujos imaginarios que formamos al unir estrellas con líneas."
+                ],
+                correct: 2,
+                explanation: "¡Correcto! Las constelaciones son figuras inventadas. Vemos las estrellas juntas, pero en realidad pueden estar muy lejos unas de otras."
+            },
+            {
+                q: "¿En cuántas regiones oficiales dividieron el cielo los astrónomos en el año 1922?",
+                options: ["30 regiones", "88 regiones", "200 regiones"],
+                correct: 1,
+                explanation: "¡Buena memoria! Dividieron el cielo en 88 partes oficiales para que todos los científicos del mundo usaran el mismo mapa estelar."
+            },
+            {
+                q: "¿Qué nos enseña el arte cuando se inspira en el cielo y las estrellas?",
+                options: [
+                    "Que todos los humanos sentimos curiosidad y compartimos el mismo universo.",
+                    "Que solo se puede pintar bien si es de noche.",
+                    "Que las estrellas son hechas de pintura brillante."
+                ],
+                correct: 0,
+                explanation: "¡Exacto! El cielo nocturno siempre ha emocionado a la humanidad, recordándonos en pinturas o historias que todos vivimos bajo el mismo cielo."
+            },
+            {
+                q: "¿Qué anunciaba la estrella Sirio a los agricultores del antiguo Egipto?",
+                options: [
+                    "El final del verano.",
+                    "Un eclipse de Luna.",
+                    "Que el río Nilo estaba a punto de inundarse."
+                ],
+                correct: 2,
+                explanation: "¡Acertado! Al ver aparecer a Sirio justo antes del amanecer, los egipcios sabían que llegaba el agua necesaria para sembrar su comida."
+            },
+            {
+                q: "Antes de tener GPS, ¿cómo se guiaban los barcos de noche en el hemisferio norte?",
+                options: [
+                    "Mirando hacia el Sol.",
+                    "Buscando la Estrella Polar.",
+                    "Siguiendo el vuelo de las gaviotas."
+                ],
+                correct: 1,
+                explanation: "¡Impecable! Los marineros buscaban la Estrella Polar porque se queda quieta apuntando siempre hacia el norte, sirviendo como un faro seguro."
+            }
+        ];
+
+        let currentQIndex = 0;
+        let scoreStars = 0;
+
+        const elQText = document.getElementById("question-text");
+        const elOptionsGrid = document.getElementById("options-grid");
+        const elFeedbackBox = document.getElementById("feedback-box");
+        const elFeedbackTitle = document.getElementById("feedback-title");
+        const elFeedbackText = document.getElementById("feedback-text");
+        const elBtnContinue = document.getElementById("btn-continue");
+        const elStarCount = document.getElementById("star-count");
+        
+        const elQuizContainer = document.getElementById("quiz-container");
+        const elQuizResult = document.getElementById("quiz-result");
+
+        function loadQuestion() {
+            const q = quizData[currentQIndex];
+            document.getElementById("q-current").textContent = currentQIndex + 1;
+            elQText.textContent = q.q;
+            elOptionsGrid.innerHTML = "";
+            elFeedbackBox.className = "feedback-box";
+            elFeedbackBox.style.display = "none";
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = opt;
+                btn.onclick = () => selectOption(index, btn);
+                elOptionsGrid.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedIndex, btnElement) {
+            const q = quizData[currentQIndex];
+            const isCorrect = selectedIndex === q.correct;
+            
+            // Inhabilitar botones tras responder
+            const allBtns = elOptionsGrid.querySelectorAll(".option-btn");
+            allBtns.forEach((b, i) => {
+                b.disabled = true;
+                if(i === q.correct) b.classList.add("correct");
+            });
+
+            elFeedbackBox.style.display = "block";
+            
+            if (isCorrect) {
+                btnElement.classList.add("correct");
+                elFeedbackBox.classList.add("correct-bg");
+                elFeedbackTitle.innerHTML = "✅ ¡Correcto! ⭐+1";
+                scoreStars++;
+                elStarCount.textContent = scoreStars;
+            } else {
+                btnElement.classList.add("incorrect");
+                elFeedbackBox.classList.add("incorrect-bg");
+                elFeedbackTitle.innerHTML = "❌ Casi, lee la respuesta";
+            }
+            
+            elFeedbackText.textContent = q.explanation;
+            
+            // Foco de accesibilidad para usar la tecla Tab fácilmente
+            elBtnContinue.focus();
+        }
+
+        elBtnContinue.addEventListener("click", () => {
+            currentQIndex++;
+            if (currentQIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            elQuizContainer.style.display = "none";
+            elQuizResult.classList.add("show");
+            
+            let starsStr = "";
+            for(let i=0; i<scoreStars; i++) starsStr += "⭐";
+            document.getElementById("final-stars").textContent = starsStr || "🌌";
+
+            const titleEl = document.getElementById("final-title");
+            const msgEl = document.getElementById("final-message");
+
+            if (scoreStars === 7) {
+                titleEl.textContent = "¡Explorador Experto!";
+                msgEl.textContent = "¡Excelente trabajo! Has entendido a la perfección cómo los seres humanos empezamos a observar y entender el cielo.";
+            } else if (scoreStars >= 4) {
+                titleEl.textContent = "¡Buen trabajo, joven astronauta!";
+                msgEl.textContent = `Lograste ${scoreStars} de 7 estrellas. Es un resultado muy bueno. ¡Sigue aprendiendo y mirando el cielo!`;
+            } else {
+                titleEl.textContent = "¡Sigue intentándolo!";
+                msgEl.textContent = `Conseguiste ${scoreStars} estrellas. En la ciencia es normal equivocarse al principio. ¡Vuelve a leer el texto y anímate a jugar otra vez para mejorar!`;
+            }
+        }
+
+        function resetQuiz() {
+            currentQIndex = 0;
+            scoreStars = 0;
+            elStarCount.textContent = "0";
+            elQuizContainer.style.display = "block";
+            elQuizResult.classList.remove("show");
+            loadQuestion();
+            // Desplazamiento hacia el inicio del quiz
+            document.getElementById("cuestionario").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Iniciar el cuestionario
+        loadQuestion();
+
+    </script>
+</body>
+</html>
