@@ -1,0 +1,89 @@
+<!-- Estilos específicos para el footer (puedes moverlos a tu archivo CSS principal si lo deseas) -->
+<style>
+  :root {
+    --footer-bg: #090d16; /* Fondo oscuro espacial para contrastar con el logo blanco */
+    --footer-text-color: #94a3b8; /* Gris azulado suave para legibilidad */
+    --footer-text-hover: #f1f5f9; /* Blanco grisáceo para interactividad */
+    --footer-border: #1e293b; /* Borde sutil superior */
+  }
+
+  .main-footer {
+    width: 100%;
+    background-color: var(--footer-bg);
+    border-top: 1px solid var(--footer-border);
+    padding: 2rem 1rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    box-sizing: border-box;
+  }
+
+  .main-footer.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .footer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: var(--footer-text-color);
+    transition: transform 0.25s ease, color 0.25s ease;
+    text-align: center;
+    width: 100%;
+    max-width: 850px;
+  }
+
+  /* Ajuste responsivo para pantallas medianas y grandes */
+  @media (min-width: 768px) {
+    .footer-card {
+      flex-direction: row;
+      text-align: left;
+      gap: 2rem;
+    }
+  }
+
+  .footer-card:hover {
+    color: var(--footer-text-hover);
+    transform: translateY(-2px);
+  }
+
+  .footer-logo {
+    height: 60px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    transition: filter 0.25s ease;
+    /* Efecto de brillo sutil en el logo al pasar el cursor */
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.1));
+  }
+
+  .footer-card:hover .footer-logo {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+  }
+
+  .footer-text {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+</style>
+
+<!-- Estructura HTML del Footer -->
+<footer class="main-footer container">
+  <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener noreferrer" class="footer-card">
+    <img 
+      src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
+      alt="Logo Uruguay Educa" 
+      class="footer-logo"
+      onerror="this.onerror=null; this.style.display='none';"
+    />
+    <p class="footer-text">
+      Portal Uruguay Educa (ANEP-DGES-EDyTIC) — Contenidistas de Astronomía 2026. Herramienta educativa interactiva de uso libre desarrollada con asistencia de IA.
+    </p>
+  </a>
+</footer>
