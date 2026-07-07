@@ -418,8 +418,7 @@
             <div>
                 <div class="glass-panel">
                     <div class="image-container">
-                        <!-- URL de la imagen de Kepler-186f actualizada -->
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Kepler186f-ComparisonGraphic-20140417.jpg/960px-Kepler186f-ComparisonGraphic-20140417.jpg" alt="Kepler">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Kepler186f-ComparisonGraphic-20140417.jpg" alt="Kepler">
                     </div>
                     <h3 style="margin-bottom: 0.25rem;">Kepler-186f</h3>
                     <div class="italic-cap">Planeta descubierto en la franja habitable exterior.</div>
@@ -585,7 +584,6 @@
                 <div id="trivia-result" class="quiz-result hidden">
                     <div id="trivia-result-emoji" class="quiz-emoji">🏆</div>
                     <h3 id="trivia-result-title" class="quiz-title">Evaluación Completa</h3>
-                    <!-- Se ha cambiado a un p normal porque inyectaremos el HTML dinámicamente -->
                     <p id="trivia-result-text" style="font-size: 0.95rem; color: var(--slate-300); margin-bottom: 1rem; line-height: 1.5;"></p>
                     <button id="btn-restart-trivia" class="btn btn-dark" style="padding: 0.75rem 1.75rem; border-radius: 0.5rem;">Reiniciar Trivia 🔄</button>
                 </div>
@@ -867,6 +865,7 @@
 
         requestAnimationFrame(drawSystemLoop);
 
+
         // --- ACTUALIZACIÓN DE LA TRIVIA INTERACTIVA (7 PREGUNTAS CON RETROALIMENTACIÓN) ---
         const triviaData = [
             {
@@ -1040,23 +1039,20 @@
             const title = document.getElementById('trivia-result-title');
             const text = document.getElementById('trivia-result-text');
 
-            // Enlace de colaboración como recompensa en las felicitaciones
-            const collaborationLink = `<br><br>¿Quieres colaborar en la búsqueda de exoplanetas en un proyecto real? Accede a <a href="https://www.zooniverse.org/projects/es/nora-dot-eisner/planet-hunters-tess" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan); font-weight: 700; text-decoration: underline;">"TESS Exoplanetas"</a>.`;
-
-            // Mecanismo evaluativo condicional estricto usando innerHTML para inyectar enlaces y saltos de línea
+            // Mecanismo evaluativo condicional estricto
             if (triviaScore < 4) {
                 emoji.textContent = "📡🛰️";
                 title.textContent = "Misión Incompleta";
-                text.innerHTML = `Has obtenido ${triviaScore} de ${triviaData.length} aciertos. Te recomendamos volver a revisar el contenido didáctico de la guía, experimentar con las variables físicas en el laboratorio interactivo e intentarlo nuevamente para mejorar tus marcas.`;
+                text.textContent = `Has obtenido ${triviaScore} de ${triviaData.length} aciertos. Te recomendamos volver a revisar el contenido didáctico de la guía, experimentar con las variables físicas en el laboratorio interactivo e intentarlo nuevamente para mejorar tus marcas.`;
             } else if (triviaScore === 4 || triviaScore === 5) {
                 emoji.textContent = "🚀🌌";
                 title.textContent = "¡Buen trabajo!";
-                text.innerHTML = `¡Felicidades! Lograste un total de ${triviaScore} de ${triviaData.length} aciertos. Demuestras un gran entendimiento sobre la mecánica geométrica de los eclipses y el cálculo térmico estelar.` + collaborationLink;
+                text.textContent = `¡Felicidades! Lograste un total de ${triviaScore} de ${triviaData.length} aciertos. Demuestras un gran entendimiento sobre la mecánica geométrica de los eclipses y el cálculo térmico estelar.`;
             } else {
                 // Felicitación vigorosa (6 o 7 aciertos)
                 emoji.textContent = "🏆🛸🪐";
                 title.textContent = "¡Magnífico! ¡Nivel Astrofísico de Élite!";
-                text.innerHTML = `¡Impresionante desempeño! Has completado con éxito ${triviaScore} de ${triviaData.length} aciertos perfectos. Recibe una felicitación vigorosa por dominar con absoluta precisión el comportamiento lumínico, el impacto de la inclinación órbita-observador y las zonas habitables del cosmos.` + collaborationLink;
+                text.textContent = `¡Impresionante desempeño! Has completado con éxito ${triviaScore} de ${triviaData.length} aciertos perfectos. Recibe una felicitación vigorosa por dominar con absoluta precisión el comportamiento lumínico, el impacto de la inclinación órbita-observador y las zonas habitables del cosmos.`;
             }
         }
 
