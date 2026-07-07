@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sondas Voyager 1 y 2 - 50 años</title>
+    <meta name="description" content="Infografía interactiva sobre los 50 años de las sondas Voyager 1 y 2. Material didáctico de Astronomía.">
+    
+    <style>
+        /* Variables de Color y Tema */
+        :root {
+            /* TEMA OSCURO (Por defecto) */
+            --bg-color: #0a0f1d;
+            --text-color: #f8fafc;
+            --accent-color: #fb923c;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --btn-bg: #3b82f6;
+            --btn-hover: #2563eb;
+            --btn-text: #ffffff;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+        }
+
+        [data-theme="light"] {
+            /* TEMA CLARO (Fondo gris 30% blanco, letras negras) */
+            --bg-color: #b3b3b3; /* Gris al 30% de blanco aprox */
+            --text-color: #000000;
+            --accent-color: #d97706;
+            --card-bg: #e5e5e5;
+            --card-border: #999999;
+            --btn-bg: #1d4ed8;
+            --btn-hover: #1e3a8a;
+            --btn-text: #ffffff;
+        }
+
+        /* Reset y Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            font-size: 1.125rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo Estrellado (Canvas) */
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Accesibilidad: Ocultar visualmente pero dejar para lectores de pantalla */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Navegación y Switch de Tema */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--card-border);
+            margin-bottom: 2rem;
+        }
+
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "☀️";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            content: "🌙";
+        }
+
+        /* Tipografía */
+        h1 { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; line-height: 1.2; }
+        h2 { font-size: 1.75rem; margin-top: 2rem; margin-bottom: 1rem; color: var(--text-color); border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p { margin-bottom: 1.25rem; }
+        strong { color: var(--accent-color); }
+        ul { margin-left: 1.5rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* Tarjetas / Contenedores */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* TDAH / Sobrecarga Cognitiva: Elementos Desplegables (Accordions) */
+        details {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        summary {
+            padding: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: rgba(0,0,0,0.05);
+            transition: background-color 0.2s ease;
+            list-style: none; /* Safari */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker {
+            display: none; /* Chrome */
+        }
+
+        summary::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            transition: transform 0.3s;
+        }
+
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        details[open] summary {
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .details-content {
+            padding: 1rem;
+        }
+
+        /* Medios (Imágenes y Video) */
+        .media-container {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            background-color: #000; /* Fondo para evitar destellos blancos */
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Galería CSS Navegable Horizontal (Accesible) */
+        .gallery-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .gallery-item {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--card-border);
+        }
+
+        /* Actividad Interactiva (Quiz) */
+        .quiz-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 2px solid var(--accent-color);
+        }
+
+        .question {
+            margin-bottom: 1.5rem;
+            display: none; /* Se muestran con JS */
+        }
+
+        .question.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        [data-theme="light"] .option-label {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .option-label:hover {
+            border-color: var(--accent-color);
+        }
+
+        .option-label input {
+            margin-right: 1rem;
+            transform: scale(1.2);
+        }
+
+        .btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .btn:disabled {
+            background-color: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* Resultados y Estrellas */
+        #quiz-result {
+            display: none;
+            text-align: center;
+        }
+
+        .stars-display {
+            font-size: 3rem;
+            margin: 1rem 0;
+            letter-spacing: 5px;
+        }
+
+        .feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct { background-color: rgba(34, 197, 94, 0.2); color: var(--success-color); display: block; border: 1px solid var(--success-color); }
+        .feedback.incorrect { background-color: rgba(239, 68, 68, 0.2); color: var(--error-color); display: block; border: 1px solid var(--error-color); }
+
+        /* Enlaces */
+        a {
+            color: var(--btn-bg);
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        [data-theme="dark"] a {
+            color: #60a5fa;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cita / Para Pensar */
+        .quote-box {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1rem;
+            font-style: italic;
+            margin: 1.5rem 0;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo Animado Interactivo -->
+    <canvas id="stars-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+        <!-- Navegación Superior -->
+        <header>
+            <div class="title-area">
+                <p style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Astronomía | Misión Espacial</p>
+            </div>
+            
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox" aria-label="Cambiar modo claro/oscuro">
+                    <input type="checkbox" id="checkbox" checked />
+                    <div class="slider"></div>
+                </label>
+            </div>
+        </header>
+
+        <main>
+            <!-- Título Principal -->
+            <article>
+                <h1 tabindex="0">Voyager: una botella con un mensaje para el Universo</h1>
+                
+                <h2 style="border:none; margin-top: 0; font-size: 1.5rem; color: var(--text-color);">Una aventura que comenzó hace casi 50 años</h2>
+
+                <div class="quote-box" tabindex="0">
+                    <p>Imagina que escribes una carta, la guardas dentro de una botella y la lanzas al océano sin saber quién la encontrará... o si alguna vez alguien la encontrará.</p>
+                </div>
+                
+                <p>Eso mismo hizo la humanidad. Solo que el océano era muchísimo más grande: <strong>Era el espacio.</strong></p>
+
+                <p>En <strong>1977</strong>, la humanidad lanzó dos pequeñas naves llamadas Voyager 1 y Voyager 2. Como dato curioso (según Wikipedia), la <strong>Voyager 2 fue lanzada primero</strong> el 20 de agosto, y la <strong>Voyager 1</strong> un poco después, el 5 de septiembre.</p>
+                
+                <p>Su misión principal era explorar los planetas gigantes del Sistema Solar. Pero también llevaban algo muy especial: un mensaje. No para nosotros, sino para cualquier civilización que pudiera encontrarlas algún día.</p>
+            </article>
+
+            <!-- ¿Por qué se llaman Voyager? -->
+            <section aria-labelledby="viajeras-titulo">
+                <div class="card">
+                    <h2 id="viajeras-titulo" style="margin-top: 0;">¿Por qué se llaman Voyager?</h2>
+                    <p>"Voyager" significa <strong>viajera</strong>. Y realmente lo son.</p>
+                    <p>Hoy siguen viajando a más de <strong>60.000 kilómetros por hora</strong>. Han recorrido miles de millones de kilómetros y continúan alejándose del Sol.</p>
+                    <p>De hecho, ambas han cruzado la <em>heliopausa</em> (la frontera donde el viento de nuestro Sol se detiene) y ahora navegan en el espacio interestelar. Son los objetos construidos por seres humanos que han llegado más lejos en toda la historia.</p>
+                </div>
+            </section>
+
+            <!-- La Misión -->
+            <section aria-labelledby="mision-titulo">
+                <h2 id="mision-titulo">Una misión con dos objetivos</h2>
+                
+                <details>
+                    <summary>1. Explorar</summary>
+                    <div class="details-content">
+                        <p>Las Voyager fotografiaron mundos que nadie había visto de cerca. Descubrieron volcanes activos, lunas heladas, tormentas gigantes y anillos desconocidos.</p>
+                        <p>Gracias a ellas conocimos mejor:</p>
+                        <ul>
+                            <li><strong>Júpiter</strong></li>
+                            <li><strong>Saturno</strong></li>
+                            <li><strong>Urano</strong></li>
+                            <li><strong>Neptuno</strong></li>
+                        </ul>
+                        <p>Muchas de las imágenes que aparecen en los libros de Astronomía fueron tomadas por estas sondas.</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>2. Llevar un mensaje</summary>
+                    <div class="details-content">
+                        <p>Pero había una segunda misión. Muchísimo más curiosa.</p>
+                        <p>Si algún día una inteligencia extraterrestre encontraba una Voyager... ¿cómo podría saber quién la construyó?</p>
+                        <p>La respuesta fue colocar dentro de la nave una especie de cápsula del tiempo.</p>
+                    </div>
+                </details>
+
+                <div class="media-container">
+                    <div class="video-wrapper">
+                        <!-- Video embebido de YouTube -->
+                        <iframe src="https://www.youtube.com/embed/jNZSjRcV_Ek" title="Video explicativo sobre las Sondas Voyager" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- El Disco de Oro -->
+            <section aria-labelledby="disco-titulo">
+                <h2 id="disco-titulo">El Disco de Oro</h2>
+                
+                <p>Cada Voyager lleva un disco dorado. No está hecho de oro puro. Es un disco de cobre recubierto por una fina capa de oro para protegerlo durante millones de años. Podría sobrevivir muchísimo más tiempo que nuestra propia civilización.</p>
+                
+                <div class="media-container" style="background-color: transparent;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Voyager_Golden_Record_fx.png/960px-Voyager_Golden_Record_fx.png" alt="Fotografía del Disco de Oro de la misión Voyager mostrando símbolos grabados en su cubierta dorada.">
+                    <p style="text-align: center; font-size: 0.9rem; margin-top: 0.5rem;"><em>Imagen de la cubierta del disco con las instrucciones de reproducción.</em></p>
+                </div>
+
+                <h3>¿Qué guarda ese disco?</h3>
+                <p>No contiene películas. Ni internet. Ni redes sociales. Contiene una pequeña muestra de lo que somos. Como si alguien intentara resumir toda la humanidad en apenas unas pocas horas.</p>
+
+                <!-- Tarjetas de contenido TDAH amigables -->
+                <details>
+                    <summary>🗣️ Saludos</summary>
+                    <div class="details-content">
+                        <p>Personas de muchos países saludan en <strong>55 idiomas</strong>. También aparece un saludo especial: el sonido de una madre hablando con su bebé.</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>🌍 Sonidos de la Tierra</summary>
+                    <div class="details-content">
+                        <p>El viento. La lluvia. Las olas del mar. Los truenos. Los pájaros. Las ballenas. Los latidos de un corazón. Una persona caminando. La risa de un niño.</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>🎵 Música</summary>
+                    <div class="details-content">
+                        <p>El disco reúne música de muchos lugares del planeta. Hay obras clásicas. Música tradicional. Canciones populares. Jazz. Y hasta una interpretación de Chuck Berry. La idea era mostrar que la música también forma parte de nuestra identidad.</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>📷 Imágenes</summary>
+                    <div class="details-content">
+                        <p>Más de cien fotografías muestran aspectos de la vida en la Tierra. Personas, animales, paisajes, montañas, bosques, océanos, edificios, herramientas, ciencia, deportes, alimentos y familias.</p>
+                        <p><strong>No intentan mostrar un país. Intentan mostrar un planeta.</strong></p>
+                    </div>
+                </details>
+            </section>
+
+            <!-- Galería -->
+            <section aria-labelledby="galeria-titulo">
+                <h3 id="galeria-titulo">Algunas de las imágenes que viajan</h3>
+                <p>Explora a continuación una muestra de las fotos codificadas en el disco.</p>
+                
+                <script src="https://cdn.jsdelivr.net/npm/publicalbum@latest/embed-ui.min.js" async></script>
+                <div class="pa-gallery-player-widget" style="width:100%; height:480px; display:none;"
+                  data-link="https://photos.app.goo.gl/rzuymcaMkmCcHWbk7"
+                  data-title="IMÁGENES en SONDAS VOYAGER (1977) · Monday, Aug 7, 2017 📸"
+                  data-description="Shared album · Tap to view!">
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNcSSgZabZiwqpUUWXkOWFN1EuzdCW0W9SSnzbVv4M8_WgPO5ZA7UGCXUubxXE7Efx4WuVAa6gAfjwSoD08R1lHa4nrCP9rau630NIvYp3WgqGsl6W1=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOlJy1W9Srjis9b_V6nDFdFeI1MrNaEikl1vn-mResvaTD8HSD4BJOxgiuHyZj8Ga-lCTvD6iGAwUcf7303KiGLE5F-h6m7wAMjynyphZECn1kjXjYE=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczN0biSVPaPAg6orVqp3PA5x332ZgKKNx3cjK1MZJf8_i58x1v6Evut6Kl6LEbbe_G8MbBRpI7PHOBdT9BNDZxwhdxj80DNo_I8xOUeATodpaqepQ1d4=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczN2QyfVMCHtqbP3Qj0ieKdD1COEjzlOWGFxZhcw7YnkvQtQjpTCPzc0vlegE89qlNvjfLfnH-ci5n-qspkOj6zpZvKDWtSNUr10-pi9cB_WbLa1grkh=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMPB_TnFGC8CIINsaG-3Tiksra1_wROOeaq3HzbhXs1HesH0sWOuje5bp67JXx5AigG6Bw3jWGdDiADASPm9Gk8HZE_AsUFp1bc21yCD8DfiTj6lyI2=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMhlyrJlxvpbyYxGiLzEHy8yb37gMlEZ5Eu180Vj7uEM-xEPWEJ5U5jAxvoaLC1KArxTy_mPAvC-NppCVOE1Y3do1zLC5Y-6M4cPOhm0-c_BMpIUZwS=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOHfdAKS5N04aN5p7k_WPVniuDA8-BB-qzLfVJDrC_WXymJXnluMnQ_mJnI9nGjyykJqdl6cex1ZjCmJ9g9Lxn5kGDDU7ZRMAr9K-vMowO3hyzyn9Il=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMCGHqXjv2XI0VSarkQFvPSWoJJZ8bncusr-HaGQzsAYCuDl0BYnpIBv9y83Gt6crzUz8Y-wRdfkzQegx4kewKheGNKlGCwX4DSrhw_YQ4bwP9x0W-p=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOKbSJaPW_wNGYYEvV46-lBnN73Pf7-SbJhEeAjWygaPZCP1W0FgOv5Zwm-RCP715iLVk2uqFda5ND5oVRd447p37Nlzfs3DvCwgGIe6tRGIG_95FSW=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNxrALM7_ovC7b-TaaEYdRCiCXol4iyOAOVaRh6o2U5-TxwFbDzCBq7hajrKRAxjKW6XdMAgFYTu40wjkz2XsYl54l4mK-y0sbm8sdR04KxiBGXvnNN=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMLrFAeHkIK3mlHT7xNBeuFTxVeVD2SxBLGr0_eqtmH5L13ESyeMGBTDCDeaNTQBjDlViM5MkvT259tCwvgaODz7U5Yrnuv8kv0Y78s_3D5cQ7kk1GN=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMhI3nduBTPsSVxTHSvy420SypFxFt-_P7eU9o7aX-fU5otsP9XEx6i8TR501ao2QD2ft4C_v9e-RHxDYbiLND-rOGxuSWNcilyQP3K3dTAmmbbKzM8=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPZKlwo7kZEN0dXwQSY4FGBzz7m_1skreQKl_LEzuMEIvP48CPKeiMkGqbFjwzBMocDxmjYJKK3qGcE0gWo3d1Ac-n43Q0N3RRq_Xgq2cFqmWojoeBb=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMSJlko0XPCKkZF5gJ40FgsGGIntx5QoFg-8z9Ps81XugY73VMLeA3qGJbXLXcPvlB_Dc1GaEwsJgjHoZWsaKTBhIyk1pKipGc0rNR9mIDlP3AKL0KQ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOj_G8ksyJsEQYHYtJnnN56b_1CI6l20hfT-i44XA1EzctMwKtXKVqcax2ILTuJ0K-3JkRPZNzqmYUbCcrVSI2wVnkBl0wckyQzc2gVG96IrKCr1bX5=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPycwgE0P6tGo-q7O0Zu5vQlUDnyWzENaZiZ5lY_aMBlazceQEXXKs1UmFnCzgDoYykrVnC6EBrZVHhsNZCz5fwvsTmY_wZyaHeDr_vQu0aTg2bbCLu=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczO_yYem4zQnp4DJKdrzrgj3HJ9EwVewR4bmlhQcNTH98Y4ZEVYiGpcUOsyXtdNpcG8hkpchU9Hfxp6khFnLW8CHBjEjFxQg-DBbRYNN809MzrW5QiED=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczONcpXb2vvVxxJJfw6cKpFk_e1L8O3qdG2_JdwHNgYKlyqHArijxIgJi3dROS5F91NQv7BxlzNh6KOLr4Gf7uEmacMAf0m02nV-Fm7-rYnlt4ydp6DJ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMuwFwPiIMcmzmgQnThwrWKM1Cdpc7SgfNc2Mn-8fGy7zpoYvQmHOhVO52SMUXf3MFoVdkTdaZhm0aVv6m4SfOkZervrojnm6jHHF9T6qJ86FKm_bOV=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNplvNjoHsQr7Y5FG6oJ-lVqa_jH7i1i45YVoGeSSTlXULI5F9G4FBEEfBE3Jdy-HdLn9w6OX3nGXuFPv62keYjx_Eom96Ak_MnI7oSktrWPSMWlnWJ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNNfhS4Exmo4UKJBOxFFev_9Zhod3hFyl-W25xOhL5VaSPUpxv1ZSwKYCsixe33g1eO4PfrvBD5cYloCzaEtdAu5OqAAI8ZupKPFaOBmFDnJBIXNlcw=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMCEu4IRm70ddGuRH4kLgHCDdMQh-Vt15NEZPzi1Y2gKJVSDxtLXyC3dH4Dmf2kLPc3jg84TuLIeSQfCTNYG8cgbTcNWoVVDZhiJnw1tvqBV5tA_oEj=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNlsohufs3Faeme_9XowdDvgVWF3Jv8T8u0sd6-o9pRYI0HdK4GetD_jOQlC1vw0EBFi7_qfOIQl4MoTT48aZsLtsBm3tEn3_f-nFNZgV5M3mZJNyrG=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOWd6ctDhSlejfqk2HJo7YLcxYNv2rKDZLIb0hJlN1h9qWb8mGPAIJrRPI1MMV9OYbfNA3WYwILzbp8VFgJCOuorF5PI6dm6Lz-qI0iurB083Fs_stS=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPryO6uSWoziLHAmA7gb_lDweFQLueWFyXgCR9VkjoqwjMgT-U_roeCbZYZqOtYvEjPC0rfPSOfpjlcJKt0BcXbDuupeivRVDf2_P0BjZiPKp8dCxi5=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNvBkU9RXvuNeFjpeE1mfOwIQVgCDPB-EgNim9Ed3XXi8PJo-ykvYoXygtePooYLJ8TcqM71III9lvkhZgrKHdKFDOsMV8ePbtdokVk-Z8BMD9RQf-r=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOomZfsN7P-E7E-hOy7L6qFD62EJ6slIh1WPTlSht_8bllJpkECNin069F9cPhjOxUVx3J-NWWVmnDYpNmjfd3amr-ldGpYahR_jnKN2lRjRGhOQYDO=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNzzn12uyxbFs-VHPgCl1rZ_6DK1HsiuO8whE7lYd2UmNuce6JCVnOIrOOZS3rHLnbjeAXPODWVssJjxBYWeOgYGU5BYx5YQgbm5m6Znp1J2NMM0XeP=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNlTfsM5wa_-7TISDRfkgJMAQlv6QZEhTMupUwbDMP_Zq0_JgNlqdeLtaEub1tGZsXcALBIgFVi48DExbo3SCnS-IEudLZB-zkDp2qIx2Pbbnao3dxo=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNefhAtgLTJFk6TnGK-fO4vfE7rIEAZu8N7Ccwl0FvxUJwS_Tb6mvYN7138wvYwp62apAZoYxOoKq4FN15J8bBG8TGFm6WaiXtKw4uuQka3QPHACe4t=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOBROVmfqMnY_ljXfQ9u-SAV9-lShuHVsXUxmFFQ4yX5T1F80jyLzidk3uEaqnbWaN6NanjdYow9U1CrlGy2Q1GKokjqYEIzwrmUOCbhO_vvsM8V63c=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMtvqZR4wCZb7VgYfFwBqp2u6j9r2KtDAchySW5aU6BoB_Pc5F4Icy8OSLv58j-fXoXsbuGPW2QT-NewOhY5aGFDPKq03TmPRg75RqGASxo1iyQyBBc=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOSPnhuK0iMweLd8hPfeM9EQeALUwes1CxBi1oyurnUju5h0gCoADPBDmBYIxwTq4MuFUUdpvA2guD2SMfoKrzmCbjSAckXDSdNwIiIlvWzPcUSzE6m=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOMwXhfS3rKJrPGlzKXw0fk5h6ClK-l2X8Lh-bNulXzAASbF7ZwLRVINJzX8PCqTMft8GKxHH1QE1RkzjyPnQDRZqG4IPBkdyEfhcrmFs1NhEb-HDOT=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOrTeTR5lXsjVgW0w88X4B_SVhSfek5SZHQO_QbbavMp990jGBifO6K6uWpZuriewcmyBeW9ctC4n04upDpdxvgDZwlBq3rFqZxNoe4KZVe2DAiKaTd=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPWRKuudSF8iWggiBN_RHwA1R3F3at_ApUKEBVAWbv9EzSGGognIu5UZvTu-8HIMbnEZRR7BfG03t_THXD-qahLZ1Ok6YtDcYjVOxyCEgfkwRR0Dg2W=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczM4u-38BoPT2s1aI5C1SjtWVM4G-G7ooDOPFcrcEEQuQ5ebsWmXZNkGEjDrDmq9FGtOB84kwqAjJ1nMaYWB3Ji1Y9VctGcfInvClPLxmIXNiqELjwRx=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNsE_OQFetzYXpx5d_0inNyU5ExqZrm8JLz6O7KV_hewEVJE6_U8MY5SWb8n4MoWf_nHWTpgd2rcvuG0P33VVJNy7UH-_9gvKOwdiMKuZYjhCPmkyYY=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczN8jE1S8H0jvvczDi6bxLDruH-d816VSQZN6SNM0DbCx-qFt4OLLFRnAoRIlLtO1ljuWCkBFCFojReQfdlDRBfDDqEV53zlg4OmMwgk5cawOYFbX9B7=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczO2gtQnC6HY_ILYn05nafji9Xs0-aexm6oFGkUwbXoaCdM4ge66PE6n86DxofHrN-2rls-8FauqoSjlle_sEnyz_6hKmQ7Gag6vjPXqYWypnxwaNbEZ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNNCE4IJm5isW2sKhEiu7tQRwfyOG_gnI6oBChQVrqSdxXoNoFYJqcyzrxG9gXUuYO4RyrIMWCJEnPN35YV2zjXJztlNW-Is2DboH8zHGSwz6pDb6Zv=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMEL96W3EAxIzN5Y5OTMJwM1ru8vKrWRpieTMdjDnwf5cRvz27HwdqJL4iiswY2gkkMQ0fhrT43vVLZEwqyuWeJwLsMgD2kfJAiFZ89XcnabqdIAVBJ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPIMFXVMsFoQsa-wOS_41OtuIF9hGxiowmvT5YbJ7kDOTq_X_iKceqdV8ae5I6rGCxV33EPErrbYjdKkvqArdMGU3aIJklKROfSeXBkEMFcp7gOiChL=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMjMY1Hc7nfitZ1RpTF2wFGp5A5k2lWco9zYvVFzNA-u7R1wtJkBn5L6KyZHXxPol-731rNHzMW8RG0Ns19BiynJlyswHpZ35xUBifIWXx0I89cO1tF=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczO53j3wwrVYfRTPTiiD25LsyoBy-SLDTJovH8ww6hddeJYHjO72iMp0ZJ_NBZqddvizAGxPkthIWHmv4ew6yrijW_L-YAZbDHia1CY62KYzFty1uB15=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOCzZmt_V0bIY4CQUQ4dbzkajIt4QMBPzHrM3TXGUv6E296OoNGsm8kMlqsHbnWbtpAQpqkqz8R0UEgh7LlR6YKGhQ14Q6IVd654CHj2oD317iDOKqY=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMqE7htKd_Qr9QqpA1QWZwvJwTDdR6LeYhXuSUc2FNUYzMy-KCpHAfVtNiFPKAmyC5B6eWtw06iSztb_4QprGxdQUJNrVXemuEAJIdxfwZ8AB1nxsDq=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPYNNoPPjb98rvEkHVg9SN2nS6a4UysCOxzhYKeTSjc7_iAizxlMrnjWODUQEzNxL72EXJlTcCcUNAtzkTqbfu1KpdelWiRU-JruWmn-2ka1KGzNagD=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczO4SjIteih1s_JZTcF8S4Ny53UB7jtinLOGT2g1mW6zj5F1jblvpzmnRjumZe-aQpHSOrxXAqehiaPCxczZU4ywlSdjNSn372EXrfGest7_x8DSHk9O=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMo86-I_vgEjxiG2FiL4xvXhal3JzAhBVeRCDh9OheJbJNJW_F5ux0P3t6nbJ42dJQHortsSYDTg5FfQwrM319EzqvqwEVUkY4oMvlAQmpS3Hwbm1bn=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMjStcdjTHyt-YskW8Ba0Ck0cLiifddZSrazHBCi-bjiICymon9B6I1-llK_QKwt-ppmO7MHvXb7eBg-n-ZIQWXO7LrRt_gRGEktJFBjs-Uofb2feNA=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPEukxApd4ZgJqKXTvZkpwvzU5w3-gJMYZOtynmPkNph11U9v68ZwPgAGhEVUq_2AGySIVtwxSW1FsRckyJDJcBR7Ef8G05zk9PsEfGYNHX5ajAGyug=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczP9_9bO0gKK-34Kstb9gA-g0ctG_22zNHBbKFdQt34OTv5Rn0rF5i3EywKfsyI1PfNMIZ8G0vFu_gYrc4MzD2ZCaOWPl9IXQUOiO_RklwBvBo5m4XH9=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPL0gu79hS9ufCRxPYrrsshjpCuIJW_n9pX5XceLcZHC5cRsY1F4n855bjALkkoR3j4aG7aGOQ52oRi4ccVnVKWfHHv6hZse_kEG_e9hrqd0Q59wK5U=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPhtM1tg3eiez4gn0ybzAFoDjCjPxgYs5tfoGK6GxWQEaLcPsefzrgbGWlTU8bh3J03XTvkahvLKFJMJRzJ_l8skkexkfXJmmLmEX0aoNmwr3amYp3U=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczN_iZKdfD7UK3JH8FtrlymBgIuf4UU1opRMgEfBPc9w08sKIFL_pVIiHR4bt0Nwc3QH5gqB2TQ782kIUXDHNSoDOKAtZIhxXIKNWedBWFiSlAvND_xH=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNT8ACkBaf5gsdmk4jAIKXmINiQu0q-OzPg8td6D4KD12Q10qKTaBfoABSV_BJE_u93eiWb8K3XSpgwZQuqLMlnGZl4gFbJuqS_6h0-TbD072Re26Kw=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczM_AU0uFS2ksutgN1y_C5EzfGbjvGnk8Hnw0PjA1crYNnBv-KR6mCQsqZ9lyIcz32wOGoszC3q1tuDrv5fQGIfm2I21p4eCiPz47wF9SGT0yIU8y3KJ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPzIU5jBSuZbA8IFmrLmmdZul54--Rv9X7roEabvFWqCT4mbMG6Px7J3QZ8dIjNII7xCr0zEs2rKi2NXeqbSB5O-rLSgU2cGCfeFmq4BDOvea2xA8SR=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNS6qiSdimStrxxBCs5ccp6UUGaA7HbonsS1VZ282ayCggR-_9vgcCthLeUA5UT2zGT2iSQPDuOnLaeBUo6nbHkDtL1gGirWEKAo2i9K9sy7YpWQHTG=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNN6FPWXfVu5Kpj_BxBIFE4YAXUTtkPopRSh5NjS5F3t7gExQJ7lmBXdSArWt-rn3E_Y2SSjVYEpsDHb63DqVs9xG8AiWLYKO_Pe5NcCmZZPtpkUcia=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMew1vZil-ZJzML8-xSDFYHv7jivSNPhVu9zV_fq_LiaJ2M2AYlBHu7o_UtaLOzFSMMDCiZxc5dBUW7u1HPlarfYTUW4-Rv8mzv-2-lASs0IhoIh40K=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPIBEbD9x_x3yC6WjpwTYsS6nSUopXu-PXzBZNh90VdjN62PWUT51Ti813VXvQUTwn2ooe5dv_2rvLy4LEy1Q6i1xQgPtluuIASTLL-PyTmmvR35Vn4=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOeg8R5bJUYfvJYScehZC4L_e61hWuWypVYfBI8F9m2c89heGQjacbGEl9NAZQxklJacLPzPaTeychzBK_YgqWar-WH57gGLMSUbQqY0vXhgUS4TyCo=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczP5kbCt1j4otNkDZzFMQQ8N9dCVRUA4iOCRJj-hR8ikbLj3Ri3nKzsU39Pk5u4y_0o0zwmJpXf6992TWGy4kHXsQM4DPILow2H73F9hYSuCi-N7rUeA=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOjbuZ446X2o_Urygqh-wSPKTpO94M39aohQOhjXa2M9oO-ud7XlSK5XbhMCQZn-2tFn7kfaiP_MCv1aPNsC77DJOgy77Z5cI9oAb0XxwccUiMkVL2G=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPap2Lscx8KoHq9_PDZPLBbGw3hXxgV6184WyAQnJNEZFQVEu3QeJUGFsd_IxY2Vq0g2dX0mR1a2B40VcFzt_hQTftgN6fii5OsCwRaRlwsLLeLa2lY=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczM70JzrQHLGTb-9ebja8rOFR5on2EGA6JHTcgxox_bDfbFVegNp4ey18BBhEvhAtPakpoypqwZsXvn40tBQrVWd17n_HKqpr_zx1z2p8ws6amIMpOOt=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMDKIvhAs3tdndQiINMx-Ki4y2KaqHJuZMSeKcvyB2wlqURc2qcez6LjCvXEfYZn8HkazIa9iM4isXL-GtCi8UyrinWap7G1wJcSANFsGTLk9fdF99U=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMPnfe10vbxdg_RLHCGCAD1g0JcpZcXWaXM-Ucy8ZEWsm3iNApDZyo6vAnKc9DX7u5xp2JmSJJmxsIWM45JmpNIk8W8kqxua6iyxxRGh69XMTC6_PBK=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMcO_rtb6q9M4IcnFc_0ucBGGIG5TXvS8X2wuWz_x9dYcOHk9tZ8mWMAea0-3yf9ZpbVStOf4mAFFsgbF42eEIcAbvFQW8jVkkeFp-sg0h5E1GEecwy=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNUDwvBapLpuGDODRh0v4oRiCt2vjbYqDNQOSw_XK74jW_GQHkuLa46wSluSE5WQWPdShTUC7cvVt11DFgdNL2IEeeJVciMa6aiFSO4q1Wy8lhluyPP=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOkT95ozPHmZS_i3ahzf4pz9ciTrMHPq6xGM2Yu8Nh_U9GGK_SVCQXOHfqkZwh4cRVWF5_feEZLbnUlim2lEHUio_Y-D96MJAn0uVtx6j6biKJklonD=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNt226TUxiOp3kFed25MzoYVNoYdlcdZmx34RfDO1qnD-QZGlHg7GHS2OrXblgieEUYRaR7TYOuuXTc-8kdVnB18qxxIxTuhriqHkU6Z6rGxR81S_sm=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczODDLiJzq1tEjbXMdtAVNfmoujl30gxecUaPS_RjyogbhsLa70l_9AIi8N2kosoluBjJ7zJ5-s3IzqNPVSeaH7P5loh2JmjPFnOYaczSst1Ij-JQgAb=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOwfJ9C-ZEWUTwwuUV2CeW-Nx6KOCa90lf8Ne88cFwi8vAcJ6AZdLf5KZI3V9ibD7OH54aEjRAho7lluRYpKm0X1cr_Gt1e9JknDyc9Q3jpYLfy-jU4=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMx0LIwkl7DySIFI6_L7_X-Dm0tH0QoZ18QmUkJ5FoxI-f7ntfbYUkrzw6a2kE5LWDT2SjJoLGTuyKGvjoNzFCQNWuXE9BYJDjFNcUHyq-LtyX0oPtS=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMAu79YbNZdJiTSmfDFRiZRLDI2Bi91e4MF_cTY3qm85HYU1I2wQE4ZW-iTBVEGN06AGBFVRMKg8zgMsic36OEEA4dL9BqxvpYtK1sbGeWlVa54eja1=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNCPuNOePrEqqBcqip6xVjSYfy9a-UbEGdLanRhiYDkQXmD5K4CVMzeihNJz_SDDqENV5GYfNv5iIV7T993ueVDNTahdYYEMUJxng5cNmWW7KFK7r5J=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPQP59fH-7mPjpb8ly4S9EnlVOB5G1hBYf7Nhge385ehXSy9A6G7wsuY3UDIaq1c4-zaOtiR2HnYytrcGfdpoar65OpqzCCofDYp465O5CkSdjyH0TA=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMG4zXU3wxbU3BT28__QGDtKY48nz98Te5q8WO6cWd930fxsWdjDfCMNGP9WXGdMeI97jtLMSqPd242xj-YeE3HUUfgkOPDW5asAh09Bdjtcm2tDREv=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPo4J1mMQO9_KxuBNGuljb9hEqa3tYzSc11iYrZTkLfM9c9yAQzkIhvFthJIqMzL6pY3ecSfS7D3F1JOuB0rU-0i3_hQSkBmwbO0e_x31nkihJWbDSc=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczODU8BKfZJ6_faqXbAT-7bfoXKzLqqds3WFbbieg5ymdaf-BVI7-El_SST8xzoUX5z_sjVry65-HqLub_tV9DOwbCaIcH3uwGdPxyGB08YXjfJarHvx=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczN4kNL_roqFSrQUeIslxtP7VtYYsrbghc_zF_ZHptfWDUKT4pdyxiNTVGsTuczCuOFX02BCKNPqZZoelh81kqqHeLQou-QM8jOEYscmfpRaqyDTmaRV=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNMhBbr7LP4JL2rCRRWd3Vu3_e9gL7QVEieBbWNgYJ__sDLtzjVMtCd5OBcHlZTx0O6blX58kPybV0zO-lrFRMXU_J3JiPpo64TVfutHftqkQoESsWi=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNZPXH6XD0vUjZtYLxHtDq4SmIL_BOd6eqmJAR2Agct3ZkLSI-YLasDVTky9BlxmZuFunA-8AE9q6g3yUCt2dRXkfzZoxbGa2nqjkQH1Pxo-Ybc8_VS=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMrs2G9FEOIQpdk-HSRbcKfbyCPfmY5paIGbJo3-nzxXKy8hHgpiZUsRGSFmUVmDShp_SiIKbMTUFTNLf1-mS3Hkh81XX8dZa32T5bBPr42ZMjySb5Z=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczM5cViqVyzmd-HFtAH0Jow0qgLu6gU4NNzCbojkPDbVzSWnOEKdb0mIkzjxy8iMGLqo32tsFS11uh_y_U9L61hRutSBtd3x5DdKOSL3Mw4XpLzzwfSN=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNO0k_86Ai8xnw_35LRdKV3RhG_DoPID8wn0Svq7pCHbHCVcKL0a0xe430TorN-l2gzU-CdPkdTrhXV0B7dFEzWznn24EacxUejJr4xm9wkXQxFe9Xp=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNWMV-Ixuj0sp6dkxPVyHUDGrHJ34DLYfbp_jYFpSXxGXp7cLPwiucqwkyLbbr6-zNRcAsJmW9CGGwXTYHj6dALGGLANUk8CwZScTP0IZvlUZ35IvU_=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOU27IXA8mpFhXqlfFuiUtTo4Mzuaqi-VfdOqEawCBpiy9Hqd-eHaiT-3__merIJQAEHk3v4ky4OXD0zStGuw65Iy8iMaRdpmc860jB_AUPJ69LuiHR=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMsvvpOHqQDNY2pG8hHN0NIgKjbhEhWi9wzVKdt5ZawdEuFwto_-IJLZ30PNk8z67XSnbCFzychueWfmSkzcwZxvGl8cg6-tYwidC4EtcWblMlSEJXe=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczM_2raEJF3a1bg5V727jQ3eyr0acnM4swd76hz2RassE1p59EuZ4mkLqaQdUhQfTyt3IgHHY6_NPVAoQx1g5M_hl8li98b2j3OI9QDPd9l2GmDYx9Zb=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNYS-uPMU4d8iN2GHVxMzgejlLBcfW0TFtdyMs92uxdFAtt0VauboBNpbNXAof3FrBUJugqxoTmWxGCw6l4wXrw8Rdtmf4_vh-gqA85yb9EhspY4HZJ=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPBH4o3yEDHBl-FmrVaZPuKnoC9sNa4xa5EhrYiDkbdJaCSz5MLsaN-ROCyguFRJ__BDX313p_TUGX4zwqn8fIanzE8e5X7BeEVB19LmjUrPH3xT1Md=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMStH6WtoTbdy7ipA1GQDMWJu7UBdtPX964xWgvnyMnDl_QSrdvcZuFe-42MI7CSOUrhIQhb9wZejoG3rs2q7oaucQyQv3mZBkU_PorADSyd9ejdSYa=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPAZg4bsbEI_U4x3R135H9FjA6Of__49kBx0XJhfRw_HnG4HG2H0m8QoKOzFLtB0Uv4wWQW2eaIOiuHXXv1FhdAAd7QSIiMw3GzQfSgDQ9oOHw2DLjh=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNNJkQbPXXLYL3jnqOMi5-HL3FSZlEdGfpQlWx44C5G6BfXEyYDpoCZLWI0JcUjhh7RK0A7o-ddCLNrFX9XL06jsuCokFLMO82gp_C2W1YwnGNIeRtE=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMhAx7E-THe3FkIkVs1UTSpZvkzkTNRnIJyTOf3ReBs09hGRH6_2nHaAmxMqX5fwn0-5T1mwpUTEkXuacmf4XRMLAHSakcM4ihqqeYTyPy7vAXQOyg9=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMDf5p1jZDIjmomRKapus3ygK4vM8xBCuQB1XztwvhKUKorIxIpx483YaU5wKDO_pt2SapoRFL2wJgXDRLYVtzIpSdYH3i3k4fiPuEdaOqkkaLADCAE=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMFvC0c_iGfXQ1OM_8Mm4FWNl8tAhZzzlXKgXHwp56NkPLTgO2GkQP-JCPHteibcJbJFvEBUGoD-qBPgtf-b1pvNPQn0KJrhiZ1SMPdywpKUyrIbYkS=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNEFBWC1Jh5_fAFJojNWlx_T_CT7U0OW1WDiiW1mlh1Vmv-cy68W-FLnK1H7BYsiVpECA4EO8JQjb9AUyvY43svD8aN8csSdNVN0VRfgnSWowYdk5xR=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPRiDZ115oTdY887ADgZZP-U5ilBY1m9ss3QP8UbNl6arUazQaeK5VDZADSjzi5Xs01qAsY2Vj2zWpKrxgGIXdbZN7r5vlZHaR5ZRL-0VYgMZiP0V1a=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOFRywqgxRMIWz4bByPRblyjdxLsXQY8kgNP1YmOwaRDWOF25Cb4FJUmG4tfuGE1kB1cdVolLWeOcycbGkHAuFXpIE57ZXnDB2Tyxi4G7nsi3pvkOVN=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczOuaotFPm5kCg2XK5GgNFn4vxsXKEfeWkQcuoWLppzvpguiFL4XNA2hGDhrZs-B6pxm3kac_vrxq_6JBtURP0TzWXzqpD2h1hOnbjVEjjDc0nq9VWgh=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczM7xzZMrY2C3eoczy-MOtBblP93gRjSWA6VYhA06Yts17UwKo9YP2CEOz54y9zPVz5sJidtygqyERwvg0q8jJp1DZsdBu6C9C3jPtqXg1TuhUaFf3SY=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNS13SqQrFvcvE5K1mo-Ow4AmJS2iRRyLRLYYRFHTASNUXhJKbBFnBIQWH9tQKN4xDymk1J5F6TZHeP0-5bq7YxbYqQzofCmPqyEUofa48YYyWyi6EO=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczP5aVc4RhyjVF-1Ag3XZlgp7pm4zX0-qrgXTmWTi4yoEWlyzVX7iTiqha1LJMznwGoEjHGHhgl2Za_wYRpdSartSXGeI8RECNP_aiiyKQyKB4OVyoGB=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNHi-YAWs98Y8v3j6k5zBBG8IShFROTte6s2vkRDmBCJBHuph1uUx4hOmaHQZDB4XsWjwnJMJzfdu4QNw9C_5Pn1AlQB4vumDZp1GxI2sIzP7KUMaxC=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNs9aZIB4HIq5KALmWil_b8y8aOb8reuFBnFOfedT-glZ7JiOyo6t-hZLBbHp3j1PF7iV4zsDDx6eKxNYbH6Es9Z3pKvgDhZ3zqevEdkhVpet-efR8q=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNDktj0MBdl1CpmHVMXBNTLp9RHEdIPokORWba-gaZgQbahxJ7bRVQ0g4AYCDTnx7VqL6b5TlPwB1JrMp5zHUyfPxVtT0n1bOgoV2GGAPiec9OSZp7m=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMYjW4pRYYle0GpY1DjvVptiHQAI_6y-Ftfuivysx4GoaRJzqbE7ya3_w_N_zwx5_Ag4viMPYyEm3gl_wVZAy1q9JFFbmLMqNyQlOKnftBsO3fw-Cx2=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNOD-QodEto6lLxoyCxSgKdJ9dJzO4cECnK6Bp8cppoqYtlwxNSKaXu64tbLjpgR_HS71WQGHLC7xrjKaiyYwaWzMcCYc8vGDwlYYl4NNr9SOrLKjUY=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPks1APIPtbjEXUDzm-VHYMc1XgyW3pAsWpMQO5HCKcxgWSaQdJm0gUKP6WtID2_UmoKz9WiRome3_feY8NWyBHWhks9QmmcOzO9cWaC7ypblx-ugBO=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPwT98eTY22sEHmUtW25rwu8LMYCaGZAvJxAVUtmwENORadd8DpDBYlQ7wGeg_6gKlDM6LNtz0q3iWWhpjpa09y2Y5__YiKoU2QIZriv_AxlTy8-hPu=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNcQyIOlNTquT5PDfN3s1_ecECPWrh-s93iyoicXBd4a8P9cWBLhmIQ9tbfMjDKR0dU1YwUzeCeAf87frsZu7gWXTdtJD02Yq8qLGlMO7x6_31jhp8I=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczNRdcsPr9ITUYeROdH_99vEnBfgAUw0g8yX7uaBA97gXwhJzBdYfSml5wyi4QQaGrzyjC2L6kQCfrmLlpjeUVoFg_5O67lkTd0_tiJheBB5wY_DBdCr=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczN28TVf_u9hC_S6A3BF-KEhkLqGAyYNR__mY4UrtZPBjnIFLlov_iRSvKFVCPmY40b9P_vDGhQyLKFcLChTEF6NNr-tlocJRuM8AkBqBJBNU-5r3ruy=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczO4rGpA6dbOCDSTUCt_2Uvtd8Wr9-FmwKkyrfxon7YGuKYFDXAdgctDbfUfzjL1x4fJ6VaP20n7WdP5ZcIeYZmMH9v1yo4SagMPqdDc88OqeD3mDEqi=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczPnDySuMjCSA0-I_rOnOHoFvnHlRXpBfc7fz21lYx-MYiH6_n5cdghTMLimZ2i8cUk_9leT5gJIVbUDyoeSUKbW3v7WukEIYbAws2uu6Eui0R1tlv9w=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczO6zPAplt-TbqsF5ogURu35r8btM49RnMtg4yqvtqa0CJcckpRqLdnYphlZ1pL4QT8qqchCp3PcNsLcM2wIGgsEiOFlxHDuYpW0A_z-TNv3X0lPTDyd=w1920-h1080"></object>
+                  <object data="https://lh3.googleusercontent.com/pw/AP1GczMmpB7-bV7G0GkddUU-nEJNrhyjLnaH_wrru4la625J4Fns2r4mkBNBP06SszdkbOECbCuRNe81KaXKaRCPAVJ0LcvQOQ1d8PIERlGax0oY4WZCKJvy=w1920-h1080"></object>
+                </div>
+            </section>
+
+            <!-- ¿Cómo podrían escucharlo? -->
+            <section>
+                <div class="card">
+                    <h2>¿Cómo podrían escucharlo?</h2>
+                    <p>Una civilización extraterrestre no sabría automáticamente qué hacer con el disco. Por eso también se grabaron instrucciones utilizando dibujos y símbolos científicos. Es una especie de manual de uso universal que explica:</p>
+                    <ul>
+                        <li>Cómo reproducir el disco.</li>
+                        <li>A qué velocidad debe girar.</li>
+                        <li>Dónde está la Tierra.</li>
+                        <li>Cuánto dura una unidad de tiempo.</li>
+                    </ul>
+                    <p>La idea era usar conceptos de Física que cualquier civilización tecnológica podría comprender.</p>
+                </div>
+            </section>
+
+            <!-- Un mapa para encontrarnos -->
+            <section aria-labelledby="mapa-titulo">
+                <h2 id="mapa-titulo">Un mapa para encontrarnos</h2>
+                <p>Una de las ilustraciones más famosas del disco muestra nuestra ubicación. No aparece un mapa del mundo. Ni un mapa del Sistema Solar.</p>
+                <p>Utiliza la posición de <strong>14 púlsares</strong> (estrellas de neutrones que emiten pulsos extremadamente regulares). Cada púlsar funciona como un faro cósmico. Comparando esas señales, sería posible calcular desde qué lugar del Universo salió la nave.</p>
+            </section>
+
+            <!-- Selección e Impacto -->
+            <section>
+                <h2>¿Quién eligió todo ese contenido?</h2>
+                <p>La selección fue dirigida por un equipo encabezado por el astrónomo <strong>Carl Sagan</strong>. Participaron científicos, artistas, ingenieros y especialistas en distintas culturas.</p>
+                <p>Tuvieron muy poco tiempo. Solo unas semanas. Y una pregunta enorme:</p>
+                
+                <div class="quote-box" tabindex="0">
+                    <p><em>"Si solo pudiéramos mostrar una pequeña parte de la humanidad... ¿Qué elegiríamos?"</em></p>
+                </div>
+                
+                <p>No fue una tarea sencilla. Miles de cosas importantes quedaron afuera.</p>
+
+                <h2>¿Alguien encontrará el mensaje?</h2>
+                <p>Probablemente nunca lo sepamos. El espacio es inmensamente vacío. Las posibilidades de que otra civilización encuentre una Voyager son extremadamente pequeñas.</p>
+                <p>Pero ese nunca fue el objetivo principal. El verdadero valor del Disco de Oro es otro. Nos obliga a pensar quiénes somos. Qué consideramos importante. Y qué nos representa como especie.</p>
+                <p><strong>En cierto modo, el mensaje fue escrito tanto para los posibles habitantes de otros mundos... como para nosotros mismos.</strong></p>
+
+                <div class="card" style="border-left: 4px solid var(--accent-color);">
+                    <h3>🚀 Un dato sorprendente</h3>
+                    <p>Aunque las Voyager viajan a unos <strong>17 kilómetros por segundo</strong>, necesitarían <strong>decenas de miles de años</strong> para acercarse siquiera a otra estrella. El espacio entre las estrellas es tan enorme que incluso las naves más rápidas construidas por la humanidad avanzan muy lentamente a escala de la galaxia.</p>
+                </div>
+            </section>
+
+            <!-- Reflexión Final -->
+            <section>
+                <div class="quote-box" tabindex="0">
+                    <h3>Para pensar 💭</h3>
+                    <p>Si mañana tuvieras que preparar una nueva "botella cósmica" para representar a la humanidad... <strong>¿Qué incluirías?</strong></p>
+                    <ul>
+                        <li>¿Una fotografía tuya o de tu ciudad?</li>
+                        <li>¿Un sonido?</li>
+                        <li>¿Una canción actual?</li>
+                        <li>¿Un objeto?</li>
+                        <li>¿Un mensaje?</li>
+                    </ul>
+                    <p><em>Tal vez, dentro de millones de años, alguien escuche esa respuesta.</em></p>
+                </div>
+            </section>
+
+            <!-- Evaluación Interactiva -->
+            <section id="quiz" class="quiz-container" aria-labelledby="quiz-titulo">
+                <h2 id="quiz-titulo" style="border:none; margin-top: 0; color: var(--accent-color);">🌟 Misión de Verificación</h2>
+                <p>Pon a prueba lo que has descubierto. Al final, coleccionarás estrellas por cada respuesta correcta. Muéstrale tu constelación a tu docente.</p>
+                
+                <div id="quiz-body">
+                    <!-- Las preguntas se inyectan mediante JS -->
+                </div>
+
+                <div id="quiz-result" aria-live="polite">
+                    <h3>¡Misión Completada!</h3>
+                    <p>Has recolectado las siguientes estrellas cósmicas:</p>
+                    <div class="stars-display" id="stars-container"></div>
+                    <p id="score-text"></p>
+                    <button class="btn" onclick="resetQuiz()">Volver a intentar 🚀</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Contenedor dinámico del Footer requerido -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts de interactividad y lógicas -->
+    <script>
+        /* =========================================
+           1. MODO CLARO / OSCURO
+           ========================================= */
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        const htmlElement = document.documentElement;
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                htmlElement.setAttribute('data-theme', 'dark');
+            } else {
+                htmlElement.setAttribute('data-theme', 'light');
+            }
+        }
+        toggleSwitch.addEventListener('change', switchTheme);
+
+
+        /* =========================================
+           2. FONDO ESTRELLADO (CANVAS)
+           ========================================= */
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createStars();
+        }
+
+        function createStars() {
+            stars = [];
+            const numStars = window.innerWidth < 600 ? 100 : 250; // Menos estrellas en móviles
+            const colors = ['#ffffff', '#60a5fa', '#fb923c']; // Blanco, azul, naranja
+
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    opacity: Math.random()
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let star of stars) {
+                // Parpadeo suave
+                star.opacity += (Math.random() - 0.5) * 0.05;
+                if (star.opacity < 0.2) star.opacity = 0.2;
+                if (star.opacity > 1) star.opacity = 1;
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = star.color;
+                ctx.globalAlpha = star.opacity;
+                ctx.fill();
+            }
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+
+        /* =========================================
+           3. ACTIVIDAD INTERACTIVA (QUIZ)
+           ========================================= */
+        const questions = [
+            {
+                question: "1. ¿En qué año se lanzaron las sondas Voyager?",
+                options: ["1969", "1977", "1990", "2001"],
+                correct: 1 // Indice 1 -> 1977
+            },
+            {
+                question: "2. ¿Qué significa la palabra 'Voyager'?",
+                options: ["Estrella", "Mensajera", "Viajera", "Descubridora"],
+                correct: 2
+            },
+            {
+                question: "3. ¿De qué material está hecho principalmente el Disco de Oro?",
+                options: ["Oro puro macizo", "Plata recubierta de oro", "Cobre recubierto por una fina capa de oro", "Aluminio espacial"],
+                correct: 2 
+            },
+            {
+                question: "4. ¿Qué astros se utilizan como 'faros' en el mapa del disco para señalar la ubicación de la Tierra?",
+                options: ["Galaxias vecinas", "14 púlsares (estrellas de neutrones)", "Planetas del sistema solar", "Agujeros negros"],
+                correct: 1
+            },
+            {
+                question: "BONUS 🌟: ¿A qué velocidad aproximada viajan las sondas Voyager hoy?",
+                options: ["A la velocidad de la luz", "A más de 60.000 kilómetros por hora (17 km/s)", "A unos 5.000 kilómetros por hora", "A 100 kilómetros por hora"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const quizBody = document.getElementById('quiz-body');
+        const quizResult = document.getElementById('quiz-result');
+
+        function buildQuiz() {
+            quizBody.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = `question ${index === 0 ? 'active' : ''}`;
+                questionDiv.id = `question-${index}`;
+
+                const title = document.createElement('h3');
+                title.textContent = q.question;
+                questionDiv.appendChild(title);
+
+                const feedback = document.createElement('div');
+                feedback.id = `feedback-${index}`;
+                feedback.className = 'feedback';
+                questionDiv.appendChild(feedback);
+
+                const optionsGrid = document.createElement('div');
+                optionsGrid.className = 'options-grid';
+
+                q.options.forEach((opt, optIndex) => {
+                    const label = document.createElement('label');
+                    label.className = 'option-label';
+                    label.innerHTML = `
+                        <input type="radio" name="q${index}" value="${optIndex}">
+                        <span>${opt}</span>
+                    `;
+                    optionsGrid.appendChild(label);
+                });
+
+                questionDiv.appendChild(optionsGrid);
+
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = index === questions.length - 1 ? 'Finalizar y Ver Estrellas' : 'Siguiente Pregunta';
+                btn.onclick = () => checkAnswer(index);
+                questionDiv.appendChild(btn);
+
+                quizBody.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswer(index) {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            const feedback = document.getElementById(`feedback-${index}`);
+            const btn = document.querySelector(`#question-${index} .btn`);
+            
+            if (!selected) {
+                alert("Por favor, selecciona una respuesta antes de continuar.");
+                return;
+            }
+
+            const selectedValue = parseInt(selected.value);
+            const isCorrect = selectedValue === questions[index].correct;
+
+            // Mostrar feedback
+            if (isCorrect) {
+                feedback.textContent = "¡Correcto! Excelente deducción.";
+                feedback.className = "feedback correct";
+                score++;
+            } else {
+                feedback.textContent = `Incorrecto. La respuesta correcta era: "${questions[index].options[questions[index].correct]}".`;
+                feedback.className = "feedback incorrect";
+            }
+
+            // Deshabilitar opciones
+            const inputs = document.querySelectorAll(`input[name="q${index}"]`);
+            inputs.forEach(input => input.disabled = true);
+            btn.style.display = 'none';
+
+            // Pasar a la siguiente después de 2 segundos para leer el feedback
+            setTimeout(() => {
+                document.getElementById(`question-${index}`).classList.remove('active');
+                if (index + 1 < questions.length) {
+                    document.getElementById(`question-${index + 1}`).classList.add('active');
+                } else {
+                    showResults();
+                }
+            }, 2500);
+        }
+
+        function showResults() {
+            quizBody.style.display = 'none';
+            quizResult.style.display = 'block';
+            
+            const starsContainer = document.getElementById('stars-container');
+            let starsHTML = '';
+            for(let i=0; i<score; i++) {
+                starsHTML += '⭐';
+            }
+            if(score === 0) starsHTML = '☄️'; // Asteroide si saca 0
+            
+            starsContainer.innerHTML = starsHTML;
+            document.getElementById('score-text').textContent = `Lograste ${score} de ${questions.length} respuestas correctas.`;
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizBody.style.display = 'block';
+            quizResult.style.display = 'none';
+            buildQuiz();
+        }
+
+        // Iniciar Quiz
+        buildQuiz();
+
+
+        /* =========================================
+           4. CARGA DINÁMICA DEL FOOTER
+           ========================================= */
+        document.addEventListener("DOMContentLoaded", () => {
+            const footerContainer = document.getElementById("footer-container");
+            const footerUrl = "https://danielgastelu.github.io/web/footer_uruguay_educa.html";
+
+            fetch(footerUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error de red HTTP: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    footerContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.warn("Fallo al cargar el footer de Uruguay Educa. Mostrando fallback.", error);
+                    footerContainer.innerHTML = `
+                        <footer style="text-align: center; padding: 2rem; border-top: 1px solid var(--card-border); margin-top: 3rem; background-color: var(--card-bg);">
+                            <p>Desarrollado para fines educativos. Material de Astronomía.</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;"><em>Nota: No se pudo cargar el pie de página institucional.</em></p>
+                        </footer>
+                    `;
+                });
+        });
+
+    </script>
+</body>
+</html>
