@@ -51,6 +51,7 @@
     
     .star-earned {
       animation: golden-glow 1s infinite ease-in-out;
+      color: #fbbf24;
     }
   </style>
 </head>
@@ -220,7 +221,7 @@
     <section id="pasos" class="space-y-6">
       <div class="text-center sm:text-left">
         <h3 class="text-2xl font-extrabold text-white">Los 4 Pasos Clave del Astro-Fotógrafo</h3>
-        <p class="text-xs text-slate-400 mt-1">Sigue esta rutina física y digital para asegurar capturas exitosas.</p>
+        <p class="text-xs text-slate-400 mt-1">Sigue esta rutina para asegurar capturas exitosas.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -231,7 +232,7 @@
             <span class="w-8 h-8 rounded-full bg-cyan-500 text-slate-950 font-black text-xs flex items-center justify-center mb-3">1</span>
             <h4 class="font-bold text-sm text-white mb-1.5">Trípode y Estabilidad</h4>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Consigue un trípode sencillo (los hay por menos de $10) o crea un soporte casero con vasos de plástico. Coloca el celular allí para que la toma de 30 segundos no registre ningún temblor.
+              Consigue un trípode sencillo o crea un soporte casero con vasos de plástico o latas. Coloca el celular allí para que la toma de 30 segundos no registre ningún temblor.
             </p>
           </div>
         </div>
@@ -321,7 +322,7 @@
             Tutorial de Astrofotografía de Bajo Costo
           </h3>
           <p class="text-sm text-slate-300 leading-relaxed">
-            Sigue este genial video elaborado por el canal <strong>Astrofotografía y Café</strong>. En él se demuestra cómo con un simple Motorola viejito y un trípode de 8€ se pueden obtener imágenes profesionales de la Vía Láctea y Andrómeda.
+            Sigue este genial video elaborado por el canal <strong>Astrofotografía y Café</strong>. En él se demuestra cómo con un simple Motorola viejito y un trípode improvisado se pueden obtener imágenes profesionales de la Vía Láctea y Andrómeda.
           </p>
           
           <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-850">
@@ -421,9 +422,12 @@
           <div class="mt-6 p-4 border border-dashed border-slate-800 bg-slate-900 rounded-xl max-w-md mx-auto text-center shadow-inner">
             <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Evidencia de Aprendizaje</p>
             <p class="text-base font-extrabold text-white mt-1">Astrofotógrafo de Secundaria 2026</p>
-            <div class="flex justify-center gap-1 my-2 text-2xl text-yellow-400">
-              ★ ★ ★ ★ ★
+            
+            <!-- Contenedor Dinámico para las Estrellas Finales -->
+            <div class="flex justify-center gap-1 my-2 text-2xl" id="final-stars-container">
+              <!-- Se generarán por JavaScript -->
             </div>
+
             <p class="text-xs text-slate-300 font-semibold mt-1">
               Puntaje obtenido: <span class="text-cyan-400 text-sm font-black" id="final-score-value">0/5</span> estrellas
             </p>
@@ -445,26 +449,32 @@
 
   </main>
 
-   <!-- PIE DE PÁGINA ESTÁNDAR URUGUAY EDUCA -->
-  <footer class="mt-8 mb-4 w-full flex justify-center z-20 px-4">
-      <a 
-        href="https://uruguayeduca.anep.edu.uy/" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl w-full px-6 py-4 bg-slate-950/40 rounded-2xl border border-blue-900/30 backdrop-blur-sm group hover:border-yellow-500/30 transition-all"
-      >
-        <img 
-          src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" 
-          alt="Logo Uruguay Educa" 
-          class="h-10 md:h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-          onerror="this.onerror=null; this.style.display='none';"
-        />
-        <span class="text-xs md:text-sm text-blue-300/60 group-hover:text-yellow-400 text-center sm:text-left transition-colors tracking-wide leading-relaxed">
-          Portal Uruguay Educa (ANEP-DGES-EDyTIC) - Contenidistas de Astronomía 2026 - Herramienta de uso libre - Desarrollado con asistencia de IA - Referencias conceptuales de "A Guide to Smartphone Astrophotography" (NASA, Dr. Sten Odenwald) y tutorial de @astrofotografiaycafe.
-        </span>
-      </a>
-  </footer>
+<div id="footer-container"></div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const footerContainer = document.getElementById('footer-container');
+    const footerUrl = 'https://danielgastelu.github.io/web/footer_uruguay_educa.html';
+
+    fetch(footerUrl)
+      .then(response => {
+        // Verificamos si la respuesta de red es exitosa
+        if (!response.ok) {
+          throw new Error(`Error en la petición: Estado ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(html => {
+        // Inyectamos el HTML obtenido en el contenedor
+        footerContainer.innerHTML = html;
+      })
+      .catch(error => {
+        // Control de errores: mostramos el error en consola y un texto de respaldo en el DOM
+        console.error('No se pudo cargar el footer de Uruguay Educa:', error);
+        footerContainer.innerHTML = '<div style="text-align: center; padding: 20px; font-size: 14px; color: #555;">No se pudo cargar el pie de página. <a href="https://danielgastelu.github.io/web/footer_uruguay_educa.html" target="_blank">Ver enlace alternativo</a></div>';
+      });
+  });
+</script>
 
   <!-- LÓGICA JAVASCRIPT -->
   <script>
@@ -509,19 +519,16 @@
     };
 
     function showBrandInstructions(brandKey) {
-      // Remover clase activa de todos los botones
       const tabs = document.querySelectorAll('.brand-tab');
       tabs.forEach(tab => {
         tab.className = "brand-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-100 transition-all";
       });
 
-      // Añadir clase activa al botón presionado
       const activeTab = document.getElementById(`tab-${brandKey}`);
       if (activeTab) {
         activeTab.className = "brand-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition-all";
       }
 
-      // Inyectar datos en la tarjeta
       const data = brandInstructions[brandKey];
       const contentBox = document.getElementById('brand-instructions-content');
       
@@ -547,7 +554,7 @@
       `;
     }
 
-    // Base de datos de las preguntas del Cuestionario
+    // Base de datos MEJORADA: Retroalimentación formativa específica por cada opción
     const quizQuestions = [
       {
         question: "¿Cuál es la ventaja de capturar tus astrofotografías en formato RAW (DNG) en lugar de JPG?",
@@ -557,7 +564,11 @@
           "Añade automáticamente un fondo cósmico de colores artificiales a la toma."
         ],
         correct: 1,
-        explanation: "¡Excelente! El formato RAW guarda la información del sensor de forma pura y 'cruda' sin descartarla como hace JPG."
+        explanations: [
+          "De hecho, es lo opuesto. El formato RAW ocupa mucho más espacio porque guarda datos sin compresión alguna.",
+          "El formato RAW guarda la información del sensor de forma pura y 'cruda', sin descartarla como hace JPG.",
+          "El celular no inventa el fondo, el RAW solo se encarga de guardar limpiamente la luz real que recibe el sensor."
+        ]
       },
       {
         question: "Al enfocar las estrellas con el modo avanzado o PRO, ¿cuál es la técnica de enfoque manual correcta?",
@@ -567,7 +578,11 @@
           "Colocar el enfoque macro para registrar partículas diminutas que flotan cerca del celular."
         ],
         correct: 1,
-        explanation: "¡Muy bien! El enfoque ideal para astros lejanos en celulares suele ubicarse una pequeñísima pizca antes del infinito manual."
+        explanations: [
+          "En la oscuridad total, la cámara no tiene contraste suficiente para que el autoenfoque funcione, por lo que la imagen siempre saldrá borrosa.",
+          "El enfoque ideal para astros lejanos en lentes de celulares modernos suele ubicarse una pequeñísima pizca antes de llegar al límite infinito del dial manual.",
+          "El modo macro sirve exclusivamente para enfocar objetos muy cercanos (a pocos centímetros), ¡no para estrellas a años luz!"
+        ]
       },
       {
         question: "Si queremos evitar que nuestras astrofotos de larga exposición salgan corridas o movidas al apretar el disparador, debemos:",
@@ -577,7 +592,11 @@
           "Mover rápidamente el celular mientras dura el tiempo de exposición."
         ],
         correct: 0,
-        explanation: "¡Correcto! El uso de trípode más el temporizador asegura que la cámara no reciba vibraciones físicas de nuestro dedo."
+        explanations: [
+          "El uso del trípode más el temporizador asegura que la cámara absorba luz sin recibir la más mínima vibración física proveniente de nuestro dedo.",
+          "Por más que lo intentes, el cuerpo humano siempre transmite micro-movimientos (respiración, latidos) que convertirán a las estrellas en garabatos.",
+          "Si mueves el celular durante una larga exposición estarías 'dibujando con luz' y todo saldría como rayos borrosos y movidos por la pantalla."
+        ]
       },
       {
         question: "¿Por qué se recomienda alejarse lo máximo posible de la contaminación lumínica?",
@@ -587,7 +606,11 @@
           "Porque las estrellas se apagan de forma selectiva para no brillar sobre zonas muy pobladas."
         ],
         correct: 1,
-        explanation: "¡Perfecto! El resplandor naranja de las ciudades disminuye drásticamente el contraste estelar. ¡Un cielo oscuro marca toda la diferencia!"
+        explanations: [
+          "El giroscopio es un sensor interno del dispositivo y funciona idénticamente en cualquier lugar del planeta.",
+          "El resplandor naranja de las ciudades disminuye drásticamente el contraste. ¡Un cielo oscuro permite al celular captar luz estelar más débil!",
+          "Las estrellas emiten luz constantemente en todo el planeta; somos los humanos quienes 'borramos' esa luz encendiendo el alumbrado público."
+        ]
       },
       {
         question: "⭐ PREGUNTA BONUS: ¿Cómo influye el 'apilamiento' (stacking) de varias fotos de pocos segundos de duración en el resultado final?",
@@ -597,13 +620,18 @@
           "Reduce de forma drástica el ruido (granulado molesto), permitiendo presionar más la exposición durante la edición."
         ],
         correct: 2,
-        explanation: "¡Increíble! Como demostró el tutorial, apilar unas pocas fotos limpia de ruido la escena sin necesidad de equipos de montura caros."
+        explanations: [
+          "El apilamiento no cambia la resolución ni el tamaño físico de la imagen, su objetivo es tratar la calidad de la información lumínica.",
+          "¡Tiene un impacto enorme! De hecho, es la técnica principal y más importante de los astrofotógrafos de todo el mundo.",
+          "Apilar varias tomas promedia la señal y elimina el ruido aleatorio, limpiando la escena como por arte de magia (igual que mostró el tutorial)."
+        ]
       }
     ];
 
     let currentStep = 0;
     let selectedIndex = null;
     let finalScore = 0;
+    let hasAnswered = false;
 
     function loadQuizQuestion() {
       const currentQuestion = quizQuestions[currentStep];
@@ -612,6 +640,7 @@
       actionBtn.innerText = "Comprobar Respuesta";
       actionBtn.disabled = true;
       selectedIndex = null;
+      hasAnswered = false;
 
       // Actualizar progreso
       const progressPercent = ((currentStep + 1) / quizQuestions.length) * 100;
@@ -650,7 +679,7 @@
     }
 
     function selectOption(index) {
-      if (document.getElementById('quiz-action-btn').innerText === "Siguiente Pregunta") return;
+      if (hasAnswered) return; // Prevenir clic si ya comprobó
 
       const currentQuestion = quizQuestions[currentStep];
       selectedIndex = index;
@@ -677,7 +706,8 @@
       const feedbackBlock = document.getElementById('quiz-feedback-block');
       const currentQuestion = quizQuestions[currentStep];
 
-      if (actionBtn.innerText === "Comprobar Respuesta") {
+      if (!hasAnswered) {
+        hasAnswered = true;
         const isCorrect = selectedIndex === currentQuestion.correct;
         
         // Bloquear todas las opciones tras responder
@@ -691,6 +721,7 @@
           }
         });
 
+        // Lógica de Retroalimentación Formativa Específica
         if (isCorrect) {
           finalScore++;
           // Encender estrella en tracker
@@ -700,10 +731,16 @@
           document.getElementById('score-text').innerText = `${finalScore} / 5`;
 
           feedbackBlock.className = "mt-4 p-4 rounded-xl text-xs leading-relaxed bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-          feedbackBlock.innerHTML = `<strong>✨ ¡Perfecto!:</strong> ${currentQuestion.explanation}`;
+          feedbackBlock.innerHTML = `<strong>✨ ¡Correcto!</strong> ${currentQuestion.explanations[selectedIndex]}`;
         } else {
           feedbackBlock.className = "mt-4 p-4 rounded-xl text-xs leading-relaxed bg-red-500/10 text-red-400 border border-red-500/20";
-          feedbackBlock.innerHTML = `<strong>❌ Sigue practicando:</strong> La respuesta correcta era la opción ${String.fromCharCode(65 + currentQuestion.correct)}. <br class="my-1">${currentQuestion.explanation}`;
+          feedbackBlock.innerHTML = `
+            <strong>❌ Incorrecto:</strong> ${currentQuestion.explanations[selectedIndex]}<br>
+            <div class="mt-2 pt-2 border-t border-red-500/30">
+              <span class="text-emerald-400 font-semibold block mb-1">💡 La opción correcta era la ${String.fromCharCode(65 + currentQuestion.correct)}:</span>
+              <span class="text-slate-300">${currentQuestion.explanations[currentQuestion.correct]}</span>
+            </div>
+          `;
         }
 
         feedbackBlock.classList.remove('hidden');
@@ -723,6 +760,17 @@
           document.getElementById('quiz-result-box').classList.remove('hidden');
           document.getElementById('final-score-value').innerText = finalScore;
           
+          // Generar estrellas dinámicamente en el recuadro final basándose en el score final
+          let finalStarsHTML = '';
+          for (let i = 1; i <= 5; i++) {
+            if (i <= finalScore) {
+              finalStarsHTML += '<span class="text-yellow-400 star-earned">★</span>';
+            } else {
+              finalStarsHTML += '<span class="text-slate-700 grayscale">★</span>';
+            }
+          }
+          document.getElementById('final-stars-container').innerHTML = finalStarsHTML;
+          
           const today = new Date();
           const options = { year: 'numeric', month: 'long', day: 'numeric' };
           document.getElementById('current-date-span').innerText = today.toLocaleDateString('es-ES', options);
@@ -734,6 +782,7 @@
       currentStep = 0;
       finalScore = 0;
       selectedIndex = null;
+      hasAnswered = false;
       document.getElementById('score-text').innerText = "0 / 5";
 
       for (let i = 1; i <= quizQuestions.length; i++) {
