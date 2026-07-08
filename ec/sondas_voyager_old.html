@@ -283,22 +283,6 @@
             border-color: var(--accent-color);
         }
 
-        /* Clases para destacar elecciones y correcciones visuales */
-        .option-label.selected {
-            border-color: var(--accent-color);
-            background-color: rgba(251, 146, 60, 0.1);
-        }
-
-        .option-label.correct-highlight {
-            border-color: var(--success-color) !important;
-            background-color: rgba(34, 197, 94, 0.15) !important;
-        }
-
-        .option-label.wrong-highlight {
-            border-color: var(--error-color) !important;
-            background-color: rgba(239, 68, 68, 0.15) !important;
-        }
-
         .option-label input {
             margin-right: 1rem;
             transform: scale(1.2);
@@ -325,7 +309,6 @@
         .btn:disabled {
             background-color: #64748b;
             cursor: not-allowed;
-            opacity: 0.6;
         }
 
         /* Resultados y Estrellas */
@@ -346,7 +329,6 @@
             margin-bottom: 1rem;
             font-weight: bold;
             display: none;
-            animation: fadeIn 0.4s ease;
         }
 
         .feedback.correct { background-color: rgba(34, 197, 94, 0.2); color: var(--success-color); display: block; border: 1px solid var(--success-color); }
@@ -695,7 +677,7 @@
             <section>
                 <div class="quote-box" tabindex="0">
                     <h3>Para pensar 💭</h3>
-                    <p>Si mañana tuvieras que colaborar en el armado de una nueva "botella cósmica" para representar a la humanidad... <strong>¿Qué incluirías?</strong></p>
+                    <p>Si mañana tuvieras que preparar una nueva "botella cósmica" para representar a la humanidad... <strong>¿Qué incluirías?</strong></p>
                     <ul>
                         <li>¿Una fotografía tuya o de tu ciudad?</li>
                         <li>¿Un sonido?</li>
@@ -703,14 +685,14 @@
                         <li>¿Un objeto?</li>
                         <li>¿Un mensaje?</li>
                     </ul>
-                    <p><em>Tal vez, dentro de millones de años, alguien acceda a ese contenido y nos conozca como especie.</em></p>
+                    <p><em>Tal vez, dentro de millones de años, alguien escuche esa respuesta.</em></p>
                 </div>
             </section>
 
             <!-- Evaluación Interactiva -->
             <section id="quiz" class="quiz-container" aria-labelledby="quiz-titulo">
                 <h2 id="quiz-titulo" style="border:none; margin-top: 0; color: var(--accent-color);">🌟 Misión de Verificación</h2>
-                <p>Pon a prueba lo que has descubierto. Al final, coleccionarás estrellas por cada respuesta correcta.</p>
+                <p>Pon a prueba lo que has descubierto. Al final, coleccionarás estrellas por cada respuesta correcta. Muéstrale tu constelación a tu docente.</p>
                 
                 <div id="quiz-body">
                     <!-- Las preguntas se inyectan mediante JS -->
@@ -718,7 +700,7 @@
 
                 <div id="quiz-result" aria-live="polite">
                     <h3>¡Misión Completada!</h3>
-                    <p>Has recolectado las siguientes estrellas:</p>
+                    <p>Has recolectado las siguientes estrellas cósmicas:</p>
                     <div class="stars-display" id="stars-container"></div>
                     <p id="score-text"></p>
                     <button class="btn" onclick="resetQuiz()">Volver a intentar 🚀</button>
@@ -800,50 +782,38 @@
 
 
         /* =========================================
-           3. ACTIVIDAD INTERACTIVA (QUIZ REESTRUCTURADO)
+           3. ACTIVIDAD INTERACTIVA (QUIZ)
            ========================================= */
         const questions = [
             {
                 question: "1. ¿En qué año se lanzaron las sondas Voyager?",
                 options: ["1969", "1977", "1990", "2001"],
-                correct: 1,
-                feedbackCorrect: "¡Excelente! Ambas sondas despegaron en 1977 aprovechando una alineación planetaria que ocurre cada 176 años.",
-                feedbackIncorrect: "Cuidado. La opción esperada es 1977. En este año único, la alineación planetaria permitió un impulso gravitacional ideal para visitar los mundos gigantes."
+                correct: 1 // Indice 1 -> 1977
             },
             {
                 question: "2. ¿Qué significa la palabra 'Voyager'?",
                 options: ["Estrella", "Mensajera", "Viajera", "Descubridora"],
-                correct: 2,
-                feedbackCorrect: "¡Muy bien! 'Voyager' significa viajera. Y realmente lo son, recorriendo millones de kilómetros incansablemente. Ya se encuentran a màs de un dìa-luz de distancia.",
-                feedbackIncorrect: "Respuesta incorrecta. La opción esperada es 'Viajera'. Un nombre poético para las naves que han llegado más lejos en la historia."
+                correct: 2
             },
             {
                 question: "3. ¿De qué material está hecho principalmente el Disco de Oro?",
                 options: ["Oro puro macizo", "Plata recubierta de oro", "Cobre recubierto por una fina capa de oro", "Aluminio espacial"],
-                correct: 2,
-                feedbackCorrect: "¡Correcto! Es un disco fonográfico de cobre recubierto con una capa de oro para preservarlo frente a la radiación espacial.",
-                feedbackIncorrect: "Atención. La opción esperada es 'Cobre recubierto por una fina capa de oro'. Esto lo hace sumamente resistente frente al desgaste de millones de años."
+                correct: 2 
             },
             {
                 question: "4. ¿Qué astros se utilizan como 'faros' en el mapa del disco para señalar la ubicación de la Tierra?",
                 options: ["Galaxias vecinas", "14 púlsares (estrellas de neutrones)", "Planetas del sistema solar", "Agujeros negros"],
-                correct: 1,
-                feedbackCorrect: "¡Muy bien! Se utilizan 14 púlsares cuyas precisas frecuencias de parpadeo cósmico funcionan como faros universales.",
-                feedbackIncorrect: "No es correcto. La opción esperada es '14 púlsares (estrellas de neutrones)'. Como emiten pulsos de radiación regulares, sirven de brújula matemática estelar."
+                correct: 1
             },
             {
                 question: "BONUS 🌟: ¿A qué velocidad aproximada viajan las sondas Voyager hoy?",
                 options: ["A la velocidad de la luz", "A más de 60.000 kilómetros por hora (17 km/s)", "A unos 5.000 kilómetros por hora", "A 100 kilómetros por hora"],
-                correct: 1,
-                feedbackCorrect: "¡Excelente! Viajan a la impresionante velocidad de más de 60.000 km/h, adentrándose cada día más en el espacio interestelar.",
-                feedbackIncorrect: "Cuidado con las magnitudes. La opción esperada es 'A más de 60.000 kilómetros por hora (17 km/s)'. Aún a esta vertiginosa velocidad, tardarán miles de años en acercarse a otra estrella."
+                correct: 1
             }
         ];
 
         let currentQuestion = 0;
         let score = 0;
-        let isVerified = false; // Registra si ya verificó la pregunta actual
-
         const quizBody = document.getElementById('quiz-body');
         const quizResult = document.getElementById('quiz-result');
 
@@ -870,9 +840,8 @@
                 q.options.forEach((opt, optIndex) => {
                     const label = document.createElement('label');
                     label.className = 'option-label';
-                    label.id = `label-${index}-${optIndex}`;
                     label.innerHTML = `
-                        <input type="radio" name="q${index}" value="${optIndex}" onchange="selectOption(${index}, ${optIndex})">
+                        <input type="radio" name="q${index}" value="${optIndex}">
                         <span>${opt}</span>
                     `;
                     optionsGrid.appendChild(label);
@@ -880,98 +849,53 @@
 
                 questionDiv.appendChild(optionsGrid);
 
-                // Botón único con estado de verificación/avance
                 const btn = document.createElement('button');
                 btn.className = 'btn';
-                btn.id = `action-btn-${index}`;
-                btn.textContent = 'VERIFICAR OPCIÓN';
-                btn.disabled = true; // Deshabilitado hasta que seleccione una opción
-                btn.onclick = () => handleQuestionAction(index);
+                btn.textContent = index === questions.length - 1 ? 'Finalizar y Ver Estrellas' : 'Siguiente Pregunta';
+                btn.onclick = () => checkAnswer(index);
                 questionDiv.appendChild(btn);
 
                 quizBody.appendChild(questionDiv);
             });
         }
 
-        // Resaltar visualmente la opción seleccionada antes de verificar
-        function selectOption(qIndex, optIndex) {
-            if (isVerified) return; // Impedir modificar selección si ya se verificó
-
-            // Habilitar el botón de verificar
-            const btn = document.getElementById(`action-btn-${qIndex}`);
-            btn.disabled = false;
-
-            // Actualizar estilo visual de las etiquetas
-            questions[qIndex].options.forEach((_, idx) => {
-                const label = document.getElementById(`label-${qIndex}-${idx}`);
-                if (idx === optIndex) {
-                    label.classList.add('selected');
-                } else {
-                    label.classList.remove('selected');
-                }
-            });
-        }
-
-        // Manejar el flujo de dos clics en el mismo botón
-        function handleQuestionAction(index) {
-            if (!isVerified) {
-                // FASE 1: Verificar la respuesta actual
-                verifyAnswer(index);
-            } else {
-                // FASE 2: Avanzar de pregunta
-                advanceQuestion(index);
-            }
-        }
-
-        // Verificar la respuesta y mostrar el feedback y colores de refuerzo
-        function verifyAnswer(index) {
-            isVerified = true;
+        function checkAnswer(index) {
             const selected = document.querySelector(`input[name="q${index}"]:checked`);
             const feedback = document.getElementById(`feedback-${index}`);
-            const btn = document.getElementById(`action-btn-${index}`);
+            const btn = document.querySelector(`#question-${index} .btn`);
             
+            if (!selected) {
+                alert("Por favor, selecciona una respuesta antes de continuar.");
+                return;
+            }
+
             const selectedValue = parseInt(selected.value);
             const isCorrect = selectedValue === questions[index].correct;
 
-            // Bloquear todos los inputs de la pregunta actual
-            const inputs = document.querySelectorAll(`input[name="q${index}"]`);
-            inputs.forEach(input => input.disabled = true);
-
-            // Remover estilos provisionales de selección
-            questions[index].options.forEach((_, idx) => {
-                document.getElementById(`label-${index}-${idx}`).classList.remove('selected');
-            });
-
-            // Resaltar y aplicar feedback detallado
+            // Mostrar feedback
             if (isCorrect) {
-                document.getElementById(`label-${index}-${selectedValue}`).classList.add('correct-highlight');
-                feedback.innerHTML = `🌟 <strong>${questions[index].feedbackCorrect}</strong>`;
+                feedback.textContent = "¡Correcto! Excelente deducción.";
                 feedback.className = "feedback correct";
                 score++;
             } else {
-                // Marcar respuesta elegida como errónea
-                document.getElementById(`label-${index}-${selectedValue}`).classList.add('wrong-highlight');
-                // Resaltar opción correcta sugerida (Refuerzo orientativo)
-                document.getElementById(`label-${index}-${questions[index].correct}`).classList.add('correct-highlight');
-                
-                feedback.innerHTML = `⚠️ <strong>${questions[index].feedbackIncorrect}</strong>`;
+                feedback.textContent = `Incorrecto. La respuesta correcta era: "${questions[index].options[questions[index].correct]}".`;
                 feedback.className = "feedback incorrect";
             }
 
-            // Cambiar comportamiento del botón para la segunda fase
-            btn.textContent = index === questions.length - 1 ? 'Finalizar y Ver Estrellas 🚀' : 'Siguiente Pregunta ➡️';
-        }
+            // Deshabilitar opciones
+            const inputs = document.querySelectorAll(`input[name="q${index}"]`);
+            inputs.forEach(input => input.disabled = true);
+            btn.style.display = 'none';
 
-        // Avanzar de pregunta limpiando el estado de verificación
-        function advanceQuestion(index) {
-            isVerified = false;
-            document.getElementById(`question-${index}`).classList.remove('active');
-            
-            if (index + 1 < questions.length) {
-                document.getElementById(`question-${index + 1}`).classList.add('active');
-            } else {
-                showResults();
-            }
+            // Pasar a la siguiente después de 2 segundos para leer el feedback
+            setTimeout(() => {
+                document.getElementById(`question-${index}`).classList.remove('active');
+                if (index + 1 < questions.length) {
+                    document.getElementById(`question-${index + 1}`).classList.add('active');
+                } else {
+                    showResults();
+                }
+            }, 2500);
         }
 
         function showResults() {
@@ -992,7 +916,6 @@
         function resetQuiz() {
             currentQuestion = 0;
             score = 0;
-            isVerified = false;
             quizBody.style.display = 'block';
             quizResult.style.display = 'none';
             buildQuiz();
