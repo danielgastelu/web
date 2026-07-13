@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Didáctico Completo: Mecánica y Vistas de Eclipses</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #030308;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            user-select: none;
+        }
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 25, 0.9);
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            min-width: 420px;
+            z-index: 10;
+        }
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+        }
+        button {
+            background-color: #1f3a60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2a5298;
+        }
+        button.active {
+            background-color: #d35400;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+        label {
+            font-size: 13px;
+            min-width: 130px;
+            text-align: right;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            max-width: 360px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        #status-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 15, 25, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #555;
+            min-width: 220px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        #status-indicator {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 8px;
+            display: block;
+            letter-spacing: 1px;
+        }
+        .status-no { color: #2ecc71; }
+        .status-solar { color: #f1c40f; text-shadow: 0 0 10px rgba(241,196,15,0.5); }
+        .status-lunar { color: #e74c3c; text-shadow: 0 0 10px rgba(231,76,60,0.5); }
+        
+        h1 { margin: 0 0 8px 0; font-size: 16px; color: #f1c40f; }
+        h2 { margin: 12px 0 6px 0; font-size: 13px; color: #3498db; text-transform: uppercase; }
+        p { margin: 4px 0; font-size: 12px; line-height: 1.4; color: #dddddd; }
+        
+        /* Contenedores para las vistas desde la Tierra */
+        .sky-view-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 1px solid #444;
+            padding-top: 10px;
+        }
+        .canvas-box {
+            background: #000;
+            border: 1px solid #555;
+            border-radius: 4px;
+            text-align: center;
+            position: relative;
+        }
+        .canvas-label {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-size: 11px;
+            color: #aaa;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        canvas.sky-canvas {
+            display: block;
+            width: 100%;
+            height: 120px;
+        }
+        .disclaimer {
+            font-size: 11px;
+            color: #ffaa66;
+            margin-top: 12px;
+            border-top: 1px dashed #555;
+            padding-top: 8px;
+            line-height: 1.3;
+        }
+        .app-recommendation {
+            font-size: 11px;
+            color: #5dade2;
+            margin-top: 8px;
+            background: rgba(41, 128, 185, 0.2);
+            padding: 6px;
+            border-radius: 4px;
+        }
+        .app-recommendation a {
+            color: #fff;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="info-panel">
+        <h1>Precesión Retrógrada de Nodos</h1>
+        <p>La línea cian indica la intersección de planos orbitales. El ciclo de precesión determina las temporadas de eclipses espaciadas en el tiempo.</p>
+        
+        <div class="sky-view-container">
+            <h2>Perspectiva desde la Tierra</h2>
+            
+            <div class="canvas-box">
+                <span class="canvas-label">Vista al Sol (Eclipse Solar)</span>
+                <canvas id="solarViewCanvas" class="sky-canvas" width="330" height="120"></canvas>
+            </div>
+            
+            <div class="canvas-box">
+                <span class="canvas-label">Vista a la Luna (Eclipse Lunar)</span>
+                <canvas id="lunarViewCanvas" class="sky-canvas" width="330" height="120"></canvas>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <strong>Nota pedagógica:</strong> Las distancias, tamaños y las vistas subjetivas en este modelo tienen fines estrictamente simbólicos y didácticos. Predecir y representar con fidelidad un evento real requiere algoritmos de alta precisión astronómica.
+        </div>
+        
+        <div class="app-recommendation">
+            Para cálculos científicos exactos en el aula, se sugiere instalar: <br>
+            <a href="https://play.google.com/store/search?q=eclipse%20calculator&c=apps" target="_blank">Eclipse Calculator 2.0</a>
+        </div>
+    </div>
+
+    <div id="status-panel">
+        <span style="font-size: 11px; color: #aaa; text-transform: uppercase; font-weight: bold;">Condición Observada</span>
+        <div id="status-indicator" class="status-no">NO HAY ECLIPSE</div>
+    </div>
+
+    <div id="ui-container">
+        <div class="control-group">
+            <button id="btn-reverse">◄ Retroceder</button>
+            <button id="btn-play-pause" class="active">Pausar</button>
+            <button id="btn-forward">Avanzar ►</button>
+        </div>
+        <div class="control-group">
+            <label for="speed-slider">Velocidad temporal:</label>
+            <input type="range" id="speed-slider" min="0.1" max="4" step="0.1" value="1.0">
+            <span id="speed-display">1.0x</span>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- Escena 3D Principal ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.set(0, 45, 85);
+        controls.update();
+
+        // Parámetros didácticos dimensionales
+        const sunRadius = 4.0;
+        const earthRadius = 1.4;
+        const moonRadius = 0.45;
+        const earthOrbitRadius = 35;
+        const moonOrbitRadius = 9.0;
+        const lunarInclination = 6.5 * (Math.PI / 180);
+
+        // Iluminación
+        scene.add(new THREE.AmbientLight(0x222222));
+        const sunLight = new THREE.PointLight(0xffffff, 2.5, 0);
+        scene.add(sunLight);
+
+        // Sol
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(sunRadius, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
+        scene.add(sun);
+
+        // Órbita de la Tierra
+        const earthOrbit = new THREE.Mesh(new THREE.RingGeometry(earthOrbitRadius-0.05, earthOrbitRadius+0.05, 64), new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide }));
+        earthOrbit.rotation.x = Math.PI / 2;
+        scene.add(earthOrbit);
+
+        const earthOrbitGroup = new THREE.Group();
+        scene.add(earthOrbitGroup);
+
+        // Tierra
+        const earth = new THREE.Mesh(new THREE.SphereGeometry(earthRadius, 32, 32), new THREE.MeshPhongMaterial({ color: 0x2471a3 }));
+        earth.position.set(earthOrbitRadius, 0, 0);
+        earthOrbitGroup.add(earth);
+
+        // Precesión
+        const nodalPrecessionGroup = new THREE.Group();
+        earth.add(nodalPrecessionGroup);
+
+        // Plano inclinado
+        const moonOrbitPlane = new THREE.Group();
+        moonOrbitPlane.rotation.x = lunarInclination;
+        nodalPrecessionGroup.add(moonOrbitPlane);
+
+        // Línea órbita lunar
+        const moonOrbitLine = new THREE.Mesh(new THREE.RingGeometry(moonOrbitRadius-0.04, moonOrbitRadius+0.04, 64), new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }));
+        moonOrbitLine.rotation.x = Math.PI / 2;
+        moonOrbitPlane.add(moonOrbitLine);
+
+        const moonTranslationGroup = new THREE.Group();
+        moonOrbitPlane.add(moonTranslationGroup);
+
+        // Luna
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(moonRadius, 32, 32), new THREE.MeshPhongMaterial({ color: 0xcccccc }));
+        moon.position.set(moonOrbitRadius, 0, 0);
+        moonTranslationGroup.add(moon);
+
+        // Línea de nodos
+        const nodeLineGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-moonOrbitRadius*1.3, 0, 0), new THREE.Vector3(moonOrbitRadius*1.3, 0, 0)]);
+        const nodeLineMat = new THREE.LineDashedMaterial({ color: 0x00ffff, dashSize: 0.5, gapSize: 0.3 });
+        const nodeLine = new THREE.Line(nodeLineGeom, nodeLineMat);
+        nodeLine.computeLineDistances();
+        nodalPrecessionGroup.add(nodeLine);
+
+        // Sombras
+        const umbraMat = new THREE.MeshBasicMaterial({ color: 0x07070a, transparent: true, opacity: 0.85, depthWrite: false });
+        const penumbraMat = new THREE.MeshBasicMaterial({ color: 0x555560, transparent: true, opacity: 0.20, depthWrite: false });
+
+        const earthShadowAnchor = new THREE.Group(); scene.add(earthShadowAnchor);
+        const eUmbraLength = 22;
+        const eUmbraGeom = new THREE.ConeGeometry(earthRadius, eUmbraLength, 32); eUmbraGeom.translate(0, eUmbraLength/2, 0);
+        earthShadowAnchor.add(new THREE.Mesh(eUmbraGeom, umbraMat));
+        const ePenumbraLength = 25;
+        const ePenumbraGeom = new THREE.CylinderGeometry(earthRadius*2.1, earthRadius, ePenumbraLength, 32); ePenumbraGeom.translate(0, ePenumbraLength/2, 0);
+        earthShadowAnchor.add(new THREE.Mesh(ePenumbraGeom, penumbraMat));
+
+        const moonShadowAnchor = new THREE.Group(); scene.add(moonShadowAnchor);
+        const mUmbraLength = 11;
+        const mUmbraGeom = new THREE.ConeGeometry(moonRadius, mUmbraLength, 32); mUmbraGeom.translate(0, mUmbraLength/2, 0);
+        moonShadowAnchor.add(new THREE.Mesh(mUmbraGeom, umbraMat));
+        const mPenumbraLength = 13;
+        const mPenumbraGeom = new THREE.CylinderGeometry(moonRadius*2.4, moonRadius, mPenumbraLength, 32); mPenumbraGeom.translate(0, mPenumbraLength/2, 0);
+        moonShadowAnchor.add(new THREE.Mesh(mPenumbraGeom, penumbraMat));
+
+        // --- Configuración Canvases 2D Subjetivos ---
+        const solarCanvas = document.getElementById('solarViewCanvas');
+        const solarCtx = solarCanvas.getContext('2d');
+        const lunarCanvas = document.getElementById('lunarViewCanvas');
+        const lunarCtx = lunarCanvas.getContext('2d');
+
+        // Estado del tiempo
+        let isPlaying = true, timeDirection = 1, timeSpeed = 1.0, time = 0;
+
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const btnForward = document.getElementById('btn-forward');
+        const btnReverse = document.getElementById('btn-reverse');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedDisplay = document.getElementById('speed-display');
+        const statusIndicator = document.getElementById('status-indicator');
+
+        function updateButtons() {
+            btnForward.classList.remove('active'); btnReverse.classList.remove('active');
+            if (timeDirection === 1) btnForward.classList.add('active');
+            if (timeDirection === -1) btnReverse.classList.add('active');
+            isPlaying ? (btnPlayPause.textContent = "Pausar", btnPlayPause.classList.add('active')) : (btnPlayPause.textContent = "Reproducir", btnPlayPause.classList.remove('active'));
+        }
+
+        btnPlayPause.addEventListener('click', () => { isPlaying = !isPlaying; updateButtons(); });
+        btnForward.addEventListener('click', () => { timeDirection = 1; isPlaying = true; updateButtons(); });
+        btnReverse.addEventListener('click', () => { timeDirection = -1; isPlaying = true; updateButtons(); });
+        speedSlider.addEventListener('input', (e) => {
+            timeSpeed = parseFloat(e.target.value);
+            speedDisplay.textContent = timeSpeed.toFixed(1) + "x";
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        const clock = new THREE.Clock();
+        const localUp = new THREE.Vector3(0, 1, 0);
+
+        // --- Bucle Principal de Renderizado ---
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            if (isPlaying) {
+                time += delta * timeSpeed * timeDirection;
+                earthOrbitGroup.rotation.y = time * 0.12;
+                moonTranslationGroup.rotation.y = time * 1.5; 
+                nodalPrecessionGroup.rotation.y = -(earthOrbitGroup.rotation.y) - (time * 0.02);
+            }
+
+            // Coordenadas absolutas
+            const earthWorldPos = new THREE.Vector3(); earth.getWorldPosition(earthWorldPos);
+            const moonWorldPos = new THREE.Vector3(); moon.getWorldPosition(moonWorldPos);
+
+            // Reorientar sombras
+            earthShadowAnchor.position.copy(earthWorldPos);
+            const dirEarthShadow = earthWorldPos.clone().normalize();
+            earthShadowAnchor.quaternion.setFromUnitVectors(localUp, dirEarthShadow);
+
+            moonShadowAnchor.position.copy(moonWorldPos);
+            const dirMoonShadow = moonWorldPos.clone().normalize();
+            moonShadowAnchor.quaternion.setFromUnitVectors(localUp, dirMoonShadow);
+
+            // Cálculos de eclipses (Colisiones)
+            let currentStatus = "NO HAY ECLIPSE";
+            let statusClass = "status-no";
+            
+            let solarEclipseFactor = 0; // 0 = no eclipse, 1 = total
+            let solarYOffset = 0;
+            let lunarEclipseFactor = 0;
+            let lunarYOffset = 0;
+
+            // Detección Lunar
+            const vectorEarthToMoon = new THREE.Vector3().subVectors(moonWorldPos, earthWorldPos);
+            const distanceAlongUmbraE = vectorEarthToMoon.dot(dirEarthShadow);
+
+            if (distanceAlongUmbraE > 0 && distanceAlongUmbraE < eUmbraLength) {
+                const umbraRadiusAtMoon = earthRadius * (1 - (distanceAlongUmbraE / eUmbraLength));
+                const perpendicularDistE = new THREE.Vector3().subVectors(vectorEarthToMoon, dirEarthShadow.clone().multiplyScalar(distanceAlongUmbraE)).length();
+                
+                // Si la Luna está angularmente alineada en la oposición
+                if (perpendicularDistE < (umbraRadiusAtMoon + moonRadius * 1.2)) {
+                    lunarEclipseFactor = Math.max(0, 1 - (perpendicularDistE / (umbraRadiusAtMoon + moonRadius)));
+                    lunarYOffset = (moonWorldPos.y - earthWorldPos.y) * 15; // Factor de desvío vertical por inclinación
+                    if (perpendicularDistE < (umbraRadiusAtMoon + moonRadius * 0.3)) {
+                        currentStatus = "¡ECLIPSE LUNAR!"; statusClass = "status-lunar";
+                    }
+                }
+            }
+
+            // Detección Solar
+            const vectorMoonToEarth = new THREE.Vector3().subVectors(earthWorldPos, moonWorldPos);
+            const distanceAlongUmbraM = vectorMoonToEarth.dot(dirMoonShadow);
+
+            if (distanceAlongUmbraM > 0 && distanceAlongUmbraM < mUmbraLength) {
+                const umbraRadiusAtEarth = moonRadius * (1 - (distanceAlongUmbraM / mUmbraLength));
+                const perpendicularDistM = new THREE.Vector3().subVectors(vectorMoonToEarth, dirMoonShadow.clone().multiplyScalar(distanceAlongUmbraM)).length();
+                
+                // Si la Luna se cruza en la conjunción
+                if (perpendicularDistM < (umbraRadiusAtEarth + earthRadius * 1.2)) {
+                    solarEclipseFactor = Math.max(0, 1 - (perpendicularDistM / (umbraRadiusAtEarth + earthRadius)));
+                    solarYOffset = (moonWorldPos.y - earthWorldPos.y) * 15;
+                    if (perpendicularDistM < (umbraRadiusAtEarth + earthRadius * 0.6)) {
+                        currentStatus = "¡ECLIPSE SOLAR!"; statusClass = "status-solar";
+                    }
+                }
+            }
+
+            if (statusIndicator.textContent !== currentStatus) {
+                statusIndicator.textContent = currentStatus; statusIndicator.className = statusClass;
+            }
+
+            // --- RENDERIZADO DE LAS VISTAS 2D (Cielo Terrestre) ---
+            
+            // 1. Renderizar Vista al Sol
+            solarCtx.fillStyle = "#050510";
+            solarCtx.fillRect(0, 0, solarCanvas.width, solarCanvas.height);
+            
+            let centerX = solarCanvas.width / 2;
+            let centerY = solarCanvas.height / 2;
+            let targetRadius = 30; // Tamaño aparente idéntico para modelar coincidencia didáctica
+
+            // Dibujar estrellas de fondo simbólicas
+            solarCtx.fillStyle = "#fff";
+            for(let i=0; i<10; i++) { solarCtx.fillRect((centerX*i*1.3)%solarCanvas.width, (centerY*i*0.7)%solarCanvas.height, 1, 1); }
+
+            // Dibujar Sol
+            solarCtx.beginPath();
+            solarCtx.arc(centerX, centerY, targetRadius, 0, Math.PI * 2);
+            solarCtx.fillStyle = "#ffdb58";
+            solarCtx.shadowBlur = solarEclipseFactor > 0.8 ? 20 : 5;
+            solarCtx.shadowColor = "#ffaa00";
+            solarCtx.fill();
+            solarCtx.shadowBlur = 0; // reset
+
+            // Calcular posición de la Luna cruzando en base a la traslación lunar
+            let moonXParam = (moonTranslationGroup.rotation.y % (Math.PI * 2));
+            if (moonXParam > Math.PI) moonXParam -= Math.PI * 2; // Rango centrado en 0
+            
+            // Si la luna está cerca del frente (conjunción)
+            let isNearSun = Math.abs(moonXParam) < 0.4;
+            
+            if (isNearSun) {
+                let sX = centerX - (moonXParam * 120);
+                let sY = centerY + solarYOffset;
+                solarCtx.beginPath();
+                solarCtx.arc(sX, sY, targetRadius * 1.02, 0, Math.PI * 2);
+                solarCtx.fillStyle = "#030308"; // Luna negra bloqueando la luz
+                solarCtx.fill();
+            }
+
+            // 2. Renderizar Vista a la Luna (Fase Llena / Eclipse)
+            lunarCtx.fillStyle = "#050510";
+            lunarCtx.fillRect(0, 0, lunarCanvas.width, lunarCanvas.height);
+
+            // Dibujar Luna de fondo
+            lunarCtx.beginPath();
+            lunarCtx.arc(centerX, centerY, targetRadius, 0, Math.PI * 2);
+            
+            // Transformación de color si ingresa a la umbra (Color rojizo-anaranjado)
+            if (lunarEclipseFactor > 0) {
+                // Interpolar de blanco/gris a rojo oscuro según penetración
+                let r = Math.floor(200 * lunarEclipseFactor + 180 * (1 - lunarEclipseFactor));
+                let g = Math.floor(50 * lunarEclipseFactor + 180 * (1 - lunarEclipseFactor));
+                let b = Math.floor(30 * lunarEclipseFactor + 180 * (1 - lunarEclipseFactor));
+                lunarCtx.fillStyle = `rgb(${r},${g},${b})`;
+            } else {
+                lunarCtx.fillStyle = "#e5e8e8"; // Luna llena normal fuera de la sombra
+            }
+            
+            // Mostrar la sombra circular de la Tierra entrando si está en fase de oposición
+            let moonXParamOpos = ((moonTranslationGroup.rotation.y + Math.PI) % (Math.PI * 2));
+            if (moonXParamOpos > Math.PI) moonXParamOpos -= Math.PI * 2;
+
+            lunarCtx.fill();
+
+            if (Math.abs(moonXParamOpos) < 0.4 && lunarEclipseFactor > 0) {
+                // Dibujar la silueta recortada de la umbra terrestre pasando por encima
+                let tX = centerX - (moonXParamOpos * 120);
+                let tY = centerY - lunarYOffset;
+                lunarCtx.save();
+                lunarCtx.globalCompositeOperation = 'source-atop';
+                lunarCtx.beginPath();
+                lunarCtx.arc(tX, tY, targetRadius * 1.8, 0, Math.PI * 2); // Sombra terrestre es más grande
+                lunarCtx.fillStyle = "rgba(10, 5, 5, 0.65)";
+                lunarCtx.fill();
+                lunarCtx.restore();
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        updateButtons();
+        animate();
+    </script>
+</body>
+</html>
