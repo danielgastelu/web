@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alinear Semillas - Pensamiento Computacional</title>
+    <!-- Tailwind CSS para la estructura limpia y responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Fredoka para tipografía amigable y altamente legible -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #F9F6F0; /* Arena suave que reduce la fatiga visual */
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Paleta de colores orgánicos y pastel */
+        :root {
+            --color-bg: #F9F6F0;
+            --color-p1: #E08972; /* Terracota pastel */
+            --color-p2: #8DA98F; /* Verde sabio pastel */
+            --color-accent: #E2C290; /* Amarillo trigo suave */
+            --color-wood: #D4B28C; /* Tono madera */
+            --color-slate: #5F6F65; /* Gris verdoso profundo */
+        }
+
+        /* Animaciones físicas tranquilas y predecibles */
+        .token-fall {
+            animation: gentleDrop 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes gentleDrop {
+            0% {
+                transform: translateY(-250px);
+                opacity: 0;
+            }
+            70% {
+                transform: translateY(10px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Pulsación sutil y no invasiva para ayudas adaptativas */
+        .scaffold-pulse {
+            animation: softPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes softPulse {
+            0%, 100% {
+                box-shadow: 0 0 4px 2px rgba(226, 194, 144, 0.4);
+                transform: scale(0.97);
+            }
+            50% {
+                box-shadow: 0 0 12px 6px rgba(226, 194, 144, 0.8);
+                transform: scale(1.03);
+            }
+        }
+
+        /* Estilo de la Consola Docente Oculta */
+        .long-press-progress {
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        /* Desactivar scrollboards visuales molestos */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4EFE6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4B28C;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-2 md:p-6 text-[#5F6F65]">
+
+<script>
+    /* 
+       SINTETIZADOR DE AUDIO WEB (ORAL/MADERA/AGUA)
+       Evitamos clips de audio ruidosos de internet y generamos ondas de frecuencia baja 
+       e instrumentos virtuales de percusión orgánica (madera y gotas de agua).
+    */
+    class OrganicSynth {
+        constructor() {
+            this.ctx = null;
+        }
+
+        init() {
+            if (!this.ctx) {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Sonido de Semilla cayendo (Plop de madera/agua)
+        playDrop() {
+            this.init();
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            
+            osc.type = 'sine';
+            // Frecuencia baja descendente imitando un impacto suave
+            osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.25);
+            
+            gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.28);
+            
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.3);
+        }
+
+        // Sonido de éxito (Arpegio pentatónico relajante)
+        playSuccess() {
+            this.init();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            // Notas pacíficas: Do, Mi, Sol, La (Pentatónica mayor relajante)
+            const freqs = [261.63, 329.63, 392.00, 440.00, 523.25];
+            
+            freqs.forEach((freq, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'triangle'; // Tono muy suave, similar a flauta
+                osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.15, now + idx * 0.12 + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.5);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now + idx * 0.12);
+                osc.stop(now + idx * 0.12 + 0.6);
+            });
+        }
+
+        // Sonido de error sutil o acción inválida (Vibración suave)
+        playInvalid() {
+            this.init();
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(110, this.ctx.currentTime);
+            
+            gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+            
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.25);
+        }
+    }
+
+    const sound = new OrganicSynth();
+</script>
+
+<main class="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-between items-center relative">
+    
+    <!-- ENCABEZADO MINIMALISTA -->
+    <header class="w-full flex flex-col items-center py-2 text-center select-none">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-[#5F6F65] mb-1">
+            🌱 Alinear Semillas
+        </h1>
+        <p class="text-xs md:text-sm text-[#8EA294] font-medium max-w-md">
+            Identifica patrones de color, descompón tus movimientos y anticipa soluciones.
+        </p>
+    </header>
+
+    <!-- ESTADOS Y SELECCIÓN DE MODO -->
+    <div id="mode-selector" class="w-full max-w-md bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[#EBE3D5] my-auto flex flex-col space-y-5 text-center">
+        <h2 class="text-lg font-semibold text-[#5F6F65]">¿Cómo jugamos hoy?</h2>
+        <p class="text-xs text-[#8EA294] leading-relaxed">
+            Especialmente adaptado para jugar en parejas en el mismo dispositivo o explorar con el tutor automático adaptativo.
+        </p>
+        
+        <div class="grid grid-cols-1 gap-3">
+            <!-- Botón 1 Jugador -->
+            <button onclick="startGame(1)" class="group flex flex-col items-center justify-center p-4 bg-[#F4EFE6] hover:bg-[#EBE3D5] border-2 border-dashed border-[#D4B28C] rounded-xl transition duration-300 transform active:scale-95">
+                <span class="text-3xl mb-1">🧭</span>
+                <span class="text-sm font-semibold text-[#5F6F65]">Tutor Adaptativo (1 Jugador)</span>
+                <span class="text-[10px] text-[#8EA294] mt-1">La máquina asiste al nivel del niño de forma dinámica.</span>
+            </button>
+            
+            <!-- Botón 2 Jugadores (En Parejas) -->
+            <button onclick="startGame(2)" class="group flex flex-col items-center justify-center p-4 bg-[#F4EFE6] hover:bg-[#EBE3D5] border-2 border-dashed border-[#8DA98F] rounded-xl transition duration-300 transform active:scale-95">
+                <span class="text-3xl mb-1">🧑‍🤝‍🧑</span>
+                <span class="text-sm font-semibold text-[#5F6F65]">Juntos en el Dispositivo (2 Jugadores)</span>
+                <span class="text-[10px] text-[#8EA294] mt-1">Ideal para resolver retos alternando turnos y dialogando.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ÁREA DE JUEGO (Oculta al inicio) -->
+    <div id="game-container" class="hidden w-full flex-col items-center space-y-4 my-auto">
+        <!-- Indicador de Turno y Proceso Cognitivo Activo -->
+        <div class="w-full max-w-md flex justify-between items-center bg-white/60 px-4 py-2 rounded-xl border border-[#EBE3D5]">
+            <div class="flex items-center space-x-2">
+                <!-- Indicador visual gigante de turno -->
+                <div id="turn-badge-p1" class="w-8 h-8 rounded-full bg-[#E08972] border-4 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold transition-all duration-300">1</div>
+                <div id="turn-badge-p2" class="w-8 h-8 rounded-full bg-[#8DA98F] border-4 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold opacity-30 transition-all duration-300">2</div>
+                <span id="turn-label" class="text-xs font-semibold text-[#5F6F65] ml-1">Turno del Sol</span>
+            </div>
+
+            <!-- Paso Cognitivo para Descomposición -->
+            <div class="text-right">
+                <span id="cognitive-helper" class="text-[10px] px-2 py-1 rounded-full bg-[#EBE3D5] text-[#5F6F65] font-medium inline-block">
+                    Paso 1: Elige columna
+                </span>
+            </div>
+        </div>
+
+        <!-- Alerta suave / Caja de mensaje de estado (En lugar de Alert) -->
+        <div id="toast-message" class="hidden max-w-sm w-full bg-[#E2C290]/20 border border-[#E2C290] text-[#7A6034] text-xs py-2 px-3 rounded-lg text-center font-medium animate-pulse">
+            Mensaje informativo
+        </div>
+
+        <!-- TABLERO PRINCIPAL CON ZONAS DE TOQUE ENORMES -->
+        <div class="relative bg-white/90 p-4 rounded-3xl shadow-sm border-4 border-[#D4B28C] max-w-md w-full">
+            
+            <!-- Canales superiores de selección (Paso de entrada algorítmico) -->
+            <div id="drop-triggers" class="grid grid-cols-7 gap-1 md:gap-2 mb-2">
+                <!-- Botones de inserción generados por JS con alto contraste sutil -->
+            </div>
+
+            <!-- Estructura del Tablero de Semillas -->
+            <div id="board-grid" class="grid grid-cols-7 gap-1 md:gap-2 bg-[#F4EFE6] p-3 rounded-2xl relative overflow-hidden">
+                <!-- Celdas circulares donde caen las semillas -->
+            </div>
+
+            <!-- Indicador dinámico de Nivel de Asistencia (ADD) -->
+            <div id="adapt-scaffolding-info" class="mt-3 text-center text-[10px] text-[#8EA294] italic font-medium">
+                Tutor en línea: Modo estándar listo.
+            </div>
+        </div>
+
+        <!-- BOTONES DE CONTROL DE BAJO IMPACTO VISUAL -->
+        <div class="flex space-x-3">
+            <button onclick="resetGame()" class="px-4 py-2 text-xs font-medium bg-[#EBE3D5] hover:bg-[#D4B28C]/30 text-[#5F6F65] rounded-xl transition-all duration-200">
+                🔄 Reiniciar juego
+            </button>
+            <button onclick="backToMenu()" class="px-4 py-2 text-xs font-medium bg-[#EBE3D5] hover:bg-[#D4B28C]/30 text-[#5F6F65] rounded-xl transition-all duration-200">
+                🔙 Volver al menú
+            </button>
+        </div>
+    </div>
+
+</main>
+
+<!-- CONSOLA DOCENTE CON ACCESO PROTEGIDO POR TIEMPO -->
+<footer class="w-full flex justify-between items-center py-2 px-3 border-t border-[#EBE3D5] mt-4 select-none relative">
+    <div class="text-[10px] text-[#8EA294]">
+        © Pensamiento Computacional - Primera Infancia
+    </div>
+
+    <!-- Botón de Acceso Docente Discreto (Hoja con renglones) -->
+    <div class="relative">
+        <button id="btn-docente-trigger" 
+                class="relative p-2 rounded-full bg-transparent hover:bg-white/40 border border-transparent hover:border-[#EBE3D5] transition duration-200" 
+                title="Consola Docente (Pulsación larga)"
+                onmousedown="startLongPress(event)"
+                onmouseup="cancelLongPress()"
+                onmouseleave="cancelLongPress()"
+                ontouchstart="startLongPress(event)"
+                ontouchend="cancelLongPress()">
+            <!-- SVG Minimalista de Hoja con Renglones -->
+            <svg class="w-6 h-6 text-[#8EA294]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <!-- Anillo de progreso de carga invisible por defecto -->
+            <svg class="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none" viewBox="0 0 36 36">
+                <path class="text-transparent" stroke-width="2" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="progress-circle" class="text-[#8DA98F] long-press-progress" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="2" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+        </button>
+        <span class="absolute right-8 bottom-2 bg-[#5F6F65] text-white text-[9px] px-2 py-0.5 rounded opacity-0 transition-opacity duration-300 pointer-events-none" id="tooltip-long-press">
+            Mantén presionado 3s
+        </span>
+    </div>
+
+    <!-- PANEL / MODAL DE LA CONSOLA DOCENTE -->
+    <div id="docente-panel" class="hidden fixed inset-0 z-50 bg-[#F9F6F0]/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border border-[#D4B28C] max-w-2xl w-full p-6 shadow-xl flex flex-col max-h-[90vh]">
+            <!-- Cabecera de Consola -->
+            <div class="flex justify-between items-center pb-4 border-b border-[#EBE3D5]">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">📋</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-[#5F6F65]">Consola de Seguimiento Pedagógico</h3>
+                        <p class="text-[10px] text-[#8EA294]">Evidencias del Pensamiento Computacional</p>
+                    </div>
+                </div>
+                <button onclick="closeDocentePanel()" class="text-[#8EA294] hover:text-[#5F6F65] p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Cuerpo del Panel (Scrollable) -->
+            <div class="flex-grow overflow-y-auto py-4 space-y-4 text-xs">
+                <!-- Tarjeta de Diagnóstico Rápido -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="bg-[#F4EFE6] p-3 rounded-xl border border-[#EBE3D5]">
+                        <span class="text-slate-400 block text-[9px] uppercase tracking-wider">Modo de Juego</span>
+                        <span id="stat-mode" class="text-xs font-bold text-[#5F6F65]">-</span>
+                    </div>
+                    <div class="bg-[#F4EFE6] p-3 rounded-xl border border-[#EBE3D5]">
+                        <span class="text-slate-400 block text-[9px] uppercase tracking-wider">Nivel Adaptativo (IA)</span>
+                        <span id="stat-difficulty" class="text-xs font-bold text-[#5F6F65]">-</span>
+                    </div>
+                    <div class="bg-[#F4EFE6] p-3 rounded-xl border border-[#EBE3D5]">
+                        <span class="text-slate-400 block text-[9px] uppercase tracking-wider">Movimientos</span>
+                        <span id="stat-moves" class="text-xs font-bold text-[#5F6F65]">0</span>
+                    </div>
+                    <div class="bg-[#F4EFE6] p-3 rounded-xl border border-[#EBE3D5]">
+                        <span class="text-slate-400 block text-[9px] uppercase tracking-wider">Rendimiento Estimado</span>
+                        <span id="stat-performance" class="text-xs font-bold text-[#5F6F65]">Equilibrado</span>
+                    </div>
+                </div>
+
+                <!-- Bloque de Mapeo de Procesos Cognitivos -->
+                <div class="bg-[#F4EFE6]/50 p-4 rounded-xl border border-[#EBE3D5] space-y-2">
+                    <h4 class="font-bold text-[#5F6F65] text-xs">Mapeo de Pensamiento Computacional (PC)</h4>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span>Reconocimiento de Patrones (Alineación coordinada)</span>
+                                <span id="pc-patterns-val">Bajo</span>
+                            </div>
+                            <div class="w-full bg-white rounded-full h-1.5">
+                                <div id="pc-patterns-bar" class="bg-[#8DA98F] h-1.5 rounded-full" style="width: 30%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span>Descomposición de Problemas (Uso consciente de columnas)</span>
+                                <span id="pc-decomposition-val">Medio</span>
+                            </div>
+                            <div class="w-full bg-white rounded-full h-1.5">
+                                <div id="pc-decomposition-bar" class="bg-[#E08972] h-1.5 rounded-full" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span>Abstracción de Variables (Bloqueo de amenazas del oponente)</span>
+                                <span id="pc-abstraction-val">Inicial</span>
+                            </div>
+                            <div class="w-full bg-white rounded-full h-1.5">
+                                <div id="pc-abstraction-bar" class="bg-[#E2C290] h-1.5 rounded-full" style="width: 20%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registro detallado de Eventos de la Sesión -->
+                <div class="space-y-1">
+                    <span class="font-bold text-[#5F6F65] block">Historial Cronológico de Acciones:</span>
+                    <div id="session-log" class="bg-[#F4EFE6] p-3 rounded-xl border border-[#EBE3D5] font-mono text-[9px] max-h-24 overflow-y-auto text-stone-600">
+                        <!-- Logs dinámicos -->
+                    </div>
+                </div>
+
+                <!-- Cuadro de Notas Rápidas para el Docente -->
+                <div class="space-y-1">
+                    <label for="teacher-notes" class="font-bold text-[#5F6F65] block">Anotaciones de la Observación Directa:</label>
+                    <textarea id="teacher-notes" rows="3" class="w-full p-2.5 rounded-xl border border-[#D4B28C] bg-[#F9F6F0] text-xs focus:ring-1 focus:ring-[#8DA98F] outline-none text-[#5F6F65]" placeholder="Escribe aquí observaciones rápidas. Ej: 'Pedro y Sofía jugaron colaborativamente, discutiendo el paso a paso...'"></textarea>
+                </div>
+            </div>
+
+            <!-- Botones de Acción de Consola -->
+            <div class="pt-4 border-t border-[#EBE3D5] flex justify-between gap-2">
+                <button onclick="clearTelemetry()" class="px-4 py-2 text-[10px] font-semibold bg-[#EBE3D5] hover:bg-stone-300 text-stone-700 rounded-xl transition duration-200">
+                    Limpiar Datos
+                </button>
+                <button onclick="exportTeacherReport()" class="px-5 py-2.5 text-xs font-semibold bg-[#8DA98F] text-white rounded-xl shadow hover:bg-emerald-800 transition duration-200 flex items-center space-x-1">
+                    <span>💾</span>
+                    <span>Descargar Reporte (.TXT)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    /* LÓGICA CORE DE JUEGO Y MOTOR ADAPTATIVO */
+    const ROWS = 6;
+    const COLS = 7;
+    let board = [];
+    let currentPlayer = 1; // 1 = Sol (Terracota), 2 = Semilla Verde (Verde)
+    let gameActive = false;
+    let playMode = 1; // 1: IA Adaptativa, 2: Parejas humano-humano
+
+    // TELEMETRÍA DOCENTE Y VARIABLES DE SEGUIMIENTO
+    let sessionData = {
+        mode: '1 Jugador (Tutor Adaptativo)',
+        startTime: null,
+        movesCount: 0,
+        turnTimes: [],
+        currentTurnStartTime: null,
+        aiWins: 0,
+        playerWins: 0,
+        adaptiveLevel: 2, // Inicia en nivel 2 (intermedio)
+        events: [],
+        consecutiveErrors: 0,
+        winsStreak: 0
+    };
+
+    // Inicializar el tablero en blanco
+    function initBoard() {
+        board = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+    }
+
+    // Iniciar Juego en un Modo específico
+    function startGame(mode) {
+        playMode = mode;
+        sessionData.mode = mode === 1 ? '1 Jugador (Tutor Adaptativo)' : '2 Jugadores (En Pareja)';
+        sessionData.startTime = new Date();
+        sessionData.movesCount = 0;
+        sessionData.events = [];
+        sessionData.consecutiveErrors = 0;
+        sessionData.winsStreak = 0;
+        sessionData.adaptiveLevel = 2; // Reiniciar adaptabilidad
+
+        document.getElementById('mode-selector').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+        document.getElementById('game-container').classList.add('flex');
+
+        initBoard();
+        buildTriggerButtons();
+        drawBoard();
+        updateTurnIndicators();
+        logEvent('Sesión Iniciada. Modo seleccionado: ' + sessionData.mode);
+        gameActive = true;
+        sessionData.currentTurnStartTime = Date.now();
+        
+        applyAdaptabilityEffects();
+    }
+
+    // Volver al Menú Principal
+    function backToMenu() {
+        document.getElementById('game-container').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('flex');
+        document.getElementById('mode-selector').classList.remove('hidden');
+        gameActive = false;
+    }
+
+    // Reiniciar Juego conservando estadísticas
+    function resetGame() {
+        initBoard();
+        currentPlayer = 1;
+        gameActive = true;
+        drawBoard();
+        updateTurnIndicators();
+        sessionData.currentTurnStartTime = Date.now();
+        logEvent('Juego Reiniciado.');
+        hideToast();
+        applyAdaptabilityEffects();
+    }
+
+    // Construir los disparadores gigantes de inserción
+    function buildTriggerButtons() {
+        const triggerContainer = document.getElementById('drop-triggers');
+        triggerContainer.innerHTML = '';
+        for (let c = 0; c < COLS; c++) {
+            const btn = document.createElement('button');
+            // Elementos sin textos, basados puramente en formas y accesos táctiles gigantes
+            btn.className = 'h-10 md:h-12 w-full rounded-xl bg-[#F4EFE6] hover:bg-[#E2C290]/50 border-2 border-dashed border-[#D4B28C] flex items-center justify-center transition-all duration-200 outline-none active:bg-[#E2C290]';
+            btn.innerHTML = `<span class="text-lg md:text-xl text-[#5F6F65] opacity-60">👇</span>`;
+            btn.onclick = () => makeMove(c);
+            triggerContainer.appendChild(btn);
+        }
+    }
+
+    // Dibujar Celdas del Tablero
+    function drawBoard() {
+        const boardGrid = document.getElementById('board-grid');
+        boardGrid.innerHTML = '';
+        
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const cellValue = board[r][c];
+                const cell = document.createElement('div');
+                cell.className = 'aspect-square rounded-full flex items-center justify-center bg-[#F9F6F0] border-2 border-[#D4B28C] shadow-inner relative';
+                
+                if (cellValue !== 0) {
+                    const token = document.createElement('div');
+                    // Tokens interactivos con textura plana pero amigable
+                    token.className = `w-[80%] h-[80%] rounded-full token-fall flex items-center justify-center ${
+                        cellValue === 1 ? 'bg-[#E08972] border-4 border-[#F5C2B4]' : 'bg-[#8DA98F] border-4 border-[#C9D9CC]'
+                    }`;
+                    
+                    // Ícono representativo minimalista para cada ficha para facilitar reconocimiento de patrones (sin depender únicamente de colores - inclusivo daltonismo)
+                    const symbol = document.createElement('span');
+                    symbol.className = 'text-white font-bold text-xs md:text-sm select-none';
+                    symbol.innerText = cellValue === 1 ? '☀️' : '🌿';
+                    token.appendChild(symbol);
+                    
+                    cell.appendChild(token);
+                }
+
+                boardGrid.appendChild(cell);
+            }
+        }
+    }
+
+    // Ejecutar Movimiento
+    function makeMove(col) {
+        if (!gameActive) return;
+
+        // Comprobar la primera fila libre desde abajo (Gravedad natural)
+        let rowToPlace = -1;
+        for (let r = ROWS - 1; r >= 0; r--) {
+            if (board[r][col] === 0) {
+                rowToPlace = r;
+                break;
+            }
+        }
+
+        // Columna llena
+        if (rowToPlace === -1) {
+            sound.playInvalid();
+            showToast("⚠️ Esa columna está llena. Busca otra opción.");
+            return;
+        }
+
+        // Registrar tiempo empleado para evaluar adaptabilidad
+        const turnEndTime = Date.now();
+        const durationSec = ((turnEndTime - sessionData.currentTurnStartTime) / 1000).toFixed(1);
+        sessionData.turnTimes.push(parseFloat(durationSec));
+
+        // Colocar semilla
+        board[rowToPlace][col] = currentPlayer;
+        sound.playDrop();
+        sessionData.movesCount++;
+        hideToast();
+
+        // Registrar Evento
+        logEvent(`Jugador ${currentPlayer} colocó semilla en fila ${rowToPlace}, col ${col}. Duración: ${durationSec}s`);
+
+        drawBoard();
+
+        // Validar si el movimiento actual causó victoria
+        if (checkWin(rowToPlace, col)) {
+            endGame(currentPlayer);
+            return;
+        }
+
+        // Validar si el tablero está lleno (Empate)
+        if (checkDraw()) {
+            endGame(0);
+            return;
+        }
+
+        // Turno siguiente
+        if (playMode === 2) {
+            // Humano contra humano
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            updateTurnIndicators();
+            sessionData.currentTurnStartTime = Date.now();
+        } else {
+            // Humano contra IA
+            currentPlayer = 2; // Máquina
+            updateTurnIndicators();
+            gameActive = false; // Bloquear toques mientras calcula la IA
+            
+            // Retraso suave no violento imitando pensamiento orgánico
+            setTimeout(() => {
+                makeAIMove();
+            }, 800 + Math.random() * 500);
+        }
+    }
+
+    // Finalizar juego (Alguien gana o empata)
+    function endGame(winner) {
+        gameActive = false;
+        if (winner === 0) {
+            sound.playInvalid();
+            showToast("🌱 Fin del espacio. ¡Ambos compartieron excelentes jugadas!");
+            logEvent("Juego terminado en empate.");
+        } else {
+            sound.playSuccess();
+            const symbol = winner === 1 ? '☀️' : '🌿';
+            showToast(`🎉 ¡Felicitaciones! Se ha formado un camino continuo de ${symbol}`);
+            
+            if (playMode === 1) {
+                if (winner === 1) {
+                    sessionData.playerWins++;
+                    sessionData.winsStreak++;
+                    sessionData.consecutiveErrors = 0;
+                } else {
+                    sessionData.aiWins++;
+                    sessionData.winsStreak = 0;
+                    sessionData.consecutiveErrors++;
+                }
+            }
+            logEvent(`Juego Ganado por Jugador ${winner} (${winner === 1 ? 'Sol' : 'Brote'})`);
+        }
+        
+        // Ajustar dificultad según el resultado del ciclo de juego actual
+        evaluateAdaptability();
+    }
+
+    // Verificar si se ha alineado una línea de 4
+    function checkWin(row, col) {
+        const val = board[row][col];
+        const directions = [
+            { dr: 0, dc: 1 },  // Horizontal
+            { dr: 1, dc: 0 },  // Vertical
+            { dr: 1, dc: 1 },  // Diagonal principal
+            { dr: 1, dc: -1 }  // Diagonal secundaria
+        ];
+
+        for (const { dr, dc } of directions) {
+            let count = 1;
+
+            // Avanzar en la dirección positiva
+            let r = row + dr;
+            let c = col + dc;
+            while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === val) {
+                count++;
+                r += dr;
+                c += dc;
+            }
+
+            // Avanzar en la dirección negativa
+            r = row - dr;
+            c = col - dc;
+            while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === val) {
+                count++;
+                r -= dr;
+                c -= dc;
+            }
+
+            if (count >= 4) return true;
+        }
+        return false;
+    }
+
+    // Verificar si el tablero está lleno
+    function checkDraw() {
+        return board[0].every(cell => cell !== 0);
+    }
+
+    /* MOTOR INTELIGENTE CON ALGORITMO ADAPTATIVO (ADD)
+       Ajusta el nivel de la heurística y ofrece visuales asistenciales a la infancia 
+       según su rendimiento técnico.
+    */
+    function makeAIMove() {
+        if (!gameActive && currentPlayer !== 2) return;
+
+        let selectedCol = -1;
+
+        // Decisión Algorítmica con Inteligencia Variable
+        if (sessionData.adaptiveLevel === 1) {
+            // Nivel 1 (Tutor Facilitador): Movimiento puramente aleatorio o no bloqueante
+            selectedCol = getRandomValidColumn();
+        } else if (sessionData.adaptiveLevel === 2) {
+            // Nivel 2 (Intermedio Equilibrado): Bloquea si hay victoria inminente del niño, de lo contrario aleatorio
+            selectedCol = getStrategicColumn(1); // Bloquea Sol si tiene 3 alineadas
+            if (selectedCol === -1) selectedCol = getRandomValidColumn();
+        } else {
+            // Nivel 3 (Reto Avanzado): Intenta ganar, bloquea agresivamente o busca maximizar líneas
+            selectedCol = getStrategicColumn(2); // Intenta ganar la máquina primero
+            if (selectedCol === -1) selectedCol = getStrategicColumn(1); // Bloquea al Sol
+            if (selectedCol === -1) selectedCol = getBestPositionalColumn(); // Busca mejor posición
+            if (selectedCol === -1) selectedCol = getRandomValidColumn();
+        }
+
+        // Colocar la semilla de la máquina
+        let rowToPlace = -1;
+        for (let r = ROWS - 1; r >= 0; r--) {
+            if (board[r][selectedCol] === 0) {
+                rowToPlace = r;
+                break;
+            }
+        }
+
+        if (rowToPlace !== -1) {
+            board[rowToPlace][selectedCol] = 2;
+            sound.playDrop();
+            logEvent(`Máquina (Nivel ADD ${sessionData.adaptiveLevel}) colocó en col ${selectedCol}`);
+            drawBoard();
+
+            if (checkWin(rowToPlace, selectedCol)) {
+                endGame(2);
+                return;
+            }
+
+            if (checkDraw()) {
+                endGame(0);
+                return;
+            }
+        }
+
+        currentPlayer = 1;
+        gameActive = true;
+        updateTurnIndicators();
+        sessionData.currentTurnStartTime = Date.now();
+    }
+
+    // Ayudante de Movimiento de IA: Obtener columna para forzar victoria o bloquear
+    function getStrategicColumn(targetPlayer) {
+        for (let c = 0; c < COLS; c++) {
+            let row = -1;
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][c] === 0) {
+                    row = r;
+                    break;
+                }
+            }
+            if (row !== -1) {
+                // Simular jugada
+                board[row][c] = targetPlayer;
+                const isWinning = checkWin(row, c);
+                // Revertir jugada
+                board[row][c] = 0;
+                if (isWinning) {
+                    return c;
+                }
+            }
+        }
+        return -1;
+    }
+
+    // Buscar una columna en el centro para mayor potencial de juego
+    function getBestPositionalColumn() {
+        const order = [3, 2, 4, 1, 5, 0, 6]; // Orden preferencial central
+        for (const col of order) {
+            if (board[0][col] === 0) return col;
+        }
+        return -1;
+    }
+
+    function getRandomValidColumn() {
+        const validCols = [];
+        for (let c = 0; c < COLS; c++) {
+            if (board[0][c] === 0) validCols.push(c);
+        }
+        if (validCols.length === 0) return -1;
+        return validCols[Math.floor(Math.random() * validCols.length)];
+    }
+
+    /* AJUSTE TRANSFRENTE DE DIFICULTAD (ADD)
+       Mantiene la jugabilidad interactiva adaptándose para evitar la frustración.
+    */
+    function evaluateAdaptability() {
+        // Reducir nivel de exigencia si hay 2 pérdidas consecutivas
+        if (sessionData.consecutiveErrors >= 2 && sessionData.adaptiveLevel > 1) {
+            sessionData.adaptiveLevel--;
+            logEvent(`DIFICULTAD ADAPTADA: Reducida a Nivel ${sessionData.adaptiveLevel} debido a errores consecutivos.`);
+        } 
+        // Aumentar nivel de exigencia si el niño encadena 2 victorias o completa rápido sus movimientos
+        else if (sessionData.winsStreak >= 2 && sessionData.adaptiveLevel < 3) {
+            sessionData.adaptiveLevel++;
+            logEvent(`DIFICULTAD ADAPTADA: Aumentada a Nivel ${sessionData.adaptiveLevel} debido a racha ganadora.`);
+        }
+
+        applyAdaptabilityEffects();
+    }
+
+    // Aplicar scaffolding físico visual como soporte de ayuda dinámica
+    function applyAdaptabilityEffects() {
+        const scaffoldInfo = document.getElementById('adapt-scaffolding-info');
+        const triggers = document.getElementById('drop-triggers').children;
+
+        // Resetear parpadeo y alertas
+        for (let i = 0; i < triggers.length; i++) {
+            triggers[i].classList.remove('scaffold-pulse');
+            triggers[i].style.borderColor = "#D4B28C";
+        }
+
+        if (playMode === 1 && sessionData.adaptiveLevel === 1) {
+            // Añadir ayudas de relieve sutil para orientar sobre la mejor opción
+            scaffoldInfo.innerText = "Tutor en línea: Asistencia cognitiva activa. El juego resalta sugerencias.";
+            
+            // Buscar si hay bloqueo inminente necesario e iluminar esa columna
+            const blockCol = getStrategicColumn(1);
+            if (blockCol !== -1 && triggers[blockCol]) {
+                triggers[blockCol].classList.add('scaffold-pulse');
+                triggers[blockCol].style.borderColor = "#E2C290";
+            }
+        } else {
+            scaffoldInfo.innerText = `Tutor en línea: Nivel ${sessionData.adaptiveLevel === 2 ? 'Equilibrado' : 'Avanzado'} activo.`;
+        }
+
+        updateTelemetryDisplay();
+    }
+
+    // Actualizar visualización del turno
+    function updateTurnIndicators() {
+        const p1Badge = document.getElementById('turn-badge-p1');
+        const p2Badge = document.getElementById('turn-badge-p2');
+        const turnLabel = document.getElementById('turn-label');
+        const cognitiveHelper = document.getElementById('cognitive-helper');
+
+        if (currentPlayer === 1) {
+            p1Badge.classList.remove('opacity-30');
+            p2Badge.classList.add('opacity-30');
+            turnLabel.innerText = "Turno del Sol";
+            cognitiveHelper.innerText = "Paso 1: Pon tu semilla";
+        } else {
+            p1Badge.classList.add('opacity-30');
+            p2Badge.classList.remove('opacity-30');
+            turnLabel.innerText = playMode === 1 ? "Turno de la Máquina" : "Turno de la Planta";
+            cognitiveHelper.innerText = "Paso 2: Espera o Colabora";
+        }
+    }
+
+    // Mostrar Toasts no obstructivos (Sin alertas molestas)
+    function showToast(msg) {
+        const toast = document.getElementById('toast-message');
+        toast.innerText = msg;
+        toast.classList.remove('hidden');
+    }
+
+    function hideToast() {
+        const toast = document.getElementById('toast-message');
+        toast.classList.add('hidden');
+    }
+
+    // Logs internos de diagnóstico para el archivo de evidencias
+    function logEvent(msg) {
+        const timestamp = new Date().toLocaleTimeString();
+        sessionData.events.push(`[${timestamp}] ${msg}`);
+        updateTelemetryDisplay();
+    }
+
+    /* CONTROL DE ACCESO SEGURO (LONG PRESS) PARA CONSOLA DOCENTE */
+    let longPressTimer = null;
+    let pressStartTime = 0;
+    const requiredDuration = 3000; // 3 segundos reales
+
+    function startLongPress(e) {
+        e.preventDefault();
+        sound.init(); // Inicializar el audio para asegurar compatibilidad posterior
+
+        const tooltip = document.getElementById('tooltip-long-press');
+        tooltip.classList.remove('opacity-0');
+        tooltip.classList.add('opacity-100');
+
+        pressStartTime = Date.now();
+        const circle = document.getElementById('progress-circle');
+        circle.style.strokeDashoffset = "0";
+
+        longPressTimer = setTimeout(() => {
+            circle.style.strokeDashoffset = "100";
+            tooltip.classList.add('opacity-0');
+            tooltip.classList.remove('opacity-100');
+            openDocentePanel();
+        }, requiredDuration);
+    }
+
+    function cancelLongPress() {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+        const circle = document.getElementById('progress-circle');
+        circle.style.strokeDashoffset = "100";
+        
+        const tooltip = document.getElementById('tooltip-long-press');
+        tooltip.classList.add('opacity-0');
+        tooltip.classList.remove('opacity-100');
+    }
+
+    // Abrir la consola docente
+    function openDocentePanel() {
+        document.getElementById('docente-panel').classList.remove('hidden');
+        updateTelemetryDisplay();
+    }
+
+    // Cerrar consola docente
+    function closeDocentePanel() {
+        document.getElementById('docente-panel').classList.add('hidden');
+    }
+
+    // Actualizar datos dentro de la consola docente
+    function updateTelemetryDisplay() {
+        document.getElementById('stat-mode').innerText = sessionData.mode;
+        document.getElementById('stat-difficulty').innerText = playMode === 1 ? `Nivel ${sessionData.adaptiveLevel}` : "No Aplicable";
+        document.getElementById('stat-moves').innerText = sessionData.movesCount;
+        
+        // Evaluar Rendimiento Estimado
+        let speedLabel = "Estable";
+        if (sessionData.turnTimes.length > 0) {
+            const avgTime = sessionData.turnTimes.reduce((a, b) => a + b, 0) / sessionData.turnTimes.length;
+            speedLabel = avgTime < 4.0 ? "Rápido (Alta Respuesta)" : "Pausado (Analítico / TDAH)";
+        }
+        document.getElementById('stat-performance').innerText = speedLabel;
+
+        // Mapeo Dinámico de Habilidades de Pensamiento Computacional
+        const patternsRatio = Math.min(100, Math.max(10, (sessionData.playerWins * 40) + (sessionData.movesCount * 2)));
+        const decompRatio = Math.min(100, Math.max(20, (sessionData.movesCount * 5)));
+        const abstractRatio = Math.max(10, Math.min(100, (sessionData.adaptiveLevel * 30)));
+
+        document.getElementById('pc-patterns-val').innerText = patternsRatio > 70 ? 'Avanzado' : patternsRatio > 40 ? 'Medio' : 'Inicial';
+        document.getElementById('pc-patterns-bar').style.width = `${patternsRatio}%`;
+
+        document.getElementById('pc-decomposition-val').innerText = decompRatio > 70 ? 'Avanzado' : decompRatio > 40 ? 'Medio' : 'Inicial';
+        document.getElementById('pc-decomposition-bar').style.width = `${decompRatio}%`;
+
+        document.getElementById('pc-abstraction-val').innerText = abstractRatio > 70 ? 'Avanzado' : abstractRatio > 40 ? 'Medio' : 'Inicial';
+        document.getElementById('pc-abstraction-bar').style.width = `${abstractRatio}%`;
+
+        // Renderizar logs
+        const logContainer = document.getElementById('session-log');
+        logContainer.innerHTML = sessionData.events.length > 0 
+            ? sessionData.events.map(ev => `<div>${ev}</div>`).join('')
+            : 'Esperando interacciones del estudiante para estructurar la bitácora...';
+        
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function clearTelemetry() {
+        sessionData.events = [];
+        sessionData.movesCount = 0;
+        sessionData.turnTimes = [];
+        sessionData.playerWins = 0;
+        sessionData.aiWins = 0;
+        sessionData.winsStreak = 0;
+        sessionData.consecutiveErrors = 0;
+        updateTelemetryDisplay();
+        logEvent("Telemetría reiniciada por el docente.");
+    }
+
+    /* GENERADOR DE EXPORTACIÓN DIRECTA DE ARCHIVOS TXT DE EVIDENCIAS */
+    function exportTeacherReport() {
+        const docNotes = document.getElementById('teacher-notes').value || "Sin comentarios adicionales por parte del docente.";
+        const dateStr = new Date().toLocaleString();
+        
+        // Estructura formal del documento de evidencia pedagógica
+        let reportText = `========================================================================\n`;
+        reportText += `       INFORME DE EVALUACIÓN PEDAGÓGICA Y PENSAMIENTO COMPUTACIONAL      \n`;
+        reportText += `========================================================================\n\n`;
+        reportText += `Fecha del Registro: ${dateStr}\n`;
+        reportText += `Modo de Juego: ${sessionData.mode}\n`;
+        reportText += `Hitos logrados por estudiantes: \n`;
+        reportText += ` - Total de movimientos realizados: ${sessionData.movesCount}\n`;
+        reportText += ` - Victorias acumuladas (Niños): ${sessionData.playerWins}\n`;
+        reportText += ` - Victorias acumuladas (Tutor AI): ${sessionData.aiWins}\n`;
+        reportText += ` - Nivel adaptativo final alcanzado: ${sessionData.adaptiveLevel}\n\n`;
+        
+        reportText += `------------------------------------------------------------------------\n`;
+        reportText += `INDICADORES DE PENSAMIENTO COMPUTACIONAL (PC)\n`;
+        reportText += `------------------------------------------------------------------------\n`;
+        reportText += `Descomposición de Problemas (Focalización paso a paso): \n`;
+        reportText += ` - Los estudiantes logran fragmentar el juego utilizando las columnas independientes.\n`;
+        reportText += `Reconocimiento de Patrones (Alineación y secuencias): \n`;
+        reportText += ` - Coordinación en la alineación horizontal, vertical o diagonal del color correspondiente.\n`;
+        reportText += `Abstracción / Adaptabilidad: \n`;
+        reportText += ` - Respuestas dadas bajo el ajuste dinámico ante el grado de desafío.\n\n`;
+
+        reportText += `------------------------------------------------------------------------\n`;
+        reportText += `OBSERVACIONES DEL DOCENTE (EVIDENCIA DE AULA):\n`;
+        reportText += `------------------------------------------------------------------------\n`;
+        reportText += `${docNotes}\n\n`;
+
+        reportText += `------------------------------------------------------------------------\n`;
+        reportText += `REGISTRO DE TELEMETRÍA TÉCNICA DETALLADA:\n`;
+        reportText += `------------------------------------------------------------------------\n`;
+        sessionData.events.forEach(ev => {
+            reportText += `${ev}\n`;
+        });
+        
+        reportText += `\n========================================================================\n`;
+        reportText += `Generado automáticamente por el Sistema de Evidencias de Alinear Semillas\n`;
+
+        // Generar la descarga compatible del archivo en formato de texto plano
+        const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Reporte_Pensamiento_Computacional_${new Date().toISOString().slice(0,10)}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        logEvent("Reporte exportado exitosamente como archivo .TXT");
+    }
+</script>
+
+</body>
+</html>
