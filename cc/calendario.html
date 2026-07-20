@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Diario - Asamblea Montessori</title>
+    <style>
+        :root {
+            --bg-canvas: #f4f1ea; /* Fondo neutro, baja estimulación visual */
+            --text-main: #333333;
+            --panel-control: #e6e2d8;
+            --accent: #4a7c59;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Panel de Control de la Maestra (Izquierda) --- */
+        #panel-maestra {
+            width: 320px;
+            background-color: var(--panel-control);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        #panel-maestra h2 {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+        }
+
+        .grupo-control {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        select, input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #b5b0a4;
+            font-size: 1rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        /* --- Área de Visualización Macro para Niños (Derecha) --- */
+        #pantalla-alumnos {
+            flex-grow: 1;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            padding: 40px;
+            box-sizing: border-box;
+            gap: 20px;
+        }
+
+        /* Bloque Fecha */
+        #macro-fecha {
+            text-align: center;
+            font-size: 4rem; /* Tamaño macro */
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bloque Contenido Inferior (Clima y Osito) */
+        #contenido-dinamico {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        /* Iconografía del Clima */
+        #macro-clima {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            background: white;
+            height: 80%;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .icono-clima {
+            font-size: 8rem; /* Escala macro para legibilidad visual */
+            transition: transform 0.3s ease;
+        }
+
+        /* Personaje y Vestuario */
+        #contenedor-osito {
+            position: relative;
+            background: white;
+            height: 80%;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Base del oso en SVG para control directo de capas */
+        .capa-personaje {
+            position: absolute;
+            width: auto;
+            height: 75%;
+            bottom: 12.5%;
+            transition: opacity 0.2s ease;
+        }
+
+        .oculto {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="panel-maestra">
+        <h2>Configuración Diaria</h2>
+        
+        <div class="grupo-control">
+            <label for="sel-dia-sem">Día de la semana:</label>
+            <select id="sel-dia-sem">
+                <option value="LUNES">Lunes</option>
+                <option value="MARTES">Martes</option>
+                <option value="MIÉRCOLES">Miércoles</option>
+                <option value="JUEVES">Jueves</option>
+                <option value="VIERNES">Viernes</option>
+                <option value="SÁBADO">Sábado</option>
+                <option value="DOMINGO">Domingo</option>
+            </select>
+        </div>
+
+        <div class="grupo-control">
+            <label for="num-dia">Número de día:</label>
+            <input type="number" id="num-dia" min="1" max="31" value="13">
+        </div>
+
+        <div class="grupo-control">
+            <label for="sel-mes">Mes:</label>
+            <select id="sel-mes">
+                <option value="ENERO">Enero</option>
+                <option value="FEBRERO">Febrero</option>
+                <option value="MARZO">Marzo</option>
+                <option value="ABRIL">Abril</option>
+                <option value="MAYO">Mayo</option>
+                <option value="JUNIO">Junio</option>
+                <option value="JULIO" selected>Julio</option>
+                <option value="AGOSTO">Agosto</option>
+                <option value="SEPTIEMBRE">Septiembre</option>
+                <option value="OCTUBRE">Octubre</option>
+                <option value="NOVIEMBRE">Noviembre</option>
+                <option value="DICIEMBRE">Diciembre</option>
+            </select>
+        </div>
+
+        <div class="grupo-control">
+            <label for="num-anio">Año:</label>
+            <input type="number" id="num-anio" value="2026">
+        </div>
+
+        <h2>Estado del Clima</h2>
+        <div class="checkbox-group">
+            <label><input type="checkbox" class="chk-clima" value="☀️" data-nombre="soleado"> Soleado</label>
+            <label><input type="checkbox" class="chk-clima" value="☁️" data-nombre="nublado"> Nublado</label>
+            <label><input type="checkbox" class="chk-clima" value="🌧️" data-nombre="lluvioso"> Lluvioso</label>
+            <label><input type="checkbox" class="chk-clima" value="💨" data-nombre="ventoso"> Ventoso</label>
+            <label><input type="checkbox" class="chk-clima" value="❄️" data-nombre="frio"> Frío</label>
+        </div>
+
+        <h2>Vestuario del Oso</h2>
+        <div class="grupo-control">
+            <label for="sel-ropa">Prenda superior:</label>
+            <select id="sel-ropa">
+                <option value="ninguno">Ninguno</option>
+                <option value="remera">Remera de verano</option>
+                <option value="buzo">Buzo de abrigo</option>
+                <option value="impermeable">Chubasquero de lluvia</option>
+            </select>
+        </div>
+        <div class="grupo-control">
+            <label for="sel-accesorio">Accesorio:</label>
+            <select id="sel-accesorio">
+                <option value="ninguno">Ninguno</option>
+                <option value="gorro">Gorro de lana</option>
+                <option value="gorra">Gorra de sol</option>
+                <option value="paraguas">Paraguas</option>
+            </select>
+        </div>
+    </nav>
+
+    <main id="pantalla-alumnos">
+        
+        <header id="macro-fecha">
+            LUNES 13 DE JULIO DE 2026
+        </header>
+
+        <section id="contenido-dinamico">
+            <article id="macro-clima">
+                </article>
+
+            <article id="contenedor-osito">
+                <svg class="capa-personaje" id="base-oso" viewBox="0 0 100 100">
+                    <circle cx="30" cy="30" r="12" fill="#8B5A2B" />
+                    <circle cx="30" cy="30" r="6" fill="#CD853F" />
+                    <circle cx="70" cy="30" r="12" fill="#8B5A2B" />
+                    <circle cx="70" cy="30" r="6" fill="#CD853F" />
+                    <ellipse cx="50" cy="75" rx="22" ry="20" fill="#8B5A2B" />
+                    <ellipse cx="50" cy="75" rx="14" ry="12" fill="#CD853F" />
+                    <circle cx="50" cy="45" r="20" fill="#8B5A2B" />
+                    <ellipse cx="50" cy="50" rx="7" ry="5" fill="#CD853F" />
+                    <polygon points="48,48 52,48 50,51" fill="#333" />
+                    <circle cx="43" cy="40" r="2.5" fill="#333" />
+                    <circle cx="57" cy="40" r="2.5" fill="#333" />
+                </svg>
+
+                <svg class="capa-personaje oculto" id="prenda-remera" viewBox="0 0 100 100">
+                    <path d="M 28,70 L 33,60 L 40,62 L 50,58 L 60,62 L 67,60 L 72,70 L 65,75 L 65,90 L 35,90 L 35,75 Z" fill="#FF6B6B" />
+                </svg>
+
+                <svg class="capa-personaje oculto" id="prenda-buzo" viewBox="0 0 100 100">
+                    <path d="M 28,70 L 33,58 L 50,55 L 67,58 L 72,70 L 63,73 L 63,94 L 37,94 L 37,73 Z" fill="#4D96FF" />
+                    <ellipse cx="50" cy="56" rx="10" ry="3" fill="#3778D6" />
+                </svg>
+
+                <svg class="capa-personaje oculto" id="prenda-impermeable" viewBox="0 0 100 100">
+                    <path d="M 28,70 L 33,58 L 50,55 L 67,58 L 72,70 L 63,73 L 63,94 L 37,94 L 37,73 Z" fill="#FFD93D" />
+                    <path d="M 35,56 Q 50,48 65,56" stroke="#CCA400" stroke-width="2" fill="none" />
+                </svg>
+
+                <svg class="capa-personaje oculto" id="acc-gorro" viewBox="0 0 100 100">
+                    <path d="M 32,32 Q 50,15 68,32 Z" fill="#6BCB77" />
+                    <rect x="30" y="29" width="40" height="5" rx="2" fill="#4EA658" />
+                    <circle cx="50" cy="18" r="4" fill="#FFF" />
+                </svg>
+
+                <svg class="capa-personaje oculto" id="acc-gorra" viewBox="0 0 100 100">
+                    <path d="M 32,32 Q 50,20 68,32 Z" fill="#FF9F43" />
+                    <path d="M 32,32 Q 50,30 75,26 L 68,34 Z" fill="#E67E22" />
+                </svg>
+
+                <svg class="capa-personaje oculto" id="acc-paraguas" viewBox="0 0 100 100">
+                    <path d="M 25,90 L 25,45 Q 25,40 20,40" stroke="#777" stroke-width="2" fill="none" />
+                    <path d="M 10,45 Q 25,20 40,45 Q 32,42 25,45 Q 18,42 10,45" fill="#9B59B6" />
+                </svg>
+
+            </article>
+        </section>
+    </main>
+
+    <script>
+        // 1. Elementos de la interfaz
+        const selDiaSem = document.getElementById('sel-dia-sem');
+        const numDia = document.getElementById('num-dia');
+        const selMes = document.getElementById('sel-mes');
+        const numAnio = document.getElementById('num-anio');
+        const macroFecha = document.getElementById('macro-fecha');
+        
+        const checksClima = document.querySelectorAll('.chk-clima');
+        const macroClima = document.getElementById('macro-clima');
+
+        const selRopa = document.getElementById('sel-ropa');
+        const selAccesorio = document.getElementById('sel-accesorio');
+
+        // 2. Actualización de la Fecha Texto Macro
+        function actualizarFecha() {
+            const texto = `${selDiaSem.value} ${numDia.value} DE ${selMes.value} DE ${numAnio.value}`;
+            macroFecha.innerText = texto;
+        }
+
+        [selDiaSem, numDia, selMes, numAnio].forEach(elemento => {
+            elemento.addEventListener('input', actualizarFecha);
+        });
+
+        // 3. Gestión del Clima (Lógica distributiva, máximo 2 activos)
+        checksClima.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                // Contar cuántos están activos
+                const activos = document.querySelectorAll('.chk-clima:checked');
+                
+                if (activos.length > 2) {
+                    // Si se excede de dos, desactivar el actual
+                    checkbox.checked = false;
+                    alert("En el panel podemos combinar un máximo de 2 características climáticas.");
+                    return;
+                }
+
+                // Renderizar íconos seleccionados en el espacio macro
+                macroClima.innerHTML = '';
+                activos.forEach(chk => {
+                    const span = document.createElement('span');
+                    span.className = 'icono-clima';
+                    span.innerText = chk.value;
+                    macroClima.appendChild(span);
+                });
+            });
+        });
+
+        // 4. Gestión de Capas de Vestuario (Motor de renderizado visual)
+        function actualizarVestuario() {
+            // Ocultar todas las capas de ropa primero
+            document.querySelectorAll('.capa-personaje:not(#base-oso)').forEach(capa => {
+                capa.classList.add('oculto');
+            });
+
+            // Mostrar prenda superior si está seleccionada
+            const ropaSeleccionada = selRopa.value;
+            if (ropaSeleccionada !== 'ninguno') {
+                document.getElementById(`prenda-${ropaSeleccionada}`).classList.remove('oculto');
+            }
+
+            // Mostrar accesorio si está seleccionado
+            const accesorioSeleccionado = selAccesorio.value;
+            if (accesorioSeleccionado !== 'ninguno') {
+                document.getElementById(`acc-${accesorioSeleccionado}`).classList.remove('oculto');
+            }
+        }
+
+        selRopa.addEventListener('change', actualizarVestuario);
+        selAccesorio.addEventListener('change', actualizarVestuario);
+
+        // Inicialización al cargar la pantalla
+        actualizarFecha();
+    </script>
+</body>
+</html>

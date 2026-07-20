@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Diario y Cumpleaños - Aula Infantil</title>
+    <style>
+        :root {
+            --bg-canvas: #f7f5f0; 
+            --text-main: #2b2b2b;
+            --panel-control: #e9e5da;
+            --accent: #4a7c59;
+            --accent-light: #689f75;
+            --accent-cake: #ff8b94;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Panel de Control de la Maestra (Izquierda) --- */
+        #panel-maestra {
+            width: 340px;
+            background-color: var(--panel-control);
+            padding: 20px;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        #panel-maestra h2 {
+            font-size: 1.15rem;
+            margin: 0 0 5px 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grupo-control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #444;
+        }
+
+        /* Datepicker macro */
+        .datepicker-grande {
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            font-size: 1.1rem;
+            font-weight: bold;
+            background-color: white;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        
+        .datepicker-grande:focus {
+            border-color: var(--accent-light);
+        }
+
+        .input-texto {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #b5b0a4;
+            font-size: 0.95rem;
+        }
+
+        .btn-accion {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-agregar {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-agregar:hover {
+            background-color: var(--accent-light);
+        }
+
+        .btn-limpiar {
+            background-color: #d9534f;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-limpiar:hover {
+            background-color: #c9302c;
+        }
+        
+        .btn-accion:active {
+            transform: scale(0.98);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* --- Área de Visualización Macro para Niños (Derecha) --- */
+        #pantalla-alumnos {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 35px;
+            gap: 25px;
+            overflow: hidden;
+        }
+
+        /* Bloque Fecha */
+        #macro-fecha {
+            text-align: center;
+            font-size: 3.6rem; 
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        /* Bloque Contenido Inferior (Clima y Torta) */
+        #contenido-dinamico {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 30px;
+            flex-grow: 1;
+            height: calc(100% - 145px);
+        }
+
+        /* Iconografía del Clima */
+        #macro-clima {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            padding: 20px;
+        }
+
+        .icono-clima {
+            font-size: 9rem; 
+            animation: aparecer 0.4s ease-out;
+        }
+
+        /* Sección Torta de Cumpleaños e Integrantes */
+        #contenedor-cumpleanos {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .titulo-cumple {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #d15a7c;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        /* Torta en SVG */
+        #svg-torta {
+            width: auto;
+            height: 40%;
+            max-height: 180px;
+        }
+
+        /* Lista de cumpleañeros */
+        #lista-cumpleaneros {
+            width: 100%;
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #444;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .nombre-cumple {
+            background-color: #fff0f3;
+            border-radius: 8px;
+            padding: 4px 15px;
+            margin: 2px auto;
+            display: inline-block;
+            border-left: 5px solid #ff8b94;
+            animation: entrarNombre 0.3s ease;
+            max-width: 90%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sin-cumple {
+            font-size: 1.4rem;
+            color: #999;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes entrarNombre {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside id="panel-maestra">
+        <h2>Tiempo Atmosférico</h2>
+        <div class="checkbox-group">
+            <label><input type="checkbox" class="chk-clima" value="☀️"> Soleado</label>
+            <label><input type="checkbox" class="chk-clima" value="☁️"> Nublado</label>
+            <label><input type="checkbox" class="chk-clima" value="🌧️"> Lluvioso</label>
+            <label><input type="checkbox" class="chk-clima" value="💨"> Ventoso</label>
+            <label><input type="checkbox" class="chk-clima" value="❄️"> Frío</label>
+        </div>
+
+        <h2>Calendario Macro</h2>
+        <div class="grupo-control">
+            <label for="date-picker">Seleccionar Fecha:</label>
+            <input type="date" id="date-picker" class="datepicker-grande" value="2026-07-13">
+        </div>
+
+        <h2>Cumpleaños de la Semana</h2>
+        <div class="grupo-control">
+            <label for="input-nombre">Nombre del cumpleañero:</label>
+            <input type="text" id="input-nombre" class="input-texto" placeholder="Ej. Martín" autocomplete="off">
+        </div>
+        <button id="btn-add" class="btn-accion btn-agregar">Agregar a la Lista</button>
+        
+        <hr style="border: 0; border-top: 1px solid #b5b0a4; width: 100%; margin: 15px 0;">
+        
+        <button id="btn-clear" class="btn-accion btn-limpiar">LIMPIAR TODO</button>
+    </aside>
+
+    <main id="pantalla-alumnos">
+        <header id="macro-fecha" aria-live="polite"></header>
+
+        <section id="contenido-dinamico">
+            <article id="macro-clima"></article>
+
+            <article id="contenedor-cumpleanos">
+                <h3 class="titulo-cumple">Cumpleaños de esta Semana</h3>
+                
+                <svg id="svg-torta" viewBox="0 0 100 90">
+                    <rect x="42" y="10" width="3" height="15" fill="#4D96FF" rx="1"/>
+                    <path d="M 43.5,2 Q 41,6 43.5,10 Q 46,6 43.5,2" fill="#FFA500"/>
+                    
+                    <rect x="55" y="10" width="3" height="15" fill="#6BCB77" rx="1"/>
+                    <path d="M 56.5,2 Q 54,6 56.5,10 Q 59,6 56.5,2" fill="#FFA500"/>
+                    
+                    <path d="M 25,50 Q 50,55 75,50 L 75,35 Q 50,40 25,35 Z" fill="#fff0f3" stroke="#e0a6b3" stroke-width="0.5"/>
+                    <path d="M 25,35 Q 50,40 75,35" fill="none" stroke="#ff8b94" stroke-width="2"/>
+                    <path d="M 25,35 Q 30,42 35,37 Q 40,44 45,38 Q 50,45 55,39 Q 60,43 65,37 Q 70,43 75,35 Z" fill="#ff8b94"/>
+
+                    <path d="M 15,80 Q 50,86 85,80 L 85,50 Q 50,56 15,50 Z" fill="#fce4ec" stroke="#e0a6b3" stroke-width="0.5"/>
+                    <path d="M 15,50 Q 50,56 85,50" fill="none" stroke="#ff6b6b" stroke-width="2"/>
+                    <path d="M 15,50 Q 22,60 30,52 Q 40,63 50,53 Q 60,62 70,52 Q 78,61 85,50 Z" fill="#ff6b6b"/>
+                    
+                    <circle cx="35" cy="65" r="1.5" fill="#4D96FF"/>
+                    <circle cx="50" cy="70" r="1.5" fill="#FFD93D"/>
+                    <circle cx="65" cy="63" r="1.5" fill="#6BCB77"/>
+                </svg>
+
+                <div id="lista-cumpleaneros"></div>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        const datePicker = document.getElementById('date-picker');
+        const macroFecha = document.getElementById('macro-fecha');
+        const checksClima = document.querySelectorAll('.chk-clima');
+        const macroClima = document.getElementById('macro-clima');
+        const inputNombre = document.getElementById('input-nombre');
+        const btnAdd = document.getElementById('btn-add');
+        const btnClear = document.getElementById('btn-clear');
+        const listaCumpleaneros = document.getElementById('lista-cumpleaneros');
+
+        // Persistencia a través de localStorage local
+        let cumpleaneros = JSON.parse(localStorage.getItem('cumpleaneros_aula')) || [];
+
+        const DIAS = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+        const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
+        function actualizarPantallaFecha() {
+            const fechaSeleccionada = datePicker.value;
+            if (!fechaSeleccionada) return;
+
+            const partes = fechaSeleccionada.split('-');
+            const anio = partes[0];
+            const mesIndex = parseInt(partes[1], 10) - 1;
+            const diaNum = parseInt(partes[2], 10);
+
+            const objetoFecha = new Date(anio, mesIndex, diaNum);
+            const diaSemanaTexto = DIAS[objetoFecha.getDay()];
+            const mesTexto = MESES[mesIndex];
+
+            macroFecha.innerText = `${diaSemanaTexto} ${diaNum} DE ${mesTexto} DE ${anio}`;
+        }
+
+        function renderizarCumpleaneros() {
+            listaCumpleaneros.innerHTML = '';
+            
+            if (cumpleaneros.length === 0) {
+                listaCumpleaneros.innerHTML = '<span class="sin-cumple">Esta semana no hay cumpleaños</span>';
+                return;
+            }
+
+            cumpleaneros.forEach(nombre => {
+                const div = document.createElement('div');
+                div.className = 'nombre-cumple';
+                div.innerText = nombre.toUpperCase();
+                listaCumpleaneros.appendChild(div);
+            });
+        }
+
+        datePicker.addEventListener('input', actualizarPantallaFecha);
+
+        checksClima.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const activos = document.querySelectorAll('.chk-clima:checked');
+                if (activos.length > 2) {
+                    checkbox.checked = false;
+                    return;
+                }
+                macroClima.innerHTML = '';
+                activos.forEach(chk => {
+                    const span = document.createElement('span');
+                    span.className = 'icono-clima';
+                    span.innerText = chk.value;
+                    macroClima.appendChild(span);
+                });
+            });
+        });
+
+        btnAdd.addEventListener('click', () => {
+            const nombre = inputNombre.value.trim();
+            if (nombre) {
+                cumpleaneros.push(nombre);
+                localStorage.setItem('cumpleaneros_aula', JSON.stringify(cumpleaneros));
+                renderizarCumpleaneros();
+                inputNombre.value = '';
+                inputNombre.focus();
+            }
+        });
+
+        inputNombre.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnAdd.click();
+        });
+
+        btnClear.addEventListener('click', () => {
+            if (confirm("¿Quieres limpiar la lista de cumpleaños y reiniciar el panel?")) {
+                cumpleaneros = [];
+                localStorage.removeItem('cumpleaneros_aula');
+                renderizarCumpleaneros();
+                checksClima.forEach(chk => chk.checked = false);
+                macroClima.innerHTML = '';
+            }
+        });
+
+        actualizarPantallaFecha();
+        renderizarCumpleaneros();
+    </script>
+</body>
+</html>
