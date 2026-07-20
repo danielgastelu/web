@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Didáctico Corregido: Eclipses y Dirección de Sombras</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #04040a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 25, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            min-width: 420px;
+        }
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+        }
+        button {
+            background-color: #1f3a60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2a5298;
+        }
+        button.active {
+            background-color: #d35400;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+        label {
+            font-size: 13px;
+            min-width: 130px;
+            text-align: right;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            max-width: 360px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #f1c40f;
+        }
+        p {
+            margin: 4px 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #dddddd;
+        }
+        .legend-box {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+            vertical-align: middle;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="info-panel">
+        <h1>Geometría de Sombras (Opuestas al Sol)</h1>
+        <p><strong>Física del modelo:</strong> Las sombras se proyectan estrictamente en la dirección opuesta al Sol (eje Sol-Cuerpo hacia el exterior). <span style="color: #0f0;">CORREGIDO</span></p>
+        <p><span class="legend-box" style="background: rgba(10, 10, 15, 0.85);"></span> <strong>Umbra:</strong> Cono cerrado (vértice en el espacio).</p>
+        <p><span class="legend-box" style="background: rgba(100, 100, 110, 0.25);"></span> <strong>Penumbra:</strong> Cono invertido que se abre.</p>
+        <p style="margin-top: 8px; font-style: italic; color: #aaa;">Observa cómo la inclinación de 5° evita la mayoría de los eclipses.</p>
+    </div>
+
+    <div id="ui-container">
+        <div class="control-group">
+            <button id="btn-reverse">◄ Retroceder</button>
+            <button id="btn-play-pause" class="active">Pausar</button>
+            <button id="btn-forward">Avanzar ►</button>
+        </div>
+        <div class="control-group">
+            <label for="speed-slider">Velocidad temporal:</label>
+            <input type="range" id="speed-slider" min="0.1" max="4" step="0.1" value="1.0">
+            <span id="speed-display">1.0x</span>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- Configuración Escena ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.set(0, 30, 70);
+        controls.update();
+
+        // --- Parámetros de Escala Didáctica Ajustada ---
+        const sunRadius = 4.0;
+        const earthRadius = 1.4;
+        const moonRadius = 0.45;
+        const earthOrbitRadius = 35;
+        const moonOrbitRadius = 9.0;
+        const lunarInclination = 5 * (Math.PI / 180); // 5 grados estrictos
+
+        // --- Iluminación ---
+        scene.add(new THREE.AmbientLight(0x222222));
+        const sunLight = new THREE.PointLight(0xffffff, 2.5, 0);
+        scene.add(sunLight);
+
+        // --- Cuerpos Celestes y Órbitas ---
+        
+        // Sol (Centro del sistema)
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(sunRadius, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
+        scene.add(sun);
+
+        // Plano de la Eclíptica (Tierra)
+        const earthOrbit = new THREE.Mesh(
+            new THREE.RingGeometry(earthOrbitRadius - 0.05, earthOrbitRadius + 0.05, 64),
+            new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide })
+        );
+        earthOrbit.rotation.x = Math.PI / 2;
+        scene.add(earthOrbit);
+
+        // Sistema de traslación de la Tierra
+        const earthOrbitGroup = new THREE.Group();
+        scene.add(earthOrbitGroup);
+
+        // Tierra
+        const earth = new THREE.Mesh(new THREE.SphereGeometry(earthRadius, 32, 32), new THREE.MeshPhongMaterial({ color: 0x2471a3 }));
+        earth.position.set(earthOrbitRadius, 0, 0);
+        earthOrbitGroup.add(earth);
+
+        // Pivote para aplicar la inclinación orbital de la Luna (5° respecto a la eclíptica)
+        const moonOrbitPlane = new THREE.Group();
+        moonOrbitPlane.rotation.x = lunarInclination; 
+        earth.add(moonOrbitPlane);
+
+        // Anillo visual de la órbita lunar
+        const moonOrbitLine = new THREE.Mesh(
+            new THREE.RingGeometry(moonOrbitRadius - 0.04, moonOrbitRadius + 0.04, 64),
+            new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.DoubleSide, transparent: true, opacity: 0.5 })
+        );
+        moonOrbitLine.rotation.x = Math.PI / 2;
+        moonOrbitPlane.add(moonOrbitLine);
+
+        // Grupo para manejar el movimiento de la Luna dentro de su plano
+        const moonTranslationGroup = new THREE.Group();
+        moonOrbitPlane.add(moonTranslationGroup);
+
+        // Luna
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(moonRadius, 32, 32), new THREE.MeshPhongMaterial({ color: 0xcccccc }));
+        moon.position.set(moonOrbitRadius, 0, 0);
+        moonTranslationGroup.add(moon);
+
+
+        // --- CONSTRUCCIÓN DE CONOS DE SOMBRA INDEPENDIENTES (ALINEADOS EN Y+) ---
+        // Construimos las sombras apuntando hacia arriba en el eje Y local del ancla.
+        // Esto permite que 'lookAt(puntosolar)' posicione la sombra OPUESTA al sol tras rotar en X.
+
+        const umbraMat = new THREE.MeshBasicMaterial({ color: 0x08080c, transparent: true, opacity: 0.85, depthWrite: false });
+        const penumbraMat = new THREE.MeshBasicMaterial({ color: 0x666675, transparent: true, opacity: 0.25, depthWrite: false });
+
+        // Contenedor Sombra Tierra
+        const earthShadowAnchor = new THREE.Group();
+        scene.add(earthShadowAnchor);
+
+        const eUmbraLength = 22;
+        const eUmbraGeom = new THREE.ConeGeometry(earthRadius, eUmbraLength, 32);
+        // Desplazamos la geometría hacia arriba en Y para que la base nazca en el centro del cuerpo
+        eUmbraGeom.translate(0, eUmbraLength / 2, 0); 
+        const eUmbraMesh = new THREE.Mesh(eUmbraGeom, umbraMat);
+        earthShadowAnchor.add(eUmbraMesh);
+
+        const ePenumbraLength = 25;
+        // Penumbra: Cono truncado que se abre. Cilindro con topRadius > bottomRadius.
+        const ePenumbraGeom = new THREE.CylinderGeometry(earthRadius * 2.1, earthRadius, ePenumbraLength, 32);
+        // Desplazamos hacia arriba en Y para que la base ancha esté lejos
+        ePenumbraGeom.translate(0, ePenumbraLength / 2, 0);
+        const ePenumbraMesh = new THREE.Mesh(ePenumbraGeom, penumbraMat);
+        earthShadowAnchor.add(ePenumbraMesh);
+
+
+        // Contenedor Sombra Luna
+        const moonShadowAnchor = new THREE.Group();
+        scene.add(moonShadowAnchor);
+
+        const mUmbraLength = 10;
+        const mUmbraGeom = new THREE.ConeGeometry(moonRadius, mUmbraLength, 32);
+        mUmbraGeom.translate(0, mUmbraLength / 2, 0);
+        const mUmbraMesh = new THREE.Mesh(mUmbraGeom, umbraMat);
+        moonShadowAnchor.add(mUmbraMesh);
+
+        const mPenumbraLength = 12;
+        const mPenumbraGeom = new THREE.CylinderGeometry(moonRadius * 2.4, moonRadius, mPenumbraLength, 32);
+        mPenumbraGeom.translate(0, mPenumbraLength / 2, 0);
+        const mPenumbraMesh = new THREE.Mesh(mPenumbraGeom, penumbraMat);
+        moonShadowAnchor.add(mPenumbraMesh);
+
+
+        // --- Lógica de Control de Tiempo ---
+        let isPlaying = true;
+        let timeDirection = 1; 
+        let timeSpeed = 1.0;
+        let time = 0;
+
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const btnForward = document.getElementById('btn-forward');
+        const btnReverse = document.getElementById('btn-reverse');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedDisplay = document.getElementById('speed-display');
+
+        function updateButtons() {
+            btnForward.classList.remove('active');
+            btnReverse.classList.remove('active');
+            if (timeDirection === 1) btnForward.classList.add('active');
+            if (timeDirection === -1) btnReverse.classList.add('active');
+            
+            if (isPlaying) {
+                btnPlayPause.textContent = "Pausar";
+                btnPlayPause.classList.add('active');
+            } else {
+                btnPlayPause.textContent = "Reproducir";
+                btnPlayPause.classList.remove('active');
+            }
+        }
+
+        btnPlayPause.addEventListener('click', () => { isPlaying = !isPlaying; updateButtons(); });
+        btnForward.addEventListener('click', () => { timeDirection = 1; isPlaying = true; updateButtons(); });
+        btnReverse.addEventListener('click', () => { timeDirection = -1; isPlaying = true; updateButtons(); });
+        speedSlider.addEventListener('input', (e) => {
+            timeSpeed = parseFloat(e.target.value);
+            speedDisplay.textContent = timeSpeed.toFixed(1) + "x";
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+
+        // --- Bucle de Animación y Cálculo Vectorial de Sombras ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            if (isPlaying) {
+                time += delta * timeSpeed * timeDirection;
+                earthOrbitGroup.rotation.y = time * 0.12;          // Traslación terrestre
+                moonTranslationGroup.rotation.y = time * 1.5;     // Traslación lunar
+            }
+
+            // --- ORIENTACIÓN VECTORIAL ESTRICTA OPUESTA AL SOL (0,0,0) ---
+            const sunPosition = new THREE.Vector3(0, 0, 0);
+
+            // 1. Sombras de la Tierra
+            const earthWorldPos = new THREE.Vector3();
+            earth.getWorldPosition(earthWorldPos);
+            earthShadowAnchor.position.copy(earthWorldPos);
+            
+            // Calculamos el vector que va desde la Tierra hasta el Sol
+            const dirEarthToSun = new THREE.Vector3().subVectors(sunPosition, earthWorldPos).normalize();
+            // Determinamos el punto objetivo en el infinito (lado opuesto al sol)
+            const targetEarthDir = new THREE.Vector3().subVectors(earthWorldPos, dirEarthToSun);
+            earthShadowAnchor.lookAt(targetEarthDir);
+            
+            // Corrección de rotación X. Como construimos las sombras en Y+, lookAt las orienta al target.
+            // Para que las sombras se proyecten alejándose del sol, necesitamos rotar 180 grados en X respecto a la dirección de lookAt.
+            earthShadowAnchor.rotateX(Math.PI); 
+
+            // 2. Sombras de la Luna
+            const moonWorldPos = new THREE.Vector3();
+            moon.getWorldPosition(moonWorldPos);
+            moonShadowAnchor.position.copy(moonWorldPos);
+            
+            // Calculamos el vector que va desde la Luna hasta el Sol
+            const dirMoonToSun = new THREE.Vector3().subVectors(sunPosition, moonWorldPos).normalize();
+            const targetMoonDir = new THREE.Vector3().subVectors(moonWorldPos, dirMoonToSun);
+            moonShadowAnchor.lookAt(targetMoonDir);
+            
+            // Corrección de rotación X para proyectar hacia el espacio
+            moonShadowAnchor.rotateX(Math.PI);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        updateButtons();
+        animate();
+    </script>
+</body>
+</html>

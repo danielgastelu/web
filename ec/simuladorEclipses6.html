@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Didáctico: Precesión de la Línea de Nodos</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #030308;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            user-select: none;
+        }
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 25, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            min-width: 420px;
+        }
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+        }
+        button {
+            background-color: #1f3a60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2a5298;
+        }
+        button.active {
+            background-color: #d35400;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+        label {
+            font-size: 13px;
+            min-width: 130px;
+            text-align: right;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            max-width: 380px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        #status-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 15, 25, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #555;
+            min-width: 220px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        #status-indicator {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            letter-spacing: 1px;
+        }
+        .status-no { color: #2ecc71; }
+        .status-solar { color: #f1c40f; text-shadow: 0 0 10px rgba(241,196,15,0.5); }
+        .status-lunar { color: #e74c3c; text-shadow: 0 0 10px rgba(231,76,60,0.5); }
+        
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #f1c40f;
+        }
+        p {
+            margin: 4px 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #dddddd;
+        }
+        .legend-line {
+            display: inline-block;
+            width: 20px;
+            height: 0;
+            border-top: 2px dotted #00ffff;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="info-panel">
+        <h1>Precesión Retrógrada de Nodos</h1>
+        <p><span class="legend-line"></span> <strong>Línea de Nodos Real:</strong> No apunta fijamente al Sol. Mantiene su orientación en el espacio y rota lentamente en sentido horario (retrógrado).</p>
+        <p><strong>Temporada de Eclipses:</strong> Solo se producen cuando la traslación de la Tierra alinea los nodos de cara al Sol.</p>
+        <p style="margin-top: 8px; font-style: italic; color: #aaa;">Observa desde una vista superior cómo la línea cian experimenta su deriva cíclica de forma independiente al giro de la Tierra.</p>
+    </div>
+
+    <div id="status-panel">
+        <span style="font-size: 12px; color: #aaa; text-transform: uppercase; font-weight: bold;">Condición Astronómica</span>
+        <div id="status-indicator" class="status-no">NO HAY ECLIPSE</div>
+    </div>
+
+    <div id="ui-container">
+        <div class="control-group">
+            <button id="btn-reverse">◄ Retroceder</button>
+            <button id="btn-play-pause" class="active">Pausar</button>
+            <button id="btn-forward">Avanzar ►</button>
+        </div>
+        <div class="control-group">
+            <label for="speed-slider">Velocidad temporal:</label>
+            <input type="range" id="speed-slider" min="0.1" max="4" step="0.1" value="1.0">
+            <span id="speed-display">1.0x</span>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- Configuración Escena ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.set(0, 45, 85);
+        controls.update();
+
+        // --- Parámetros Escala Didáctica Ajustada ---
+        const sunRadius = 4.0;
+        const earthRadius = 1.4;
+        const moonRadius = 0.45;
+        const earthOrbitRadius = 35;
+        const moonOrbitRadius = 9.0;
+        const lunarInclination = 6.5 * (Math.PI / 180); // Inclinación didáctica optimizada
+
+        // --- Iluminación ---
+        scene.add(new THREE.AmbientLight(0x222222));
+        const sunLight = new THREE.PointLight(0xffffff, 2.5, 0);
+        scene.add(sunLight);
+
+        // --- Cuerpos Celestes y Estructuras de Órbitas ---
+        // Sol
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(sunRadius, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
+        scene.add(sun);
+
+        // Órbita de la Tierra (Plano de la Eclíptica)
+        const earthOrbit = new THREE.Mesh(
+            new THREE.RingGeometry(earthOrbitRadius - 0.05, earthOrbitRadius + 0.05, 64),
+            new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide })
+        );
+        earthOrbit.rotation.x = Math.PI / 2;
+        scene.add(earthOrbit);
+
+        // Grupo de Traslación de la Tierra alrededor del Sol
+        const earthOrbitGroup = new THREE.Group();
+        scene.add(earthOrbitGroup);
+
+        // Tierra
+        const earth = new THREE.Mesh(new THREE.SphereGeometry(earthRadius, 32, 32), new THREE.MeshPhongMaterial({ color: 0x2471a3 }));
+        earth.position.set(earthOrbitRadius, 0, 0);
+        earthOrbitGroup.add(earth);
+
+        // SISTEMA DE PRECESIÓN NODAL:
+        // Este grupo se encarga de rotar el plano entero de la órbita lunar en sentido retrógrado
+        const nodalPrecessionGroup = new THREE.Group();
+        earth.add(nodalPrecessionGroup);
+
+        // Plano inclinado de la órbita de la Luna (Anclado al grupo de precesión)
+        const moonOrbitPlane = new THREE.Group();
+        moonOrbitPlane.rotation.x = lunarInclination; 
+        nodalPrecessionGroup.add(moonOrbitPlane);
+
+        // Anillo de la órbita lunar
+        const moonOrbitLine = new THREE.Mesh(
+            new THREE.RingGeometry(moonOrbitRadius - 0.04, moonOrbitRadius + 0.04, 64),
+            new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.DoubleSide, transparent: true, opacity: 0.5 })
+        );
+        moonOrbitLine.rotation.x = Math.PI / 2;
+        moonOrbitPlane.add(moonOrbitLine);
+
+        // Grupo para la traslación de la Luna dentro de su plano inclinado
+        const moonTranslationGroup = new THREE.Group();
+        moonOrbitPlane.add(moonTranslationGroup);
+
+        // Luna
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(moonRadius, 32, 32), new THREE.MeshPhongMaterial({ color: 0xcccccc }));
+        moon.position.set(moonOrbitRadius, 0, 0);
+        moonTranslationGroup.add(moon);
+
+
+        // --- LÍNEA DE NODOS (INDICADOR CIAN DISCONTINUO) ---
+        // Se añade directamente al grupo de precesión nodal para que muestre el giro físico real
+        const nodeLineGeom = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-moonOrbitRadius * 1.3, 0, 0),
+            new THREE.Vector3(moonOrbitRadius * 1.3, 0, 0)
+        ]);
+        const nodeLineMat = new THREE.LineDashedMaterial({
+            color: 0x00ffff,
+            dashSize: 0.5,
+            gapSize: 0.3
+        });
+        const nodeLine = new THREE.Line(nodeLineGeom, nodeLineMat);
+        nodeLine.computeLineDistances();
+        nodalPrecessionGroup.add(nodeLine); 
+
+
+        // --- CONOS DE SOMBRA ---
+        const umbraMat = new THREE.MeshBasicMaterial({ color: 0x07070a, transparent: true, opacity: 0.85, depthWrite: false });
+        const penumbraMat = new THREE.MeshBasicMaterial({ color: 0x555560, transparent: true, opacity: 0.20, depthWrite: false });
+
+        // Sombra de la Tierra
+        const earthShadowAnchor = new THREE.Group();
+        scene.add(earthShadowAnchor);
+
+        const eUmbraLength = 22;
+        const eUmbraGeom = new THREE.ConeGeometry(earthRadius, eUmbraLength, 32);
+        eUmbraGeom.translate(0, eUmbraLength / 2, 0);
+        const eUmbraMesh = new THREE.Mesh(eUmbraGeom, umbraMat);
+        earthShadowAnchor.add(eUmbraMesh);
+
+        const ePenumbraLength = 25;
+        const ePenumbraGeom = new THREE.CylinderGeometry(earthRadius * 2.1, earthRadius, ePenumbraLength, 32);
+        ePenumbraGeom.translate(0, ePenumbraLength / 2, 0);
+        const ePenumbraMesh = new THREE.Mesh(ePenumbraGeom, penumbraMat);
+        earthShadowAnchor.add(ePenumbraMesh);
+
+        // Sombra de la Luna
+        const moonShadowAnchor = new THREE.Group();
+        scene.add(moonShadowAnchor);
+
+        const mUmbraLength = 11;
+        const mUmbraGeom = new THREE.ConeGeometry(moonRadius, mUmbraLength, 32);
+        mUmbraGeom.translate(0, mUmbraLength / 2, 0);
+        const mUmbraMesh = new THREE.Mesh(mUmbraGeom, umbraMat);
+        moonShadowAnchor.add(mUmbraMesh);
+
+        const mPenumbraLength = 13;
+        const mPenumbraGeom = new THREE.CylinderGeometry(moonRadius * 2.4, moonRadius, mPenumbraLength, 32);
+        mPenumbraGeom.translate(0, mPenumbraLength / 2, 0);
+        const mPenumbraMesh = new THREE.Mesh(mPenumbraGeom, penumbraMat);
+        moonShadowAnchor.add(mPenumbraMesh);
+
+
+        // --- Controles de Tiempo e Interfaz ---
+        let isPlaying = true;
+        let timeDirection = 1; 
+        let timeSpeed = 1.0;
+        let time = 0;
+
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const btnForward = document.getElementById('btn-forward');
+        const btnReverse = document.getElementById('btn-reverse');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedDisplay = document.getElementById('speed-display');
+        const statusIndicator = document.getElementById('status-indicator');
+
+        function updateButtons() {
+            btnForward.classList.remove('active');
+            btnReverse.classList.remove('active');
+            if (timeDirection === 1) btnForward.classList.add('active');
+            if (timeDirection === -1) btnReverse.classList.add('active');
+            isPlaying ? (btnPlayPause.textContent = "Pausar", btnPlayPause.classList.add('active')) : (btnPlayPause.textContent = "Reproducir", btnPlayPause.classList.remove('active'));
+        }
+
+        btnPlayPause.addEventListener('click', () => { isPlaying = !isPlaying; updateButtons(); });
+        btnForward.addEventListener('click', () => { timeDirection = 1; isPlaying = true; updateButtons(); });
+        btnReverse.addEventListener('click', () => { timeDirection = -1; isPlaying = true; updateButtons(); });
+        speedSlider.addEventListener('input', (e) => {
+            timeSpeed = parseFloat(e.target.value);
+            speedDisplay.textContent = timeSpeed.toFixed(1) + "x";
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+
+        // --- Bucle de Renderizado y Física del Sistema ---
+        const clock = new THREE.Clock();
+        const localUp = new THREE.Vector3(0, 1, 0);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            if (isPlaying) {
+                time += delta * timeSpeed * timeDirection;
+                
+                // 1. Traslación de la Tierra alrededor del Sol
+                earthOrbitGroup.rotation.y = time * 0.12;
+                
+                // 2. TRASLACIÓN DE LA LUNA (Movimiento directo antihorario)
+                moonTranslationGroup.rotation.y = time * 1.5; 
+
+                // 3. MOVIMIENTO DE PRECESIÓN NODAL RETRÓGRADO (Sentido de las agujas del reloj: -time)
+                // Se resta la inclinación de la traslación de la Tierra para aislar la orientación en el espacio
+                // y se le añade un factor multiplicador para simular la deriva retrógrada visible en pocos minutos.
+                nodalPrecessionGroup.rotation.y = -(earthOrbitGroup.rotation.y) - (time * 0.02);
+            }
+
+            // Capturar Coordenadas Globales Absolutas en cada frame
+            const earthWorldPos = new THREE.Vector3();
+            earth.getWorldPosition(earthWorldPos);
+            
+            const moonWorldPos = new THREE.Vector3();
+            moon.getWorldPosition(moonWorldPos);
+
+            // Reorientación estricta de sombras radiales opuestas al Sol
+            earthShadowAnchor.position.copy(earthWorldPos);
+            const dirEarthShadow = earthWorldPos.clone().normalize();
+            earthShadowAnchor.quaternion.setFromUnitVectors(localUp, dirEarthShadow);
+
+            moonShadowAnchor.position.copy(moonWorldPos);
+            const dirMoonShadow = moonWorldPos.clone().normalize();
+            moonShadowAnchor.quaternion.setFromUnitVectors(localUp, dirMoonShadow);
+
+
+            // --- SISTEMA DE CÁLCULO DE INTERSECCIÓN DE SOMBRAS ---
+            let currentStatus = "NO HAY ECLIPSE";
+            let statusClass = "status-no";
+
+            // Intersección Umbra de la Tierra -> Luna
+            const vectorEarthToMoon = new THREE.Vector3().subVectors(moonWorldPos, earthWorldPos);
+            const distanceAlongUmbraE = vectorEarthToMoon.dot(dirEarthShadow);
+
+            if (distanceAlongUmbraE > 0 && distanceAlongUmbraE < eUmbraLength) {
+                const umbraRadiusAtMoon = earthRadius * (1 - (distanceAlongUmbraE / eUmbraLength));
+                const perpendicularDistE = new THREE.Vector3().subVectors(vectorEarthToMoon, dirEarthShadow.clone().multiplyScalar(distanceAlongUmbraE)).length();
+                
+                if (perpendicularDistE < (umbraRadiusAtMoon + moonRadius * 0.3)) {
+                    currentStatus = "¡ECLIPSE LUNAR!";
+                    statusClass = "status-lunar";
+                }
+            }
+
+            // Intersección Umbra de la Luna -> Tierra
+            const vectorMoonToEarth = new THREE.Vector3().subVectors(earthWorldPos, moonWorldPos);
+            const distanceAlongUmbraM = vectorMoonToEarth.dot(dirMoonShadow);
+
+            if (distanceAlongUmbraM > 0 && distanceAlongUmbraM < mUmbraLength) {
+                const umbraRadiusAtEarth = moonRadius * (1 - (distanceAlongUmbraM / mUmbraLength));
+                const perpendicularDistM = new THREE.Vector3().subVectors(vectorMoonToEarth, dirMoonShadow.clone().multiplyScalar(distanceAlongUmbraM)).length();
+                
+                if (perpendicularDistM < (umbraRadiusAtEarth + earthRadius * 0.6)) {
+                    currentStatus = "¡ECLIPSE SOLAR!";
+                    statusClass = "status-solar";
+                }
+            }
+
+            // Actualizar interfaz sólo ante cambios
+            if (statusIndicator.textContent !== currentStatus) {
+                statusIndicator.textContent = currentStatus;
+                statusIndicator.className = statusClass;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        updateButtons();
+        animate();
+    </script>
+</body>
+</html>

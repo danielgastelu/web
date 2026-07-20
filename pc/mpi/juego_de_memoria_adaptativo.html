@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMORIA DE ANIMALITOS - JUEGO INFANTIL</title>
+    <!-- Tailwind CSS para el diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Nunito ideal para niños y educación infantil -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* Animaciones personalizadas suaves para niños de 2 a 5 años */
+        .bounce-soft {
+            animation: bounceSoft 2s infinite;
+        }
+        @keyframes bounceSoft {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .pop-card {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pop-card:active {
+            transform: scale(0.92);
+        }
+        /* Rotación 3D fluida para las fichas de memoria */
+        .card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-front {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-teal-50 to-indigo-50 min-h-screen flex flex-col justify-between text-gray-800 overflow-x-hidden p-2 md:p-4">
+
+    <!-- CABECERA: Título, Rondas, Estrellas y selector de Dificultad -->
+    <header class="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-md border-4 border-teal-200/50 mb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            
+            <!-- Título del Juego -->
+            <div class="text-center sm:text-left">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-teal-600 tracking-wide uppercase bounce-soft">
+                    🐾 ANIMALITOS 🐾
+                </h1>
+                <p class="text-xs sm:text-sm text-teal-700/80 font-bold uppercase mt-1">JUEGO DE MEMORIA ADAPTATIVO</p>
+            </div>
+
+            <!-- Contadores de Ronda y Estrellas -->
+            <div class="flex items-center gap-4 bg-teal-100/50 px-4 py-2 rounded-2xl border-2 border-teal-200">
+                <div class="text-center">
+                    <span class="block text-xs text-teal-600 font-black uppercase">RONDA</span>
+                    <span id="ronda-display" class="text-2xl font-black text-teal-700">1</span>
+                </div>
+                <div class="h-8 w-1 bg-teal-200 rounded-full"></div>
+                <div class="text-center flex items-center gap-2">
+                    <div>
+                        <span class="block text-xs text-amber-600 font-black uppercase">ESTRELLAS</span>
+                        <span id="star-count" class="text-2xl font-black text-amber-500">0</span>
+                    </div>
+                    <span class="text-3xl animate-pulse">⭐</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selector de Dificultades / Niveles -->
+        <div class="mt-4">
+            <span class="block text-center text-xs font-black text-teal-600 uppercase mb-2">¡ELIGE TU NIVEL!</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <button onclick="setDifficulty(1)" id="btn-diff-1" class="diff-btn py-3 px-2 rounded-xl text-sm font-black border-b-4 border-green-600 bg-green-400 text-white shadow-md active:border-b-0 hover:brightness-105 transition-all uppercase">
+                    👶 MUY FÁCIL<br><span class="text-xs opacity-90">(2 x 3)</span>
+                </button>
+                <button onclick="setDifficulty(2)" id="btn-diff-2" class="diff-btn py-3 px-2 rounded-xl text-sm font-black border-b-4 border-yellow-600 bg-yellow-400 text-white shadow-md active:border-b-0 hover:brightness-105 transition-all uppercase">
+                    🧸 FÁCIL<br><span class="text-xs opacity-90">(3 x 3)</span>
+                </button>
+                <button onclick="setDifficulty(3)" id="btn-diff-3" class="diff-btn py-3 px-2 rounded-xl text-sm font-black border-b-4 border-orange-600 bg-orange-400 text-white shadow-md active:border-b-0 hover:brightness-105 transition-all uppercase">
+                    🦁 MEDIO<br><span class="text-xs opacity-90">(3 x 4)</span>
+                </button>
+                <button onclick="setDifficulty(4)" id="btn-diff-4" class="diff-btn py-3 px-2 rounded-xl text-sm font-black border-b-4 border-purple-600 bg-purple-400 text-white shadow-md active:border-b-0 hover:brightness-105 transition-all uppercase">
+                    🏆 RETO<br><span class="text-xs opacity-90">(4 x 4)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- TABLERO DE JUEGO PRINCIPAL -->
+    <main class="flex-grow flex items-center justify-center max-w-4xl mx-auto w-full px-2">
+        <div class="w-full bg-white/60 backdrop-blur-md rounded-3xl p-4 md:p-6 shadow-xl border-4 border-teal-100 flex flex-col items-center justify-center min-h-[380px] relative">
+            
+            <!-- Indicador Visual de Modo Ayuda Adaptativo (Discreto para el niño pero visible para la maestra) -->
+            <div id="assist-indicator" class="hidden absolute top-2 right-2 bg-pink-100 border border-pink-300 text-pink-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider animate-pulse">
+                🧸 MODO ASISTIDO ACTIVO (3 VISTAS - 4.5S)
+            </div>
+
+            <!-- Grid de Fichas (Cargado dinámicamente) -->
+            <div id="game-grid" class="grid gap-3 md:gap-4 w-full max-w-lg justify-center items-center transition-all duration-300">
+                <!-- Las fichas se inyectarán aquí por JavaScript -->
+            </div>
+
+            <!-- Pantalla de Éxito / Siguiente Ronda (Superpuesta) -->
+            <div id="victory-modal" class="hidden absolute inset-0 bg-white/95 rounded-3xl flex flex-col items-center justify-center p-6 text-center z-10 animate-fade-in">
+                <span class="text-6xl md:text-8xl mb-4 animate-bounce">🎉</span>
+                <h2 class="text-3xl md:text-4xl font-black text-teal-600 uppercase tracking-wider">¡SÚPER BIEN!</h2>
+                <p class="text-lg md:text-xl font-bold text-teal-700/80 mt-2 uppercase">¡HAS COMPLETADO LA RONDA!</p>
+                <div class="flex justify-center my-4">
+                    <div class="flex gap-1 text-4xl text-amber-400">
+                        ⭐ ⭐ ⭐ ⭐ ⭐
+                    </div>
+                </div>
+                <p class="text-md font-extrabold text-amber-500 uppercase mb-6">+10 ESTRELLITAS GANADAS</p>
+                <button onclick="nextRound()" class="py-4 px-8 bg-emerald-400 hover:bg-emerald-500 text-white font-black text-xl rounded-2xl border-b-8 border-emerald-600 active:border-b-0 shadow-lg transform active:scale-95 transition-all uppercase">
+                    ¡Siguiente Ronda! ➔
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- PANEL DE OBSERVACIÓN DOCENTE (Plegable con resguardo de seguridad infantil) -->
+    <footer class="w-full max-w-4xl mx-auto mt-4">
+        <details id="pedagogical-panel" class="bg-slate-800 text-slate-100 rounded-3xl shadow-lg border-2 border-slate-700 overflow-hidden group">
+            <summary onclick="openTeacherGuard(event)" class="list-none flex justify-between items-center p-4 cursor-pointer font-black text-sm uppercase select-none tracking-wide hover:bg-slate-750">
+                <span class="flex items-center gap-2">
+                    📊 PANEL DE OBSERVACIÓN PEDAGÓGICA (MAESTRAS)
+                </span>
+                <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼ CLIC PARA VER DETALLES</span>
+            </summary>
+            
+            <div class="p-4 border-t border-slate-700 text-xs md:text-sm space-y-4">
+                <p class="text-slate-300 leading-relaxed">
+                    Este panel registra la conducta motriz e intuitiva del niño/a durante el juego para permitir el análisis cualitativo y cuantitativo del desarrollo del "point and click" y la memoria de trabajo.
+                </p>
+
+                <!-- Tarjetas de Métricas -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="bg-slate-700 p-3 rounded-xl border border-slate-600">
+                        <span class="block text-slate-400 text-[10px] font-black uppercase">Clics Totales</span>
+                        <strong id="metric-clicks" class="text-lg text-emerald-400">0</strong>
+                    </div>
+                    <div class="bg-slate-700 p-3 rounded-xl border border-slate-600">
+                        <span class="block text-slate-400 text-[10px] font-black uppercase">Errores Cometidos</span>
+                        <strong id="metric-errors" class="text-lg text-rose-400">0</strong>
+                    </div>
+                    <div class="bg-slate-700 p-3 rounded-xl border border-slate-600">
+                        <span class="block text-slate-400 text-[10px] font-black uppercase">Efectividad Media</span>
+                        <strong id="metric-accuracy" class="text-lg text-cyan-400">0%</strong>
+                    </div>
+                    <div class="bg-slate-700 p-3 rounded-xl border border-slate-600">
+                        <span class="block text-slate-400 text-[10px] font-black uppercase">Asistencias Adaptativas</span>
+                        <strong id="metric-assists" class="text-lg text-pink-400">0</strong>
+                    </div>
+                </div>
+
+                <!-- Historial y Comportamiento -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 max-h-40 overflow-y-auto font-mono text-[11px] space-y-1">
+                    <span class="text-teal-400 block font-bold mb-1 uppercase">📝 REGISTRO DE EVENTOS (CONDUCTA):</span>
+                    <div id="log-container" class="space-y-1 text-slate-300">
+                        <!-- Logs cargados por JS -->
+                        <span class="text-slate-500">[Esperando interacción...]</span>
+                    </div>
+                </div>
+
+                <!-- Botones del Panel Docente -->
+                <div class="flex flex-wrap gap-2 justify-end">
+                    <button onclick="copyDocenteReport()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-xl shadow active:scale-95 transition-all text-xs uppercase">
+                        📋 COPIAR REPORTE DOCENTE
+                    </button>
+                    <button onclick="resetDocenteMetrics()" class="bg-rose-600/80 hover:bg-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow active:scale-95 transition-all text-xs uppercase">
+                        🗑️ REINICIAR MÉTRICAS
+                    </button>
+                </div>
+            </div>
+        </details>
+        
+        <!-- Derechos del desarrollo -->
+        <p class="text-center text-[10px] text-teal-800/60 font-bold uppercase mt-2">
+            CONCEBIDO PARA ESTIMULACIÓN SENSORIOMOTRIZ Y EVALUACIÓN DE CONDUCTA INFANTIL © 2026
+        </p>
+    </footer>
+
+    <!-- BARRERA DE SEGURIDAD DOCENTE (MATH GATE) -->
+    <div id="teacher-guard-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 items-center justify-center p-4">
+        <div class="bg-slate-800 border-4 border-teal-400 text-slate-100 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative transition-transform duration-300 scale-95 md:scale-100">
+            
+            <div class="text-center mb-4">
+                <span class="text-4xl">🔒</span>
+                <h3 class="text-lg font-black text-teal-400 mt-2 uppercase tracking-wide">ACCESO RESTRINGIDO</h3>
+                <p class="text-xs text-slate-400 uppercase mt-1">Control exclusivo para maestras y evaluadores</p>
+            </div>
+            
+            <!-- Barra de temporizador visual de 15 segundos -->
+            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-2">
+                <div id="guard-timer-bar" class="bg-teal-400 h-full transition-all duration-1000 w-full"></div>
+            </div>
+            <div id="guard-timer-text" class="text-center text-xs font-bold text-teal-300 mb-4 uppercase">15 SEGUNDOS RESTANTES</div>
+
+            <!-- Pregunta generada -->
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-700 text-center mb-4">
+                <span class="block text-slate-400 text-[10px] font-black uppercase mb-1">RESUELVE LA SUMA</span>
+                <span id="guard-math-question" class="text-2xl font-black text-white tracking-widest">0 + 0 = ?</span>
+            </div>
+
+            <!-- Entrada de respuesta -->
+            <div class="space-y-3">
+                <input type="number" id="guard-math-input" inputmode="numeric" pattern="[0-9]*" placeholder="RESPUESTA" 
+                       class="w-full text-center py-3 bg-slate-900 border-2 border-slate-700 rounded-xl text-xl font-black text-white focus:outline-none focus:border-teal-400 placeholder:text-slate-500 uppercase" 
+                       onkeydown="if(event.key === 'Enter') checkTeacherResponse()">
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="closeTeacherGuard(false)" class="py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl text-xs uppercase tracking-wider transition-all">
+                        CANCELAR
+                    </button>
+                    <button onclick="checkTeacherResponse()" class="py-3 bg-teal-500 hover:bg-teal-400 text-slate-900 font-black rounded-xl text-xs uppercase tracking-wider transition-all">
+                        VERIFICAR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación emergente temporal (reemplazo seguro de alert) -->
+    <div id="toast-message" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-black uppercase shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+        ¡NOTIFICACIÓN!
+    </div>
+
+    <script>
+        /* CONFIGURACIÓN Y EFECTOS DE SONIDO (Web Audio API)
+         * Se implementan tonos amigables, no estridentes, para evitar la hiperestimulación. */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            // Asegurar que el contexto de audio esté activo (restricciones de navegador)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'flip') {
+                // Sonido suave y rápido al dar vuelta una carta
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'match') {
+                // Acorde ascendente alegre para el éxito
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'wildcard') {
+                // Sonido especial para el sol comodín del nivel 2
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3); // A5
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'fail') {
+                // Sonido grave y suave (nada estridente ni castigador)
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(180, audioCtx.currentTime + 0.25);
+                // Filtro para suavizar el sonido del diente de sierra
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.disconnect(gain);
+                osc.connect(filter);
+                filter.connect(gain);
+
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'victory') {
+                // Fanfarria alegre al terminar la ronda
+                const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.type = 'sine';
+                    noteOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+                    noteGain.gain.setValueAtTime(0.12, audioCtx.currentTime + idx * 0.08);
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.15);
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.start(audioCtx.currentTime + idx * 0.08);
+                    noteOsc.stop(audioCtx.currentTime + idx * 0.08 + 0.15);
+                });
+            }
+        }
+
+        // Banco de emojis de animalitos para las fichas
+        const ANIMAL_POOL = [
+            { emoji: '🦁', color: 'bg-orange-100 border-orange-300' },
+            { emoji: '🐼', color: 'bg-slate-100 border-slate-300' },
+            { emoji: '🐸', color: 'bg-green-100 border-green-300' },
+            { emoji: '🐵', color: 'bg-amber-100 border-amber-300' },
+            { emoji: '🐷', color: 'bg-pink-100 border-pink-300' },
+            { emoji: '🐮', color: 'bg-yellow-100 border-yellow-300' },
+            { emoji: '🐱', color: 'bg-teal-100 border-teal-300' },
+            { emoji: '🐶', color: 'bg-indigo-100 border-indigo-300' }
+        ];
+
+        // Estado del juego
+        let currentLevel = 1; // 1: 2x3, 2: 3x3, 3: 3x4, 4: 4x4
+        let ronda = 1;
+        let stars = 0;
+        let cards = [];
+        let selectedCards = []; // Guarda las referencias de las cartas abiertas no emparejadas
+        let consecutiveFails = 0;
+        let adaptiveMode = false;
+        let cardTimeouts = {}; // Almacena los identificadores de timeout para la lógica adaptativa
+
+        // Control de Acceso Docente
+        let guardInterval = null;
+        let expectedAnswer = 0;
+
+        // Métricas de observación pedagógica
+        let metrics = {
+            totalClicks: 0,
+            errors: 0,
+            matches: 0,
+            adaptiveAssists: 0,
+            logs: [],
+            startTime: Date.now()
+        };
+
+        // Estructuras de dimensiones por nivel [filas, columnas]
+        const GRID_CONFIGS = {
+            1: { rows: 2, cols: 3, pairsNeeded: 3 },
+            2: { rows: 3, cols: 3, pairsNeeded: 4, hasWildcard: true }, // 3x3 = 9 (4 pares + 1 estrella comodín instantánea)
+            3: { rows: 3, cols: 4, pairsNeeded: 6 },
+            4: { rows: 4, cols: 4, pairsNeeded: 8 }
+        };
+
+        // Registrar logs de eventos para la maestra
+        function logEvent(action) {
+            const timeDiff = ((Date.now() - metrics.startTime) / 1000).toFixed(1);
+            const logMsg = `[${timeDiff}s] Nivel ${currentLevel} - ${action}`;
+            metrics.logs.push(logMsg);
+
+            const logContainer = document.getElementById('log-container');
+            if (logContainer) {
+                // Formatear para visualización
+                const logElement = document.createElement('div');
+                logElement.className = 'py-0.5 border-b border-slate-800 text-slate-300';
+                logElement.innerText = logMsg;
+                logContainer.appendChild(logElement);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }
+
+        // Mostrar un mensaje seguro (reemplaza alert)
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            toast.innerText = message;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        // Mezclador aleatorio Fisher-Yates
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /* MANEJO DE LA BARRERA DE SEGURIDAD DOCENTE (MATH GATE) */
+        function openTeacherGuard(event) {
+            const panel = document.getElementById('pedagogical-panel');
+            
+            // Si el panel ya está abierto, permitimos que se cierre normalmente sin validar
+            if (panel.hasAttribute('open')) {
+                return; 
+            }
+
+            // Evitar que el panel de detalles se abra automáticamente
+            event.preventDefault();
+
+            // Generar valores aleatorios entre 3 y 14
+            const a = Math.floor(Math.random() * 12) + 3;
+            const b = Math.floor(Math.random() * 12) + 3;
+            expectedAnswer = a + b;
+
+            // Mostrar el reto en pantalla
+            document.getElementById('guard-math-question').innerText = `${a} + ${b} = ?`;
+            document.getElementById('guard-math-input').value = '';
+
+            // Mostrar el modal
+            const modal = document.getElementById('teacher-guard-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Foco automático en el input
+            setTimeout(() => document.getElementById('guard-math-input').focus(), 100);
+
+            // Iniciar temporizador de 15 segundos
+            let timeLeft = 15;
+            const timerBar = document.getElementById('guard-timer-bar');
+            const timerText = document.getElementById('guard-timer-text');
+            
+            timerBar.style.width = '100%';
+            timerText.innerText = `${timeLeft} SEGUNDOS RESTANTES`;
+
+            if (guardInterval) clearInterval(guardInterval);
+
+            guardInterval = setInterval(() => {
+                timeLeft--;
+                timerText.innerText = `${timeLeft} SEGUNDOS RESTANTES`;
+                timerBar.style.width = `${(timeLeft / 15) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(guardInterval);
+                    closeTeacherGuard(false);
+                    logEvent("Acceso docente cancelado: Tiempo de respuesta agotado (15s).");
+                    showToast("⏰ TIEMPO AGOTADO");
+                }
+            }, 1000);
+        }
+
+        function closeTeacherGuard(authorized = false) {
+            if (guardInterval) clearInterval(guardInterval);
+            
+            const modal = document.getElementById('teacher-guard-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            if (authorized) {
+                const panel = document.getElementById('pedagogical-panel');
+                panel.setAttribute('open', '');
+                // Desplazar la pantalla suavemente para ver el panel
+                panel.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function checkTeacherResponse() {
+            const userInput = parseInt(document.getElementById('guard-math-input').value, 10);
+            
+            if (userInput === expectedAnswer) {
+                closeTeacherGuard(true);
+                logEvent("Acceso docente aprobado. Validación correcta.");
+                showToast("🔓 ACCESO PERMITIDO");
+            } else {
+                closeTeacherGuard(false);
+                logEvent(`Acceso rechazado. Respuesta incorrecta: Ingresó ${userInput || 'vacio'} (Esperaba: ${expectedAnswer}).`);
+                showToast("❌ RESPUESTA INCORRECTA");
+            }
+        }
+
+        // Configurar dificultad seleccionada
+        function setDifficulty(level) {
+            currentLevel = level;
+            // Estilo visual del botón seleccionado
+            document.querySelectorAll('.diff-btn').forEach((btn, idx) => {
+                if (idx + 1 === level) {
+                    btn.classList.add('ring-4', 'ring-teal-500', 'scale-105');
+                } else {
+                    btn.classList.remove('ring-4', 'ring-teal-500', 'scale-105');
+                }
+            });
+            logEvent(`Cambio de nivel a: ${level}`);
+            initGame();
+        }
+
+        // Inicializar o reiniciar juego
+        function initGame() {
+            const config = GRID_CONFIGS[currentLevel];
+            const gameGrid = document.getElementById('game-grid');
+            
+            // Limpiar estados
+            selectedCards = [];
+            consecutiveFails = 0;
+            adaptiveMode = false;
+            document.getElementById('assist-indicator').classList.add('hidden');
+            
+            // Limpiar timeouts de cartas pendientes
+            Object.values(cardTimeouts).forEach(timeoutId => clearTimeout(timeoutId));
+            cardTimeouts = {};
+
+            // Seleccionar animales requeridos para el tablero
+            let selectedAnimals = shuffle([...ANIMAL_POOL]).slice(0, config.pairsNeeded);
+            
+            // Crear el mazo de cartas (duplicando para hacer parejas)
+            let cardDeck = [];
+            selectedAnimals.forEach((animal, index) => {
+                const cardIdA = `${index}-A`;
+                const cardIdB = `${index}-B`;
+                cardDeck.push({ id: cardIdA, matchId: index, emoji: animal.emoji, color: animal.color, isWildcard: false });
+                cardDeck.push({ id: cardIdB, matchId: index, emoji: animal.emoji, color: animal.color, isWildcard: false });
+            });
+
+            // Si es 3x3 (Nivel 2), agregamos 1 ficha "Comodín / Sol Alegre"
+            if (config.hasWildcard) {
+                cardDeck.push({
+                    id: 'wildcard-sun',
+                    matchId: 'wildcard',
+                    emoji: '☀️',
+                    color: 'bg-amber-50 border-amber-300 animate-pulse',
+                    isWildcard: true
+                });
+            }
+
+            // Mezclar mazo definitivo
+            cards = shuffle(cardDeck);
+
+            // Ajustar clases CSS del Grid según dimensiones
+            gameGrid.className = 'grid gap-3 md:gap-4 w-full justify-center items-center';
+            if (config.cols === 3) {
+                gameGrid.classList.add('grid-cols-3', 'max-w-md');
+            } else if (config.cols === 4) {
+                gameGrid.classList.add('grid-cols-4', 'max-w-lg');
+            }
+
+            // Renderizar las fichas
+            renderBoard();
+            updateTeacherMetrics();
+            
+            // Ocultar modal de victoria por si estaba activo
+            document.getElementById('victory-modal').classList.add('hidden');
+        }
+
+        function renderBoard() {
+            const gameGrid = document.getElementById('game-grid');
+            gameGrid.innerHTML = '';
+
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.id = `card-wrapper-${index}`;
+                // Adaptabilidad de tamaño en móviles para niños de 2 a 5 años (tamaños colosales y robustos)
+                cardElement.className = 'pop-card aspect-square w-full cursor-pointer relative rounded-2xl md:rounded-3xl shadow-sm border-2 border-slate-300/40 select-none';
+                
+                // Estructura interna para rotación 3D limpia
+                cardElement.innerHTML = `
+                    <div class="card-inner w-full h-full relative duration-500 rounded-2xl md:rounded-3xl" id="card-inner-${index}">
+                        
+                        <!-- LADO POSTERIOR DE LA FICHA (Boca abajo - Vista que ve el niño al empezar) -->
+                        <div class="card-back absolute inset-0 bg-gradient-to-br from-yellow-300 to-amber-400 rounded-2xl md:rounded-3xl flex items-center justify-center border-4 border-white shadow-inner">
+                            <span class="text-3xl md:text-5xl font-black text-amber-100 select-none">?</span>
+                        </div>
+
+                        <!-- LADO FRONTAL DE LA FICHA (Boca arriba - Revela el animal) -->
+                        <div class="card-front absolute inset-0 ${card.color} rounded-2xl md:rounded-3xl flex items-center justify-center border-4 border-white shadow-inner">
+                            <span class="text-4xl md:text-6xl select-none">${card.emoji}</span>
+                        </div>
+
+                    </div>
+                `;
+
+                // Evento táctil y clic unificado para evitar retrasos de doble toque
+                cardElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleCardFlip(index);
+                });
+
+                gameGrid.appendChild(cardElement);
+            });
+        }
+
+        function handleCardFlip(index) {
+            const card = cards[index];
+            const cardWrapper = document.getElementById(`card-wrapper-${index}`);
+            const cardInner = document.getElementById(`card-inner-${index}`);
+
+            // Validar si la carta ya está emparejada o ya está abierta en el array activo
+            if (card.isMatched || selectedCards.some(item => item.index === index)) {
+                return; 
+            }
+
+            // Reproducir sonido de volteado
+            playSound('flip');
+
+            // Incrementar métrica de clics para observación
+            metrics.totalClicks++;
+            logEvent(`Clic en casilla ${index} (Contenido: ${card.emoji})`);
+
+            // Voltear visualmente la ficha
+            cardWrapper.classList.add('card-flipped');
+
+            // --- CASO ESPECIAL: FICHA COMODÍN (Sol Alegre en Dificultad 2) ---
+            if (card.isWildcard) {
+                card.isMatched = true;
+                playSound('wildcard');
+                logEvent(`¡Activó el Sol Comodín! Éxito inmediato.`);
+                stars += 1; // Otorga una estrella instantánea
+                document.getElementById('star-count').innerText = stars;
+                checkVictoryCondition();
+                updateTeacherMetrics();
+                return;
+            }
+
+            // --- LÓGICA DE JUEGO ADAPTATIVA PARA NIÑOS (CON ASISTENCIA ACTIVA) ---
+            if (adaptiveMode) {
+                // En modo adaptativo permitimos hasta 3 cartas abiertas simultáneamente
+                if (selectedCards.length >= 3) {
+                    // Si ya hay 3 abiertas, forzar el volteo manual inmediato de la primera del FIFO
+                    const firstOut = selectedCards.shift();
+                    flipCardBack(firstOut.index);
+                    logEvent(`Forzado retroceso de casilla ${firstOut.index} por límite de 3 abiertas.`);
+                }
+
+                // Añadir a seleccionadas
+                selectedCards.push({ card, index });
+
+                // Iniciar temporizador de cierre autónomo individual de 4.5 segundos
+                const timeoutId = setTimeout(() => {
+                    // Si la carta aún no se emparejó, se devuelve automáticamente a su posición boca abajo
+                    if (!card.isMatched && selectedCards.some(item => item.index === index)) {
+                        flipCardBack(index);
+                        selectedCards = selectedCards.filter(item => item.index !== index);
+                        logEvent(`Asistencia: Cerrando automáticamente casilla ${index} (${card.emoji}) tras 4.5s.`);
+                    }
+                }, 4500);
+
+                // Guardar referencia del timeout
+                cardTimeouts[index] = timeoutId;
+
+                // Verificar parejas concurrentes entre el set de abiertas (compara todas contra todas)
+                checkPairsInAdaptive();
+
+            } else {
+                // --- LÓGICA DE JUEGO NORMAL ---
+                selectedCards.push({ card, index });
+
+                if (selectedCards.length === 2) {
+                    // Desactivar temporalmente los clics del tablero para evitar interferencias en el análisis
+                    document.getElementById('game-grid').classList.add('pointer-events-none');
+                    
+                    const first = selectedCards[0];
+                    const second = selectedCards[1];
+
+                    if (first.card.matchId === second.card.matchId) {
+                        // ¡Fichas emparejadas con éxito!
+                        handleMatchSuccess(first, second);
+                    } else {
+                        // Fallo en la combinación
+                        handleMatchFailure(first, second);
+                    }
+                }
+            }
+
+            updateTeacherMetrics();
+        }
+
+        function handleMatchSuccess(first, second) {
+            first.card.isMatched = true;
+            second.card.isMatched = true;
+            
+            // Limpiar timeouts si existían
+            if (cardTimeouts[first.index]) clearTimeout(cardTimeouts[first.index]);
+            if (cardTimeouts[second.index]) clearTimeout(cardTimeouts[second.index]);
+
+            selectedCards = [];
+            consecutiveFails = 0; // Restablecer racha de fallos
+            metrics.matches++;
+
+            playSound('match');
+            logEvent(`¡PAREJA ENCONTRADA! [${first.card.emoji} = ${second.card.emoji}]`);
+
+            // Animación festiva de rebote en las cartas emparejadas
+            setTimeout(() => {
+                document.getElementById(`card-wrapper-${first.index}`).classList.add('scale-105', 'brightness-110');
+                document.getElementById(`card-wrapper-${second.index}`).classList.add('scale-105', 'brightness-110');
+                
+                document.getElementById('game-grid').classList.remove('pointer-events-none');
+                checkVictoryCondition();
+            }, 300);
+        }
+
+        function handleMatchFailure(first, second) {
+            consecutiveFails++;
+            metrics.errors++;
+            playSound('fail');
+            logEvent(`Fallo de pareja: ${first.card.emoji} != ${second.card.emoji}. Racha de fallos: ${consecutiveFails}`);
+
+            // Verificar si debe dispararse el modo de ayuda adaptativo (3 fallos seguidos)
+            if (consecutiveFails >= 3 && !adaptiveMode) {
+                adaptiveMode = true;
+                metrics.adaptiveAssists++;
+                document.getElementById('assist-indicator').classList.remove('hidden');
+                logEvent(`🧸 ADAPTATIVIDAD ACTIVADA: Se activa tolerancia a 3 abiertas y cerrado por tiempo (4.5s).`);
+                showToast("🧸 MODO AYUDA ACTIVO 🧸");
+            }
+
+            // Voltear boca abajo tras un intervalo apto para que el niño procese la ubicación (1.8 segundos)
+            setTimeout(() => {
+                flipCardBack(first.index);
+                flipCardBack(second.index);
+                selectedCards = [];
+                document.getElementById('game-grid').classList.remove('pointer-events-none');
+            }, 1800);
+        }
+
+        // Volver a colocar una ficha boca abajo
+        function flipCardBack(index) {
+            const cardWrapper = document.getElementById(`card-wrapper-${index}`);
+            if (cardWrapper) {
+                cardWrapper.classList.remove('card-flipped');
+            }
+        }
+
+        function checkPairsInAdaptive() {
+            // Evaluamos si dentro del array de hasta 3 elementos hay dos que hagan Match
+            if (selectedCards.length < 2) return;
+
+            for (let i = 0; i < selectedCards.length; i++) {
+                for (let j = i + 1; j < selectedCards.length; j++) {
+                    const itemA = selectedCards[i];
+                    const itemB = selectedCards[j];
+
+                    if (itemA.card.matchId === itemB.card.matchId) {
+                        // Pareja identificada en el pool adaptativo
+                        itemA.card.isMatched = true;
+                        itemB.card.isMatched = true;
+
+                        // Detener sus respectivos temporizadores
+                        if (cardTimeouts[itemA.index]) clearTimeout(cardTimeouts[itemA.index]);
+                        if (cardTimeouts[itemB.index]) clearTimeout(cardTimeouts[itemB.index]);
+
+                        // Eliminar estas del pool de abiertas
+                        selectedCards = selectedCards.filter(item => item.index !== itemA.index && item.index !== itemB.index);
+                        
+                        metrics.matches++;
+                        consecutiveFails = 0; // Se reduce la racha por el logro
+
+                        playSound('match');
+                        logEvent(`[Modo Asistido] ¡PAREJA ENCONTRADA! [${itemA.card.emoji} = ${itemB.card.emoji}]`);
+
+                        // Brillo y escala de éxito
+                        const wrapA = document.getElementById(`card-wrapper-${itemA.index}`);
+                        const wrapB = document.getElementById(`card-wrapper-${itemB.index}`);
+                        if (wrapA) wrapA.classList.add('scale-105', 'brightness-110');
+                        if (wrapB) wrapB.classList.add('scale-105', 'brightness-110');
+
+                        checkVictoryCondition();
+                        return; // Detener la verificación en este ciclo
+                    }
+                }
+            }
+        }
+
+        function checkVictoryCondition() {
+            // Revisar si todas las cartas (excluyendo comodín si aplica) están emparejadas
+            const allMatched = cards.every(card => card.isMatched);
+            if (allMatched) {
+                logEvent(`🏆 RONDA COMPLETADA CON ÉXITO.`);
+                playSound('victory');
+                
+                // Mostrar pantalla de recompensa
+                setTimeout(() => {
+                    document.getElementById('victory-modal').classList.remove('hidden');
+                }, 800);
+            }
+        }
+
+        // Avanzar de ronda y otorgar estrellas
+        function nextRound() {
+            ronda++;
+            stars += 10; // Suma de 10 estrellas garantizada por ronda
+            document.getElementById('ronda-display').innerText = ronda;
+            document.getElementById('star-count').innerText = stars;
+            
+            logEvent(`Iniciando Ronda ${ronda}. Acumulado: ${stars} estrellas.`);
+            initGame();
+        }
+
+        // Actualizar estadísticas del panel en vivo
+        function updateTeacherMetrics() {
+            document.getElementById('metric-clicks').innerText = metrics.totalClicks;
+            document.getElementById('metric-errors').innerText = metrics.errors;
+            document.getElementById('metric-assists').innerText = metrics.adaptiveAssists;
+
+            const accuracy = metrics.totalClicks > 0 
+                ? Math.round((metrics.matches * 2 / metrics.totalClicks) * 100) 
+                : 0;
+            
+            document.getElementById('metric-accuracy').innerText = `${Math.min(accuracy, 100)}%`;
+        }
+
+        // Copiar reporte docente en el portapapeles
+        function copyDocenteReport() {
+            const timeElapsed = ((Date.now() - metrics.startTime) / 1000).toFixed(1);
+            const accuracy = metrics.totalClicks > 0 
+                ? Math.round((metrics.matches * 2 / metrics.totalClicks) * 100) 
+                : 0;
+
+            const textReport = `
+=== REPORTE DE CONDUCTA INFANTIL (MEMORIA ADAPTATIVA) ===
+Fecha/Hora de Sesión: ${new Date().toLocaleString()}
+Duración Total de Actividad: ${timeElapsed} segundos
+Ronda Máxima Alcanzada: ${ronda}
+Estrellas Cosechadas: ${stars}
+Dificultad Actual: Nivel ${currentLevel} (Configuración de la rejilla)
+
+MÉTRICAS DEL POINT AND CLICK / MEMORIA:
+- Clics Totales: ${metrics.totalClicks}
+- Errores Cometidos: ${metrics.errors}
+- Parejas Encontradas: ${metrics.matches}
+- Tasa de Acierto Estimada: ${Math.min(accuracy, 100)}%
+- Veces que se Activó la Asistencia Adaptativa: ${metrics.adaptiveAssists}
+
+LOG DE EVENTOS DETALLADO (FLUJO DE JUEGO):
+${metrics.logs.join('\n')}
+========================================================
+            `.trim();
+
+            // Técnica de copiado robusta en iFrame
+            const el = document.createElement('textarea');
+            el.value = textReport;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            showToast("📋 REPORTE COPIADO AL PORTAPAPELES");
+        }
+
+        // Reiniciar métricas para un nuevo estudiante
+        function resetDocenteMetrics() {
+            metrics = {
+                totalClicks: 0,
+                errors: 0,
+                matches: 0,
+                adaptiveAssists: 0,
+                logs: [],
+                startTime: Date.now()
+            };
+            ronda = 1;
+            stars = 0;
+            document.getElementById('ronda-display').innerText = ronda;
+            document.getElementById('star-count').innerText = stars;
+            
+            const logContainer = document.getElementById('log-container');
+            if (logContainer) logContainer.innerHTML = '';
+            
+            logEvent("Reinicio completo del sistema por el evaluador.");
+            initGame();
+            showToast("🗑️ MÉTRICAS RESTABLECIDAS");
+        }
+
+        window.onload = function() {
+            setDifficulty(1); // Arranca por defecto en "Muy fácil" para evaluar la primera aproximación
+        };
+    </script>
+</body>
+</html>
