@@ -214,7 +214,13 @@
                 const response = await fetch(GITHUB_API_URL);
                 
                 if (!response.ok) {
-                    throw new Error(`Error de red: ${response.status}`);
+                    // Si falla, intentamos leer el mensaje exacto que nos da GitHub
+                    let errorDetails = `Error de red: ${response.status}`;
+                    try {
+                        const errorJson = await response.json();
+                        errorDetails += ` - ${errorJson.message}`;
+                    } catch(e) {} // Si no hay JSON, ignoramos
+                    throw new Error(errorDetails);
                 }
 
                 const data = await response.json();
@@ -232,7 +238,7 @@
 
                 if (htmlFiles.length === 0) {
                     errorEl.style.display = 'block';
-                    errorEl.innerHTML = '<p>No se encontraron actividades (.html) en este directorio.</p>';
+                    errorEl.innerHTML = '<h3>Carpeta vacía</h3><p>No se encontraron actividades (.html) en este directorio.</p>';
                     return;
                 }
 
@@ -250,7 +256,6 @@
                     const card = document.createElement('a');
                     card.href = fileUrl;
                     card.className = 'activity-card';
-                    // Evitar comportamiento por defecto en el mismo marco para abrir bien en móviles/PC
                     card.target = '_self'; 
 
                     card.innerHTML = `
@@ -266,6 +271,14 @@
                 console.error("Error al cargar los enlaces:", error);
                 loadingEl.style.display = 'none';
                 errorEl.style.display = 'block';
+                // AÑADIDO: Muestra el error técnico real en pantalla
+                errorEl.innerHTML = `
+                    <h3>¡Ups! Hubo un problema.</h3>
+                    <p>No pudimos cargar la lista de actividades en este momento.</p>
+                    <p style="margin-top: 15px; font-size: 0.9em; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px;">
+                        <strong>Detalle técnico para Daniel:</strong><br> ${error.message}
+                    </p>
+                `;
             }
         }
 
