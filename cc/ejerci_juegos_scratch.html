@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejerci-Juegos: ¡Salta, Juega y Programa!</title>
+    <!-- Tailwind CSS para el diseño rápido, responsive y vibrante -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes amigables y legibles para niños -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Iconos para ilustrar los conceptos visualmente -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Estilos base y tema visual luminoso */
+        body {
+            font-family: 'Nunito', sans-serif;
+            /* Fondo inspirado en un día soleado al aire libre */
+            background: linear-gradient(135deg, #e0f2fe 0%, #d9f99d 100%);
+            background-attachment: fixed;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Forma orgánica (blob) para dar una sensación de juego libre y naturaleza */
+        .blob-shape {
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            animation: morph 8s ease-in-out infinite;
+        }
+
+        @keyframes morph {
+            0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+            67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+        }
+
+        /* Ajustes para que los iframes de Scratch sean responsivos en móviles */
+        .scratch-iframe {
+            max-width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .scratch-iframe:hover {
+            transform: scale(1.02);
+        }
+
+        /* Animación suave para tarjetas interactivas */
+        .hover-bounce:hover {
+            transform: translateY(-8px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- HERO SECTION: Espacio luminoso y presentación de la idea -->
+    <header class="relative overflow-hidden pt-20 pb-24 text-center">
+        <!-- Decoraciones de fondo (Sol y nubes abstractas) -->
+        <div class="absolute top-10 left-10 w-32 h-32 bg-yellow-400 blob-shape opacity-80 z-0"></div>
+        <div class="absolute top-20 right-10 w-48 h-48 bg-white blob-shape opacity-60 z-0" style="animation-delay: 2s;"></div>
+        
+        <div class="relative z-10 max-w-4xl mx-auto px-6">
+            <h1 class="text-5xl md:text-7xl font-bold text-purple-700 mb-6 drop-shadow-md">
+                ¡Adiós Silla, <br> <span class="text-pink-500">Hola Movimiento!</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-700 font-bold mb-8 max-w-2xl mx-auto">
+                ¿Quién dijo que para programar o jugar hay que estar sentado? Descubre los <span class="text-purple-600 bg-purple-100 px-2 py-1 rounded-lg">Ejerci-Juegos</span> (Exergaming). ¡Usa la tecnología para saltar, correr y sudar de alegría!
+            </p>
+            <a href="#galeria" class="inline-block bg-lime-500 hover:bg-lime-400 text-white font-display text-2xl py-4 px-8 rounded-full shadow-lg transition-transform transform hover:scale-110">
+                ¡Vamos a Jugar! <i class="fa-solid fa-play ml-2"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- EXERGAMING EXPLICADO PARA NIÑOS -->
+    <section class="max-w-5xl mx-auto px-6 py-12">
+        <div class="bg-white rounded-3xl p-8 md:p-12 shadow-xl border-4 border-yellow-300 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 text-yellow-100 text-9xl z-0">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div class="relative z-10">
+                <h2 class="text-4xl font-display text-sky-500 mb-6 flex items-center">
+                    <i class="fa-solid fa-bolt text-yellow-400 mr-4"></i> ¿Qué es el Exergaming?
+                </h2>
+                <p class="text-lg md:text-xl text-gray-600 mb-4 leading-relaxed">
+                    Es la combinación perfecta entre <strong>Videojuegos y Deporte</strong>. En lugar de usar los pulgares en un control mientras estás en el sofá, ¡tu cuerpo entero se convierte en el control de mando!
+                </p>
+                <p class="text-lg md:text-xl text-gray-600 leading-relaxed">
+                    Al programar en <strong>Scratch</strong>, podemos crear experiencias donde necesitas mover los brazos, saltar obstáculos imaginarios en tu sala o correr en el lugar. ¡Así usamos el poder de la programación para traer el juego libre y activo al mundo digital!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MICRO:BIT Y SENSORES -->
+    <section class="py-16 bg-sky-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-display text-purple-600 mb-4">
+                    Tu Compañero Físico: Micro:bit
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Esta pequeña placa inteligente se conecta a Scratch y siente todo lo que haces. ¿Qué sensores podemos usar para nuestros proyectos?
+                </p>
+            </div>
+
+            <!-- Cuadrícula de Sensores -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Tarjeta 1 -->
+                <div class="bg-white p-6 rounded-3xl shadow-lg border-b-8 border-pink-400 hover-bounce text-center">
+                    <div class="w-20 h-20 mx-auto bg-pink-100 rounded-full flex items-center justify-center text-4xl text-pink-500 mb-4">
+                        <i class="fa-solid fa-person-running"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Acelerómetro</h3>
+                    <p class="text-gray-600">Siente cuando sacudes o mueves la placa. ¡Perfecto para juegos de carreras donde debes agitar las manos para avanzar!</p>
+                </div>
+                
+                <!-- Tarjeta 2 -->
+                <div class="bg-white p-6 rounded-3xl shadow-lg border-b-8 border-yellow-400 hover-bounce text-center">
+                    <div class="w-20 h-20 mx-auto bg-yellow-100 rounded-full flex items-center justify-center text-4xl text-yellow-500 mb-4">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Pines Táctiles</h3>
+                    <p class="text-gray-600">Conecta papel aluminio o plastilina conductiva a los pines (0,1,2). ¡Puedes crear un circuito de obstáculos físico que pisas descalzo!</p>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="bg-white p-6 rounded-3xl shadow-lg border-b-8 border-lime-400 hover-bounce text-center">
+                    <div class="w-20 h-20 mx-auto bg-lime-100 rounded-full flex items-center justify-center text-4xl text-lime-500 mb-4">
+                        <i class="fa-solid fa-sun"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Sensor de Luz</h3>
+                    <p class="text-gray-600">Detecta la cantidad de luz. Puedes hacer un juego donde debes esconder la placa debajo de tu ropa para evadir a un monstruo.</p>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div class="bg-white p-6 rounded-3xl shadow-lg border-b-8 border-sky-400 hover-bounce text-center">
+                    <div class="w-20 h-20 mx-auto bg-sky-100 rounded-full flex items-center justify-center text-4xl text-sky-500 mb-4">
+                        <i class="fa-solid fa-compass"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">La Brújula</h3>
+                    <p class="text-gray-600">Sabe hacia dónde miras. Gira tu cuerpo físicamente hacia el norte, sur, este u oeste para explorar laberintos en la pantalla.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WEBCAM / VIDEO SENSING -->
+    <section class="py-16">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-8 md:p-12 shadow-2xl text-white flex flex-col md:flex-row items-center gap-8">
+                <div class="w-full md:w-1/3 flex justify-center">
+                    <div class="w-48 h-48 bg-white/20 rounded-full flex items-center justify-center relative blob-shape shadow-[0_0_40px_rgba(255,255,255,0.4)]">
+                        <i class="fa-solid fa-camera text-6xl"></i>
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3">
+                    <h2 class="text-4xl md:text-5xl font-display mb-4">¡Cámara y Acción!</h2>
+                    <h3 class="text-2xl font-bold mb-4 text-purple-100">Sin hardware extra: El Sensor de Video en Scratch</h3>
+                    <p class="text-lg mb-6 leading-relaxed">
+                        ¿No tienes una placa Micro:bit en casa? ¡No hay excusas para quedarse quieto! Al activar la extensión de <strong>"Sensor de Video"</strong> en Scratch, tu cámara web se transforma en el mejor sensor.
+                    </p>
+                    <p class="text-lg bg-white/20 p-4 rounded-xl">
+                        <i class="fa-solid fa-lightbulb text-yellow-300 mr-2"></i> <strong>Idea creativa:</strong> Programa objetos que caen de la pantalla y debes "golpearlos" agitando tus manos reales frente a la computadora. ¡Es como estar dentro del juego!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALERÍA DE PROYECTOS (IFRAMES) -->
+    <section id="galeria" class="py-16 bg-white/60">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-display text-sky-500 mb-4">
+                    Galería de Ejerci-Juegos
+                </h2>
+                <p class="text-xl text-gray-700">Explora estos proyectos de prueba, mueve tu cuerpo y descubre cómo funciona el código por dentro.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                
+                <!-- Caso 1: El proyecto original solicitado por el usuario -->
+                <div class="flex flex-col">
+                    <div class="bg-pink-100 p-4 rounded-t-2xl">
+                        <h3 class="text-xl font-bold text-pink-700 font-display flex justify-between items-center">
+                            Desafío Misterioso <i class="fa-solid fa-star text-yellow-500"></i>
+                        </h3>
+                    </div>
+                    <div class="bg-white p-4 border-l-4 border-r-4 border-pink-100 flex-grow">
+                        <p class="text-sm text-gray-600 mb-4">
+                            ¡Un proyecto sorpresa! Entra en este mundo interactivo creado en Scratch y descubre las mecánicas preparadas. Haz clic en la bandera verde para comenzar.
+                        </p>
+                    </div>
+                    <!-- Iframe de muestra proporcionado -->
+                    <div class="bg-gray-100 rounded-b-2xl overflow-hidden flex justify-center p-2 border-t-0 border-pink-100 border-4">
+                        <iframe class="scratch-iframe" src="https://scratch.mit.edu/projects/1328326185/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Caso 2: Sensor de Video (Burbujas) -->
+                <div class="flex flex-col">
+                    <div class="bg-sky-100 p-4 rounded-t-2xl">
+                        <h3 class="text-xl font-bold text-sky-700 font-display flex justify-between items-center">
+                            Pop Burbujas (Webcam) <i class="fa-solid fa-video text-sky-500"></i>
+                        </h3>
+                    </div>
+                    <div class="bg-white p-4 border-l-4 border-r-4 border-sky-100 flex-grow">
+                        <p class="text-sm text-gray-600 mb-4">
+                            <strong>Usa tu Webcam:</strong> Al presionar la bandera verde, da permisos a tu cámara. Muévete por toda la habitación frente al lente para reventar todas las burbujas que aparecen en la pantalla. ¡No te quedes quieto!
+                        </p>
+                    </div>
+                    <!-- Iframe: Proyecto clásico de Bubble Video Sensing -->
+                    <div class="bg-gray-100 rounded-b-2xl overflow-hidden flex justify-center p-2 border-t-0 border-sky-100 border-4">
+                        <iframe class="scratch-iframe" src="https://scratch.mit.edu/projects/10128119/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Caso 3: Micro:bit (Driver) -->
+                <div class="flex flex-col">
+                    <div class="bg-lime-100 p-4 rounded-t-2xl">
+                        <h3 class="text-xl font-bold text-lime-700 font-display flex justify-between items-center">
+                            Carrera Micro:bit <i class="fa-solid fa-microchip text-lime-500"></i>
+                        </h3>
+                    </div>
+                    <div class="bg-white p-4 border-l-4 border-r-4 border-lime-100 flex-grow">
+                        <p class="text-sm text-gray-600 mb-4">
+                            <strong>Requiere Micro:bit:</strong> Toma tu placa con ambas manos como si fuera un volante real. Inclina la placa hacia la izquierda y derecha físicamente usando su acelerómetro para esquivar el tráfico en el juego.
+                        </p>
+                    </div>
+                    <!-- Iframe: Proyecto de conducción con Microbit -->
+                    <div class="bg-gray-100 rounded-b-2xl overflow-hidden flex justify-center p-2 border-t-0 border-lime-100 border-4">
+                        <iframe class="scratch-iframe" src="https://scratch.mit.edu/projects/428740218/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- RINCÓN PARA DOCENTES -->
+    <section class="py-16 bg-indigo-50">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="bg-white border-l-8 border-indigo-500 rounded-2xl p-8 md:p-10 shadow-lg">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl shrink-0">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                    </div>
+                    <h2 class="text-3xl font-display text-indigo-800">Rincón para Docentes: El Respaldo Académico</h2>
+                </div>
+                
+                <p class="text-lg text-gray-700 mb-4">
+                    El diseño de experiencias de "Exergaming" con Scratch y Micro:bit no es solo una actividad lúdica, sino una estrategia pedagógica con sólido respaldo científico. Al integrar el movimiento físico con el aprendizaje computacional, se aborda el desarrollo integral de los estudiantes de manera innovadora.
+                </p>
+                
+                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 mb-6">
+                    <h3 class="text-xl font-bold text-indigo-900 mb-2">Referencia Científica Recomendada</h3>
+                    <p class="text-gray-700 italic mb-4">
+                        "Exergaming and education: a relational model for games selection and evaluation" (Chow & Mann, 2023).
+                    </p>
+                    <p class="text-gray-700 mb-4">
+                        Esta investigación, publicada en <em>Frontiers in Psychology</em> y alojada en la biblioteca de los Institutos Nacionales de Salud de EE.UU. (NIH), propone un modelo relacional basado en la <strong>Taxonomía de Bloom</strong>. El estudio demuestra que para aprovechar el exergaming en la educación, los docentes deben alinear las demandas del juego con las capacidades del estudiante en tres dominios clave:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 ml-2">
+                        <li><strong>Dominio Psicomotor:</strong> Desarrollo de habilidades motoras (finas y gruesas) al usar el cuerpo o crear circuitos para interactuar con la placa Micro:bit o la cámara.</li>
+                        <li><strong>Dominio Cognitivo:</strong> Estimulación de la resolución de problemas, el pensamiento lógico y las funciones ejecutivas al programar las reglas y condiciones en Scratch.</li>
+                        <li><strong>Dominio Afectivo:</strong> Mejora de la motivación hacia la educación física, el bienestar psicosocial y la autoeficacia de los alumnos, trabajando en equipo o superando retos.</li>
+                    </ul>
+                </div>
+                
+                <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10359147/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+                    Leer el artículo académico completo en PMC (NCBI) <i class="fa-solid fa-external-link-alt ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- RINCÓN TÉCNICO -->
+    <section class="py-16 bg-slate-100">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="bg-white border-t-8 border-teal-500 rounded-2xl p-8 md:p-10 shadow-lg">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-3xl shrink-0">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                    <h2 class="text-3xl font-display text-teal-800">Rincón Técnico: Conecta tu Micro:bit a Scratch</h2>
+                </div>
+                
+                <p class="text-lg text-gray-700 mb-8 leading-relaxed">
+                    Para que el sistema funcione y tu cuerpo controle los juegos, necesitamos establecer una conexión de datos entre la placa física y tu pantalla. Ese puente de comunicación se llama <strong>Scratch Link</strong>. Sigue estos 3 sencillos pasos para empezar a programar:
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+                    <!-- Paso 1 -->
+                    <div class="bg-teal-50 p-6 rounded-xl border border-teal-100 relative pt-8">
+                        <div class="absolute -top-5 left-6 w-12 h-12 bg-teal-500 text-white rounded-full flex items-center justify-center font-display font-bold text-2xl shadow-md border-4 border-white">1</div>
+                        <h3 class="text-xl font-bold text-teal-900 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-download text-teal-500"></i> Scratch Link
+                        </h3>
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            Descarga e instala la aplicación <strong>Scratch Link</strong> desde la <a href="https://scratch.mit.edu/microbit" target="_blank" class="text-teal-600 underline font-bold hover:text-teal-800">página oficial de Scratch</a>. Ábrela y déjala funcionando en segundo plano. Asegúrate de tener el <strong>Bluetooth activado</strong> en tu computadora.
+                        </p>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="bg-teal-50 p-6 rounded-xl border border-teal-100 relative pt-8">
+                        <div class="absolute -top-5 left-6 w-12 h-12 bg-teal-500 text-white rounded-full flex items-center justify-center font-display font-bold text-2xl shadow-md border-4 border-white">2</div>
+                        <h3 class="text-xl font-bold text-teal-900 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-teal-500"></i> Prepara la Placa
+                        </h3>
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            Conecta tu Micro:bit por USB. Descarga el <strong>archivo HEX de Scratch</strong> (en el mismo enlace del paso 1) y arrástralo a la unidad de tu Micro:bit como si fuera un pendrive. Verás un código en la pantalla LED de tu placa al terminar.
+                        </p>
+                    </div>
+
+                    <!-- Paso 3 -->
+                    <div class="bg-teal-50 p-6 rounded-xl border border-teal-100 relative pt-8">
+                        <div class="absolute -top-5 left-6 w-12 h-12 bg-teal-500 text-white rounded-full flex items-center justify-center font-display font-bold text-2xl shadow-md border-4 border-white">3</div>
+                        <h3 class="text-xl font-bold text-teal-900 mb-3 flex items-center gap-2">
+                            <i class="fa-brands fa-bluetooth text-teal-500"></i> Enlaza y Juega
+                        </h3>
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            Abre tu proyecto de Scratch en el navegador. Haz clic en el botón <strong>"Añadir Extensión"</strong> (abajo a la izquierda) y elige "Micro:bit". Scratch buscará tu placa vía Bluetooth. ¡Dale a "Conectar" y listo!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-800 text-white text-center py-8">
+        <p class="text-lg font-display mb-2">¡La pantalla no es un límite, es el inicio de la cancha!</p>
+        <p class="text-sm text-slate-400">Diseñado para inspirar experiencias de Exergaming con Scratch y Micro:bit.</p>
+    </footer>
+
+</body>
+</html>
