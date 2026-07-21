@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTAL DE ACTIVIDADES</title>
+    
+    <style>
+        :root {
+            --bg-color: #f0f8ff; /* Azul muy claro y amigable */
+            --header-bg: #4a90e2;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --btn-hover: #e3f2fd;
+            --accent-colors: #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #d4fc79, #96e6a1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--header-bg);
+            margin-top: 50px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.02); }
+            100% { opacity: 0.5; transform: scale(0.98); }
+        }
+
+        #error-message {
+            display: none;
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #ef9a9a;
+            margin-top: 20px;
+        }
+
+        #links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            display: none; /* Se muestra cuando cargan los datos */
+        }
+
+        .activity-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+        }
+
+        .activity-card:active {
+            transform: translateY(-2px);
+        }
+
+        /* Borde superior de color aleatorio para hacerlo alegre */
+        .color-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 12px;
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌟 Portal de Actividades 🌟</h1>
+        <p class="subtitle">Selecciona un juego para comenzar a aprender y divertirte</p>
+    </header>
+
+    <main>
+        <div id="loading">Buscando actividades mágicas... ✨</div>
+        
+        <div id="error-message">
+            <h3>¡Ups! Hubo un problema.</h3>
+            <p>No pudimos cargar la lista de actividades en este momento. Verifica tu conexión o intenta recargar la página.</p>
+        </div>
+
+        <div id="links-grid">
+            <!-- Las tarjetas se generarán aquí con JavaScript -->
+        </div>
+    </main>
+
+    <script>
+        // Configuración de la API y URLs
+        // Repositorio deducido de la URL: danielgastelu.github.io
+        const GITHUB_API_URL = 'https://api.github.com/repos/danielgastelu/danielgastelu.github.io/contents/web/prim';
+        const BASE_URL = 'http://danielgastelu.github.io/web/prim/';
+
+        // Elementos del DOM
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error-message');
+        const gridEl = document.getElementById('links-grid');
+
+        // Paleta de colores divertidos para las tarjetas
+        const cardColors = ['#ff9a9e', '#a1c4fd', '#d4fc79', '#f6d365', '#a8edea', '#fed6e3'];
+        // Emojis aleatorios para acompañar si no podemos deducir uno del título
+        const defaultEmojis = ['🎮', '🚀', '⭐', '🎈', '🎨', '🧩', '🐾', '🌟'];
+
+        // Función para limpiar y formatear el nombre del archivo
+        function formatName(filename) {
+            // 1. Quitar la extensión .html
+            let name = filename.replace('.html', '');
+            
+            // 2. Reemplazar guiones bajos o medios por espacios
+            name = name.replace(/[-_]/g, ' ');
+            
+            // 3. (Opcional) Si hay palabras como "juego" o "app", se podrían filtrar, 
+            // pero por ahora lo dejamos exactamente como el nombre del archivo limpio.
+            return name;
+        }
+
+        // Función para intentar asignar un emoji semántico basado en el nombre
+        function getEmojiForName(name) {
+            const lowerName = name.toLowerCase();
+            if (lowerName.includes('burbuja')) return '🫧';
+            if (lowerName.includes('animal') || lowerName.includes('comer')) return '🐾';
+            if (lowerName.includes('memoria')) return '🧠';
+            if (lowerName.includes('ordenar') || lowerName.includes('juguete')) return '🧸';
+            if (lowerName.includes('buscar')) return '🔍';
+            if (lowerName.includes('color')) return '🎨';
+            if (lowerName.includes('torre') || lowerName.includes('hanoi')) return '🗼';
+            if (lowerName.includes('forma') || lowerName.includes('geometria')) return '🔺';
+            if (lowerName.includes('sombra')) return '👤';
+            
+            // Si no hay coincidencia, devuelve uno aleatorio de la lista por defecto
+            return defaultEmojis[Math.floor(Math.random() * defaultEmojis.length)];
+        }
+
+        async function fetchAndRenderLinks() {
+            try {
+                // Hacemos la petición a la API pública de GitHub
+                const response = await fetch(GITHUB_API_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`Error de red: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Filtramos para obtener SOLO los archivos .html (excluyendo el index o esta misma portada si estuviera allí)
+                const htmlFiles = data.filter(file => {
+                    return file.type === 'file' && 
+                           file.name.endsWith('.html') && 
+                           file.name !== 'index.html' &&
+                           file.name !== 'portadaprim.html';
+                });
+
+                // Ocultar mensaje de carga
+                loadingEl.style.display = 'none';
+
+                if (htmlFiles.length === 0) {
+                    errorEl.style.display = 'block';
+                    errorEl.innerHTML = '<p>No se encontraron actividades (.html) en este directorio.</p>';
+                    return;
+                }
+
+                // Mostrar la cuadrícula
+                gridEl.style.display = 'grid';
+
+                // Recorrer los archivos y generar las tarjetas HTML
+                htmlFiles.forEach((file, index) => {
+                    const cleanTitle = formatName(file.name);
+                    const fileUrl = `${BASE_URL}${file.name}`;
+                    const emoji = getEmojiForName(cleanTitle);
+                    const color = cardColors[index % cardColors.length];
+
+                    // Crear el elemento <a>
+                    const card = document.createElement('a');
+                    card.href = fileUrl;
+                    card.className = 'activity-card';
+                    // Evitar comportamiento por defecto en el mismo marco para abrir bien en móviles/PC
+                    card.target = '_self'; 
+
+                    card.innerHTML = `
+                        <div class="color-bar" style="background-color: ${color}"></div>
+                        <div class="icon">${emoji}</div>
+                        <div class="title">${cleanTitle}</div>
+                    `;
+
+                    gridEl.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("Error al cargar los enlaces:", error);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // Iniciar el proceso cuando se carga la página
+        window.onload = fetchAndRenderLinks;
+
+    </script>
+</body>
+</html>
