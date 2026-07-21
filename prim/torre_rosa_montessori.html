@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Torre Rosa Montessori</title>
+    
+    <style>
+        :root {
+            /* Colores inspirados en el ambiente Montessori */
+            --bg-color: #f9f6f0; /* Tono lino/pergamino suave */
+            --wood-color: #d8c3a5; /* Color madera clara */
+            --wood-dark: #b8a385;
+            --pink-tower: #e69ea8; /* Rosa clásico Montessori */
+            --pink-shadow: #c9828d;
+            --text-color: #5c5346;
+            --white: #ffffff;
+            --success: #88b08b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Previene selección de texto accidental en móviles */
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif; /* Tipografía de alta legibilidad */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden; /* Evita el scroll durante el drag & drop */
+            text-transform: uppercase; /* Imprenta mayúscula en toda la aplicación */
+            letter-spacing: 1px; /* Separación extra para facilitar la lectura en edades tempranas */
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+            flex-wrap: wrap; /* Añadido para que se adapte bien con el deslizador */
+            gap: 15px;
+        }
+
+        .difficulty-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .difficulty-wrapper input[type="range"] {
+            cursor: pointer;
+            accent-color: var(--pink-shadow);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background-color: var(--wood-color);
+            color: var(--text-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--wood-dark);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            #game-container {
+                flex-direction: row; /* En escritorio, estante a la izquierda, alfombra a la derecha */
+            }
+        }
+
+        /* El estante donde empiezan los bloques desordenados */
+        #shelf {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px dashed var(--wood-color);
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            gap: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* La alfombra donde se construye la torre */
+        #mat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .mat-rug {
+            width: 80%;
+            max-width: 300px;
+            height: 20px;
+            background-color: var(--wood-color);
+            border-radius: 10px;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.1);
+            position: absolute;
+            bottom: 20px;
+            z-index: 1;
+        }
+
+        #tower {
+            display: flex;
+            flex-direction: column-reverse; /* Apila desde abajo hacia arriba (DOM: primer hijo abajo) */
+            align-items: center;
+            z-index: 2;
+            padding-bottom: 5px; /* Espacio mínimo sobre la alfombra */
+            width: 100%;
+            min-height: 50vh;
+        }
+
+        .block {
+            background-color: var(--pink-tower);
+            box-shadow: inset -2px -2px 5px var(--pink-shadow), inset 2px 2px 5px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.15);
+            border-radius: 4px; /* Un poco redondeado por seguridad infantil simulada */
+            cursor: grab;
+            touch-action: none; /* Vital para drag en móviles */
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.2s;
+        }
+
+        .block:active {
+            cursor: grabbing;
+        }
+
+        .block.placed {
+            cursor: default;
+            box-shadow: inset -2px -2px 5px var(--pink-shadow), inset 2px 2px 5px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Elemento clonado que sigue el ratón/dedo */
+        .ghost-block {
+            position: fixed;
+            pointer-events: none; /* Permite detectar elementos debajo */
+            z-index: 1000;
+            background-color: var(--pink-tower);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            transition: top 0.3s ease, left 0.3s ease; /* Para la animación de retorno */
+        }
+
+        .ghost-block.dragging {
+            transition: none; /* Sin transición mientras el usuario arrastra */
+        }
+
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        .shake {
+            animation: gentleShake 0.4s ease-in-out;
+        }
+
+        @keyframes softGlow {
+            0%, 100% { filter: brightness(1); box-shadow: 0 0 10px rgba(136, 176, 139, 0); }
+            50% { filter: brightness(1.05); box-shadow: 0 0 20px rgba(136, 176, 139, 0.6); }
+        }
+
+        .tower-complete .block {
+            animation: softGlow 2s infinite;
+        }
+
+        /* Modal de información / Victoria */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h2 {
+            color: var(--pink-shadow);
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .close-btn {
+            background-color: var(--pink-tower);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .close-btn:hover {
+            background-color: var(--pink-shadow);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Torre Rosa</h1>
+        <div class="difficulty-wrapper">
+            <label for="difficulty-slider">Nivel:</label>
+            <input type="range" id="difficulty-slider" min="1" max="3" value="3">
+            <span id="diff-label">Difícil (10)</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn" id="btn-info">¿Qué es?</button>
+            <button class="btn" id="btn-reset">Reiniciar</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <!-- Área inicial de bloques -->
+        <div id="shelf"></div>
+
+        <!-- Área de construcción -->
+        <div id="mat-area">
+            <div id="tower"></div>
+            <div class="mat-rug"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>La Torre Rosa Montessori</h2>
+            <p>Este material pertenece al área <strong>Sensorial</strong>. Está compuesto por diez cubos (aquí representados en 2D) que varían en tamaño de 1 a 10.</p>
+            <p><strong>Propósito:</strong> Ayuda a desarrollar la discriminación visual de las dimensiones. El niño debe ordenarlos del más grande al más pequeño.</p>
+            <p><strong>Control del error:</strong> En el método Montessori, el material educa por sí mismo. Si colocas un cubo más grande sobre uno pequeño, la torre pierde el equilibrio visual. En esta versión digital, el bloque regresará a su lugar suavemente indicando que aún no es su turno, fomentando el auto-descubrimiento.</p>
+            <button class="close-btn" id="close-info">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal de Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <h2>¡Lo lograste!</h2>
+            <p style="text-align: center;">Has construido la Torre Rosa correctamente, concentrándote en el orden y la dimensión.</p>
+            <button class="close-btn" id="close-win">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración del juego
+        let TOTAL_BLOCKS = 10;
+        let BASE_SIZE = 25; // Tamaño del cubo más pequeño en píxeles
+        let SIZE_INCREMENT = 12; // Incremento de tamaño por cada bloque
+        
+        // Elementos DOM
+        const shelf = document.getElementById('shelf');
+        const tower = document.getElementById('tower');
+        const infoModal = document.getElementById('info-modal');
+        const winModal = document.getElementById('win-modal');
+        const difficultySlider = document.getElementById('difficulty-slider');
+        const diffLabel = document.getElementById('diff-label');
+
+        // Estado del juego
+        let expectedId = TOTAL_BLOCKS; // Empezamos esperando el bloque más grande (ID 10)
+        let isDragging = false;
+        let currentBlock = null;
+        let ghostBlock = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let originalRect = null;
+
+        // Inicializar o Reiniciar Juego
+        function initGame() {
+            shelf.innerHTML = '';
+            tower.innerHTML = '';
+            tower.classList.remove('tower-complete');
+            expectedId = TOTAL_BLOCKS;
+            
+            // Crear array de bloques
+            let blocks = [];
+            for (let i = 1; i <= TOTAL_BLOCKS; i++) {
+                blocks.push(i);
+            }
+            
+            // Mezclar bloques aleatoriamente
+            blocks.sort(() => Math.random() - 0.5);
+
+            // Renderizar bloques en el estante
+            blocks.forEach(id => {
+                const size = BASE_SIZE + (id * SIZE_INCREMENT);
+                const block = document.createElement('div');
+                block.className = 'block';
+                block.style.width = `${size}px`;
+                block.style.height = `${size}px`;
+                block.dataset.id = id;
+                block.dataset.placed = "false";
+                
+                // Eventos de ratón y táctiles
+                block.addEventListener('mousedown', dragStart);
+                block.addEventListener('touchstart', dragStart, {passive: false});
+                
+                shelf.appendChild(block);
+            });
+        }
+
+        function dragStart(e) {
+            // Ignorar si ya está colocado
+            if (e.target.dataset.placed === "true") return;
+            
+            e.preventDefault(); // Prevenir comportamientos por defecto (scroll táctil)
+            
+            currentBlock = e.target;
+            isDragging = true;
+            originalRect = currentBlock.getBoundingClientRect();
+
+            // Determinar coordenadas iniciales
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            // Calcular offset desde el ratón hasta la esquina superior izquierda del bloque
+            offsetX = clientX - originalRect.left;
+            offsetY = clientY - originalRect.top;
+
+            // Crear el "fantasma" que se moverá por la pantalla
+            ghostBlock = currentBlock.cloneNode(true);
+            ghostBlock.className = 'ghost-block dragging';
+            ghostBlock.style.width = `${originalRect.width}px`;
+            ghostBlock.style.height = `${originalRect.height}px`;
+            ghostBlock.style.left = `${originalRect.left}px`;
+            ghostBlock.style.top = `${originalRect.top}px`;
+            document.body.appendChild(ghostBlock);
+
+            // Ocultar parcialmente el bloque original
+            currentBlock.style.opacity = '0.1';
+
+            // Escuchar eventos globales de movimiento y fin
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!isDragging || !ghostBlock) return;
+            e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            ghostBlock.style.left = `${clientX - offsetX}px`;
+            ghostBlock.style.top = `${clientY - offsetY}px`;
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
+
+            // Obtener coordenadas finales
+            let clientX, clientY;
+            if (e.type.includes('mouse')) {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            } else {
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
+            }
+
+            // Ocultar temporalmente el fantasma para ver qué hay debajo
+            ghostBlock.style.display = 'none';
+            const elemBelow = document.elementFromPoint(clientX, clientY);
+            ghostBlock.style.display = 'block';
+
+            // Comprobar si soltó sobre el área de la alfombra/torre
+            const isOverMat = elemBelow && (elemBelow.closest('#mat-area') || elemBelow.closest('#tower'));
+            const blockId = parseInt(currentBlock.dataset.id);
+
+            if (isOverMat) {
+                if (blockId === expectedId) {
+                    // ¡Correcto! Es el bloque que sigue.
+                    acceptPlacement();
+                } else {
+                    // Error: No es el bloque correcto
+                    rejectPlacement();
+                }
+            } else {
+                // Soltó fuera del área
+                rejectPlacement(false); // No sacudir si solo lo soltó fuera
+            }
+        }
+
+        function acceptPlacement() {
+            // Eliminar fantasma
+            ghostBlock.remove();
+            ghostBlock = null;
+
+            // Mover bloque real a la torre
+            currentBlock.style.opacity = '1';
+            currentBlock.dataset.placed = "true";
+            currentBlock.classList.add('placed');
+            tower.appendChild(currentBlock);
+
+            expectedId--; // Preparar para el siguiente tamaño
+
+            // Comprobar victoria
+            if (expectedId === 0) {
+                setTimeout(winGame, 300);
+            }
+            
+            currentBlock = null;
+        }
+
+        function rejectPlacement(shouldShake = true) {
+            // Animar retorno al origen
+            ghostBlock.classList.remove('dragging');
+            if (shouldShake) {
+                ghostBlock.classList.add('shake');
+            }
+
+            // Usar requestAnimationFrame para asegurar que el navegador procese los cambios de clase antes de animar
+            requestAnimationFrame(() => {
+                ghostBlock.style.left = `${originalRect.left}px`;
+                ghostBlock.style.top = `${originalRect.top}px`;
+            });
+
+            // Al terminar la transición, limpiar
+            setTimeout(() => {
+                if (ghostBlock) {
+                    ghostBlock.remove();
+                    ghostBlock = null;
+                }
+                if (currentBlock) {
+                    currentBlock.style.opacity = '1';
+                    currentBlock = null;
+                }
+            }, 350); // Ligeramente mayor que la transición CSS
+        }
+
+        function winGame() {
+            tower.classList.add('tower-complete');
+            showModal(winModal);
+        }
+
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            // Pequeño retraso para la animación CSS
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        // Configuración de niveles
+        function applyDifficulty() {
+            const level = parseInt(difficultySlider.value);
+            if (level === 1) {
+                TOTAL_BLOCKS = 6;
+                BASE_SIZE = 40;
+                SIZE_INCREMENT = 22; // Mayor diferencia de tamaño
+                diffLabel.textContent = "Fácil (6)";
+            } else if (level === 2) {
+                TOTAL_BLOCKS = 8;
+                BASE_SIZE = 30;
+                SIZE_INCREMENT = 16; // Diferencia media
+                diffLabel.textContent = "Medio (8)";
+            } else {
+                TOTAL_BLOCKS = 10;
+                BASE_SIZE = 25;
+                SIZE_INCREMENT = 12; // Diferencia sutil (clásico)
+                diffLabel.textContent = "Difícil (10)";
+            }
+            initGame(); // Reinicia el juego con la nueva configuración
+        }
+
+        // Eventos de botones
+        difficultySlider.addEventListener('input', applyDifficulty);
+        document.getElementById('btn-reset').addEventListener('click', initGame);
+        
+        document.getElementById('btn-info').addEventListener('click', () => {
+            showModal(infoModal);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            hideModal(infoModal);
+        });
+
+        document.getElementById('close-win').addEventListener('click', () => {
+            hideModal(winModal);
+            initGame();
+        });
+
+        // Iniciar al cargar
+        applyDifficulty();
+        
+        // Ajuste en caso de redimensión (vuelve a colocar los bloques mal calculados visualmente)
+        window.addEventListener('resize', () => {
+            if (expectedId !== 0 && expectedId !== TOTAL_BLOCKS) {
+                // Si el juego está a medias, un resize masivo puede descolocar visualmente
+                // la posición original de las piezas en el estante. 
+                // En un caso real avanzado se recalcularían posiciones, aquí confiamos en Flexbox.
+            }
+        });
+    </script>
+</body>
+</html>

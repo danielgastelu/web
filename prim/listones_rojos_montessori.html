@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LOS LISTONES ROJOS MONTESSORI</title>
+    
+    <style>
+        :root {
+            /* Colores inspirados en el ambiente Montessori */
+            --bg-color: #f9f6f0; 
+            --wood-color: #d8c3a5; 
+            --wood-dark: #b8a385;
+            --red-rod: #c92a2a; /* Rojo clásico Montessori */
+            --red-shadow: #a61e1e;
+            --text-color: #5c5346;
+            --white: #ffffff;
+            --success: #88b08b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .difficulty-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .difficulty-wrapper input[type="range"] {
+            cursor: pointer;
+            accent-color: var(--red-shadow);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background-color: var(--wood-color);
+            color: var(--text-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--wood-dark);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            #game-container {
+                flex-direction: row;
+            }
+        }
+
+        /* Estante (mezclados) */
+        #shelf {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px dashed var(--wood-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column; /* Apilados pero desordenados */
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Área de trabajo (alfombra) */
+        #mat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; /* ALINEACIÓN A LA IZQUIERDA CLAVE EN ESTE MATERIAL */
+            padding: 20px;
+            position: relative;
+            background-color: rgba(216, 195, 165, 0.2);
+            border-radius: 12px;
+            border-left: 8px solid var(--wood-dark); /* Guía visual izquierda */
+        }
+
+        #mat-area::before {
+            content: 'ALINEAR AQUÍ';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            color: var(--wood-dark);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        #stair {
+            display: flex;
+            flex-direction: column-reverse; /* Se construye desde el más largo (abajo) hacia arriba */
+            align-items: flex-start;
+            z-index: 2;
+            width: 100%;
+            gap: 2px; /* Pequeña separación visual */
+        }
+
+        .rod {
+            background-color: var(--red-rod);
+            height: 25px; /* Altura constante, aísla la longitud */
+            box-shadow: inset -2px -2px 4px var(--red-shadow), inset 2px 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            cursor: grab;
+            touch-action: none;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+        }
+
+        .rod:active {
+            cursor: grabbing;
+        }
+
+        .rod.placed {
+            cursor: default;
+            box-shadow: inset -2px -2px 4px var(--red-shadow), inset 2px 2px 4px rgba(255,255,255,0.3), 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .ghost-rod {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            background-color: var(--red-rod);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-radius: 2px;
+            transition: top 0.3s ease, left 0.3s ease;
+        }
+
+        .ghost-rod.dragging {
+            transition: none;
+        }
+
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        .shake {
+            animation: gentleShake 0.4s ease-in-out;
+        }
+
+        @keyframes softGlow {
+            0%, 100% { filter: brightness(1); box-shadow: 0 0 10px rgba(201, 42, 42, 0); }
+            50% { filter: brightness(1.1); box-shadow: 0 0 15px rgba(201, 42, 42, 0.5); }
+        }
+
+        .stair-complete .rod {
+            animation: softGlow 2s infinite;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h2 {
+            color: var(--red-shadow);
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .close-btn {
+            background-color: var(--red-rod);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: inherit;
+            text-transform: inherit;
+            letter-spacing: inherit;
+        }
+
+        .close-btn:hover {
+            background-color: var(--red-shadow);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>LISTONES ROJOS</h1>
+        <div class="difficulty-wrapper">
+            <label for="difficulty-slider">NIVEL:</label>
+            <input type="range" id="difficulty-slider" min="1" max="3" value="3">
+            <span id="diff-label">DIFÍCIL (10)</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn" id="btn-info">¿QUÉ ES?</button>
+            <button class="btn" id="btn-reset">REINICIAR</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <!-- Área inicial de listones -->
+        <div id="shelf"></div>
+
+        <!-- Área de construcción alineada a la izquierda -->
+        <div id="mat-area">
+            <div id="stair"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>LOS LISTONES ROJOS MONTESSORI</h2>
+            <p>ESTE MATERIAL SENSORIAL AÍSLA EL CONCEPTO DE <strong>LONGITUD</strong> (LARGO VERSUS CORTO). TODOS LOS LISTONES TIENEN EL MISMO GROSOR Y COLOR.</p>
+            <p><strong>PROPÓSITO:</strong> EL NIÑO APRENDE A ORDENAR DE MAYOR A MENOR, ALINEANDO SIEMPRE DEL LADO IZQUIERDO. ESTO PREPARA EL OJO PARA LA LECTURA DE IZQUIERDA A DERECHA.</p>
+            <p><strong>INSTRUCCIONES:</strong> ARRASTRA EL LISTÓN MÁS LARGO DISPONIBLE HACIA LA ZONA DE ALINEACIÓN. SI TE EQUIVOCAS, EL LISTÓN VOLVERÁ SOLITO A SU LUGAR.</p>
+            <button class="close-btn" id="close-info">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Modal de Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <h2>¡EXCELENTE TRABAJO!</h2>
+            <p style="text-align: center;">HAS ORDENADO LAS LONGITUDES CORRECTAMENTE, DE LA MÁS LARGA A LA MÁS CORTA.</p>
+            <button class="close-btn" id="close-win">JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración del juego
+        let TOTAL_RODS = 10;
+        let BASE_WIDTH = 10; // Porcentaje de ancho base
+        let WIDTH_INC = 9;   // Incremento en porcentaje por bloque
+        
+        // Elementos DOM
+        const shelf = document.getElementById('shelf');
+        const stair = document.getElementById('stair');
+        const infoModal = document.getElementById('info-modal');
+        const winModal = document.getElementById('win-modal');
+        const difficultySlider = document.getElementById('difficulty-slider');
+        const diffLabel = document.getElementById('diff-label');
+
+        // Estado del juego
+        let expectedId = TOTAL_RODS; 
+        let isDragging = false;
+        let currentRod = null;
+        let ghostRod = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let originalRect = null;
+
+        // Inicializar
+        function initGame() {
+            shelf.innerHTML = '';
+            stair.innerHTML = '';
+            stair.classList.remove('stair-complete');
+            expectedId = TOTAL_RODS;
+            
+            let rods = [];
+            for (let i = 1; i <= TOTAL_RODS; i++) {
+                rods.push(i);
+            }
+            
+            // Mezclar
+            rods.sort(() => Math.random() - 0.5);
+
+            rods.forEach(id => {
+                const widthPercent = BASE_WIDTH + (id * WIDTH_INC);
+                const rod = document.createElement('div');
+                rod.className = 'rod';
+                rod.style.width = `${widthPercent}%`;
+                rod.dataset.id = id;
+                rod.dataset.placed = "false";
+                
+                rod.addEventListener('mousedown', dragStart);
+                rod.addEventListener('touchstart', dragStart, {passive: false});
+                
+                shelf.appendChild(rod);
+            });
+        }
+
+        function dragStart(e) {
+            if (e.target.dataset.placed === "true") return;
+            e.preventDefault(); 
+            
+            currentRod = e.target;
+            isDragging = true;
+            originalRect = currentRod.getBoundingClientRect();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            offsetX = clientX - originalRect.left;
+            offsetY = clientY - originalRect.top;
+
+            ghostRod = currentRod.cloneNode(true);
+            ghostRod.className = 'ghost-rod dragging';
+            ghostRod.style.width = `${originalRect.width}px`;
+            ghostRod.style.height = `${originalRect.height}px`;
+            ghostRod.style.left = `${originalRect.left}px`;
+            ghostRod.style.top = `${originalRect.top}px`;
+            document.body.appendChild(ghostRod);
+
+            currentRod.style.opacity = '0.1';
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!isDragging || !ghostRod) return;
+            e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            ghostRod.style.left = `${clientX - offsetX}px`;
+            ghostRod.style.top = `${clientY - offsetY}px`;
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
+
+            let clientX, clientY;
+            if (e.type.includes('mouse')) {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            } else {
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
+            }
+
+            ghostRod.style.display = 'none';
+            const elemBelow = document.elementFromPoint(clientX, clientY);
+            ghostRod.style.display = 'block';
+
+            const isOverMat = elemBelow && (elemBelow.closest('#mat-area') || elemBelow.closest('#stair'));
+            const rodId = parseInt(currentRod.dataset.id);
+
+            if (isOverMat) {
+                if (rodId === expectedId) {
+                    acceptPlacement();
+                } else {
+                    rejectPlacement();
+                }
+            } else {
+                rejectPlacement(false); 
+            }
+        }
+
+        function acceptPlacement() {
+            ghostRod.remove();
+            ghostRod = null;
+
+            currentRod.style.opacity = '1';
+            currentRod.dataset.placed = "true";
+            currentRod.classList.add('placed');
+            // Al usar porcentajes, debemos asegurarnos de que la alfombra controle el ancho relativo
+            stair.appendChild(currentRod);
+
+            expectedId--; 
+
+            if (expectedId === 0) {
+                setTimeout(winGame, 300);
+            }
+            
+            currentRod = null;
+        }
+
+        function rejectPlacement(shouldShake = true) {
+            ghostRod.classList.remove('dragging');
+            if (shouldShake) {
+                ghostRod.classList.add('shake');
+            }
+
+            requestAnimationFrame(() => {
+                ghostRod.style.left = `${originalRect.left}px`;
+                ghostRod.style.top = `${originalRect.top}px`;
+            });
+
+            setTimeout(() => {
+                if (ghostRod) {
+                    ghostRod.remove();
+                    ghostRod = null;
+                }
+                if (currentRod) {
+                    currentRod.style.opacity = '1';
+                    currentRod = null;
+                }
+            }, 350); 
+        }
+
+        function winGame() {
+            stair.classList.add('stair-complete');
+            showModal(winModal);
+        }
+
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function applyDifficulty() {
+            const level = parseInt(difficultySlider.value);
+            if (level === 1) {
+                TOTAL_RODS = 5;
+                BASE_WIDTH = 20; 
+                WIDTH_INC = 16; 
+                diffLabel.textContent = "FÁCIL (5)";
+            } else if (level === 2) {
+                TOTAL_RODS = 7;
+                BASE_WIDTH = 15;
+                WIDTH_INC = 12; 
+                diffLabel.textContent = "MEDIO (7)";
+            } else {
+                TOTAL_RODS = 10;
+                BASE_WIDTH = 10;
+                WIDTH_INC = 9; 
+                diffLabel.textContent = "DIFÍCIL (10)";
+            }
+            initGame(); 
+        }
+
+        difficultySlider.addEventListener('input', applyDifficulty);
+        document.getElementById('btn-reset').addEventListener('click', initGame);
+        
+        document.getElementById('btn-info').addEventListener('click', () => {
+            showModal(infoModal);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            hideModal(infoModal);
+        });
+
+        document.getElementById('close-win').addEventListener('click', () => {
+            hideModal(winModal);
+            initGame();
+        });
+
+        applyDifficulty();
+    </script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>¡BÚSCALOS TODOS!</title>
+    
+    <style>
+        :root {
+            --bg-color: #e0f7fa; /* Celeste muy suave y relajante */
+            --text-color: #006064;
+            --btn-color: #00acc1;
+            --btn-hover: #00838f;
+            --bar-green: #66bb6a;
+            --bar-orange: #ffa726;
+            --bar-red: #ef5350;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation; /* Evita zoom con doble toque en móviles */
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        #start-screen, #end-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(224, 247, 250, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #00838f;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .level-select {
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border: 4px solid var(--btn-color);
+        }
+
+        .level-select label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .level-select select {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid var(--btn-color);
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            width: 100%;
+        }
+
+        .btn {
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--btn-hover);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--btn-hover);
+        }
+
+        #hud {
+            display: none; /* Se activa al jugar */
+            padding: 15px 20px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .score-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #00838f;
+        }
+
+        .score-container span {
+            color: #ff8f00; /* Color brillante para los puntos */
+            font-size: 2rem;
+        }
+
+        /* La Barra de Tiempo Mágica */
+        .timer-container {
+            width: 100%;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            border: 3px solid white;
+            position: relative;
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--bar-green);
+            border-radius: 15px;
+            transition: width 1s linear, background-color 0.5s ease;
+            position: relative;
+            /* Efecto brillante en la barra */
+            background-image: linear-gradient(
+                rgba(255, 255, 255, 0.3) 0%, 
+                rgba(255, 255, 255, 0) 50%, 
+                rgba(0, 0, 0, 0.1) 50%, 
+                rgba(0, 0, 0, 0.1) 100%
+            );
+        }
+
+        #game-area {
+            flex: 1;
+            position: relative;
+            display: none; /* Se activa al jugar */
+            overflow: hidden; /* Que nada salga de la pantalla */
+        }
+
+        .target {
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Animación de entrada amistosa (rebote suave) */
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            -webkit-tap-highlight-color: transparent; /* Quita el recuadro azul en móviles */
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Animación de "Brillitos / Magia" al hacer clic */
+        .magic-vanish {
+            animation: magicPop 0.4s forwards;
+            pointer-events: none; /* Evita doble clic */
+        }
+
+        @keyframes magicPop {
+            0% { transform: scale(1); filter: brightness(1); opacity: 1; }
+            40% { transform: scale(1.4) rotate(15deg); filter: brightness(1.5); opacity: 0.9; }
+            100% { transform: scale(0) rotate(45deg); opacity: 0; }
+        }
+        
+        /* Animación cuando desaparece por tiempo (sin ser tocado) */
+        .timeout-vanish {
+            animation: fadeOut 0.3s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.5); opacity: 0; }
+        }
+
+        .emoji-huge {
+            font-size: 5rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h1>¡BÚSCALOS TODOS!</h1>
+        <div class="level-select">
+            <label>NIVEL DE DIFICULTAD:</label>
+            <select id="level-selector">
+                <option value="1">NIVEL 1 (GRANDES Y LENTOS)</option>
+                <option value="2">NIVEL 2 (MEDIANOS Y NORMALES)</option>
+                <option value="3">NIVEL 3 (PEQUEÑOS Y RÁPIDOS)</option>
+            </select>
+        </div>
+        <button class="btn" id="btn-start">¡A JUGAR!</button>
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <div class="emoji-huge">🌟</div>
+        <h1>¡TIEMPO TERMINADO!</h1>
+        <h2 style="margin-bottom: 30px; color: #ff8f00;">ENCONTRASTE <span id="final-score" style="font-size: 2.5rem;">0</span> OBJETOS</h2>
+        <button class="btn" id="btn-restart">JUGAR OTRA VEZ</button>
+    </div>
+
+    <div id="hud">
+        <div class="score-container">
+            PUNTOS: <span id="score-display">0</span>
+        </div>
+        <div class="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+    </div>
+
+    <div id="game-area"></div>
+
+    <script>
+        // Configuración General
+        const TOTAL_TIME = 120; // Segundos totales
+        const EMOJIS = ['🎈', '⭐', '🍎', '🐱', '🐶', '☀️', '🌸', '⚽', '🦋', '🐞'];
+        
+        // Parámetros por nivel (Tamaño en px, Tiempo en pantalla en ms, Ritmo de aparición en ms)
+        const LEVELS = {
+            1: { size: 100, lifespan: 4000, spawnRate: 1500 },
+            2: { size: 70,  lifespan: 2500, spawnRate: 1000 },
+            3: { size: 50,  lifespan: 1500, spawnRate: 600  }
+        };
+
+        // Elementos DOM
+        const startScreen = document.getElementById('start-screen');
+        const endScreen = document.getElementById('end-screen');
+        const hud = document.getElementById('hud');
+        const gameArea = document.getElementById('game-area');
+        const btnStart = document.getElementById('btn-start');
+        const btnRestart = document.getElementById('btn-restart');
+        const levelSelector = document.getElementById('level-selector');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScore = document.getElementById('final-score');
+        const timerBar = document.getElementById('timer-bar');
+
+        // Variables de Estado
+        let score = 0;
+        let timeLeft = TOTAL_TIME;
+        let mainTimerInterval;
+        let spawnInterval;
+        let currentLevelConfig;
+        let activeTargets = []; // Para limpiar al terminar
+
+        // Iniciar el Juego
+        function startGame() {
+            // Obtener configuración del nivel
+            const level = parseInt(levelSelector.value);
+            currentLevelConfig = LEVELS[level];
+
+            // Resetear variables
+            score = 0;
+            timeLeft = TOTAL_TIME;
+            scoreDisplay.textContent = score;
+            
+            // Actualizar UI
+            startScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            hud.style.display = 'block';
+            gameArea.style.display = 'block';
+            gameArea.innerHTML = ''; // Limpiar área
+
+            // Resetear Barra
+            updateTimerBar();
+
+            // Iniciar Reloj Principal (Corre cada segundo)
+            mainTimerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerBar();
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            // Iniciar Aparición de Objetos
+            spawnInterval = setInterval(spawnTarget, currentLevelConfig.spawnRate);
+            
+            // Aparecer el primero de inmediato
+            spawnTarget();
+        }
+
+        // Actualizar la Barra de Tiempo
+        function updateTimerBar() {
+            // Calcular porcentaje (0 a 100)
+            const percentage = (timeLeft / TOTAL_TIME) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            // Cambiar el color según el tiempo restante
+            if (timeLeft <= 15) {
+                timerBar.style.backgroundColor = 'var(--bar-red)';
+            } else if (timeLeft <= 30) {
+                timerBar.style.backgroundColor = 'var(--bar-orange)';
+            } else {
+                timerBar.style.backgroundColor = 'var(--bar-green)';
+            }
+        }
+
+        // Crear y mostrar un objeto
+        function spawnTarget() {
+            const target = document.createElement('div');
+            target.className = 'target';
+            target.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+            
+            // Aplicar tamaño según nivel
+            const size = currentLevelConfig.size;
+            target.style.fontSize = `${size}px`;
+            target.style.width = `${size}px`;
+            target.style.height = `${size}px`;
+
+            // Calcular posición asegurando que no se salga de la pantalla
+            // Se resta el tamaño del objeto más un pequeño margen (20px)
+            const maxX = gameArea.clientWidth - size - 20;
+            const maxY = gameArea.clientHeight - size - 20;
+            
+            // Math.max evita valores negativos si la pantalla es muy pequeña
+            const x = Math.max(10, Math.random() * maxX);
+            const y = Math.max(10, Math.random() * maxY);
+            
+            target.style.left = `${x}px`;
+            target.style.top = `${y}px`;
+            
+            // Lógica de clic (Éxito)
+            target.addEventListener('click', () => {
+                score++;
+                scoreDisplay.textContent = score;
+                
+                // Animación de estrellitas/brillo
+                target.classList.add('magic-vanish');
+                
+                // Eliminar del DOM tras la animación
+                setTimeout(() => target.remove(), 400);
+            });
+            
+            // Lógica de desaparición por tiempo (si no lo tocan)
+            const lifespanTimer = setTimeout(() => {
+                if (gameArea.contains(target) && !target.classList.contains('magic-vanish')) {
+                    target.classList.add('timeout-vanish');
+                    setTimeout(() => target.remove(), 300);
+                }
+            }, currentLevelConfig.lifespan);
+
+            // Guardar referencia para limpieza
+            target.dataset.timerId = lifespanTimer;
+            
+            gameArea.appendChild(target);
+        }
+
+        // Terminar el Juego
+        function endGame() {
+            clearInterval(mainTimerInterval);
+            clearInterval(spawnInterval);
+            
+            // Ocultar juego y mostrar pantalla final
+            hud.style.display = 'none';
+            gameArea.style.display = 'none';
+            endScreen.style.display = 'flex';
+            
+            finalScore.textContent = score;
+        }
+
+        // Eventos de botones
+        btnStart.addEventListener('click', startGame);
+        btnRestart.addEventListener('click', () => {
+            endScreen.style.display = 'none';
+            startScreen.style.display = 'flex'; // Volver al menú para que el adulto pueda cambiar el nivel si quiere
+        });
+
+    </script>
+</body>
+</html>

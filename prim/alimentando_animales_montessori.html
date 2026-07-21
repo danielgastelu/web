@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta viewport estricto para evitar zoom accidental al tocar en móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>¡A COMER! - JUEGO DE ARRASTRAR Y SOLTAR</title>
+    
+    <style>
+        :root {
+            --bg-color: #e0f7fa; /* Un azul cielo muy suave y alegre */
+            --panel-bg: #ffffff;
+            --text-color: #2c3e50;
+            --btn-color: #ffca28; /* Amarillo alegre */
+            --btn-hover: #ffb300;
+            --zone-bg: rgba(255, 255, 255, 0.6);
+            --success-color: #4caf50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none; /* Previene selección en iOS */
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden; /* Evita scroll mientras el niño arrastra */
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--panel-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 4px solid var(--btn-color);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #d35400; /* Naranja vibrante para el título */
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .difficulty-wrapper input[type="range"] {
+            cursor: pointer;
+            accent-color: #d35400;
+        }
+
+        /* Panel de estadísticas para el docente */
+        .stats-panel {
+            display: flex;
+            gap: 15px;
+            background-color: var(--zone-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid #b2ebf2;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .stats-panel strong {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .btn {
+            background-color: var(--btn-color);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 0 #f39c12;
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #f39c12;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        /* Área superior: Los animales que tienen hambre */
+        #animals-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background-color: var(--zone-bg);
+            border-radius: 20px;
+            border: 3px dashed #b2ebf2;
+        }
+
+        /* Área inferior: La comida disponible */
+        #food-area {
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background-color: #fff3e0; /* Naranja muy suave para la despensa */
+            border-radius: 20px;
+            border: 3px solid #ffe0b2;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .animal-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+            border: 4px solid transparent;
+        }
+
+        .animal-container.hovered {
+            transform: scale(1.15);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            border-color: var(--success-color);
+        }
+
+        /* Corazón que aparece cuando el animal es alimentado */
+        .heart {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 2rem;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .animal-container.fed .heart {
+            animation: popHeart 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .animal-container.fed {
+            animation: happyJump 0.6s ease-in-out;
+        }
+
+        .food {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5rem;
+            cursor: grab;
+            touch-action: none;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
+        }
+
+        .food:active {
+            cursor: grabbing;
+        }
+
+        /* Elemento fantasma para el arrastre */
+        .ghost-food {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 4rem; /* Un poco más grande al arrastrar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+            transition: top 0.3s ease, left 0.3s ease;
+        }
+
+        .ghost-food.dragging {
+            transition: none;
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0) scale(1.1) rotate(5deg); }
+            25% { transform: translateX(-10px) scale(1.1) rotate(0deg); }
+            50% { transform: translateX(10px) scale(1.1) rotate(10deg); }
+            75% { transform: translateX(-10px) scale(1.1) rotate(0deg); }
+        }
+
+        .shake {
+            animation: gentleShake 0.4s ease-in-out;
+        }
+
+        @keyframes popHeart {
+            0% { opacity: 0; transform: scale(0) translateY(0); }
+            70% { opacity: 1; transform: scale(1.2) translateY(-15px); }
+            100% { opacity: 1; transform: scale(1) translateY(-10px); }
+        }
+
+        @keyframes happyJump {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-20px) scale(1.05); }
+            50% { transform: translateY(0) scale(0.95); }
+            70% { transform: translateY(-10px) scale(1.02); }
+        }
+
+        /* Modales (Mensajes emergentes) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(30px) scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 5px solid var(--btn-color);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-content h2 {
+            color: #d35400;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .huge-emoji {
+            font-size: 5rem;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>¡A COMER! 🐾</h1>
+        <div class="controls">
+            <div class="stats-panel">
+                <span>INTENTOS: <strong id="total-attempts">0</strong></span>
+                <span>ACIERTOS: <strong id="successful-attempts">0</strong></span>
+            </div>
+            <div class="difficulty-wrapper">
+                <label for="difficulty-slider">NIVEL:</label>
+                <input type="range" id="difficulty-slider" min="1" max="3" value="1">
+                <span id="diff-label">FÁCIL (2)</span>
+            </div>
+            <button class="btn" id="btn-info">¿CÓMO JUGAR?</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <!-- Aquí aparecerán los animales -->
+        <div id="animals-area"></div>
+
+        <!-- Aquí aparecerá la comida -->
+        <div id="food-area"></div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>¿CÓMO JUGAR?</h2>
+            <div class="huge-emoji">👇👆</div>
+            <p>TOCA Y ARRASTRA LA COMIDA FAVORITA HACIA CADA ANIMALITO PARA DARLES DE COMER.</p>
+            <p>¡ELLOS SE PONDRÁN MUY FELICES!</p>
+            <button class="btn" id="close-info">¡A JUGAR!</button>
+        </div>
+    </div>
+
+    <!-- Modal de Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <h2>¡MUY BIEN!</h2>
+            <div class="huge-emoji">🎉🥳</div>
+            <p>¡TODOS LOS ANIMALITOS ESTÁN LLENOS Y FELICES!</p>
+            <button class="btn" id="close-win">JUGAR OTRA VEZ</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de animales y su comida
+        const ANIMAL_PAIRS = [
+            { id: 'perro', animal: '🐶', food: '🦴' },
+            { id: 'conejo', animal: '🐰', food: '🥕' },
+            { id: 'mono', animal: '🐒', food: '🍌' },
+            { id: 'raton', animal: '🐭', food: '🧀' },
+            { id: 'gato', animal: '🐱', food: '🐟' },
+            { id: 'oso', animal: '🐻', food: '🍯' }
+        ];
+
+        let numPairs = 2; // Cantidad de animales según dificultad
+        let animalsFed = 0;
+        
+        // Contadores de evaluación
+        let totalAttempts = 0;
+        let successfulAttempts = 0;
+
+        // Elementos DOM
+        const animalsArea = document.getElementById('animals-area');
+        const foodArea = document.getElementById('food-area');
+        const infoModal = document.getElementById('info-modal');
+        const winModal = document.getElementById('win-modal');
+        const difficultySlider = document.getElementById('difficulty-slider');
+        const diffLabel = document.getElementById('diff-label');
+        const totalAttemptsEl = document.getElementById('total-attempts');
+        const successfulAttemptsEl = document.getElementById('successful-attempts');
+
+        // Variables para el Drag & Drop
+        let isDragging = false;
+        let currentFood = null;
+        let ghostFood = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let originalRect = null;
+        let currentHoveredAnimal = null;
+
+        function initGame() {
+            animalsArea.innerHTML = '';
+            foodArea.innerHTML = '';
+            animalsFed = 0;
+            totalAttempts = 0;
+            successfulAttempts = 0;
+            updateStats();
+
+            // Seleccionar animales aleatorios para esta partida
+            let shuffledPairs = [...ANIMAL_PAIRS].sort(() => 0.5 - Math.random());
+            let selectedPairs = shuffledPairs.slice(0, numPairs);
+
+            // Crear arreglos separados para mezclar la comida
+            let animals = [...selectedPairs];
+            let foods = [...selectedPairs].sort(() => 0.5 - Math.random());
+
+            // Renderizar Animales
+            animals.forEach(pair => {
+                const animalBox = document.createElement('div');
+                animalBox.className = 'animal-container';
+                animalBox.dataset.id = pair.id;
+                animalBox.innerHTML = `
+                    ${pair.animal}
+                    <div class="heart">❤️</div>
+                `;
+                animalsArea.appendChild(animalBox);
+            });
+
+            // Renderizar Comida
+            foods.forEach(pair => {
+                const foodItem = document.createElement('div');
+                foodItem.className = 'food';
+                foodItem.dataset.match = pair.id;
+                foodItem.textContent = pair.food;
+                
+                // Eventos universales de toque y ratón
+                foodItem.addEventListener('mousedown', dragStart);
+                foodItem.addEventListener('touchstart', dragStart, {passive: false});
+                
+                foodArea.appendChild(foodItem);
+            });
+        }
+
+        function dragStart(e) {
+            e.preventDefault(); 
+            
+            currentFood = e.target;
+            isDragging = true;
+            originalRect = currentFood.getBoundingClientRect();
+
+            // Soportar tanto touch como mouse
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            // Calcular dónde agarró el objeto el niño para que no salte de posición
+            offsetX = clientX - originalRect.left;
+            offsetY = clientY - originalRect.top;
+
+            // Crear el elemento fantasma que seguirá el dedo/cursor
+            ghostFood = document.createElement('div');
+            ghostFood.className = 'ghost-food dragging';
+            ghostFood.textContent = currentFood.textContent;
+            ghostFood.style.width = `${originalRect.width}px`;
+            ghostFood.style.height = `${originalRect.height}px`;
+            ghostFood.style.left = `${originalRect.left}px`;
+            ghostFood.style.top = `${originalRect.top}px`;
+            document.body.appendChild(ghostFood);
+
+            // Ocultar levemente el original
+            currentFood.style.opacity = '0.2';
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!isDragging || !ghostFood) return;
+            e.preventDefault(); // Crítico en móviles para evitar scroll
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            // Mover el fantasma
+            ghostFood.style.left = `${clientX - offsetX}px`;
+            ghostFood.style.top = `${clientY - offsetY}px`;
+
+            // Detectar si estamos sobre un animal para darle feedback visual (crece)
+            ghostFood.style.display = 'none'; // Ocultar temporalmente para ver qué hay debajo
+            const elemBelow = document.elementFromPoint(clientX, clientY);
+            ghostFood.style.display = 'flex'; // Volver a mostrar
+
+            const animalBelow = elemBelow ? elemBelow.closest('.animal-container') : null;
+
+            if (animalBelow !== currentHoveredAnimal) {
+                if (currentHoveredAnimal) {
+                    currentHoveredAnimal.classList.remove('hovered');
+                }
+                currentHoveredAnimal = animalBelow;
+                if (currentHoveredAnimal && !currentHoveredAnimal.classList.contains('fed')) {
+                    currentHoveredAnimal.classList.add('hovered');
+                }
+            }
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
+
+            if (currentHoveredAnimal) {
+                currentHoveredAnimal.classList.remove('hovered');
+            }
+
+            const foodId = currentFood.dataset.match;
+            
+            // Cada vez que se suelta una comida, cuenta como intento
+            totalAttempts++;
+
+            // Si soltó sobre un animal correcto
+            if (currentHoveredAnimal && currentHoveredAnimal.dataset.id === foodId && !currentHoveredAnimal.classList.contains('fed')) {
+                acceptFood(currentHoveredAnimal);
+            } else {
+                rejectFood();
+            }
+            
+            updateStats();
+        }
+
+        function acceptFood(animalElement) {
+            // Éxito
+            successfulAttempts++;
+            
+            ghostFood.remove();
+            ghostFood = null;
+            
+            // La comida desaparece de la despensa
+            currentFood.style.visibility = 'hidden';
+            
+            // El animal reacciona
+            animalElement.classList.add('fed');
+            
+            animalsFed++;
+            
+            if (animalsFed === numPairs) {
+                setTimeout(() => showModal(winModal), 800);
+            }
+            
+            currentFood = null;
+            currentHoveredAnimal = null;
+        }
+
+        function updateStats() {
+            totalAttemptsEl.textContent = totalAttempts;
+            successfulAttemptsEl.textContent = successfulAttempts;
+        }
+
+        function rejectFood() {
+            // Error suave: el elemento tiembla un poco y regresa a su lugar
+            ghostFood.classList.remove('dragging');
+            ghostFood.classList.add('shake');
+
+            // Regresar a la posición original
+            requestAnimationFrame(() => {
+                ghostFood.style.left = `${originalRect.left}px`;
+                ghostFood.style.top = `${originalRect.top}px`;
+            });
+
+            // Limpiar después de la animación
+            setTimeout(() => {
+                if (ghostFood) {
+                    ghostFood.remove();
+                    ghostFood = null;
+                }
+                if (currentFood) {
+                    currentFood.style.opacity = '1';
+                    currentFood = null;
+                }
+            }, 350); 
+        }
+
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function applyDifficulty() {
+            const level = parseInt(difficultySlider.value);
+            if (level === 1) {
+                numPairs = 2; // Ideal para iniciar (3 años)
+                diffLabel.textContent = "FÁCIL (2)";
+            } else if (level === 2) {
+                numPairs = 4; // Intermedio (4 años)
+                diffLabel.textContent = "MEDIO (4)";
+            } else {
+                numPairs = 6; // Desafiante, más elementos en pantalla (5 años)
+                diffLabel.textContent = "DIFÍCIL (6)";
+            }
+            initGame(); 
+        }
+
+        // Listeners de los botones
+        difficultySlider.addEventListener('input', applyDifficulty);
+        
+        document.getElementById('btn-info').addEventListener('click', () => {
+            showModal(infoModal);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            hideModal(infoModal);
+        });
+
+        document.getElementById('close-win').addEventListener('click', () => {
+            hideModal(winModal);
+            initGame();
+        });
+
+        // Setup inicial al cargar la página
+        applyDifficulty();
+    </script>
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LAS TABLETAS DE COLOR MONTESSORI</title>
+    
+    <style>
+        :root {
+            /* Paleta base del ambiente */
+            --bg-color: #f9f6f0; 
+            --wood-color: #e3d2bc; 
+            --wood-dark: #b8a385;
+            --text-color: #5c5346;
+            --white: #ffffff;
+            --success: #88b08b;
+            --error-shadow: #c92a2a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .difficulty-wrapper input[type="range"] {
+            cursor: pointer;
+            accent-color: var(--wood-dark);
+        }
+
+        .btn {
+            background-color: var(--wood-color);
+            color: var(--text-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--wood-dark);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-color {
+            background-color: #4a90e2; /* Azul por defecto */
+            color: white;
+        }
+        .btn-color:hover {
+            filter: brightness(0.9);
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            #game-container {
+                flex-direction: row;
+            }
+        }
+
+        /* Estante (mezclados) */
+        #shelf {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px dashed var(--wood-color);
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Área de trabajo (alfombra) */
+        #mat-area {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 40px;
+            position: relative;
+            background-color: rgba(216, 195, 165, 0.2);
+            border-radius: 12px;
+            border-left: 8px solid var(--wood-dark);
+        }
+
+        #mat-area::before {
+            content: 'ORDENAR AQUÍ (MÁS OSCURO A MÁS CLARO)';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--wood-dark);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #board {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 2;
+            width: 100%;
+            height: 140px;
+            gap: 4px;
+            background: rgba(255,255,255,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tablet {
+            width: 50px;
+            height: 100px;
+            background-color: white; /* Color base */
+            border-radius: 2px;
+            cursor: grab;
+            touch-action: none;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            /* Bordes de madera superior e inferior simulados */
+            border-top: 12px solid var(--wood-color);
+            border-bottom: 12px solid var(--wood-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tablet::before {
+            content: '';
+            position: absolute;
+            top: -12px; left: 0; right: 0; height: 12px;
+            background: linear-gradient(to right, rgba(0,0,0,0.1), transparent, rgba(0,0,0,0.1));
+        }
+
+        .tablet::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; left: 0; right: 0; height: 12px;
+            background: linear-gradient(to right, rgba(0,0,0,0.1), transparent, rgba(0,0,0,0.1));
+        }
+
+        .tablet:active {
+            cursor: grabbing;
+        }
+
+        .tablet.placed {
+            cursor: default;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Ajuste responsivo para que quepan todas */
+        @media (max-width: 600px) {
+            .tablet { width: 35px; height: 80px; border-top-width: 8px; border-bottom-width: 8px; }
+            .tablet::before, .tablet::after { height: 8px; top: -8px; }
+            .tablet::after { bottom: -8px; top: auto; }
+            #board { height: 110px; }
+        }
+
+        .ghost-tablet {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+            transition: top 0.3s ease, left 0.3s ease;
+        }
+
+        .ghost-tablet.dragging {
+            transition: none;
+            transform: scale(1.1);
+        }
+
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0) scale(1.1); }
+            25% { transform: translateX(-8px) scale(1.1); }
+            50% { transform: translateX(8px) scale(1.1); }
+            75% { transform: translateX(-8px) scale(1.1); }
+        }
+
+        .shake {
+            animation: gentleShake 0.4s ease-in-out;
+        }
+
+        @keyframes softGlow {
+            0%, 100% { filter: brightness(1); box-shadow: 0 0 5px transparent; }
+            50% { filter: brightness(1.1); box-shadow: 0 0 15px var(--wood-dark); }
+        }
+
+        .board-complete {
+            animation: softGlow 2s infinite;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h2 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .close-btn {
+            background-color: var(--wood-dark);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: inherit;
+            text-transform: inherit;
+            letter-spacing: inherit;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TABLETAS DE COLOR</h1>
+        
+        <div class="controls-wrapper">
+            <button class="btn btn-color" id="btn-change-color">CAMBIAR COLOR</button>
+            <div class="difficulty-wrapper">
+                <label for="difficulty-slider">NIVEL:</label>
+                <input type="range" id="difficulty-slider" min="1" max="3" value="3">
+                <span id="diff-label">DIFÍCIL (9)</span>
+            </div>
+            <button class="btn" id="btn-info">¿QUÉ ES?</button>
+            <button class="btn" id="btn-reset">REINICIAR</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <!-- Área inicial de tabletas desordenadas -->
+        <div id="shelf"></div>
+
+        <!-- Área de ordenamiento -->
+        <div id="mat-area">
+            <div id="board"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>LAS TABLETAS DE COLOR (CAJA 3)</h2>
+            <p>ESTE MATERIAL SENSORIAL AÍSLA EL SENTIDO <strong>CROMÁTICO VISUAL</strong>. TODAS LAS TABLETAS TIENEN EL MISMO TAMAÑO, SOLO CAMBIA LA INTENSIDAD DEL COLOR.</p>
+            <p><strong>PROPÓSITO:</strong> REFINAR LA DISCRIMINACIÓN VISUAL AL ORDENAR MATICES DE UN MISMO COLOR. PREPARA PARA EL ARTE Y LA OBSERVACIÓN DE LA NATURALEZA.</p>
+            <p><strong>INSTRUCCIONES:</strong> ARRASTRA LA TABLETA <strong>MÁS OSCURA</strong> QUE QUEDE EN LA MESA HACIA EL TABLERO, ORDENÁNDOLAS HASTA LLEGAR A LA MÁS CLARA.</p>
+            <button class="close-btn" id="close-info">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Modal de Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <h2>¡HERMOSO DEGRADADO!</h2>
+            <p style="text-align: center;">HAS ORDENADO LOS TONOS CORRECTAMENTE, DESDE EL MÁS OSCURO AL MÁS CLARO.</p>
+            <button class="close-btn" id="close-win">NUEVO COLOR</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración del juego
+        let TOTAL_TABLETS = 9;
+        let currentHue = 210; // Empieza en Azul
+        const HUES = [
+            { h: 210, name: 'AZUL', color: '#4a90e2' },
+            { h: 0,   name: 'ROJO', color: '#e24a4a' },
+            { h: 120, name: 'VERDE', color: '#4ae25c' },
+            { h: 50,  name: 'AMARILLO', color: '#e2c54a' },
+            { h: 280, name: 'PÚRPURA', color: '#a24ae2' },
+            { h: 25,  name: 'NARANJA', color: '#e27b4a' },
+            { h: 0,   name: 'GRIS', color: '#777777', isGray: true }
+        ];
+        let hueIndex = 0;
+        
+        // Elementos DOM
+        const shelf = document.getElementById('shelf');
+        const board = document.getElementById('board');
+        const infoModal = document.getElementById('info-modal');
+        const winModal = document.getElementById('win-modal');
+        const difficultySlider = document.getElementById('difficulty-slider');
+        const diffLabel = document.getElementById('diff-label');
+        const btnChangeColor = document.getElementById('btn-change-color');
+
+        // Estado del juego
+        let expectedId = 1; // 1 es el más oscuro
+        let isDragging = false;
+        let currentTablet = null;
+        let ghostTablet = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let originalRect = null;
+
+        // Inicializar
+        function initGame() {
+            shelf.innerHTML = '';
+            board.innerHTML = '';
+            board.classList.remove('board-complete');
+            expectedId = 1; // Siempre esperamos el ID 1 primero (el más oscuro)
+            
+            let tablets = [];
+            for (let i = 1; i <= TOTAL_TABLETS; i++) {
+                tablets.push(i);
+            }
+            
+            // Mezclar aleatoriamente
+            tablets.sort(() => Math.random() - 0.5);
+
+            // Calcular el rango de luminosidad dependiendo de la cantidad de tabletas
+            // Evitamos los extremos puros (blanco/negro)
+            const minLightness = 20; 
+            const maxLightness = 85; 
+            const step = (maxLightness - minLightness) / Math.max(1, (TOTAL_TABLETS - 1));
+
+            const activeColorDef = HUES[hueIndex];
+
+            tablets.forEach(id => {
+                // ID 1 es el más oscuro (minLightness)
+                const lightness = minLightness + ((id - 1) * step);
+                
+                const tablet = document.createElement('div');
+                tablet.className = 'tablet';
+                
+                // Aplicar el color HSL
+                if (activeColorDef.isGray) {
+                    tablet.style.backgroundColor = `hsl(0, 0%, ${lightness}%)`;
+                } else {
+                    tablet.style.backgroundColor = `hsl(${activeColorDef.h}, 70%, ${lightness}%)`;
+                }
+                
+                tablet.dataset.id = id;
+                tablet.dataset.placed = "false";
+                
+                tablet.addEventListener('mousedown', dragStart);
+                tablet.addEventListener('touchstart', dragStart, {passive: false});
+                
+                shelf.appendChild(tablet);
+            });
+        }
+
+        function dragStart(e) {
+            if (e.target.dataset.placed === "true") return;
+            e.preventDefault(); 
+            
+            currentTablet = e.target;
+            isDragging = true;
+            originalRect = currentTablet.getBoundingClientRect();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            offsetX = clientX - originalRect.left;
+            offsetY = clientY - originalRect.top;
+
+            ghostTablet = currentTablet.cloneNode(true);
+            ghostTablet.className = 'tablet ghost-tablet dragging';
+            ghostTablet.style.width = `${originalRect.width}px`;
+            ghostTablet.style.height = `${originalRect.height}px`;
+            ghostTablet.style.left = `${originalRect.left}px`;
+            ghostTablet.style.top = `${originalRect.top}px`;
+            document.body.appendChild(ghostTablet);
+
+            currentTablet.style.opacity = '0.1';
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!isDragging || !ghostTablet) return;
+            e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            ghostTablet.style.left = `${clientX - offsetX}px`;
+            ghostTablet.style.top = `${clientY - offsetY}px`;
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
+
+            let clientX, clientY;
+            if (e.type.includes('mouse')) {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            } else {
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
+            }
+
+            ghostTablet.style.display = 'none';
+            const elemBelow = document.elementFromPoint(clientX, clientY);
+            ghostTablet.style.display = 'flex';
+
+            const isOverMat = elemBelow && (elemBelow.closest('#mat-area') || elemBelow.closest('#board'));
+            const tabletId = parseInt(currentTablet.dataset.id);
+
+            if (isOverMat) {
+                if (tabletId === expectedId) {
+                    acceptPlacement();
+                } else {
+                    rejectPlacement();
+                }
+            } else {
+                rejectPlacement(false); 
+            }
+        }
+
+        function acceptPlacement() {
+            ghostTablet.remove();
+            ghostTablet = null;
+
+            currentTablet.style.opacity = '1';
+            currentTablet.dataset.placed = "true";
+            currentTablet.classList.add('placed');
+            board.appendChild(currentTablet);
+
+            expectedId++; 
+
+            if (expectedId > TOTAL_TABLETS) {
+                setTimeout(winGame, 300);
+            }
+            
+            currentTablet = null;
+        }
+
+        function rejectPlacement(shouldShake = true) {
+            ghostTablet.classList.remove('dragging');
+            if (shouldShake) {
+                ghostTablet.classList.add('shake');
+            }
+
+            requestAnimationFrame(() => {
+                ghostTablet.style.left = `${originalRect.left}px`;
+                ghostTablet.style.top = `${originalRect.top}px`;
+            });
+
+            setTimeout(() => {
+                if (ghostTablet) {
+                    ghostTablet.remove();
+                    ghostTablet = null;
+                }
+                if (currentTablet) {
+                    currentTablet.style.opacity = '1';
+                    currentTablet = null;
+                }
+            }, 350); 
+        }
+
+        function winGame() {
+            board.classList.add('board-complete');
+            showModal(winModal);
+        }
+
+        // Funciones de utilidad
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function applyDifficulty() {
+            const level = parseInt(difficultySlider.value);
+            if (level === 1) {
+                TOTAL_TABLETS = 4; // Alto contraste
+                diffLabel.textContent = "FÁCIL (4)";
+            } else if (level === 2) {
+                TOTAL_TABLETS = 6; // Contraste medio
+                diffLabel.textContent = "MEDIO (6)";
+            } else {
+                TOTAL_TABLETS = 9; // Gradiente sutil clásico
+                diffLabel.textContent = "DIFÍCIL (9)";
+            }
+            initGame(); 
+        }
+
+        function changeColor() {
+            hueIndex = (hueIndex + 1) % HUES.length;
+            const activeColor = HUES[hueIndex];
+            btnChangeColor.style.backgroundColor = activeColor.color;
+            btnChangeColor.textContent = `COLOR: ${activeColor.name}`;
+            initGame();
+        }
+
+        // Listeners
+        difficultySlider.addEventListener('input', applyDifficulty);
+        document.getElementById('btn-reset').addEventListener('click', initGame);
+        btnChangeColor.addEventListener('click', changeColor);
+        
+        document.getElementById('btn-info').addEventListener('click', () => {
+            showModal(infoModal);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            hideModal(infoModal);
+        });
+
+        document.getElementById('close-win').addEventListener('click', () => {
+            hideModal(winModal);
+            changeColor(); // Al ganar, cambia de color automáticamente como recompensa
+        });
+
+        // Setup inicial
+        btnChangeColor.textContent = `COLOR: ${HUES[hueIndex].name}`;
+        applyDifficulty();
+    </script>
+</body>
+</html>

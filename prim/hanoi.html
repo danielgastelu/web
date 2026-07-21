@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torres de Hanói</title>
+    <style>
+        /* Variables CSS para los temas Claro y Oscuro */
+        :root {
+            --bg-color: #f4f4f9;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --border-color: #dddddd;
+            --peg-color: #8b4513;
+            --peg-base: #5c2e0b;
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --success-color: #28a745;
+            --highlight-color: rgba(74, 144, 226, 0.2);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a2e;
+            --panel-bg: #16213e;
+            --text-color: #e6e6e6;
+            --text-muted: #a0a0a0;
+            --primary-color: #e94560;
+            --primary-hover: #d33c56;
+            --border-color: #2a2a4a;
+            --peg-color: #a37b5b;
+            --peg-base: #825a3d;
+            --modal-bg: rgba(0, 0, 0, 0.8);
+            --success-color: #00d084;
+            --highlight-color: rgba(233, 69, 96, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--panel-bg);
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        /* Controles Superiores */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            cursor: pointer;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Estadísticas */
+        .stats-panel {
+            display: flex;
+            justify-content: space-around;
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .stat-box strong {
+            display: block;
+            font-size: 1.4em;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+
+        /* Curiosidad / Tiempo */
+        .fun-fact {
+            background: var(--bg-color);
+            padding: 15px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .fun-fact span.time-value {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Juego / Torres */
+        .game-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 350px;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .peg-container {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column-reverse; /* Apila los discos desde abajo hacia arriba */
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .peg-container:hover, .peg-container.selected {
+            background-color: var(--highlight-color);
+        }
+
+        /* El palo visual */
+        .peg-container::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 12px;
+            height: 85%;
+            background-color: var(--peg-color);
+            border-radius: 6px 6px 0 0;
+            z-index: 1;
+        }
+
+        /* La base del palo */
+        .peg-container::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            width: 80%;
+            height: 10px;
+            background-color: var(--peg-base);
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        .disk {
+            height: 20px;
+            border-radius: 10px;
+            z-index: 2;
+            transition: transform 0.2s, bottom 0.2s;
+            box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.4);
+            margin-bottom: 2px;
+            pointer-events: none; /* Los clics los maneja el contenedor */
+        }
+
+        /* Animación de error al intentar movimiento inválido */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.3s;
+        }
+
+        /* Mensaje de Victoria */
+        #win-message {
+            display: none;
+            text-align: center;
+            color: var(--success-color);
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal de Historia */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--modal-bg);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--panel-bg);
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .close-modal:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .game-area {
+                height: 250px;
+            }
+            .stats-panel {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="container">
+        <h1>Torres de Hanói</h1>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="disk-slider"><strong>Discos:</strong></label>
+                <input type="range" id="disk-slider" min="3" max="64" value="3">
+                <input type="number" id="disk-input" min="3" max="64" value="3">
+                <button id="btn-reset">Reiniciar</button>
+            </div>
+
+            <div class="control-group">
+                <span><strong>Mostrar Mínimo Ideal:</strong></span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-min-moves" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="control-group">
+                <span><strong>Modo Oscuro:</strong></span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-theme">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <button id="btn-history">Ver la Leyenda</button>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-box">
+                Movimientos realizados
+                <strong id="move-count">0</strong>
+            </div>
+            <div class="stat-box" id="min-moves-box">
+                Mínimo ideal para ganar
+                <strong id="min-moves">7</strong>
+            </div>
+        </div>
+
+        <div class="fun-fact">
+            💡 <strong>Dato Curioso:</strong> Si resolvieras este puzzle de <span id="fact-disk-count">3</span> discos moviendo 1 disco cada 2 segundos sin equivocarte ni detenerte nunca, tardarías en terminar: 
+            <br>
+            <span class="time-value" id="fact-time">14 segundos</span>
+        </div>
+
+        <div id="win-message">¡Felicidades! Has completado el puzzle. 🎉</div>
+
+        <div class="game-area" id="game-area">
+            <!-- Los postes se generarán aquí -->
+            <div class="peg-container" data-index="0" onclick="handlePegClick(0)"></div>
+            <div class="peg-container" data-index="1" onclick="handlePegClick(1)"></div>
+            <div class="peg-container" data-index="2" onclick="handlePegClick(2)"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Historia -->
+    <div class="modal" id="history-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2>La Leyenda de las Torres de Hanói</h2>
+            <p>El rompecabezas de las Torres de Hanói fue inventado por el matemático francés Édouard Lucas en 1883. Lo acompañó de una fascinante leyenda sobre un antiguo templo en la India (o Vietnam, en algunas versiones).</p>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/60/Tower_of_Hanoi_4.gif" alt="Animación de resolución de Torre de Hanói con 4 discos">
+            <p>Según la historia, en el gran templo de Benarés, bajo la cúpula que marca el centro del mundo, hay una placa de bronce con tres agujas de diamante. Al momento de la creación, el dios Brahma colocó <strong>64 discos de oro puro</strong> en una de las agujas, el más grande en la base y los demás cada vez más pequeños hasta llegar arriba. Esta es la Torre de Brahma.</p>
+            <p>Los sacerdotes del templo trabajan día y noche moviendo los discos de una aguja a otra, siguiendo las reglas inmutables de Brahma: solo se puede mover un disco a la vez y jamás un disco más grande puede descansar sobre uno más pequeño.</p>
+            <p>La leyenda advierte que cuando los sacerdotes terminen de mover la torre completa de 64 discos a la tercera aguja, el templo se convertirá en polvo y <strong>el mundo desaparecerá con un gran trueno</strong>.</p>
+            <p>Como habrás notado calculando el tiempo en esta app, ¡el universo aún tiene muchos, muchísimos miles de millones de años por delante antes de que eso suceda!</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables de estado del juego
+        let numDisks = 3;
+        let pegs = [[], [], []];
+        let moves = 0;
+        let selectedPeg = null;
+
+        // Elementos del DOM
+        const pegElements = [
+            document.querySelector('[data-index="0"]'),
+            document.querySelector('[data-index="1"]'),
+            document.querySelector('[data-index="2"]')
+        ];
+        const moveCountEl = document.getElementById('move-count');
+        const minMovesEl = document.getElementById('min-moves');
+        const minMovesBox = document.getElementById('min-moves-box');
+        const diskSlider = document.getElementById('disk-slider');
+        const diskInput = document.getElementById('disk-input');
+        const winMessage = document.getElementById('win-message');
+        const factDiskCount = document.getElementById('fact-disk-count');
+        const factTime = document.getElementById('fact-time');
+        const toggleMinMoves = document.getElementById('toggle-min-moves');
+        const toggleTheme = document.getElementById('toggle-theme');
+
+        // Inicialización
+        function initGame() {
+            moves = 0;
+            selectedPeg = null;
+            winMessage.style.display = 'none';
+            moveCountEl.textContent = moves;
+            
+            // Vaciar postes
+            pegs = [[], [], []];
+            
+            // Llenar el primer poste con discos (el más grande abajo, número mayor)
+            for (let i = numDisks; i >= 1; i--) {
+                pegs[0].push(i);
+            }
+            
+            updateStats();
+            renderGame();
+        }
+
+        // Lógica de cálculo matemático para el dato curioso (usando BigInt para soportar hasta 64 discos sin perder precisión)
+        function updateStats() {
+            // Mínimos movimientos = 2^n - 1
+            const minMovesBig = (2n ** BigInt(numDisks)) - 1n;
+            minMovesEl.textContent = minMovesBig.toLocaleString('es-ES');
+            
+            factDiskCount.textContent = numDisks;
+            
+            // Calculo de tiempo (2 segundos por movimiento)
+            const totalSeconds = minMovesBig * 2n;
+            factTime.textContent = formatTime(totalSeconds);
+        }
+
+        function formatTime(totalSeconds) {
+            const SECONDS_IN_YEAR = 31536000n; // 365 * 24 * 60 * 60
+            const SECONDS_IN_MONTH = 2592000n; // 30 días
+            const SECONDS_IN_DAY = 86400n;
+            const SECONDS_IN_HOUR = 3600n;
+            const SECONDS_IN_MINUTE = 60n;
+
+            let years = totalSeconds / SECONDS_IN_YEAR;
+            let rem = totalSeconds % SECONDS_IN_YEAR;
+
+            let months = rem / SECONDS_IN_MONTH;
+            rem %= SECONDS_IN_MONTH;
+
+            let days = rem / SECONDS_IN_DAY;
+            rem %= SECONDS_IN_DAY;
+
+            let hours = rem / SECONDS_IN_HOUR;
+            rem %= SECONDS_IN_HOUR;
+
+            let minutes = rem / SECONDS_IN_MINUTE;
+            let seconds = rem % SECONDS_IN_MINUTE;
+
+            let parts = [];
+            
+            // Formateo especial si son demasiados años (ej. más de un trillón)
+            if (years > 1000000n) {
+                 return years.toLocaleString('es-ES') + " años. ¡Es mucho más que la edad actual del universo entero (que es de unos 13.800 millones de años)!";
+            }
+
+            if (years > 0n) parts.push(years.toLocaleString('es-ES') + (years === 1n ? " año" : " años"));
+            if (months > 0n) parts.push(months + (months === 1n ? " mes" : " meses"));
+            if (days > 0n) parts.push(days + (days === 1n ? " día" : " días"));
+            if (hours > 0n) parts.push(hours + (hours === 1n ? " hora" : " horas"));
+            if (minutes > 0n) parts.push(minutes + (minutes === 1n ? " minuto" : " minutos"));
+            if (seconds > 0n || parts.length === 0) parts.push(seconds + (seconds === 1n ? " segundo" : " segundos"));
+
+            // Juntar con comas y un "y" final
+            if (parts.length > 1) {
+                const last = parts.pop();
+                return parts.join(", ") + " y " + last;
+            }
+            return parts[0];
+        }
+
+        // Renderizar el estado actual en el DOM
+        function renderGame() {
+            pegElements.forEach((pegEl, pegIndex) => {
+                // Limpiar discos existentes
+                const disks = pegEl.querySelectorAll('.disk');
+                disks.forEach(d => d.remove());
+
+                // Actualizar clase de selección visual
+                if (selectedPeg === pegIndex) {
+                    pegEl.classList.add('selected');
+                } else {
+                    pegEl.classList.remove('selected');
+                }
+
+                // Dibujar discos
+                pegs[pegIndex].forEach((diskSize, diskIndex) => {
+                    const disk = document.createElement('div');
+                    disk.classList.add('disk');
+                    
+                    // Cálculo de anchura: min 20%, max 95%
+                    const widthPercent = 20 + ((diskSize / numDisks) * 75);
+                    disk.style.width = `${widthPercent}%`;
+                    
+                    // Cálculo de altura para que quepan todos si hay hasta 64
+                    let maxDiskHeight = 25;
+                    if (numDisks > 12) maxDiskHeight = 300 / numDisks;
+                    if (maxDiskHeight < 4) maxDiskHeight = 4; // mínimo 4px
+                    disk.style.height = `${maxDiskHeight}px`;
+
+                    // Generar un color arcoiris distintivo basado en el tamaño
+                    const hue = (diskSize / 64) * 360; 
+                    disk.style.backgroundColor = `hsl(${hue}, 70%, 55%)`;
+
+                    pegEl.appendChild(disk);
+                });
+            });
+        }
+
+        // Interacción: Clic en poste
+        window.handlePegClick = function(index) {
+            // Si el juego ya se ganó, no hacer nada hasta reiniciar
+            if (pegs[2].length === numDisks) return;
+
+            if (selectedPeg === null) {
+                // Seleccionar poste origen (solo si tiene discos)
+                if (pegs[index].length > 0) {
+                    selectedPeg = index;
+                    renderGame();
+                }
+            } else {
+                // Si hacemos clic en el mismo, deseleccionar
+                if (selectedPeg === index) {
+                    selectedPeg = null;
+                    renderGame();
+                    return;
+                }
+
+                // Intentar mover de selectedPeg a index
+                const sourceTopDisk = pegs[selectedPeg][pegs[selectedPeg].length - 1];
+                const destTopDisk = pegs[index].length > 0 ? pegs[index][pegs[index].length - 1] : Infinity;
+
+                if (sourceTopDisk < destTopDisk) {
+                    // Movimiento válido
+                    pegs[index].push(pegs[selectedPeg].pop());
+                    moves++;
+                    moveCountEl.textContent = moves;
+                    selectedPeg = null;
+                    renderGame();
+                    checkWin();
+                } else {
+                    // Movimiento inválido (animación de error)
+                    const pegEl = pegElements[index];
+                    pegEl.classList.add('shake');
+                    setTimeout(() => pegEl.classList.remove('shake'), 300);
+                    selectedPeg = null;
+                    renderGame();
+                }
+            }
+        };
+
+        function checkWin() {
+            if (pegs[2].length === numDisks) {
+                winMessage.style.display = 'block';
+            }
+        }
+
+        // --- Event Listeners Controles ---
+
+        // Cambiar cantidad de discos
+        function handleDiskChange(e) {
+            let val = parseInt(e.target.value);
+            if (val < 3) val = 3;
+            if (val > 64) val = 64;
+            
+            diskSlider.value = val;
+            diskInput.value = val;
+            numDisks = val;
+            initGame();
+        }
+
+        diskSlider.addEventListener('input', handleDiskChange);
+        diskInput.addEventListener('change', handleDiskChange);
+        document.getElementById('btn-reset').addEventListener('click', initGame);
+
+        // Mostrar/Ocultar Mínimo de Movimientos
+        toggleMinMoves.addEventListener('change', (e) => {
+            minMovesBox.style.visibility = e.target.checked ? 'visible' : 'hidden';
+        });
+
+        // Alternar Tema Claro/Oscuro
+        toggleTheme.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+            }
+        });
+
+        // --- Lógica del Modal de Historia ---
+        const historyModal = document.getElementById('history-modal');
+        const btnHistory = document.getElementById('btn-history');
+        const closeModal = document.getElementById('close-modal');
+
+        btnHistory.addEventListener('click', () => {
+            historyModal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            historyModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === historyModal) {
+                historyModal.style.display = 'none';
+            }
+        });
+
+        // Inicializar al cargar
+        initGame();
+    </script>
+</body>
+</html>

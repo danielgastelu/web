@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>¡A ORDENAR LOS JUGUETES!</title>
+    
+    <style>
+        :root {
+            --bg-color: #e8f5e9; /* Verde muy suave y relajante */
+            --panel-bg: #ffffff;
+            --text-color: #2e7d32;
+            --btn-color: #4caf50;
+            --btn-hover: #43a047;
+            --box-front: #ffb74d; /* Naranja/madera claro */
+            --box-back: #e65100; /* Fondo oscuro de la caja */
+            --box-border: #f57c00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            /* Patrón de fondo sutil para parecer una habitación infantil */
+            background-image: radial-gradient(#c8e6c9 15%, transparent 16%), radial-gradient(#c8e6c9 15%, transparent 16%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--panel-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 4px solid var(--btn-color);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .difficulty-wrapper input[type="range"] {
+            cursor: pointer;
+            accent-color: var(--text-color);
+        }
+
+        .stats-panel {
+            display: flex;
+            gap: 15px;
+            background-color: rgba(255,255,255,0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid var(--btn-color);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .stats-panel strong {
+            font-size: 1.2rem;
+            color: #d32f2f; /* Rojo para destacar lo que falta */
+        }
+
+        .btn {
+            background-color: var(--btn-color);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 0 var(--btn-hover);
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--btn-hover);
+        }
+
+        /* Área de juego */
+        #game-container {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Juguetes esparcidos */
+        .toy {
+            position: absolute;
+            font-size: 4.5rem;
+            cursor: grab;
+            touch-action: none;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+            transition: transform 0.2s;
+            z-index: 5;
+        }
+
+        .toy:active {
+            cursor: grabbing;
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Elemento fantasma para el arrastre fluido */
+        .ghost-toy {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3));
+            transition: top 0.3s ease, left 0.3s ease;
+        }
+
+        .ghost-toy.dragging {
+            transition: none;
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        /* Caja de juguetes (Efecto 3D) */
+        #toy-box-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 150px;
+            z-index: 10; /* La caja debe estar encima de algunos juguetes cayendo */
+        }
+
+        .box-part {
+            position: absolute;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .box-back {
+            bottom: 0;
+            height: 120px;
+            background-color: var(--box-back);
+            z-index: 1;
+            border: 4px solid var(--box-border);
+            box-shadow: inset 0 20px 20px rgba(0,0,0,0.5); /* Sombra interior profunda */
+        }
+
+        .box-front {
+            bottom: 0;
+            height: 90px;
+            background-color: var(--box-front);
+            z-index: 100; /* CRÍTICO: Frente de la caja tapa el juguete al caer */
+            border: 4px solid var(--box-border);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: #fff;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .box-front::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -4px;
+            right: -4px;
+            height: 10px;
+            background-color: #ffcc80;
+            border: 4px solid var(--box-border);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        /* Animaciones */
+        #toy-box-container.hovered .box-front {
+            background-color: #ffcc80; /* Se ilumina al pasar por encima */
+            transform: scale(1.05);
+        }
+
+        .box-happy {
+            animation: bounceBox 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceBox {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1) translateY(10px); }
+        }
+
+        @keyframes dropIn {
+            0% { transform: scale(1) translateY(0) rotate(10deg); opacity: 1; }
+            50% { transform: scale(0.8) translateY(30px) rotate(-10deg); opacity: 0.8; }
+            100% { transform: scale(0) translateY(80px) rotate(20deg); opacity: 0; }
+        }
+
+        .dropping {
+            animation: dropIn 0.4s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px) rotate(-5deg); }
+            50% { transform: translateX(15px) rotate(5deg); }
+            75% { transform: translateX(-15px) rotate(-5deg); }
+        }
+
+        .shake {
+            animation: gentleShake 0.4s ease-in-out;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(30px) scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 5px solid var(--btn-color);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-content h2 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .huge-emoji {
+            font-size: 5rem;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>¡A ORDENAR! 🧸</h1>
+        <div class="controls">
+            <div class="stats-panel">
+                <span>FALTAN: <strong id="toys-left">0</strong></span>
+            </div>
+            <div class="difficulty-wrapper">
+                <label for="difficulty-slider">NIVEL:</label>
+                <input type="range" id="difficulty-slider" min="1" max="3" value="1">
+                <span id="diff-label">FÁCIL (3)</span>
+            </div>
+            <button class="btn" id="btn-info">¿CÓMO JUGAR?</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <!-- Los juguetes se generarán dinámicamente aquí -->
+        
+        <!-- La caja donde deben caer (Estructura 3D simulada) -->
+        <div id="toy-box-container">
+            <div class="box-part box-back" id="box-hitbox"></div>
+            <div class="box-part box-front">📦 JUGUETES</div>
+        </div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>¿CÓMO JUGAR?</h2>
+            <div class="huge-emoji">🧺✨</div>
+            <p>¡LA HABITACIÓN ESTÁ DESORDENADA!</p>
+            <p>TOCA Y ARRASTRA TODOS LOS JUGUETES ADENTRO DE LA CAJA GRANDE PARA GUARDARLOS.</p>
+            <button class="btn" id="close-info">¡A ORDENAR!</button>
+        </div>
+    </div>
+
+    <!-- Modal de Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <h2>¡HABITACIÓN LIMPIA!</h2>
+            <div class="huge-emoji">🧹🌟</div>
+            <p>¡HICISTE UN TRABAJO FANTÁSTICO GUARDANDO TODOS TUS JUGUETES!</p>
+            <button class="btn" id="close-win">ORDENAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <script>
+        // Catálogo de juguetes disponibles
+        const TOY_CATALOG = ['🚗', '🧸', '⚽', '🚂', '🧩', '🪁', '🚁', '⛵', '🦖', '🦄', '🥁', '🎨', '🪀', '🤖'];
+
+        let numToys = 3; 
+        let toysRemaining = 0;
+
+        // Elementos DOM
+        const gameContainer = document.getElementById('game-container');
+        const toyBoxContainer = document.getElementById('toy-box-container');
+        const boxHitbox = document.getElementById('box-hitbox');
+        const toysLeftEl = document.getElementById('toys-left');
+        const infoModal = document.getElementById('info-modal');
+        const winModal = document.getElementById('win-modal');
+        const difficultySlider = document.getElementById('difficulty-slider');
+        const diffLabel = document.getElementById('diff-label');
+
+        // Variables de Drag & Drop
+        let isDragging = false;
+        let currentToy = null;
+        let ghostToy = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let originalRect = null;
+        let isOverBox = false;
+
+        function initGame() {
+            // Limpiar juguetes anteriores
+            const oldToys = document.querySelectorAll('.toy, .toy-dropped');
+            oldToys.forEach(t => t.remove());
+
+            toysRemaining = numToys;
+            toysLeftEl.textContent = toysRemaining;
+
+            // Seleccionar juguetes aleatorios
+            let shuffledToys = [...TOY_CATALOG].sort(() => 0.5 - Math.random());
+            let selectedToys = shuffledToys.slice(0, numToys);
+
+            // Determinar área segura para aparecer (mitad superior y evitar bordes)
+            const maxWidth = gameContainer.clientWidth - 80;
+            const maxHeight = gameContainer.clientHeight - 250; // Dejar espacio para la caja abajo
+
+            selectedToys.forEach(toyEmoji => {
+                const toy = document.createElement('div');
+                toy.className = 'toy';
+                toy.textContent = toyEmoji;
+                
+                // Posición inicial aleatoria
+                const randomX = Math.max(20, Math.random() * maxWidth);
+                const randomY = Math.max(20, Math.random() * maxHeight);
+                
+                toy.style.left = `${randomX}px`;
+                toy.style.top = `${randomY}px`;
+                
+                toy.addEventListener('mousedown', dragStart);
+                toy.addEventListener('touchstart', dragStart, {passive: false});
+                
+                gameContainer.appendChild(toy);
+            });
+        }
+
+        function dragStart(e) {
+            e.preventDefault(); 
+            
+            currentToy = e.target;
+            isDragging = true;
+            originalRect = currentToy.getBoundingClientRect();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            offsetX = clientX - originalRect.left;
+            offsetY = clientY - originalRect.top;
+
+            // Crear fantasma
+            ghostToy = document.createElement('div');
+            ghostToy.className = 'ghost-toy dragging';
+            ghostToy.textContent = currentToy.textContent;
+            ghostToy.style.width = `${originalRect.width}px`;
+            ghostToy.style.height = `${originalRect.height}px`;
+            ghostToy.style.left = `${originalRect.left}px`;
+            ghostToy.style.top = `${originalRect.top}px`;
+            document.body.appendChild(ghostToy);
+
+            currentToy.style.opacity = '0'; // Ocultar el original por completo mientras arrastra
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!isDragging || !ghostToy) return;
+            e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            ghostToy.style.left = `${clientX - offsetX}px`;
+            ghostToy.style.top = `${clientY - offsetY}px`;
+
+            // Detectar si está sobre la hitbox de la caja
+            const boxRect = boxHitbox.getBoundingClientRect();
+            // Punto central del juguete fantasma para la detección
+            const ghostCenterX = clientX;
+            const ghostCenterY = clientY;
+
+            if (ghostCenterX > boxRect.left && ghostCenterX < boxRect.right &&
+                ghostCenterY > boxRect.top && ghostCenterY < boxRect.bottom + 50) { // Margen extra abajo
+                if (!isOverBox) {
+                    isOverBox = true;
+                    toyBoxContainer.classList.add('hovered');
+                }
+            } else {
+                if (isOverBox) {
+                    isOverBox = false;
+                    toyBoxContainer.classList.remove('hovered');
+                }
+            }
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
+
+            toyBoxContainer.classList.remove('hovered');
+
+            if (isOverBox) {
+                acceptToy();
+            } else {
+                rejectToy();
+            }
+            
+            isOverBox = false;
+        }
+
+        function acceptToy() {
+            // Calcular posición relativa a la caja para la animación
+            const boxRect = toyBoxContainer.getBoundingClientRect();
+            
+            // Reemplazar el fantasma por un clon en el contenedor del juego para animar su caída "dentro"
+            const droppedToy = document.createElement('div');
+            droppedToy.className = 'toy toy-dropped dropping';
+            droppedToy.textContent = ghostToy.textContent;
+            
+            // Intercalar z-index para que pase DETRÁS del frente de la caja pero DELANTE del fondo
+            droppedToy.style.zIndex = '50'; 
+            
+            // Posicionarlo exactamente donde se soltó el fantasma
+            const ghostRect = ghostToy.getBoundingClientRect();
+            const containerRect = gameContainer.getBoundingClientRect();
+            
+            droppedToy.style.left = `${ghostRect.left - containerRect.left}px`;
+            droppedToy.style.top = `${ghostRect.top - containerRect.top}px`;
+            
+            gameContainer.appendChild(droppedToy);
+
+            // Eliminar elementos temporales
+            ghostToy.remove();
+            ghostToy = null;
+            currentToy.remove(); // Eliminar original
+            currentToy = null;
+
+            // Animar la caja rebotando de felicidad
+            toyBoxContainer.classList.remove('box-happy'); // reset
+            void toyBoxContainer.offsetWidth; // trigger reflow
+            toyBoxContainer.classList.add('box-happy');
+
+            // Actualizar estado
+            toysRemaining--;
+            toysLeftEl.textContent = toysRemaining;
+            
+            if (toysRemaining === 0) {
+                setTimeout(() => showModal(winModal), 800);
+            }
+        }
+
+        function rejectToy() {
+            // El juguete vibra y regresa de golpe a su posición
+            ghostToy.classList.remove('dragging');
+            ghostToy.classList.add('shake');
+
+            requestAnimationFrame(() => {
+                ghostToy.style.left = `${originalRect.left}px`;
+                ghostToy.style.top = `${originalRect.top}px`;
+            });
+
+            setTimeout(() => {
+                if (ghostToy) {
+                    ghostToy.remove();
+                    ghostToy = null;
+                }
+                if (currentToy) {
+                    currentToy.style.opacity = '1';
+                    currentToy = null;
+                }
+            }, 350); 
+        }
+
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function applyDifficulty() {
+            const level = parseInt(difficultySlider.value);
+            if (level === 1) {
+                numToys = 3;
+                diffLabel.textContent = "FÁCIL (3)";
+            } else if (level === 2) {
+                numToys = 6; 
+                diffLabel.textContent = "MEDIO (6)";
+            } else {
+                numToys = 10; 
+                diffLabel.textContent = "DIFÍCIL (10)";
+            }
+            initGame(); 
+        }
+
+        // Listeners
+        difficultySlider.addEventListener('input', applyDifficulty);
+        
+        document.getElementById('btn-info').addEventListener('click', () => {
+            showModal(infoModal);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            hideModal(infoModal);
+        });
+
+        document.getElementById('close-win').addEventListener('click', () => {
+            hideModal(winModal);
+            initGame();
+        });
+
+        // Al redimensionar, reiniciar para evitar que los juguetes queden fuera de la pantalla
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimer);
+            window.resizeTimer = setTimeout(initGame, 250);
+        });
+
+        // Iniciar
+        applyDifficulty();
+        
+        // Mostrar instrucciones la primera vez
+        setTimeout(() => showModal(infoModal), 500);
+    </script>
+</body>
+</html>

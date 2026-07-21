@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Evita el zoom accidental en pantallas táctiles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>¡EXPLOTA LAS BURBUJAS!</title>
+    
+    <style>
+        :root {
+            --sky-blue: #87CEEB;
+            --sky-dark: #4facfe;
+            --text-color: #0d47a1;
+            --btn-color: #ff4081;
+            --btn-hover: #f50057;
+            --bar-green: #00e676;
+            --bar-orange: #ff9100;
+            --bar-red: #ff1744;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background: linear-gradient(to bottom, var(--sky-blue), var(--sky-dark));
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        #start-screen, #end-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--btn-color);
+            text-shadow: 2px 2px 0px white, 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .level-select {
+            margin-bottom: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 4px solid var(--btn-color);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .level-select label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .level-select select {
+            font-size: 1.2rem;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--btn-color);
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            width: 100%;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--btn-hover);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--btn-hover);
+        }
+
+        #hud {
+            display: none;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            border-bottom: 3px solid white;
+        }
+
+        .score-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .score-container span {
+            color: var(--btn-color);
+            font-size: 2.2rem;
+        }
+
+        .timer-container {
+            width: 100%;
+            height: 25px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+            border: 3px solid white;
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--bar-green);
+            border-radius: 15px;
+            transition: width 1s linear, background-color 0.5s ease;
+            background-image: linear-gradient(
+                rgba(255, 255, 255, 0.4) 0%, 
+                rgba(255, 255, 255, 0) 50%, 
+                rgba(0, 0, 0, 0.1) 50%, 
+                rgba(0, 0, 0, 0.1) 100%
+            );
+        }
+
+        #game-area {
+            flex: 1;
+            position: relative;
+            display: none;
+            overflow: hidden; /* Las burbujas que se escapan no causan scroll */
+        }
+
+        /* El hitbox es más grande que la burbuja visual (Precisión Flexible) */
+        .bubble-container {
+            position: absolute;
+            bottom: -150px; /* Inician fuera de la pantalla por debajo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            /* La animación de subida se aplicará por JS para variar velocidades */
+        }
+
+        .bubble-visual {
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(173, 216, 230, 0.6) 60%, rgba(255,255,255,0.4) 100%);
+            box-shadow: 
+                inset -5px -5px 15px rgba(0,0,0,0.1),
+                inset 5px 5px 10px rgba(255,255,255,0.8),
+                0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: transform 0.1s;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bubble-container:active .bubble-visual {
+            transform: scale(0.95);
+        }
+
+        /* Animación cuando el niño toca la burbuja (Pop) */
+        .pop-animation {
+            animation: popEffect 0.3s forwards;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+        }
+
+        .pop-animation .bubble-visual {
+            display: none; /* Oculta la burbuja redonda */
+        }
+
+        .pop-animation::before {
+            content: '✨'; /* Estrellita mágica al explotar */
+            position: absolute;
+        }
+
+        @keyframes popEffect {
+            0% { transform: scale(1); opacity: 1; filter: brightness(1.5); }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        /* Animación de subida estándar (se sobreescribe con JS para la duración) */
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-50vh) translateX(20px); }
+            100% { transform: translateY(-120vh) translateX(-20px); } /* Se va por arriba */
+        }
+
+        .emoji-huge {
+            font-size: 5rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h1>¡EXPLOTA LAS<br>BURBUJAS!</h1>
+        <div class="level-select">
+            <label>TAMAÑO Y VELOCIDAD:</label>
+            <select id="level-selector">
+                <option value="1">NIVEL 1 (GIGANTES Y LENTAS)</option>
+                <option value="2">NIVEL 2 (MEDIANAS)</option>
+                <option value="3">NIVEL 3 (PEQUEÑAS Y RÁPIDAS)</option>
+            </select>
+        </div>
+        <button class="btn" id="btn-start">¡A JUGAR!</button>
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <div class="emoji-huge">🌟</div>
+        <h1>¡TIEMPO TERMINADO!</h1>
+        <h2 style="margin-bottom: 30px; color: var(--btn-hover);">EXPLOTASTE <span id="final-score" style="font-size: 2.5rem;">0</span> BURBUJAS</h2>
+        <button class="btn" id="btn-restart">JUGAR OTRA VEZ</button>
+    </div>
+
+    <div id="hud">
+        <div class="score-container">
+            PUNTOS: <span id="score-display">0</span>
+        </div>
+        <div class="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+    </div>
+
+    <div id="game-area"></div>
+
+    <script>
+        // Configuración General
+        const TOTAL_TIME = 60; // 60 segundos es ideal para mantener la atención
+        
+        // Precargar el sonido para que reaccione sin lag (latencia)
+        const popAudio = new Audio("http://danielgastelu.github.io/web/sonidos/plop.mp3");
+        popAudio.preload = "auto";
+        
+        // Configuración de precisión y niveles
+        // size: Tamaño visual de la burbuja
+        // hitboxPadding: Espacio extra invisible para facilitar el toque (motricidad fina flexible)
+        // speed: Segundos que tarda en cruzar la pantalla (menor es más rápido)
+        // spawnRate: Milisegundos entre cada nueva burbuja
+        const LEVELS = {
+            1: { size: 120, hitboxPadding: 40, speed: 7, spawnRate: 1200 },
+            2: { size: 90,  hitboxPadding: 35, speed: 5, spawnRate: 800 },
+            3: { size: 65,  hitboxPadding: 30, speed: 3.5, spawnRate: 500 }
+        };
+
+        // Elementos DOM
+        const startScreen = document.getElementById('start-screen');
+        const endScreen = document.getElementById('end-screen');
+        const hud = document.getElementById('hud');
+        const gameArea = document.getElementById('game-area');
+        const btnStart = document.getElementById('btn-start');
+        const btnRestart = document.getElementById('btn-restart');
+        const levelSelector = document.getElementById('level-selector');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScore = document.getElementById('final-score');
+        const timerBar = document.getElementById('timer-bar');
+
+        // Variables de Estado
+        let score = 0;
+        let timeLeft = TOTAL_TIME;
+        let mainTimerInterval;
+        let spawnInterval;
+        let currentConfig;
+
+        // Iniciar el Juego
+        function startGame() {
+            const level = parseInt(levelSelector.value);
+            currentConfig = LEVELS[level];
+
+            score = 0;
+            timeLeft = TOTAL_TIME;
+            scoreDisplay.textContent = score;
+            
+            startScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            hud.style.display = 'block';
+            gameArea.style.display = 'block';
+            gameArea.innerHTML = ''; 
+
+            updateTimerBar();
+
+            // Reloj Principal
+            mainTimerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerBar();
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            // Generador de Burbujas
+            spawnInterval = setInterval(spawnBubble, currentConfig.spawnRate);
+        }
+
+        // Actualizar la Barra de Tiempo
+        function updateTimerBar() {
+            const percentage = (timeLeft / TOTAL_TIME) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            // Lógica de colores semáforo
+            if (timeLeft <= 15) {
+                timerBar.style.backgroundColor = 'var(--bar-red)';
+            } else if (timeLeft <= 30) {
+                timerBar.style.backgroundColor = 'var(--bar-orange)';
+            } else {
+                timerBar.style.backgroundColor = 'var(--bar-green)';
+            }
+        }
+
+        // Crear una burbuja
+        function spawnBubble() {
+            // Contenedor invisible más grande (El Hitbox flexible)
+            const bubbleWrap = document.createElement('div');
+            bubbleWrap.className = 'bubble-container';
+            
+            // Calculamos el tamaño total interactivo
+            const totalSize = currentConfig.size + currentConfig.hitboxPadding;
+            bubbleWrap.style.width = `${totalSize}px`;
+            bubbleWrap.style.height = `${totalSize}px`;
+
+            // La burbuja visual (Más pequeña que el contenedor)
+            const visual = document.createElement('div');
+            visual.className = 'bubble-visual';
+            visual.style.width = `${currentConfig.size}px`;
+            visual.style.height = `${currentConfig.size}px`;
+            
+            bubbleWrap.appendChild(visual);
+
+            // Posición X aleatoria (asegurando que no se corte en los bordes)
+            const maxX = gameArea.clientWidth - totalSize;
+            const randomX = Math.max(0, Math.random() * maxX);
+            bubbleWrap.style.left = `${randomX}px`;
+
+            // Variar un poquito la velocidad para que no suban todas igual
+            const timeVariance = (Math.random() * 2) - 1; // Entre -1 y +1 segundo
+            const finalSpeed = Math.max(2, currentConfig.speed + timeVariance);
+            
+            // Aplicar animación de subida
+            bubbleWrap.style.animation = `floatUp ${finalSpeed}s linear forwards`;
+
+            // Manejador de evento (Tocar/Point)
+            // Se usa mousedown y touchstart para máxima velocidad de respuesta sin delay
+            const popHandler = (e) => {
+                e.preventDefault(); // Previene comportamientos dobles en móviles
+                
+                if (bubbleWrap.classList.contains('pop-animation')) return; // Evitar doble toque
+                
+                score++;
+                scoreDisplay.textContent = score;
+                
+                // Clonar el nodo permite que se superpongan varios sonidos si explota varias a la vez
+                const soundClone = popAudio.cloneNode();
+                soundClone.play().catch(e => console.log("Esperando interacción para audio", e));
+                
+                // Efecto mágico
+                bubbleWrap.classList.add('pop-animation');
+                
+                // Limpiar del DOM luego de la animación
+                setTimeout(() => {
+                    if(gameArea.contains(bubbleWrap)) bubbleWrap.remove();
+                }, 300);
+            };
+
+            bubbleWrap.addEventListener('touchstart', popHandler, { passive: false });
+            bubbleWrap.addEventListener('mousedown', popHandler);
+
+            // Limpieza automática si no la tocan y sale de la pantalla
+            setTimeout(() => {
+                if(gameArea.contains(bubbleWrap) && !bubbleWrap.classList.contains('pop-animation')) {
+                    bubbleWrap.remove();
+                }
+            }, finalSpeed * 1000 + 500); // Dar un margen extra antes de borrar
+
+            gameArea.appendChild(bubbleWrap);
+        }
+
+        // Terminar el Juego
+        function endGame() {
+            clearInterval(mainTimerInterval);
+            clearInterval(spawnInterval);
+            
+            hud.style.display = 'none';
+            gameArea.style.display = 'none';
+            endScreen.style.display = 'flex';
+            
+            finalScore.textContent = score;
+        }
+
+        // Listeners de Botones
+        btnStart.addEventListener('click', startGame);
+        btnRestart.addEventListener('click', () => {
+            endScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
