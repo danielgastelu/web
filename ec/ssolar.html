@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Orbital del Sistema Solar</title>
+    <style>
+        :root {
+            --bg-color: #050508;
+            --panel-bg: rgba(15, 15, 25, 0.75);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --text-main: #f0f0f0;
+            --text-muted: #a0a0b5;
+            --accent: #4da6ff;
+            --sun-color: #ffcc00;
+            --transition-smooth: 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Parallax Starry Background */
+        #stars-container {
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: transparent;
+            z-index: 0;
+            animation: slowDrift 120s linear infinite;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        @keyframes slowDrift {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* UI Layer */
+        header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(5,5,8,0.9), transparent);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        h1 span { color: var(--accent); }
+
+        .search-container {
+            position: relative;
+        }
+
+        #search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        #search-results {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .search-result-item:hover, .search-result-item:focus {
+            background: rgba(77, 166, 255, 0.2);
+            outline: none;
+        }
+
+        /* Solar System Visualization */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            perspective: 1000px;
+        }
+
+        #solar-system {
+            position: relative;
+            width: 100vmin;
+            height: 100vmin;
+            transform-style: preserve-3d;
+            transition: transform var(--transition-smooth);
+        }
+
+        .sun {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 8vmin; height: 8vmin;
+            background: radial-gradient(circle, #fff, var(--sun-color), #ff6600);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 40px var(--sun-color), 0 0 80px #ff6600;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .orbit {
+            position: absolute;
+            top: 50%; left: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        .planet-container {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+        }
+
+        .planet {
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.7), 0 0 10px rgba(255,255,255,0.2);
+            transition: transform 0.3s;
+            animation: counter-spin linear infinite;
+        }
+
+        .planet-container:hover .planet, .planet-container:focus .planet {
+            transform: scale(1.5);
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.7), 0 0 20px var(--accent);
+        }
+
+        .planet-label {
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes counter-spin { 100% { transform: rotate(-360deg); } }
+
+        /* Information Panel (Glassmorphism) */
+        #info-panel {
+            position: absolute;
+            right: -400px; top: 0; bottom: 0;
+            width: 400px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border-color);
+            padding: 2rem;
+            z-index: 20;
+            transition: right var(--transition-smooth), visibility var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #info-panel.active { 
+            right: 0; 
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .close-btn {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        #panel-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(77, 166, 255, 0.2);
+            color: var(--accent);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #panel-title { font-size: 2rem; margin-bottom: 0.5rem; }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-item {
+            background: rgba(0,0,0,0.3);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .data-item.full-width {
+            grid-column: span 2;
+        }
+
+        .data-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .data-value { font-size: 0.95rem; font-weight: 600; margin-top: 0.2rem; }
+
+        .fact-box {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Pedagogical Note & Credits */
+        footer {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: linear-gradient(to top, rgba(5,5,8,0.9), transparent);
+        }
+
+        .pedagogical-note {
+            max-width: 60%;
+        }
+
+        .credits-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .credits-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Credits Modal */
+        #credits-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #credits-modal.active { display: flex; }
+        
+        .modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-content h2 { margin-bottom: 1rem; color: var(--text-main); }
+        .credit-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .credit-item:last-child { border-bottom: none; }
+        .credit-item a { color: var(--accent); text-decoration: none; }
+        .credit-item a:hover { text-decoration: underline; }
+        
+        #external-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 15;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #info-panel { width: 100%; right: -100%; border-left: none; }
+            .pedagogical-note { display: none; }
+            header { flex-direction: column; gap: 1rem; }
+            #solar-system { width: 150vmin; height: 150vmin; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="stars-container" aria-hidden="true"></div>
+
+    <header>
+        <h1>Explorador<span>orbital</span></h1>
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="search" id="search-input" placeholder="Buscar cuerpo celeste..." aria-label="Buscar planetas y cuerpos menores" aria-controls="search-results">
+            <div id="search-results" role="listbox"></div>
+        </div>
+    </header>
+
+    <main aria-label="Simulación interactiva del sistema solar">
+        <div id="solar-system">
+            <div class="sun" role="button" tabindex="0" aria-label="Sol" onclick="openPanel('sol')"></div>
+        </div>
+    </main>
+
+    <aside id="info-panel" aria-hidden="true" aria-labelledby="panel-title">
+        <button class="close-btn" aria-label="Cerrar panel" onclick="closePanel()">✖</button>
+        <img id="panel-img" src="" alt="">
+        <span class="badge" id="panel-type"></span>
+        <h2 id="panel-title"></h2>
+        
+        <div class="fact-box">
+            <strong>Mecánica y curiosidades:</strong> <span id="panel-fact"></span>
+        </div>
+
+        <div class="data-grid">
+            <div class="data-item full-width">
+                <div class="data-label">Satélites conocidos</div>
+                <div class="data-value" id="panel-moons"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Diámetro</div>
+                <div class="data-value" id="panel-diameter"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Masa</div>
+                <div class="data-value" id="panel-mass"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Gravedad (m/s²)</div>
+                <div class="data-value" id="panel-gravity"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Temperatura</div>
+                <div class="data-value" id="panel-temp"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Rotación (Día)</div>
+                <div class="data-value" id="panel-day"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Traslación (Año)</div>
+                <div class="data-value" id="panel-year"></div>
+            </div>
+        </div>
+    </aside>
+
+    <footer id="internal-footer">
+        <div class="pedagogical-note">
+            <strong>Nota instruccional: </strong> Los tamaños y distancias orbitales no están a escala real. Se aplican transformaciones logarítmicas para visualizar el sistema en una única pantalla.
+        </div>
+        <button class="credits-btn" onclick="toggleCredits()">Licencias y Créditos OER</button>
+    </footer>
+
+    <div id="credits-modal" role="dialog" aria-labelledby="credits-title" aria-modal="true">
+        <div class="modal-content">
+            <h2 id="credits-title">Recursos Educativos Abiertos (OER)</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                Las imágenes provienen de Wikimedia Commons. Se respeta el modelo de atribución de licencias Creative Commons y Dominio Público para su uso en la educación.
+            </p>
+            <div id="credits-list"></div>
+            <button class="credits-btn" style="margin-top: 1rem; width: 100%;" onclick="toggleCredits()">Cerrar</button>
+        </div>
+    </div>
+    
+    <!-- Contenedor para inyectar footer.html -->
+    <div id="external-footer"></div>
+
+    <script>
+        const celestialBodies = {
+            sol: {
+                id: "sol", name: "Sol", type: "Estrella (Enana Amarilla)", 
+                diameter: "1.392.700 km", mass: "1.989 × 10³⁰ kg", gravity: "274.0", 
+                temp: "5.500 °C (superficie)", day: "27 días terrestres", year: "N/A", 
+                fact: "Contiene el 99.86% de toda la masa del sistema solar. Su energía es el motor que impulsa los sistemas climáticos y la mecánica orbital de todos los planetas.",
+                moons: { count: 0, names: [] },
+                img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg",
+                credit: "NASA/SDO", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg"
+            },
+            mercurio: {
+                id: "mercurio", name: "Mercurio", type: "Planeta Terrestre", 
+                diameter: "4.879 km", mass: "3.30 × 10²³ kg", gravity: "3.7", 
+                temp: "-173°C a 427°C", day: "58.6 días", year: "88 días", 
+                fact: "Su excentricidad orbital es la mayor de los 8 planetas, lo que sumado a su lenta rotación genera las variaciones térmicas más extremas.",
+                moons: { count: 0, names: [] },
+                orbitSize: 18, size: 2.5, speed: 8.8,
+                img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg",
+                credit: "NASA/JHUAPL/CIW", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:Mercury_in_true_color.jpg"
+            },
+            venus: {
+                id: "venus", name: "Venus", type: "Planeta Terrestre", 
+                diameter: "12.104 km", mass: "4.87 × 10²⁴ kg", gravity: "8.87", 
+                temp: "462 °C", day: "243 días", year: "225 días", 
+                fact: "Presenta rotación retrógrada (gira en sentido horario). Su densa atmósfera de CO2 genera un efecto invernadero desbocado continuo.",
+                moons: { count: 0, names: [] },
+                orbitSize: 26, size: 4, speed: 22.5,
+                img: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg",
+                credit: "NASA/JPL-Caltech", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:Venus-real_color.jpg"
+            },
+            tierra: {
+                id: "tierra", name: "Tierra", type: "Planeta Terrestre", 
+                diameter: "12.742 km", mass: "5.97 × 10²⁴ kg", gravity: "9.807", 
+                temp: "15 °C (media)", day: "24 horas", year: "365.25 días", 
+                fact: "Único cuerpo conocido con tectónica de placas activa y agua en los tres estados físicos de la materia en su superficie.",
+                moons: { count: 1, names: ["La Luna"] },
+                orbitSize: 36, size: 4.5, speed: 36.5,
+                img: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg",
+                credit: "NASA", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:The_Earth_seen_from_Apollo_17.jpg"
+            },
+            marte: {
+                id: "marte", name: "Marte", type: "Planeta Terrestre", 
+                diameter: "6.779 km", mass: "6.39 × 10²³ kg", gravity: "3.71", 
+                temp: "-63 °C (media)", day: "24h 37m", year: "687 días", 
+                fact: "Alberga el Monte Olimpo, el volcán en escudo más grande conocido del sistema solar, demostrando un vulcanismo pasado de gran escala.",
+                moons: { count: 2, names: ["Fobos", "Deimos"] },
+                orbitSize: 46, size: 3, speed: 68.7,
+                img: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",
+                credit: "ESA/MPS", license: "CC BY-SA 3.0 IGO", url: "https://commons.wikimedia.org/wiki/File:OSIRIS_Mars_true_color.jpg"
+            },
+            jupiter: {
+                id: "jupiter", name: "Júpiter", type: "Gigante Gaseoso", 
+                diameter: "139.820 km", mass: "1.89 × 10²⁷ kg", gravity: "24.79", 
+                temp: "-108 °C", day: "9h 55m", year: "11.8 años", 
+                fact: "Funciona como un 'escudo gravitacional' para el universo interior. Su rápida rotación provoca un achatamiento medible en sus polos.",
+                moons: { count: 95, names: ["Ganímedes", "Calisto", "Ío", "Europa"] },
+                orbitSize: 62, size: 7, speed: 120,
+                img: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg",
+                credit: "NASA, ESA, A. Simon", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:Jupiter.jpg"
+            },
+            saturno: {
+                id: "saturno", name: "Saturno", type: "Gigante Gaseoso", 
+                diameter: "116.460 km", mass: "5.68 × 10²⁶ kg", gravity: "10.44", 
+                temp: "-139 °C", day: "10h 33m", year: "29.5 años", 
+                fact: "Su densidad media es menor que la del agua pura. Su sistema de anillos es una demostración visible de los límites de Roche.",
+                moons: { count: 146, names: ["Titán", "Encélado", "Jápeto", "Rea"] },
+                orbitSize: 76, size: 6, speed: 180,
+                img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg",
+                credit: "NASA/JPL/Space Science Institute", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:Saturn_during_Equinox.jpg"
+            },
+            urano: {
+                id: "urano", name: "Urano", type: "Gigante Helado", 
+                diameter: "50.724 km", mass: "8.68 × 10²⁵ kg", gravity: "8.69", 
+                temp: "-195 °C", day: "17h 14m", year: "84 años", 
+                fact: "Su eje de rotación está inclinado 98 grados, lo que significa que orbita 'de lado', causando estaciones extremas de 21 años.",
+                moons: { count: 28, names: ["Titania", "Oberón", "Umbriel", "Ariel"] },
+                orbitSize: 88, size: 4.5, speed: 250,
+                img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg",
+                credit: "NASA/JPL-Caltech", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:Uranus2.jpg"
+            },
+            neptuno: {
+                id: "neptuno", name: "Neptuno", type: "Gigante Helado", 
+                diameter: "49.244 km", mass: "1.02 × 10²⁶ kg", gravity: "11.15", 
+                temp: "-200 °C", day: "16h 6m", year: "165 años", 
+                fact: "Posee los vientos más fuertes registrados en el sistema solar (hasta 2.100 km/h), un fenómeno impulsado por el calor interno remanente.",
+                moons: { count: 16, names: ["Tritón", "Proteo", "Nereida", "Larisa"] },
+                orbitSize: 98, size: 4.2, speed: 320,
+                img: "https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829777304246%29.jpg",
+                credit: "NASA/JPL-Caltech", license: "Dominio Público", url: "https://commons.wikimedia.org/wiki/File:Neptune_-_Voyager_2_(29777304246).jpg"
+            }
+        };
+
+        const systemContainer = document.getElementById('solar-system');
+        const starsContainer = document.getElementById('stars-container');
+
+        function generateStars() {
+            const numStars = 300;
+            for(let i=0; i<numStars; i++) {
+                let star = document.createElement('div');
+                star.className = 'star';
+                let size = Math.random() * 2 + 0.5;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.opacity = Math.random() * 0.8 + 0.2;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function buildSystem() {
+            Object.keys(celestialBodies).forEach(key => {
+                if (key === 'sol') return;
+                const body = celestialBodies[key];
+                
+                const orbit = document.createElement('div');
+                orbit.className = 'orbit';
+                orbit.style.width = body.orbitSize + 'vmin';
+                orbit.style.height = body.orbitSize + 'vmin';
+                orbit.style.animationDuration = body.speed + 's';
+                
+                const pContainer = document.createElement('div');
+                pContainer.className = 'planet-container';
+                pContainer.setAttribute('role', 'button');
+                pContainer.setAttribute('tabindex', '0');
+                pContainer.setAttribute('aria-label', `Ver detalles de ${body.name}`);
+                
+                pContainer.addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openPanel(key);
+                    }
+                });
+                pContainer.onclick = () => openPanel(key);
+
+                const planet = document.createElement('div');
+                planet.className = 'planet';
+                planet.style.width = body.size + 'vmin';
+                planet.style.height = body.size + 'vmin';
+                planet.style.backgroundImage = `url(${body.img})`;
+                planet.style.animationDuration = body.speed + 's';
+
+                const label = document.createElement('div');
+                label.className = 'planet-label';
+                label.textContent = body.name;
+
+                pContainer.appendChild(planet);
+                pContainer.appendChild(label);
+                orbit.appendChild(pContainer);
+                systemContainer.appendChild(orbit);
+            });
+        }
+
+        function formatMoons(moons) {
+            if (moons.count === 0) return "0";
+            let text = `${moons.count} (${moons.names.join(", ")}`;
+            if (moons.count > 4) {
+                text += "... y más";
+            }
+            text += ")";
+            return text;
+        }
+
+        const panel = document.getElementById('info-panel');
+
+        function openPanel(id) {
+            const data = celestialBodies[id];
+            if (!data) return;
+
+            document.getElementById('panel-title').textContent = data.name;
+            document.getElementById('panel-type').textContent = data.type;
+            document.getElementById('panel-img').src = data.img;
+            document.getElementById('panel-img').alt = `Fotografía de ${data.name}`;
+            document.getElementById('panel-fact').textContent = data.fact;
+            
+            document.getElementById('panel-moons').textContent = formatMoons(data.moons);
+            document.getElementById('panel-diameter').textContent = data.diameter;
+            document.getElementById('panel-mass').textContent = data.mass;
+            document.getElementById('panel-gravity').textContent = data.gravity;
+            document.getElementById('panel-temp').textContent = data.temp;
+            document.getElementById('panel-day').textContent = data.day;
+            document.getElementById('panel-year').textContent = data.year;
+
+            panel.classList.add('active');
+            panel.setAttribute('aria-hidden', 'false');
+
+            if(window.innerWidth > 768) {
+                systemContainer.style.transform = 'scale(0.65) translateX(-25%)';
+            } else {
+                systemContainer.style.transform = 'scale(0.5)';
+            }
+        }
+
+        function closePanel() {
+            panel.classList.remove('active');
+            panel.setAttribute('aria-hidden', 'true');
+            systemContainer.style.transform = 'scale(1) translateX(0)';
+        }
+
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            searchResults.innerHTML = '';
+            
+            if (term.length < 1) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            const matches = Object.values(celestialBodies).filter(body => 
+                body.name.toLowerCase().includes(term) || body.type.toLowerCase().includes(term)
+            );
+
+            if (matches.length > 0) {
+                searchResults.style.display = 'block';
+                matches.forEach(match => {
+                    const div = document.createElement('div');
+                    div.className = 'search-result-item';
+                    div.setAttribute('role', 'option');
+                    div.setAttribute('tabindex', '0');
+                    div.innerHTML = `<strong>${match.name}</strong> <span style="font-size:0.8em; color:#a0a0b5;">- ${match.type}</span>`;
+                    
+                    const selectMatch = () => {
+                        openPanel(match.id);
+                        searchResults.style.display = 'none';
+                        searchInput.value = '';
+                    };
+
+                    div.onclick = selectMatch;
+                    div.addEventListener('keydown', (evt) => {
+                        if(evt.key === 'Enter') selectMatch();
+                    });
+                    
+                    searchResults.appendChild(div);
+                });
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        function generateCredits() {
+            const list = document.getElementById('credits-list');
+            Object.values(celestialBodies).forEach(body => {
+                const item = document.createElement('div');
+                item.className = 'credit-item';
+                item.innerHTML = `
+                    <strong>${body.name}:</strong> Fotografía proveída por ${body.credit}.<br>
+                    Licencia: <strong>${body.license}</strong>.<br>
+                    <a href="${body.url}" target="_blank" rel="noopener noreferrer">Ver archivo original en Wikimedia Commons</a>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleCredits() {
+            const modal = document.getElementById('credits-modal');
+            if(modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                modal.setAttribute('aria-hidden', 'true');
+            } else {
+                modal.classList.add('active');
+                modal.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        // Fetch externo para el archivo footer.html
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('footer.html')
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al cargar footer.html');
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById('external-footer').innerHTML = html;
+                    // Ocultar el footer interno si el externo se carga con éxito
+                    const internalFooter = document.getElementById('internal-footer');
+                    if(internalFooter) internalFooter.style.display = 'none';
+                })
+                .catch(err => {
+                    console.log('Nota (Mecánica Técnica): La carga dinámica de footer.html mediante la API fetch requiere que el archivo sea despachado desde un servidor web local (ej. Live Server, XAMPP, o python -m http.server). Si lo abres directamente desde el sistema de archivos (file://), los navegadores bloquearán la petición por políticas de seguridad (CORS).', err);
+                });
+        });
+
+        generateStars();
+        buildSystem();
+        generateCredits();
+    </script>
+</body>
+</html>
