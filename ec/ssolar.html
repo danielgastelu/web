@@ -373,7 +373,7 @@
     <div id="stars-container" aria-hidden="true"></div>
 
     <header>
-        <h1>Explorador<span>orbital</span></h1>
+        <h1>Explorador<span>Orbital</span></h1>
         <div class="search-container">
             <span class="search-icon" aria-hidden="true">🔍</span>
             <input type="search" id="search-input" placeholder="Buscar cuerpo celeste..." aria-label="Buscar planetas y cuerpos menores" aria-controls="search-results">
@@ -394,12 +394,12 @@
         <h2 id="panel-title"></h2>
         
         <div class="fact-box">
-            <strong>Mecánica y curiosidades:</strong> <span id="panel-fact"></span>
+            <strong>Mecánica & Curiosidad:</strong> <span id="panel-fact"></span>
         </div>
 
         <div class="data-grid">
             <div class="data-item full-width">
-                <div class="data-label">Satélites conocidos</div>
+                <div class="data-label">Satélites Conocidos</div>
                 <div class="data-value" id="panel-moons"></div>
             </div>
             <div class="data-item">
@@ -431,7 +431,7 @@
 
     <footer id="internal-footer">
         <div class="pedagogical-note">
-            <strong>Nota instruccional: </strong> Los tamaños y distancias orbitales no están a escala real. Se aplican transformaciones logarítmicas para visualizar el sistema en una única pantalla.
+            <strong>Nota instruccional ("Caja Blanca"):</strong> Los tamaños y distancias orbitales no están a escala real. Se aplican transformaciones logarítmicas para visualizar el sistema en una única pantalla.
         </div>
         <button class="credits-btn" onclick="toggleCredits()">Licencias y Créditos OER</button>
     </footer>
@@ -440,7 +440,7 @@
         <div class="modal-content">
             <h2 id="credits-title">Recursos Educativos Abiertos (OER)</h2>
             <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
-                Las imágenes provienen de Wikimedia Commons. Se respeta el modelo de atribución de licencias Creative Commons y Dominio Público para su uso en la educación.
+                Las imágenes provienen de Wikimedia Commons. Se respeta el modelo de atribución de licencias Creative Commons y Dominio Público para su uso en la educación científica.
             </p>
             <div id="credits-list"></div>
             <button class="credits-btn" style="margin-top: 1rem; width: 100%;" onclick="toggleCredits()">Cerrar</button>
@@ -724,21 +724,20 @@
             }
         }
 
-        // Fetch externo para el archivo footer.html
+        // Fetch externo para el archivo footer_uruguay_educa.html en la carpeta superior
         document.addEventListener("DOMContentLoaded", () => {
-            fetch('footer.html')
+            fetch('../footer_uruguay_educa.html')
                 .then(response => {
-                    if (!response.ok) throw new Error('Error al cargar footer.html');
+                    if (!response.ok) throw new Error('Error al cargar ../footer_uruguay_educa.html');
                     return response.text();
                 })
                 .then(html => {
                     document.getElementById('external-footer').innerHTML = html;
-                    // Ocultar el footer interno si el externo se carga con éxito
                     const internalFooter = document.getElementById('internal-footer');
                     if(internalFooter) internalFooter.style.display = 'none';
                 })
                 .catch(err => {
-                    console.log('Nota (Mecánica Técnica): La carga dinámica de footer.html mediante la API fetch requiere que el archivo sea despachado desde un servidor web local (ej. Live Server, XAMPP, o python -m http.server). Si lo abres directamente desde el sistema de archivos (file://), los navegadores bloquearán la petición por políticas de seguridad (CORS).', err);
+                    console.log('Nota (Mecánica Técnica): La carga dinámica mediante la API fetch requiere que el archivo sea despachado desde un servidor web local. Se detuvo la carga por seguridad (CORS).', err);
                 });
         });
 
