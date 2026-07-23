@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>¡A APILAR CAJAS!</title>
+    
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #334e68;
+            --btn-color: #486581;
+            --btn-hover: #334e68;
+            --accent-color: #f59e0b;
+            --wood-color: #8b5a2b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none; /* Previene scroll al tocar el canvas */
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        header {
+            width: 100%;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .level-selector {
+            background-color: var(--bg-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .level-selector select {
+            font-family: inherit;
+            font-weight: bold;
+            border: 2px solid var(--btn-color);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--btn-hover);
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--btn-hover);
+        }
+
+        #game-container {
+            position: relative;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1 / 1; /* Fuerza la relación 1:1 */
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        /* Marcador de puntuación superior */
+        #score-display {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .emoji-score {
+            letter-spacing: 2px;
+        }
+
+        /* Instrucciones flotantes para el niño */
+        #tap-hint {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            color: #9fb3c8;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Modales */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            border: 4px solid var(--btn-color);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h2 { margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 20px; line-height: 1.5; text-transform: none; }
+        .huge-emoji { font-size: 4rem; margin-bottom: 15px; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>¡A APILAR! 📦</h1>
+        <div class="controls">
+            <div class="level-selector">
+                <label>NIVEL:</label>
+                <select id="level-select">
+                    <option value="1">1 (FÁCIL)</option>
+                    <option value="2">2 (MEDIO)</option>
+                    <option value="3">3 (DIFÍCIL)</option>
+                </select>
+            </div>
+            <button class="btn" id="btn-info">INFO</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <canvas id="game-canvas" width="500" height="500"></canvas>
+        <div id="score-display">
+            <span id="score-number">0</span>
+            <span class="emoji-score" id="score-emojis"></span>
+        </div>
+        <div id="tap-hint">TOCA LA PANTALLA PARA SOLTAR LA CAJA</div>
+    </div>
+
+    <!-- Modal Información -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>PRINCIPIO MONTESSORI</h2>
+            <p>Este material digital aísla la <strong>percepción visoespacial</strong> y el <strong>ritmo</strong>. La manipulación activa (tocar para soltar) permite al niño ensayar la causa y efecto. El control del error es visual: si la caja no cae sobre la base, simplemente se desliza fuera, invitando a intentarlo de nuevo sin penalizaciones.</p>
+            <button class="btn" id="close-info">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Modal Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <div class="huge-emoji">🌟</div>
+            <h2>¡EXCELENTE TRABAJO!</h2>
+            <p>¡HAS APILADO TODAS LAS CAJAS CON GRAN PRECISIÓN!</p>
+            <button class="btn" id="btn-restart">JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const levelSelect = document.getElementById('level-select');
+        const scoreNumberEl = document.getElementById('score-number');
+        const scoreEmojisEl = document.getElementById('score-emojis');
+        const winModal = document.getElementById('win-modal');
+        const infoModal = document.getElementById('info-modal');
+        const tapHint = document.getElementById('tap-hint');
+
+        // Configuración de la lógica del juego
+        const blockW = 60;
+        const blockH = 40;
+        const platformW = 100;
+        const platformH = 20;
+        const platformY = canvas.height - 40; // Zona inferior
+        const fallSpeed = 6;
+        
+        let gameState = 'playing'; // 'playing', 'win'
+        let animationFrameId;
+
+        // Variables de estado
+        let platform = { x: 150, speed: 2, dir: 1, w: platformW };
+        let dropperY = 250;
+        let isFalling = false;
+        let fallingBlock = { x: 0, y: 0 };
+        let stack = []; // Arreglo de objetos { offsetX, hue }
+        let currentHue = 0;
+        let score = 0;
+        let winTarget = 5;
+
+        // Configuración de niveles (Adaptados para la altura de 500px del canvas 1:1)
+        const levels = {
+            1: { target: 5, dropperY: 200, platSpeed: 2 },   // Corta distancia, lento
+            2: { target: 7, dropperY: 100, platSpeed: 3.5 }, // Distancia media, más rápido
+            3: { target: 9, dropperY: 30,  platSpeed: 3.5 }  // Máxima distancia, rápido
+        };
+
+        function initGame() {
+            const lvl = parseInt(levelSelect.value);
+            const config = levels[lvl];
+            
+            winTarget = config.target;
+            dropperY = config.dropperY;
+            platform.speed = config.platSpeed;
+            platform.x = (canvas.width - platform.w) / 2;
+            
+            stack = [];
+            score = 0;
+            currentHue = Math.floor(Math.random() * 360); // Empezar con un color aleatorio
+            isFalling = false;
+            resetFallingBlock();
+            updateScoreUI();
+            
+            gameState = 'playing';
+            tapHint.style.display = 'block';
+            
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            gameLoop();
+        }
+
+        function resetFallingBlock() {
+            // El bloque siempre cae desde el centro exacto
+            fallingBlock.x = (canvas.width - blockW) / 2;
+            fallingBlock.y = dropperY;
+        }
+
+        function updateScoreUI() {
+            scoreNumberEl.textContent = score;
+            // Repetir el emoji según la cantidad de aciertos
+            scoreEmojisEl.textContent = '😊'.repeat(score);
+        }
+
+        function drop() {
+            if (gameState !== 'playing' || isFalling) return;
+            isFalling = true;
+            tapHint.style.display = 'none'; // Ocultar pista tras el primer toque
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (gameState === 'playing') {
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function update() {
+            // 1. Mover la plataforma base y toda la pila de forma continua
+            platform.x += platform.speed * platform.dir;
+            
+            // Rebotar en los bordes (considerando el ancho de la plataforma)
+            if (platform.x <= 0) {
+                platform.x = 0;
+                platform.dir = 1;
+            } else if (platform.x + platform.w >= canvas.width) {
+                platform.x = canvas.width - platform.w;
+                platform.dir = -1;
+            }
+
+            // 2. Lógica de caída del bloque
+            if (isFalling) {
+                fallingBlock.y += fallSpeed;
+
+                // Calcular a qué altura debe detenerse (depende de cuántos bloques hay)
+                const targetY = platformY - (stack.length * blockH);
+
+                // Detectar el cruce exacto de la altura objetivo
+                if (fallingBlock.y + blockH >= targetY && (fallingBlock.y + blockH - fallSpeed) < targetY) {
+                    
+                    // Determinar los límites de la superficie de apoyo
+                    let targetLeft, targetRight;
+                    if (stack.length === 0) {
+                        targetLeft = platform.x;
+                        targetRight = platform.x + platform.w;
+                    } else {
+                        const topBlock = stack[stack.length - 1];
+                        targetLeft = platform.x + topBlock.offsetX;
+                        targetRight = targetLeft + blockW;
+                    }
+
+                    const blockLeft = fallingBlock.x;
+                    const blockRight = fallingBlock.x + blockW;
+
+                    // Comprobar solapamiento (Colisión AABB)
+                    // Con que una parte del bloque toque la base, lo consideramos éxito para evitar frustración
+                    if (blockRight > targetLeft && blockLeft < targetRight) {
+                        // ¡Aterrizaje exitoso!
+                        const offsetX = fallingBlock.x - platform.x;
+                        stack.push({ offsetX: offsetX, hue: currentHue });
+                        
+                        score++;
+                        currentHue = (currentHue + 35) % 360; // Cambiar tonalidad suavemente
+                        updateScoreUI();
+
+                        isFalling = false;
+                        resetFallingBlock();
+
+                        // Condición de Victoria
+                        if (score >= winTarget) {
+                            gameState = 'win';
+                            setTimeout(() => {
+                                winModal.style.display = 'flex';
+                                setTimeout(() => winModal.classList.add('active'), 10);
+                            }, 500);
+                        }
+                    }
+                }
+
+                // Si falló, simplemente dejamos que caiga fuera de la pantalla (Control del error visual)
+                if (fallingBlock.y > canvas.height) {
+                    isFalling = false;
+                    resetFallingBlock();
+                }
+            }
+        }
+
+        function draw() {
+            // Limpiar fondo
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar el punto de liberación (Dispensador)
+            ctx.fillStyle = '#cbd5e1';
+            // Tubo dispensador
+            ctx.fillRect((canvas.width - 80)/2, 0, 80, dropperY);
+            // Borde del dispensador
+            ctx.fillRect((canvas.width - 100)/2, dropperY - 10, 100, 10);
+
+            // Dibujar Plataforma móvil
+            ctx.fillStyle = varColor('--wood-color', '#8b5a2b');
+            ctx.beginPath();
+            ctx.roundRect(platform.x, platformY, platform.w, platformH, 10);
+            ctx.fill();
+
+            // Dibujar Cajas Apiladas (Se mueven junto a la plataforma usando sus offsets)
+            for (let i = 0; i < stack.length; i++) {
+                const b = stack[i];
+                const bx = platform.x + b.offsetX;
+                const by = platformY - ((i + 1) * blockH);
+                drawBox(bx, by, b.hue);
+            }
+
+            // Dibujar Caja Cayendo / En Espera
+            if (gameState === 'playing') {
+                drawBox(fallingBlock.x, fallingBlock.y, currentHue);
+            }
+        }
+
+        function drawBox(x, y, hue) {
+            const color = `hsl(${hue}, 75%, 60%)`;
+            const shadow = `hsl(${hue}, 75%, 45%)`;
+
+            // Cuerpo principal
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x, y, blockW, blockH, 5);
+            ctx.fill();
+
+            // Sombra inferior (Dar volumen 3D simple)
+            ctx.fillStyle = shadow;
+            ctx.beginPath();
+            ctx.roundRect(x, y + blockH - 8, blockW, 8, {bl: 5, br: 5, tl: 0, tr: 0});
+            ctx.fill();
+            
+            // Brillo superior
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.roundRect(x, y, blockW, 6, {tl: 5, tr: 5, bl: 0, br: 0});
+            ctx.fill();
+        }
+
+        // Función de utilidad para leer variables CSS
+        function varColor(name, fallback) {
+            const val = getComputedStyle(document.documentElement).getPropertyValue(name);
+            return val ? val.trim() : fallback;
+        }
+
+        
+        // Input: Mouse, Touch y Teclado
+        canvas.addEventListener('mousedown', (e) => { e.preventDefault(); drop(); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); drop(); }, {passive: false});
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                drop();
+            }
+        });
+
+        // Controles UI
+        levelSelect.addEventListener('change', initGame);
+        
+        document.getElementById('btn-restart').addEventListener('click', () => {
+            winModal.classList.remove('active');
+            setTimeout(() => {
+                winModal.style.display = 'none';
+                initGame();
+            }, 300);
+        });
+
+        document.getElementById('btn-info').addEventListener('click', () => {
+            infoModal.style.display = 'flex';
+            setTimeout(() => infoModal.classList.add('active'), 10);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            infoModal.classList.remove('active');
+            setTimeout(() => infoModal.style.display = 'none', 300);
+        });
+
+        // Iniciar el juego al cargar
+        window.onload = () => {
+            // Polyfill básico para roundRect si el navegador es antiguo
+            if (!CanvasRenderingContext2D.prototype.roundRect) {
+                CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                    if (w < 2 * r) r = w / 2;
+                    if (h < 2 * r) r = h / 2;
+                    this.beginPath();
+                    this.moveTo(x + r, y);
+                    this.arcTo(x + w, y, x + w, y + h, r);
+                    this.arcTo(x + w, y + h, x, y + h, r);
+                    this.arcTo(x, y + h, x, y, r);
+                    this.arcTo(x, y, x + w, y, r);
+                    this.closePath();
+                    return this;
+                }
+            }
+            initGame();
+        };
+
+    </script>
+</body>
+</html>

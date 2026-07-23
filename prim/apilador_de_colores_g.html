@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Juego de Apilar Montessori</title>
+    <style>
+        :root {
+            --bg-color: #fdf6e3;
+            --primary: #5c5346;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #d8c3a5; 
+            font-family: 'Verdana', sans-serif;
+            touch-action: none; /* Previene scroll accidental en táctiles */
+        }
+
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1 / 1; /* Relación estricta 1:1 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; /* Deja pasar los clics al canvas */
+        }
+
+        .menu-card {
+            background: rgba(253, 246, 227, 0.95);
+            border: 4px solid var(--primary);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            pointer-events: auto;
+            color: var(--primary);
+        }
+
+        h1 { margin-top: 0; font-size: 1.8rem; text-transform: uppercase; }
+        
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background-color: #8c7b68;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:hover { background-color: var(--primary); }
+
+        #level-1-btn { background-color: #92b06a; }
+        #level-2-btn { background-color: #e69ea8; }
+        #level-3-btn { background-color: #d97b58; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <canvas id="gameCanvas" width="800" height="800"></canvas>
+        
+        <div id="start-menu" class="ui-layer">
+            <div class="menu-card">
+                <h1>APILA LAS CAJAS</h1>
+                <p>Toca la pantalla para soltar la figura.</p>
+                <button id="level-1-btn">Nivel 1 (5 piezas)</button>
+                <button id="level-2-btn">Nivel 2 (7 piezas)</button>
+                <button id="level-3-btn">Nivel 3 (9 piezas)</button>
+            </div>
+        </div>
+
+        <div id="victory-menu" class="ui-layer hidden">
+            <div class="menu-card">
+                <h1>¡LO LOGRASTE! 🌟</h1>
+                <p id="victory-text"></p>
+                <button id="restart-btn" style="background-color: var(--primary);">JUGAR OTRA VEZ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Menús
+        const startMenu = document.getElementById('start-menu');
+        const victoryMenu = document.getElementById('victory-menu');
+        const victoryText = document.getElementById('victory-text');
+
+        // Configuración general del juego
+        const STATE_MENU = 0;
+        const STATE_PLAYING = 1;
+        const STATE_GAMEOVER = 2;
+        let gameState = STATE_MENU;
+
+        // Dimensiones maestras
+        const PLATFORM_W = 140;
+        const PLATFORM_H = 30;
+        const BOX_SIZE = 80;
+        const GRAVITY = 0.6; // Aceleración realista de caída
+
+        // Estado del nivel y variables
+        let currentLevelConfig = null;
+        let platform = { x: 0, y: 720, w: PLATFORM_W, h: PLATFORM_H, speed: 0, dir: 1 };
+        let stack = []; 
+        let droppedBoxes = []; // Cajas que se caen por falta de equilibrio
+        let fallingBox = null;
+        let currentHue = 0; // Para iterar la paleta de colores
+
+        // Definición de Niveles
+        const levels = {
+            1: { target: 5, dropDistance: 150, speed: 3.5 },
+            2: { target: 7, dropDistance: 350, speed: 4.5 },
+            3: { target: 9, dropDistance: 550, speed: 4.5 }
+        };
+
+        // Escuchadores de eventos para menús
+        document.getElementById('level-1-btn').addEventListener('click', () => startGame(1));
+        document.getElementById('level-2-btn').addEventListener('click', () => startGame(2));
+        document.getElementById('level-3-btn').addEventListener('click', () => startGame(3));
+        document.getElementById('restart-btn').addEventListener('click', showMenu);
+
+        // Control de toque / clic para el juego
+        canvas.addEventListener('pointerdown', (e) => {
+            if (gameState === STATE_PLAYING && fallingBox && fallingBox.state === 'WAITING') {
+                fallingBox.state = 'FALLING';
+            }
+        });
+
+        function showMenu() {
+            gameState = STATE_MENU;
+            startMenu.classList.remove('hidden');
+            victoryMenu.classList.add('hidden');
+        }
+
+        function startGame(level) {
+            currentLevelConfig = levels[level];
+            stack = [];
+            droppedBoxes = [];
+            currentHue = 0;
+            platform.x = canvas.width / 2 - platform.w / 2;
+            platform.speed = currentLevelConfig.speed;
+            
+            spawnBox();
+            
+            gameState = STATE_PLAYING;
+            startMenu.classList.add('hidden');
+            victoryMenu.classList.add('hidden');
+        }
+
+        function spawnBox() {
+            // Calcular Y tope actual (Plataforma o última caja)
+            const currentTopY = platform.y - (stack.length * BOX_SIZE);
+            const dropY = currentTopY - currentLevelConfig.dropDistance;
+
+            fallingBox = {
+                x: canvas.width / 2 - BOX_SIZE / 2, // Siempre nace en el centro visual
+                y: dropY,
+                w: BOX_SIZE,
+                h: BOX_SIZE,
+                vy: 0,
+                color: `hsl(${currentHue}, 75%, 55%)`,
+                state: 'WAITING'
+            };
+
+            currentHue = (currentHue + 35) % 360; // Avanza el color de la paleta
+        }
+
+        function update() {
+            if (gameState !== STATE_PLAYING) return;
+
+            // Mover plataforma
+            platform.x += platform.speed * platform.dir;
+            if (platform.x <= 0 || platform.x + platform.w >= canvas.width) {
+                platform.dir *= -1; // Rebote
+            }
+
+            const platformCenter = platform.x + platform.w / 2;
+
+            // Lógica de la caja en espera/cayendo
+            if (fallingBox) {
+                if (fallingBox.state === 'FALLING') {
+                    fallingBox.vy += GRAVITY;
+                    fallingBox.y += fallingBox.vy;
+
+                    const currentTopY = platform.y - (stack.length * BOX_SIZE);
+
+                    // Colisión con la base/pila
+                    if (fallingBox.y + fallingBox.h >= currentTopY) {
+                        fallingBox.y = currentTopY - fallingBox.h; // Ajustar a la superficie exacta
+                        
+                        // Lógica del CENTRO DE GRAVEDAD
+                        const boxCenter = fallingBox.x + fallingBox.w / 2;
+                        let supportLeft, supportRight;
+
+                        if (stack.length === 0) {
+                            // Se apoya directo en la plataforma
+                            supportLeft = platform.x;
+                            supportRight = platform.x + platform.w;
+                        } else {
+                            // Se apoya en la última caja apilada
+                            const topBox = stack[stack.length - 1];
+                            const topBoxAbsX = platformCenter + topBox.offsetX - BOX_SIZE / 2;
+                            supportLeft = topBoxAbsX;
+                            supportRight = topBoxAbsX + BOX_SIZE;
+                        }
+
+                        // ¿El centro de gravedad está dentro de la base de soporte?
+                        if (boxCenter >= supportLeft && boxCenter <= supportRight) {
+                            // ¡Equilibrio perfecto! Calcular offset para fijarla a la plataforma móvil
+                            const offsetX = boxCenter - platformCenter;
+                            
+                            stack.push({
+                                offsetX: offsetX,
+                                color: fallingBox.color
+                            });
+
+                            checkVictory();
+                        } else {
+                            // ¡Se cae por efecto de gravedad realista!
+                            const direction = boxCenter < supportLeft ? -1 : 1; // ¿Cae por la izq o la der?
+                            
+                            droppedBoxes.push({
+                                x: fallingBox.x,
+                                y: fallingBox.y,
+                                w: fallingBox.w,
+                                h: fallingBox.h,
+                                color: fallingBox.color,
+                                vx: 3 * direction,   // Salto lateral
+                                vy: -2,              // Pequeño rebote hacia arriba
+                                rotation: 0,
+                                angularSpeed: 0.1 * direction // Rotación en la dirección de la caída
+                            });
+
+                            // Generar nueva caja para que el niño lo siga intentando
+                            spawnBox();
+                        }
+                    }
+                }
+            }
+
+            // Animar las cajas que cayeron fuera
+            for (let i = droppedBoxes.length - 1; i >= 0; i--) {
+                let db = droppedBoxes[i];
+                db.vy += GRAVITY;
+                db.x += db.vx;
+                db.y += db.vy;
+                db.rotation += db.angularSpeed;
+
+                // Limpiar memoria si caen fuera del lienzo
+                if (db.y > canvas.height + 100) {
+                    droppedBoxes.splice(i, 1);
+                }
+            }
+        }
+
+        function checkVictory() {
+            if (stack.length >= currentLevelConfig.target) {
+                gameState = STATE_GAMEOVER;
+                victoryText.innerText = `Apilaste ${stack.length} figuras con excelente precisión.`;
+                setTimeout(() => {
+                    victoryMenu.classList.remove('hidden');
+                }, 500);
+            } else {
+                spawnBox();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (gameState === STATE_MENU) return;
+
+            // Dibujar marcadores (Emojis sonrientes)
+            ctx.font = "35px Arial";
+            ctx.textAlign = "center";
+            let emojis = "";
+            for (let i = 0; i < stack.length; i++) emojis += "😊";
+            
+            ctx.fillText(emojis, canvas.width / 2, 60);
+            
+            ctx.fillStyle = "#5c5346";
+            ctx.font = "bold 24px Verdana";
+            ctx.fillText(`Apilados: ${stack.length} / ${currentLevelConfig.target}`, canvas.width / 2, 100);
+
+            // Centro dinámico de la plataforma
+            const platformCenter = platform.x + platform.w / 2;
+
+            // Dibujar plataforma
+            ctx.fillStyle = "#5c5346";
+            ctx.beginPath();
+            ctx.roundRect(platform.x, platform.y, platform.w, platform.h, 15);
+            ctx.fill();
+
+            // Dibujar pila estable
+            for (let i = 0; i < stack.length; i++) {
+                const item = stack[i];
+                const boxX = platformCenter + item.offsetX - BOX_SIZE / 2;
+                const boxY = platform.y - ((i + 1) * BOX_SIZE);
+
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                ctx.roundRect(boxX, boxY, BOX_SIZE, BOX_SIZE, 8);
+                ctx.fill();
+                
+                // Brillo para dar volumen sutil
+                ctx.fillStyle = "rgba(255,255,255,0.2)";
+                ctx.fillRect(boxX, boxY, BOX_SIZE, 15);
+            }
+
+            // Dibujar caja en juego (esperando o cayendo recto)
+            if (gameState === STATE_PLAYING && fallingBox) {
+                ctx.fillStyle = fallingBox.color;
+                ctx.beginPath();
+                ctx.roundRect(fallingBox.x, fallingBox.y, fallingBox.w, fallingBox.h, 8);
+                ctx.fill();
+                ctx.fillStyle = "rgba(255,255,255,0.2)";
+                ctx.fillRect(fallingBox.x, fallingBox.y, fallingBox.w, 15);
+            }
+
+            // Dibujar cajas caídas (física realista rotacional)
+            for (let db of droppedBoxes) {
+                ctx.save();
+                // Trasladar al centro de la caja caída para rotarla
+                ctx.translate(db.x + db.w / 2, db.y + db.h / 2);
+                ctx.rotate(db.rotation);
+                
+                ctx.fillStyle = db.color;
+                ctx.beginPath();
+                ctx.roundRect(-db.w / 2, -db.h / 2, db.w, db.h, 8);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        // Bucle principal (Game Loop) a 60 FPS aprox.
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Iniciar bucle
+        gameLoop();
+    </script>
+</body>
+</html>
