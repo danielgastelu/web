@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LA RULETA DE COLORES</title>
+    
+    <style>
+        :root {
+            --bg-color: #fdf6e3;
+            --primary: #5c5346;
+            --btn-color: #e24a4a;
+            --btn-hover: #c92a2a;
+            --success: #88b08b;
+            --panel-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--panel-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 { font-size: 1.5rem; font-weight: 800; }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .level-selector {
+            background-color: var(--bg-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .level-selector select {
+            font-family: inherit;
+            font-weight: bold;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: var(--primary);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: transform 0.1s;
+        }
+
+        .btn:active { transform: translateY(3px); }
+
+        #game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .top-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            background: var(--panel-bg);
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .target-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #target-color-display {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            border: 4px solid var(--primary);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+
+        .score-box {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: right;
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+
+        #star-display {
+            color: #f59e0b;
+            letter-spacing: 2px;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background-color: white;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid var(--primary);
+            z-index: 5;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
+        }
+
+        .stop-btn {
+            background-color: var(--btn-color);
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 900;
+            padding: 20px 60px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 8px 0 var(--btn-hover), 0 15px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.1s;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        .stop-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 var(--btn-hover), 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .stop-btn.disabled {
+            background-color: #ccc;
+            box-shadow: 0 8px 0 #999;
+            pointer-events: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            border: 4px solid var(--primary);
+        }
+
+        .modal-overlay.active { opacity: 1; }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-content h2 { margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 20px; line-height: 1.5; font-size: 0.95rem; text-transform: none;}
+        .huge-emoji { font-size: 4rem; margin-bottom: 15px; }
+
+        @keyframes pulseSuccess {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.1); filter: brightness(1.2); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .success-anim { animation: pulseSuccess 0.5s ease; }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .error-anim { animation: shakeError 0.4s ease; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>LA RULETA DE COLORES</h1>
+        <div class="controls">
+            <div class="level-selector">
+                <label>NIVEL:</label>
+                <select id="level-select">
+                    <option value="1">1 (5 COLORES)</option>
+                    <option value="2">2 (8 COLORES)</option>
+                    <option value="3">3 (10 COLORES)</option>
+                </select>
+            </div>
+            <button class="btn" id="btn-info">FUNDAMENTO</button>
+        </div>
+    </header>
+
+    <div id="game-container">
+        <!-- Barra superior: Color objetivo y Estrellas -->
+        <div class="top-status">
+            <div class="target-box">
+                <span>BUSCA ESTE COLOR:</span>
+                <div id="target-color-display"></div>
+            </div>
+            <div class="score-box">
+                <div>ESTRELLAS: <span id="score-text">0</span>/10</div>
+                <div id="star-display"></div>
+            </div>
+        </div>
+
+        <!-- Ruleta -->
+        <div class="wheel-wrapper">
+            <div class="pointer"></div>
+            <canvas id="wheel-canvas" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Control interactivo -->
+        <button class="stop-btn" id="btn-stop">¡PARAR!</button>
+    </div>
+
+    <!-- Modal Información Montessori -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h2>PRINCIPIO MONTESSORI</h2>
+            <p><strong>Aislamiento de la cualidad:</strong> El juego aísla el concepto de color y la coordinación espacial-temporal. El niño debe anticipar el movimiento constante y ejecutar la acción en el momento preciso.</p>
+            <p><strong>Control del Error:</strong> La flecha marca visualmente dónde se detuvo la rueda. Si el color coincide con la muestra, el niño gana una estrella (autocorrección directa).</p>
+            <p><strong>Adaptabilidad:</strong> La velocidad se ajusta dinámicamente al ritmo del niño. Si acierta consecutivamente, la rueda gira más rápido, manteniendo el reto en la "zona de desarrollo próximo". Si hay dificultad, se ralentiza para evitar la frustración.</p>
+            <button class="btn" id="close-info">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Modal Victoria -->
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal-content">
+            <div class="huge-emoji">🌟</div>
+            <h2>¡EXCELENTE CONCENTRACIÓN!</h2>
+            <p>¡Lograste juntar las 10 estrellas atrapando los colores en el momento exacto!</p>
+            <button class="btn" id="btn-restart">JUGAR OTRA VEZ</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+        const targetColorDisplay = document.getElementById('target-color-display');
+        const starDisplay = document.getElementById('star-display');
+        const scoreText = document.getElementById('score-text');
+        const btnStop = document.getElementById('btn-stop');
+        const levelSelect = document.getElementById('level-select');
+        const winModal = document.getElementById('win-modal');
+
+        // Paletas de Colores (No se repiten entre niveles para evitar confusión y cumplir el requisito)
+        const PALETTE_L1 = ['#e24a4a', '#4a90e2', '#e2c54a', '#4ae25c', '#e27b4a']; // Rojo, Azul, Amarillo, Verde, Naranja (Primarios y secundarios)
+        const PALETTE_L2 = ['#a24ae2', '#e24ab4', '#4ae2d3', '#77523d', '#97e24a', '#777777', '#4a53e2', '#e24a73']; // Purpura, Rosa, Cyan, Marron, Lima, Gris, Indigo, Coral
+        const PALETTE_L3 = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#800000', '#008000', '#000080', '#FF8000']; // 10 colores de fuerte contraste
+        
+        let currentLevel = 1;
+        let currentColors = [];
+        let sliceAngle = 0;
+        let targetColor = '';
+        
+        let score = 0;
+        const TARGET_SCORE = 10;
+        
+        // Variables de Rotación
+        let currentAngle = 0;
+        let baseSpeed = 36; // Grados por segundo (1 vuelta / 10 seg = 360 / 10 = 36)
+        let currentSpeed = baseSpeed; 
+        
+        // Variables Adaptativas
+        let consecutiveHits = 0;
+        let misses = 0;
+
+        let isRunning = false;
+        let animationFrameId;
+        let lastTime = 0;
+
+        function initGame() {
+            currentLevel = parseInt(levelSelect.value);
+            
+            if (currentLevel === 1) currentColors = [...PALETTE_L1];
+            else if (currentLevel === 2) currentColors = [...PALETTE_L2];
+            else currentColors = [...PALETTE_L3];
+
+            sliceAngle = 360 / currentColors.length;
+            
+            score = 0;
+            consecutiveHits = 0;
+            misses = 0;
+
+            // Ajustar la velocidad inicial según el nivel
+            if (currentLevel === 3) {
+                baseSpeed = 72; // 1 vuelta cada 5 segundos (360 grados / 5 seg = 72)
+            } else {
+                baseSpeed = 36; // 1 vuelta cada 10 segundos (360 grados / 10 seg = 36)
+            }
+            
+            currentSpeed = baseSpeed;
+            currentAngle = 0;
+            
+            updateScore();
+            pickTargetColor();
+            
+            winModal.classList.remove('active');
+            setTimeout(() => winModal.style.display = 'none', 300);
+            
+            btnStop.classList.remove('disabled');
+            isRunning = true;
+            lastTime = performance.now();
+            
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            gameLoop(lastTime);
+        }
+
+        function pickTargetColor() {
+            // Selecciona un color aleatorio de la ruleta
+            const randIndex = Math.floor(Math.random() * currentColors.length);
+            targetColor = currentColors[randIndex];
+            targetColorDisplay.style.backgroundColor = targetColor;
+        }
+
+        function updateScore() {
+            scoreText.textContent = score;
+            starDisplay.textContent = '⭐'.repeat(score);
+        }
+
+        function gameLoop(timestamp) {
+            if (!isRunning) {
+                lastTime = timestamp; // Mantener el reloj sincronizado si está pausado
+                animationFrameId = requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            // Actualizar ángulo basado en la velocidad (grados por segundo)
+            // Dividimos por 1000 porque deltaTime está en milisegundos
+            currentAngle = (currentAngle + currentSpeed * (deltaTime / 1000)) % 360;
+
+            drawWheel();
+
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = centerX; // Ocupa todo el canvas
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            
+            // Rotar el canvas. Usamos -Math.PI/2 como compensación visual para que el inicio de los arcos sea arriba (las 12 en punto)
+            ctx.rotate(currentAngle * Math.PI / 180);
+
+            for (let i = 0; i < currentColors.length; i++) {
+                const startAngle = (i * sliceAngle) * Math.PI / 180 - Math.PI/2;
+                const endAngle = ((i + 1) * sliceAngle) * Math.PI / 180 - Math.PI/2;
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.fillStyle = currentColors[i];
+                ctx.fill();
+                
+                // Borde suave entre secciones
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+            }
+
+            ctx.restore();
+            
+            // Centro decorativo de la ruleta (Eje)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'var(--primary)';
+            ctx.stroke();
+        }
+
+        function handleStop() {
+            if (!isRunning) return; // Evitar múltiples clics
+            
+            isRunning = false; // Pausar visualmente para ver el resultado
+            btnStop.classList.add('disabled');
+
+            // Calcular qué color quedó en la zona de la flecha (Arriba / 0 grados lógicos)
+            // Como la rueda gira en sentido horario (suma de ángulo), la porción en la parte superior
+            // es equivalente a retroceder ese ángulo en los slices originales.
+            const effectiveAngle = (360 - (currentAngle % 360)) % 360;
+            const sliceIndex = Math.floor(effectiveAngle / sliceAngle);
+            const colorUnderPointer = currentColors[sliceIndex];
+
+            // Evaluar acierto
+            if (colorUnderPointer === targetColor) {
+                // ÉXITO
+                score++;
+                updateScore();
+                targetColorDisplay.classList.add('success-anim');
+                setTimeout(() => targetColorDisplay.classList.remove('success-anim'), 500);
+
+                // Dificultad Adaptativa
+                if (currentLevel === 3) {
+                    // En nivel 3: Incrementar velocidad un 15% cada 3 estrellas
+                    if (score > 0 && score % 3 === 0) {
+                        currentSpeed *= 1.15;
+                    }
+                } else {
+                    // En nivel 1 y 2: Subir velocidad tras aciertos rápidos/consecutivos
+                    consecutiveHits++;
+                    misses = 0;
+                    if (consecutiveHits >= 2) {
+                        currentSpeed *= 1.15; // +15% velocidad
+                        consecutiveHits = 0; // Resetear para el siguiente escalón
+                    }
+                }
+
+                if (score >= TARGET_SCORE) {
+                    setTimeout(() => showWinModal(), 800);
+                    return; // No reanudar
+                }
+
+            } else {
+                // ERROR
+                targetColorDisplay.classList.add('error-anim');
+                setTimeout(() => targetColorDisplay.classList.remove('error-anim'), 400);
+
+                // Dificultad Adaptativa: Bajar velocidad si hay dificultad
+                misses++;
+                consecutiveHits = 0;
+                if (misses >= 2) {
+                    currentSpeed *= 0.85; // -15% velocidad
+                    // Limitar la velocidad mínima para que no sea absurdamente lento
+                    if (currentSpeed < 15) currentSpeed = 15; 
+                    misses = 0;
+                }
+            }
+
+            // Esperar 1 segundo para que el niño procese el resultado visual, y reanudar
+            setTimeout(() => {
+                pickTargetColor();
+                isRunning = true;
+                btnStop.classList.remove('disabled');
+            }, 1000);
+        }
+
+        function showWinModal() {
+            winModal.style.display = 'flex';
+            setTimeout(() => winModal.classList.add('active'), 10);
+        }
+
+        // Eventos
+        btnStop.addEventListener('mousedown', (e) => { e.preventDefault(); handleStop(); });
+        btnStop.addEventListener('touchstart', (e) => { e.preventDefault(); handleStop(); }, {passive: false});
+        
+        // Tecla Espacio también sirve para parar (accesibilidad)
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isRunning) {
+                e.preventDefault();
+                handleStop();
+            }
+        });
+
+        levelSelect.addEventListener('change', initGame);
+        
+        document.getElementById('btn-restart').addEventListener('click', initGame);
+
+        // Modal de Información
+        const infoModal = document.getElementById('info-modal');
+        document.getElementById('btn-info').addEventListener('click', () => {
+            infoModal.style.display = 'flex';
+            setTimeout(() => infoModal.classList.add('active'), 10);
+        });
+
+        document.getElementById('close-info').addEventListener('click', () => {
+            infoModal.classList.remove('active');
+            setTimeout(() => infoModal.style.display = 'none', 300);
+        });
+
+        // Asegurarse de dibujar la primera vez
+        window.onload = initGame;
+
+    </script>
+</body>
+</html>
