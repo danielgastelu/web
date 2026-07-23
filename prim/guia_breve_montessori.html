@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DISEÑO DE MATERIAL MONTESSORI (3-5 AÑOS)</title>
+    <style>
+        :root {
+            --primary: #5c5346;
+            --accent: #d8c3a5;
+            --bg: #f9f6f0;
+            --highlight: #e69ea8;
+        }
+        body { font-family: 'Verdana', sans-serif; background: var(--bg); color: var(--primary); padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); text-transform: uppercase; }
+        .principle { margin: 20px 0; padding: 20px; border-left: 5px solid var(--accent); background: #fdfdfd; cursor: pointer; transition: 0.3s; }
+        .principle:hover { background: #fcfcfc; border-left-color: var(--highlight); }
+        .content { display: none; margin-top: 10px; font-size: 0.95rem; }
+        .active .content { display: block; }
+        .badge { display: inline-block; padding: 5px 10px; background: var(--highlight); color: white; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Diseño Montessori (3-5 años)</h1>
+        <p>Haz clic en cada principio para descubrir cómo aplicarlo al diseño de tus materiales:</p>
+        
+        <div class="principle" onclick="this.classList.toggle('active')">
+            <span class="badge">Principio 1</span>
+            <strong>Aislamiento de una sola cualidad</strong>
+            <div class="content">El material debe centrarse en un solo concepto (peso, forma, color o longitud). Si diseñas algo digital, evita distracciones como música de fondo o animaciones que no tengan que ver con el objetivo pedagógico.</div>
+        </div>
+
+        <div class="principle" onclick="this.classList.toggle('active')">
+            <span class="badge">Principio 2</span>
+            <strong>Control del error</strong>
+            <div class="content">El material debe permitir que el niño note por sí mismo si ha cometido un error. Ejemplo: una pieza que no encaja o una secuencia lógica que no se cierra. No necesita "premios" ni sonidos de error; el propio ejercicio es la retroalimentación.</div>
+        </div>
+
+        <div class="principle" onclick="this.classList.toggle('active')">
+            <span class="badge">Principio 3</span>
+            <strong>Estética y orden</strong>
+            <div class="content">Todo debe ser bello y estar organizado. Los objetos deben estar limpios, tener colores naturales o coherentes. En entornos digitales, usa mucho espacio en blanco (espacio negativo) y evita el exceso de saturación.</div>
+        </div>
+
+        <div class="principle" onclick="this.classList.toggle('active')">
+            <span class="badge">Principio 4</span>
+            <strong>Propósito activo (Manipulabilidad)</strong>
+            <div class="content">El niño debe "hacer". Si es físico, debe invitar al tacto; si es digital, debe ser altamente interactivo (arrastrar, clasificar, construir). El material es el maestro, el docente solo prepara el ambiente.</div>
+        </div>
+
+        <div class="principle" onclick="this.classList.toggle('active')">
+            <span class="badge">Principio 5</span>
+            <strong>Limitación en el número de materiales</strong>
+            <div class="content">Menos es más. Presenta una sola propuesta de trabajo a la vez para fomentar la concentración profunda (el "flujo" en el niño).</div>
+        </div>
+    </div>
+</body>
+</html>
