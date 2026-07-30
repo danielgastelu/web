@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcador Robótico - CEILAB BB2</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            /* Fondo verde puro para Chroma Key en OBS */
+            background-color: #00FF00;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ocupa exactamente 1/6 de la zona superior de la pantalla */
+        .scoreboard-container {
+            width: 100%;
+            height: 16.666vh;
+            background-color: rgba(15, 23, 42, 0.95);
+            border-bottom: 4px solid #38bdf8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            color: white;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* Logo / Branding superior derecho */
+        .brand-box {
+            position: absolute;
+            top: 8px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #38bdf8;
+            text-transform: uppercase;
+        }
+
+        .help-btn {
+            background: #334155;
+            color: white;
+            border: 2px solid #38bdf8;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-btn:hover {
+            background: #38bdf8;
+            color: #0f172a;
+        }
+
+        /* Secciones de los contendientes */
+        .contestant {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .contestant:nth-child(3) {
+            justify-content: flex-end;
+        }
+
+        .name-input {
+            background: transparent;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            color: #f8fafc;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 6px;
+            width: 240px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .name-input:focus, .name-input:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        /* Tamaños de fuente idénticos para score y reloj */
+        .score, .timer {
+            font-size: 55px;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .score {
+            color: #4ade80;
+            min-width: 70px;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+        }
+
+        /* Zona central: Reloj */
+        .timer-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .timer {
+            color: #facc15;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+        }
+
+        .match-status {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-top: -2px;
+        }
+
+        /* Overlay de Fin del Juego Dinámico */
+        #game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-text {
+            color: #ef4444;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.8);
+            animation: pulseSize 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseSize {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Modal de Instrucciones */
+        #help-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 2px solid #38bdf8;
+            padding: 30px;
+            border-radius: 12px;
+            color: white;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            color: #38bdf8;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .modal-content ul {
+            list-style-type: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content li span {
+            color: #facc15;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+        }
+
+        /* Barra de progreso visual para el reset de 5 segundos con R+S+T */
+        #reset-progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: #ef4444;
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 1500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MARCADOR (1/6 SUPERIOR) -->
+    <div class="scoreboard-container">
+        
+        <!-- Branding esquina superior derecha -->
+        <div class="brand-box">
+            <span class="brand-title">CEILAB BB2</span>
+            <button class="help-btn" onclick="toggleHelp(true)" title="Instrucciones">?</button>
+        </div>
+
+        <!-- Contendiente Izquierda (Tecla A) -->
+        <div class="contestant" style="justify-content: flex-start;">
+            <input type="text" class="name-input" value="ROBOT 1" spellcheck="false">
+            <div class="score" id="score-left">0</div>
+        </div>
+
+        <!-- Reloj Central (Mismo tamaño que el score: 55px) -->
+        <div class="timer-box">
+            <div class="timer" id="timer-display">10:00</div>
+            <div class="match-status" id="match-status-text">LISTO</div>
+        </div>
+
+        <!-- Contendiente Derecha (Tecla L) -->
+        <div class="contestant" style="justify-content: flex-end;">
+            <div class="score" id="score-right">0</div>
+            <input type="text" class="name-input" value="ROBOT 2" spellcheck="false">
+        </div>
+    </div>
+
+    <!-- PANTALLA DE FIN DEL JUEGO -->
+    <div id="game-over-overlay">
+        <div class="game-over-text">FINAL DEL JUEGO</div>
+    </div>
+
+    <!-- BARRA INFERIOR DE PROGRESO PARA RESET (R+S+T) -->
+    <div id="reset-progress"></div>
+
+    <!-- MODAL DE INSTRUCCIONES -->
+    <div id="help-modal">
+        <div class="modal-content">
+            <h2>Instrucciones del Marcador</h2>
+            <ul>
+                <li><span>Tecla A:</span> Incrementa score Izquierda.</li>
+                <li><span>Tecla L:</span> Incrementa score Derecha.</li>
+                <li><span>Espacio:</span> Inicia / Pausa / Reanuda el partido.</li>
+                <li><span>R + S + T (Mantener 5s):</span> Resetea el marcador y el tiempo a 10:00.</li>
+                <li><span>Clic en nombres:</span> Permite editar los contendientes libremente.</li>
+            </ul>
+            <button class="close-modal" onclick="toggleHelp(false)">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        let scoreLeft = 0;
+        let scoreRight = 0;
+        let timeLeft = 600;
+        let timerInterval = null;
+        let isRunning = false;
+        let isGameOver = false;
+
+        const scoreLeftEl = document.getElementById('score-left');
+        const scoreRightEl = document.getElementById('score-right');
+        const timerDisplayEl = document.getElementById('timer-display');
+        const matchStatusEl = document.getElementById('match-status-text');
+        const gameOverOverlay = document.getElementById('game-over-overlay');
+        const helpModal = document.getElementById('help-modal');
+        const resetProgressBar = document.getElementById('reset-progress');
+
+        const pressedKeys = {};
+        let resetHoldTimeout = null;
+        const RESET_HOLD_TIME = 5000;
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            timerDisplayEl.textContent = formatTime(timeLeft);
+        }
+
+        function toggleTimer() {
+            if (isGameOver) return;
+
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                matchStatusEl.textContent = "PAUSA";
+                matchStatusEl.style.color = "#facc15";
+            } else {
+                isRunning = true;
+                matchStatusEl.textContent = "EN JUEGO";
+                matchStatusEl.style.color = "#4ade80";
+                
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        isGameOver = true;
+                        matchStatusEl.textContent = "FINALIZADO";
+                        matchStatusEl.style.color = "#ef4444";
+                        gameOverOverlay.style.display = 'flex';
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetMatch() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isGameOver = false;
+            timeLeft = 600;
+            scoreLeft = 0;
+            scoreRight = 0;
+            
+            scoreLeftEl.textContent = '0';
+            scoreRightEl.textContent = '0';
+            updateTimerDisplay();
+            
+            matchStatusEl.textContent = "LISTO";
+            matchStatusEl.style.color = "#94a3b8";
+            gameOverOverlay.style.display = 'none';
+            resetProgressBar.style.width = '0%';
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') {
+                if (e.key === 'Enter') {
+                    e.target.blur();
+                }
+                return;
+            }
+
+            const key = e.key.toUpperCase();
+            pressedKeys[key] = true;
+
+            if (key === 'A') {
+                scoreLeft++;
+                scoreLeftEl.textContent = scoreLeft;
+            }
+
+            if (key === 'L') {
+                scoreRight++;
+                scoreRightEl.textContent = scoreRight;
+            }
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleTimer();
+            }
+
+            if (pressedKeys['R'] && pressedKeys['S'] && pressedKeys['T']) {
+                if (!resetHoldTimeout) {
+                    resetProgressBar.style.width = '100%';
+                    resetProgressBar.style.transition = `width ${RESET_HOLD_TIME}ms linear`;
+
+                    resetHoldTimeout = setTimeout(() => {
+                        resetMatch();
+                        resetHoldTimeout = null;
+                        resetProgressBar.style.width = '0%';
+                    }, RESET_HOLD_TIME);
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toUpperCase();
+            pressedKeys[key] = false;
+
+            if (key === 'R' || key === 'S' || key === 'T') {
+                if (resetHoldTimeout && (!pressedKeys['R'] || !pressedKeys['S'] || !pressedKeys['T'])) {
+                    clearTimeout(resetHoldTimeout);
+                    resetHoldTimeout = null;
+                    resetProgressBar.style.transition = 'width 0.2s ease';
+                    resetProgressBar.style.width = '0%';
+                }
+            }
+        });
+
+        function toggleHelp(show) {
+            helpModal.style.display = show ? 'flex' : 'none';
+        }
+
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
