@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Coordenadas al Rescate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --grid-size: 20px;
+            --max-x: 20;
+            --min-x: -20;
+            --max-y: 15;
+            --min-y: -15;
+            --bg-color: #ffd8a8;
+            --text-color: #1e3a8a;
+            --grid-color-axis: #1e3a8a;
+            --grid-color-lines: rgba(0, 0, 0, 0.4);
+            --grid-color-lines-dark: rgba(0, 0, 0, 0.8);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content vertically */
+            height: 100vh; /* Use full viewport height */
+            overflow: hidden; /* Prevent scrolling for fixed 800x600 feel */
+        }
+
+        h1, h2, h3, .fredoka {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px; /* Constrain max width */
+            max-height: 600px; /* Constrain max height */
+            padding: 0.5rem;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        #header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .title {
+            margin: 0;
+            font-size: 1.5rem;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+        }
+
+        #coordinate-plane {
+            position: relative;
+            width: 100%; 
+            /* Fixed aspect ratio 40:30, adjusted to fit 800x600 constraints better */
+            aspect-ratio: 40 / 30; 
+            max-height: 400px; /* Limit height to leave room for controls */
+            background-color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-image: 
+                linear-gradient(var(--grid-color-lines) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color-lines) 1px, transparent 1px);
+            /* Background size calculation: 100% / (rangeX or Y).  Will be updated via JS */
+            background-position: center center;
+        }
+
+        .axis-x, .axis-y {
+            position: absolute;
+            background-color: var(--grid-color-axis);
+            z-index: 5;
+        }
+        .axis-x { top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); }
+        .axis-y { left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); }
+
+        /* Major grid lines overlay */
+        .major-grid-x, .major-grid-y { position: absolute; background-color: var(--grid-color-lines-dark); z-index: 4; }
+        .major-grid-x { left: 0; right: 0; height: 2px; }
+        .major-grid-y { top: 0; bottom: 0; width: 2px; }
+
+        .axis-label {
+            position: absolute;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--text-color);
+            z-index: 10;
+            background: rgba(255,255,255,0.7);
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+
+        .animal-target {
+            position: absolute;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease-out;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #timer-container {
+            width: 100%;
+            height: 15px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+            border: 2px solid var(--text-color);
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: #10b981; 
+            transition: width 1s linear, background-color 0.3s;
+        }
+
+        .timer-orange { background-color: #f59e0b !important; } 
+        .timer-red { background-color: #ef4444 !important; }
+
+        #control-panel {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: stretch; /* Make buttons same height */
+            width: 100%;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 2px dashed var(--text-color);
+            min-height: 80px;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            background-color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #1e3a8a;
+            transition: all 0.1s;
+            font-family: 'Fredoka One', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .option-btn:hover:not(:disabled) { background-color: #f0f9ff; }
+        .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0px 0px #1e3a8a; }
+        .option-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #collection-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 1rem;
+            background-color: #fff;
+            border: 3px solid var(--text-color);
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
+            min-width: 100px;
+        }
+        .box-title { font-size: 0.7rem; text-transform: uppercase; margin-bottom: -5px;}
+
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 216, 168, 0.95);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 100; border-radius: 8px;
+            text-align: center; padding: 1rem;
+        }
+
+        .hidden { display: none !important; }
+
+        .btn-start {
+            padding: 0.75rem 1.5rem; font-size: 1.2rem; font-weight: bold;
+            color: white; background-color: #10b981; border: none; border-radius: 8px;
+            cursor: pointer; box-shadow: 0 4px 0px #047857; transition: all 0.1s;
+            font-family: 'Fredoka One', cursive;
+        }
+        .btn-start:active { transform: translateY(4px); box-shadow: 0 0px 0px #047857; }
+
+        /* Penalty Animation overlay */
+        #penalty-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 80;
+            color: #ef4444; /* Red */
+            font-family: 'Fredoka One', cursive;
+            font-size: 4rem;
+            text-shadow: 3px 3px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            opacity: 0;
+            pointer-events: none; /* Let clicks pass through */
+            /* occupy roughly 1/8 of surface. (sqrt(1/8) ~ 0.35) -> 35% of dimensions */
+            width: 35%;
+            height: 35%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        @keyframes showPenalty {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+        }
+        
+        .animate-penalty {
+            animation: showPenalty 1s ease-out forwards;
+        }
+        
+        @keyframes shakeBtn {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); background-color: #fee2e2; border-color: #ef4444; color: #ef4444;}
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .shake-wrong { animation: shakeBtn 0.4s; }
+        
+        .correct-btn { background-color: #d1fae5 !important; border-color: #10b981 !important; color: #047857 !important;}
+
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        
+        <div id="header-area">
+            <h1 class="title fredoka text-blue-900">¡Rescate en Coordenadas!</h1>
+            <div id="collection-box" title="Animales rescatados">
+                <span class="box-title">Rescatados</span>
+                <span><i class="fa-solid fa-box-open text-amber-600 mr-1"></i><span id="score-display">0</span></span>
+            </div>
+        </div>
+
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+
+        <div id="coordinate-plane">
+            <!-- Background pattern handles minor grid lines now -->
+            <div class="axis-x"></div>
+            <div class="axis-y"></div>
+            <!-- Labels and major grid lines added via JS -->
+            
+            <div id="start-screen" class="overlay">
+                <h2 class="text-3xl mb-2 text-blue-900">¿Listo para rescatar?</h2>
+                <p class="mb-4 text-md">Selecciona la coordenada correcta (X,Y) del animal antes de que acabe el tiempo (120s).<br>¡Cuidado, los errores restan 5 segundos!</p>
+                <div class="flex gap-4 text-xs mb-4 bg-white p-2 rounded-lg border-2 border-blue-900 text-left">
+                    <div><strong>X:</strong> Horizontal (-20 a +20)</div>
+                    <div><strong>Y:</strong> Vertical (-15 a +15)</div>
+                </div>
+                <button id="start-btn" class="btn-start"><i class="fa-solid fa-play mr-2"></i> INICIAR</button>
+            </div>
+
+            <div id="game-over-screen" class="overlay hidden">
+                <h2 class="text-4xl mb-2 text-red-600 fredoka">¡TIEMPO AGOTADO!</h2>
+                <div class="text-2xl mb-4">Rescatados: <span id="final-score" class="text-blue-900 font-bold fredoka text-4xl">0</span></div>
+                <button id="restart-btn" class="btn-start"><i class="fa-solid fa-rotate-right mr-2"></i> REPETIR</button>
+            </div>
+            
+            <div id="animals-layer"></div>
+            
+            <!-- Penalty Feedback Element -->
+            <div id="penalty-overlay">-5s</div>
+        </div>
+
+        <div id="control-panel">
+            <button class="option-btn" id="opt-1" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-2" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-3" disabled>(?, ?)</button>
+        </div>
+    </div>
+
+    <script>
+        const GAME_DURATION = 120; 
+        const PENALTY = 5;
+        const MIN_X = -20, MAX_X = 20;
+        const MIN_Y = -15, MAX_Y = 15;
+        
+        const animalIcons = ['fa-cat', 'fa-dog', 'fa-hippo', 'fa-fish', 'fa-crow', 'fa-dove', 'fa-spider', 'fa-bug', 'fa-otter', 'fa-kiwi-bird', 'fa-horse', 'fa-frog'];
+        const animalColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
+
+        const planeEl = document.getElementById('coordinate-plane');
+        const animalsLayer = document.getElementById('animals-layer');
+        const timerBar = document.getElementById('timer-bar');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const collectionBox = document.getElementById('collection-box');
+        const penaltyOverlay = document.getElementById('penalty-overlay');
+        
+        const optionBtns = [
+            document.getElementById('opt-1'),
+            document.getElementById('opt-2'),
+            document.getElementById('opt-3')
+        ];
+
+        let score = 0;
+        let timeLeft = GAME_DURATION;
+        let timerInterval;
+        let currentAnimal = null; 
+        let isPlaying = false;
+        let correctOptionIndex = -1;
+
+        function setupGrid() {
+            // Remove old dynamic elements
+            planeEl.querySelectorAll('.major-grid-x, .major-grid-y, .axis-label').forEach(el => el.remove());
+
+            const rangeX = MAX_X - MIN_X;
+            const rangeY = MAX_Y - MIN_Y;
+            
+            // Set background pattern size for minor grid lines
+            planeEl.style.backgroundSize = `${100 / rangeX}% ${100 / rangeY}%`;
+
+            // Add Major lines and labels (every 5 units)
+            for (let i = MIN_X; i <= MAX_X; i += 5) {
+                if (i !== 0) {
+                    const line = document.createElement('div');
+                    line.className = 'major-grid-y';
+                    const posPct = ((i - MIN_X) / rangeX) * 100;
+                    line.style.left = `${posPct}%`;
+                    planeEl.appendChild(line);
+
+                    const label = document.createElement('div');
+                    label.className = 'axis-label';
+                    label.textContent = i;
+                    label.style.left = `${posPct}%`;
+                    label.style.top = '50%';
+                    label.style.transform = 'translate(-50%, 2px)';
+                    planeEl.appendChild(label);
+                }
+            }
+
+            for (let j = MIN_Y; j <= MAX_Y; j += 5) {
+                if (j !== 0) {
+                    const line = document.createElement('div');
+                    line.className = 'major-grid-x';
+                    const posPct = 100 - (((j - MIN_Y) / rangeY) * 100);
+                    line.style.top = `${posPct}%`;
+                    planeEl.appendChild(line);
+
+                    const label = document.createElement('div');
+                    label.className = 'axis-label';
+                    label.textContent = j;
+                    label.style.top = `${posPct}%`;
+                    label.style.left = '50%';
+                    label.style.transform = 'translate(2px, -50%)';
+                    planeEl.appendChild(label);
+                }
+            }
+            
+            const originLabel = document.createElement('div');
+            originLabel.className = 'axis-label';
+            originLabel.textContent = '0';
+            originLabel.style.top = '50%';
+            originLabel.style.left = '50%';
+            originLabel.style.transform = 'translate(2px, 2px)';
+            planeEl.appendChild(originLabel);
+        }
+
+        function spawnAnimal() {
+            if (!isPlaying) return;
+
+            if (currentAnimal && currentAnimal.el) currentAnimal.el.remove();
+
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * (MAX_X - MIN_X + 1)) + MIN_X;
+                y = Math.floor(Math.random() * (MAX_Y - MIN_Y + 1)) + MIN_Y;
+            } while (x === 0 && y === 0); 
+
+            const posX_pct = ((x - MIN_X) / (MAX_X - MIN_X)) * 100;
+            const posY_pct = 100 - (((y - MIN_Y) / (MAX_Y - MIN_Y)) * 100);
+
+            const animalEl = document.createElement('div');
+            animalEl.className = 'animal-target';
+            const iconClass = animalIcons[Math.floor(Math.random() * animalIcons.length)];
+            
+            animalEl.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+            animalEl.style.color = animalColors[Math.floor(Math.random() * animalColors.length)];
+            animalEl.style.left = `${posX_pct}%`;
+            animalEl.style.top = `${posY_pct}%`;
+            
+            // Adjust size based on grid cell height
+            const cellHeight = planeEl.clientHeight / (MAX_Y - MIN_Y);
+            animalEl.style.fontSize = `${cellHeight * 1.2}px`;
+
+            animalsLayer.appendChild(animalEl);
+            currentAnimal = { x, y, el: animalEl };
+            
+            generateOptions(x, y);
+        }
+
+        function generateOptions(correctX, correctY) {
+            const options = [{x: correctX, y: correctY}];
+            
+            // Generate 2 wrong but plausible options
+            while(options.length < 3) {
+                // Strategy: reverse sign, swap x/y, or slight offset
+                let strat = Math.floor(Math.random() * 3);
+                let nx, ny;
+                if(strat === 0) { nx = -correctX; ny = correctY; }
+                else if (strat === 1) { nx = correctX; ny = -correctY; }
+                else { 
+                    nx = correctX + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random()*3)+1);
+                    ny = correctY + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random()*3)+1);
+                }
+                
+                // Ensure within bounds
+                nx = Math.max(MIN_X, Math.min(MAX_X, nx));
+                ny = Math.max(MIN_Y, Math.min(MAX_Y, ny));
+                
+                // Ensure unique
+                if (!options.some(opt => opt.x === nx && opt.y === ny)) {
+                    options.push({x: nx, y: ny});
+                }
+            }
+
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            // Assign to buttons
+            optionBtns.forEach((btn, index) => {
+                btn.textContent = `(${options[index].x}, ${options[index].y})`;
+                btn.disabled = false;
+                btn.classList.remove('shake-wrong', 'correct-btn');
+                
+                // Remove old listeners to avoid duplicates, then add new one
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                optionBtns[index] = newBtn;
+                
+                if (options[index].x === correctX && options[index].y === correctY) {
+                    correctOptionIndex = index;
+                    newBtn.addEventListener('click', () => handleCorrectChoice(newBtn));
+                } else {
+                    newBtn.addEventListener('click', () => handleWrongChoice(newBtn));
+                }
+            });
+        }
+
+        function handleCorrectChoice(btn) {
+            if(!isPlaying) return;
+            btn.classList.add('correct-btn');
+            // Disable all temporarily
+            optionBtns.forEach(b => b.disabled = true);
+            collectAnimal();
+        }
+
+        function handleWrongChoice(btn) {
+            if(!isPlaying) return;
+            
+            // Visual feedback on button
+            btn.classList.add('shake-wrong');
+            setTimeout(() => btn.classList.remove('shake-wrong'), 400);
+            
+            // Apply time penalty
+            timeLeft -= PENALTY;
+            if(timeLeft < 0) timeLeft = 0;
+            updateTimerDisplay();
+            
+            // Show penalty animation overlay
+            penaltyOverlay.classList.remove('animate-penalty');
+            // Trigger reflow to restart animation
+            void penaltyOverlay.offsetWidth;
+            penaltyOverlay.classList.add('animate-penalty');
+            
+            if(timeLeft === 0) endGame();
+        }
+
+        function collectAnimal() {
+            const el = currentAnimal.el;
+            const rectAnimal = el.getBoundingClientRect();
+            const rectBox = collectionBox.getBoundingClientRect();
+            
+            const dx = rectBox.left + (rectBox.width/2) - (rectAnimal.left + rectAnimal.width/2);
+            const dy = rectBox.top + (rectBox.height/2) - (rectAnimal.top + rectAnimal.height/2);
+
+            el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.1) rotate(720deg)`;
+            el.style.opacity = '0';
+            
+            score++;
+            scoreDisplay.textContent = score;
+            
+            collectionBox.style.transform = 'scale(1.1)';
+            setTimeout(() => collectionBox.style.transform = 'scale(1)', 200);
+
+            setTimeout(() => {
+                if(el && el.parentNode) el.remove();
+                if(isPlaying) spawnAnimal();
+            }, 500); 
+
+            currentAnimal = null;
+        }
+
+        function updateTimerDisplay() {
+            const percentage = (timeLeft / GAME_DURATION) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            if (timeLeft <= 15 && timeLeft > 5) {
+                timerBar.className = 'timer-orange';
+            } else if (timeLeft <= 5) {
+                timerBar.className = 'timer-red';
+            } else {
+                timerBar.className = ''; 
+            }
+        }
+
+        function tick() {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 0) endGame();
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = GAME_DURATION;
+            scoreDisplay.textContent = score;
+            updateTimerDisplay();
+            
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            penaltyOverlay.classList.remove('animate-penalty');
+            
+            isPlaying = true;
+            animalsLayer.innerHTML = '';
+            
+            timerInterval = setInterval(tick, 1000);
+            spawnAnimal();
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            optionBtns.forEach(b => b.disabled = true);
+            
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        
+        window.addEventListener('resize', () => {
+            setupGrid();
+            if(currentAnimal && currentAnimal.el) {
+                 const cellHeight = planeEl.clientHeight / (MAX_Y - MIN_Y);
+                 currentAnimal.el.style.fontSize = `${cellHeight * 1.2}px`;
+            }
+        });
+
+        window.onload = function() {
+            setupGrid();
+        };
+    </script>
+</body>
+</html>
