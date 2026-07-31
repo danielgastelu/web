@@ -69,8 +69,6 @@
         #coordinate-plane {
             position: relative;
             width: 100%; 
-            /* Fixed aspect ratio 40:30, adjusted to fit 800x600 constraints better */
-            aspect-ratio: 40 / 30; 
             max-height: 400px; /* Limit height to leave room for controls */
             background-color: white;
             border: 3px solid var(--text-color);
@@ -78,11 +76,6 @@
             margin-bottom: 0.5rem;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            background-image: 
-                linear-gradient(var(--grid-color-lines) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color-lines) 1px, transparent 1px);
-            /* Background size calculation: 100% / (rangeX or Y).  Will be updated via JS */
-            background-position: center center;
         }
 
         .axis-x, .axis-y {
@@ -93,10 +86,14 @@
         .axis-x { top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); }
         .axis-y { left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); }
 
-        /* Major grid lines overlay */
+        /* Grid lines overlay */
         .major-grid-x, .major-grid-y { position: absolute; background-color: var(--grid-color-lines-dark); z-index: 4; }
         .major-grid-x { left: 0; right: 0; height: 2px; }
         .major-grid-y { top: 0; bottom: 0; width: 2px; }
+        
+        .minor-grid-x, .minor-grid-y { position: absolute; background-color: var(--grid-color-lines); z-index: 3; }
+        .minor-grid-x { left: 0; right: 0; height: 1px; }
+        .minor-grid-y { top: 0; bottom: 0; width: 1px; }
 
         .axis-label {
             position: absolute;
@@ -151,12 +148,14 @@
             border-radius: 12px;
             border: 2px dashed var(--text-color);
             min-height: 80px;
+            flex-wrap: wrap; /* Allow wrapping if needed on smaller screens */
         }
 
         .option-btn {
             flex: 1;
+            min-width: 120px; /* Ensure buttons don't get too squeezed */
             padding: 0.5rem;
-            font-size: 1.5rem;
+            font-size: 1.2rem; /* Slightly smaller font to fit 5 options */
             font-weight: bold;
             color: var(--text-color);
             background-color: white;
@@ -283,8 +282,8 @@
                 <input type="text" id="player-name-input" placeholder="Ingresa tu nombre" class="mb-3 p-2 rounded-lg border-2 border-blue-900 text-blue-900 font-bold text-center text-lg focus:outline-none focus:border-green-500 shadow-sm" autocomplete="off" maxlength="15">
                 <p class="mb-4 text-md">Selecciona la coordenada correcta (X,Y) del animal antes de que acabe el tiempo (120s).<br>¡Cuidado, los errores restan 5 segundos!</p>
                 <div class="flex gap-4 text-xs mb-4 bg-white p-2 rounded-lg border-2 border-blue-900 text-left">
-                    <div><strong>X:</strong> Horizontal (-20 a +20)</div>
-                    <div><strong>Y:</strong> Vertical (-15 a +15)</div>
+                    <div><strong>X:</strong> Horizontal (-15 a +15)</div>
+                    <div><strong>Y:</strong> Vertical (-10 a +10)</div>
                 </div>
                 <button id="start-btn" class="btn-start"><i class="fa-solid fa-play mr-2"></i> INICIAR</button>
             </div>
@@ -306,14 +305,16 @@
             <button class="option-btn" id="opt-1" disabled>(?, ?)</button>
             <button class="option-btn" id="opt-2" disabled>(?, ?)</button>
             <button class="option-btn" id="opt-3" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-4" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-5" disabled>(?, ?)</button>
         </div>
     </div>
 
     <script>
         const GAME_DURATION = 120; 
         const PENALTY = 5;
-        const MIN_X = -20, MAX_X = 20;
-        const MIN_Y = -15, MAX_Y = 15;
+        const MIN_X = -15, MAX_X = 15;
+        const MIN_Y = -10, MAX_Y = 10;
         
         const animalIcons = ['fa-cat', 'fa-dog', 'fa-hippo', 'fa-fish', 'fa-crow', 'fa-dove', 'fa-spider', 'fa-bug', 'fa-otter', 'fa-kiwi-bird', 'fa-horse', 'fa-frog'];
         const animalColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
@@ -337,7 +338,9 @@
         const optionBtns = [
             document.getElementById('opt-1'),
             document.getElementById('opt-2'),
-            document.getElementById('opt-3')
+            document.getElementById('opt-3'),
+            document.getElementById('opt-4'),
+            document.getElementById('opt-5')
         ];
 
         let score = 0;
@@ -349,48 +352,54 @@
 
         function setupGrid() {
             // Remove old dynamic elements
-            planeEl.querySelectorAll('.major-grid-x, .major-grid-y, .axis-label').forEach(el => el.remove());
+            planeEl.querySelectorAll('.major-grid-x, .major-grid-y, .minor-grid-x, .minor-grid-y, .axis-label').forEach(el => el.remove());
 
             const rangeX = MAX_X - MIN_X;
             const rangeY = MAX_Y - MIN_Y;
             
-            // Set background pattern size for minor grid lines
-            planeEl.style.backgroundSize = `${100 / rangeX}% ${100 / rangeY}%`;
+            // Forzar proporción 1:1 estricta en función de los rangos X e Y
+            planeEl.style.aspectRatio = `${rangeX} / ${rangeY}`;
 
-            // Add Major lines and labels (every 5 units)
-            for (let i = MIN_X; i <= MAX_X; i += 5) {
+            // Add precise lines and labels
+            for (let i = MIN_X; i <= MAX_X; i++) {
                 if (i !== 0) {
+                    const isMajor = i % 5 === 0;
                     const line = document.createElement('div');
-                    line.className = 'major-grid-y';
+                    line.className = isMajor ? 'major-grid-y' : 'minor-grid-y';
                     const posPct = ((i - MIN_X) / rangeX) * 100;
                     line.style.left = `${posPct}%`;
                     planeEl.appendChild(line);
 
-                    const label = document.createElement('div');
-                    label.className = 'axis-label';
-                    label.textContent = i;
-                    label.style.left = `${posPct}%`;
-                    label.style.top = '50%';
-                    label.style.transform = 'translate(-50%, 2px)';
-                    planeEl.appendChild(label);
+                    if (isMajor) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = i;
+                        label.style.left = `${posPct}%`;
+                        label.style.top = '50%';
+                        label.style.transform = 'translate(-50%, 2px)';
+                        planeEl.appendChild(label);
+                    }
                 }
             }
 
-            for (let j = MIN_Y; j <= MAX_Y; j += 5) {
+            for (let j = MIN_Y; j <= MAX_Y; j++) {
                 if (j !== 0) {
+                    const isMajor = j % 5 === 0;
                     const line = document.createElement('div');
-                    line.className = 'major-grid-x';
+                    line.className = isMajor ? 'major-grid-x' : 'minor-grid-x';
                     const posPct = 100 - (((j - MIN_Y) / rangeY) * 100);
                     line.style.top = `${posPct}%`;
                     planeEl.appendChild(line);
 
-                    const label = document.createElement('div');
-                    label.className = 'axis-label';
-                    label.textContent = j;
-                    label.style.top = `${posPct}%`;
-                    label.style.left = '50%';
-                    label.style.transform = 'translate(2px, -50%)';
-                    planeEl.appendChild(label);
+                    if (isMajor) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = j;
+                        label.style.top = `${posPct}%`;
+                        label.style.left = '50%';
+                        label.style.transform = 'translate(2px, -50%)';
+                        planeEl.appendChild(label);
+                    }
                 }
             }
             
@@ -439,8 +448,8 @@
         function generateOptions(correctX, correctY) {
             const options = [{x: correctX, y: correctY}];
             
-            // Generate 2 wrong but plausible options
-            while(options.length < 3) {
+            // Generate 4 wrong but plausible options
+            while(options.length < 5) {
                 // Strategy: reverse sign, swap x/y, or slight offset
                 let strat = Math.floor(Math.random() * 3);
                 let nx, ny;
