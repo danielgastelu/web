@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Juego de Coordenadas al Rescate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #ffd8a8;
+            --text-color: #1e3a8a;
+            --grid-color-axis: #1e3a8a;
+            --grid-color-lines: rgba(0, 0, 0, 0.4);
+            --grid-color-lines-dark: rgba(0, 0, 0, 1);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Changed for mobile scroll if needed */
+            min-height: 100vh; 
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        h1, h2, h3, .fredoka {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px; 
+            padding: 1rem 0.5rem;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        #header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        #info-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #info-btn:hover { transform: scale(1.1); }
+
+        .title {
+            margin: 0;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+            flex-grow: 1;
+        }
+
+        #coordinate-plane {
+            position: relative;
+            width: 100%; 
+            aspect-ratio: 30 / 20; /* Force exact 1:1 scale for X(-15 to 15)=30, Y(-10 to 10)=20 */
+            background-color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            touch-action: manipulation;
+        }
+
+        .axis-x, .axis-y {
+            position: absolute;
+            background-color: var(--grid-color-axis);
+            z-index: 5;
+        }
+        .axis-x { top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); }
+        .axis-y { left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); }
+
+        .major-grid-x, .major-grid-y { position: absolute; background-color: var(--grid-color-lines-dark); z-index: 4; }
+        .major-grid-x { left: 0; right: 0; height: 2px; }
+        .major-grid-y { top: 0; bottom: 0; width: 2px; }
+        
+        .minor-grid-x, .minor-grid-y { position: absolute; background-color: var(--grid-color-lines); z-index: 3; }
+        .minor-grid-x { left: 0; right: 0; height: 1px; }
+        .minor-grid-y { top: 0; bottom: 0; width: 1px; }
+
+        .axis-label {
+            position: absolute;
+            font-size: clamp(8px, 1.5vw, 11px);
+            font-weight: bold;
+            color: var(--text-color);
+            z-index: 10;
+            background: rgba(255,255,255,0.7);
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
+
+        .quadrant-hint {
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(1.5rem, 6vw, 5rem);
+            color: rgba(0, 0, 0, 0.08); /* Gris al 8% */
+            z-index: 1; /* Lowest z-index so lines and animals render on top */
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap; /* Evita que el texto caiga en una segunda línea */
+        }
+
+        .animal-target {
+            position: absolute;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease-out;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #timer-container {
+            width: 100%;
+            height: 15px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+            border: 2px solid var(--text-color);
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: #10b981; 
+            transition: width 1s linear, background-color 0.3s;
+        }
+
+        .timer-orange { background-color: #f59e0b !important; } 
+        .timer-red { background-color: #ef4444 !important; }
+
+        #control-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 2px dashed var(--text-color);
+        }
+
+        @media (min-width: 640px) {
+            #control-panel {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .option-btn {
+            padding: 0.75rem 0.5rem;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: bold;
+            color: var(--text-color);
+            background-color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #1e3a8a;
+            transition: all 0.1s;
+            font-family: 'Fredoka One', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .option-btn:hover:not(:disabled) { background-color: #f0f9ff; }
+        .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0px 0px #1e3a8a; }
+        .option-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #collection-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            background-color: #fff;
+            border: 3px solid var(--text-color);
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
+            min-width: 80px;
+        }
+        .box-title { font-size: 0.6rem; text-transform: uppercase; margin-bottom: -5px;}
+
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 216, 168, 0.95);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 100; text-align: center; padding: 1rem;
+            overflow-y: auto; /* Allow internal scroll on very small screens */
+        }
+
+        .hidden { display: none !important; }
+
+        .btn-start {
+            padding: 0.75rem 1.5rem; font-size: 1.2rem; font-weight: bold;
+            color: white; background-color: #10b981; border: none; border-radius: 8px;
+            cursor: pointer; box-shadow: 0 4px 0px #047857; transition: all 0.1s;
+            font-family: 'Fredoka One', cursive;
+        }
+        .btn-start:active { transform: translateY(4px); box-shadow: 0 0px 0px #047857; }
+
+        /* Penalty Animation overlay */
+        #penalty-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 80;
+            color: #ef4444; /* Red */
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(2rem, 8vw, 4rem);
+            text-shadow: 3px 3px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            opacity: 0;
+            pointer-events: none;
+            width: 50%; height: 50%;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        @keyframes showPenalty {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+        }
+        .animate-penalty { animation: showPenalty 1s ease-out forwards; }
+        
+        @keyframes shakeBtn {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); background-color: #fee2e2; border-color: #ef4444; color: #ef4444;}
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .shake-wrong { animation: shakeBtn 0.4s; }
+        .correct-btn { background-color: #d1fae5 !important; border-color: #10b981 !important; color: #047857 !important;}
+
+        /* Modal Styles for Info */
+        #info-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 200;
+            display: flex; justify-content: center; align-items: center;
+            padding: 1rem;
+        }
+        .info-content {
+            background: white; border-radius: 12px; padding: 1.5rem;
+            max-width: 400px; text-align: center;
+            border: 4px solid var(--text-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        
+        <div id="header-area">
+            <button id="info-btn" aria-label="Información"><i class="fa-solid fa-circle-question"></i></button>
+            <h1 class="title fredoka text-blue-900">¡Rescate en Coordenadas!</h1>
+            <div id="collection-box" title="Animales rescatados">
+                <span class="box-title">Rescatados</span>
+                <span><i class="fa-solid fa-box-open text-amber-600 mr-1"></i><span id="score-display">0</span></span>
+            </div>
+        </div>
+
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+
+        <div id="coordinate-plane">
+            <!-- Ejes y grillas (Generados por JS) -->
+            <div class="axis-x"></div>
+            <div class="axis-y"></div>
+            
+            <!-- Marcas de Cuadrantes Discretas -->
+            <div class="quadrant-hint" style="top: 25%; left: 75%;">(+, +)</div>
+            <div class="quadrant-hint" style="top: 25%; left: 25%;">(-, +)</div>
+            <div class="quadrant-hint" style="top: 75%; left: 25%;">(-, -)</div>
+            <div class="quadrant-hint" style="top: 75%; left: 75%;">(+, -)</div>
+            
+            <!-- Pantallas superpuestas -->
+            <div id="start-screen" class="overlay">
+                <h2 class="text-2xl md:text-3xl mb-3 text-blue-900">¿Listo para rescatar?</h2>
+                <input type="text" id="player-name-input" placeholder="Ingresa tu nombre" class="mb-3 p-2 w-3/4 max-w-xs rounded-lg border-2 border-blue-900 text-blue-900 font-bold text-center text-lg focus:outline-none focus:border-green-500 shadow-sm" autocomplete="off" maxlength="15">
+                <p class="mb-4 text-sm md:text-base px-2">Selecciona la coordenada (X,Y) del animal antes de 120s. ¡Cuidado, los errores restan 5 segundos!</p>
+                <div class="flex gap-4 text-xs mb-4 bg-white p-2 rounded-lg border-2 border-blue-900 text-left">
+                    <div><strong>X:</strong> Horizontal (-15 a +15)</div>
+                    <div><strong>Y:</strong> Vertical (-10 a +10)</div>
+                </div>
+                <button id="start-btn" class="btn-start"><i class="fa-solid fa-play mr-2"></i> INICIAR</button>
+            </div>
+
+            <div id="game-over-screen" class="overlay hidden">
+                <h2 class="text-4xl mb-2 text-red-600 fredoka">¡TIEMPO AGOTADO!</h2>
+                <h3 id="game-over-greeting" class="text-xl md:text-2xl text-blue-900 mb-2 font-bold"></h3>
+                <div class="text-2xl mb-6">Rescatados: <span id="final-score" class="text-blue-900 font-bold fredoka text-5xl">0</span></div>
+                <button id="restart-btn" class="btn-start"><i class="fa-solid fa-rotate-right mr-2"></i> REPETIR</button>
+            </div>
+            
+            <div id="animals-layer"></div>
+            <div id="penalty-overlay">-5s</div>
+        </div>
+
+        <div id="control-panel">
+            <button class="option-btn" id="opt-1" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-2" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-3" disabled>(?, ?)</button>
+            <button class="option-btn" id="opt-4" disabled>(?, ?)</button>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="hidden">
+        <div class="info-content">
+            <h3 class="fredoka text-xl text-blue-900 mb-4">Información</h3>
+            <p class="text-sm md:text-base text-gray-700 mb-6 text-left">
+                Ciencias de la Computación 2026. Actividad generada con asistencia de Gemini IA para revisar aplicación de sistema de coordenadas XY aplicables a Scratch. Daniel Gastelú.
+            </p>
+            <button id="close-info-btn" class="btn-start w-full text-sm">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const GAME_DURATION = 120; 
+        const PENALTY = 5;
+        const MIN_X = -15, MAX_X = 15;
+        const MIN_Y = -10, MAX_Y = 10;
+        
+        const animalIcons = ['fa-cat', 'fa-dog', 'fa-hippo', 'fa-fish', 'fa-crow', 'fa-dove', 'fa-spider', 'fa-bug', 'fa-otter', 'fa-kiwi-bird', 'fa-horse', 'fa-frog'];
+        const animalColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
+
+        const planeEl = document.getElementById('coordinate-plane');
+        const animalsLayer = document.getElementById('animals-layer');
+        const timerBar = document.getElementById('timer-bar');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const collectionBox = document.getElementById('collection-box');
+        const penaltyOverlay = document.getElementById('penalty-overlay');
+        const playerNameInput = document.getElementById('player-name-input');
+        const gameOverGreeting = document.getElementById('game-over-greeting');
+        
+        // Modal Elements
+        const infoBtn = document.getElementById('info-btn');
+        const infoModal = document.getElementById('info-modal');
+        const closeInfoBtn = document.getElementById('close-info-btn');
+        
+        const optionBtns = [
+            document.getElementById('opt-1'),
+            document.getElementById('opt-2'),
+            document.getElementById('opt-3'),
+            document.getElementById('opt-4')
+        ];
+
+        let playerName = "";
+        let score = 0;
+        let timeLeft = GAME_DURATION;
+        let timerInterval;
+        let currentAnimal = null; 
+        let isPlaying = false;
+        
+        // Dynamic Difficulty Variables
+        let currentDifficulty = 0; 
+        let consecutiveCorrect = 0;
+        let consecutiveWrong = 0;
+
+        function setupGrid() {
+            // Remove old dynamic grid elements (keep quadrants and overlays)
+            planeEl.querySelectorAll('.major-grid-x, .major-grid-y, .minor-grid-x, .minor-grid-y, .axis-label').forEach(el => el.remove());
+
+            const rangeX = MAX_X - MIN_X; // 30
+            const rangeY = MAX_Y - MIN_Y; // 20
+
+            // Add precision lines and labels via DOM
+            for (let i = MIN_X; i <= MAX_X; i++) {
+                if (i !== 0) {
+                    const isMajor = i % 5 === 0;
+                    const line = document.createElement('div');
+                    line.className = isMajor ? 'major-grid-y' : 'minor-grid-y';
+                    const posPct = ((i - MIN_X) / rangeX) * 100;
+                    line.style.left = `${posPct}%`;
+                    planeEl.appendChild(line);
+
+                    if (isMajor) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = i;
+                        label.style.left = `${posPct}%`;
+                        label.style.top = '50%';
+                        label.style.transform = 'translate(-50%, 2px)';
+                        planeEl.appendChild(label);
+                    }
+                }
+            }
+
+            for (let j = MIN_Y; j <= MAX_Y; j++) {
+                if (j !== 0) {
+                    const isMajor = j % 5 === 0;
+                    const line = document.createElement('div');
+                    line.className = isMajor ? 'major-grid-x' : 'minor-grid-x';
+                    const posPct = 100 - (((j - MIN_Y) / rangeY) * 100);
+                    line.style.top = `${posPct}%`;
+                    planeEl.appendChild(line);
+
+                    if (isMajor) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = j;
+                        label.style.top = `${posPct}%`;
+                        label.style.left = '50%';
+                        label.style.transform = 'translate(2px, -50%)';
+                        planeEl.appendChild(label);
+                    }
+                }
+            }
+            
+            const originLabel = document.createElement('div');
+            originLabel.className = 'axis-label';
+            originLabel.textContent = '0';
+            originLabel.style.top = '50%';
+            originLabel.style.left = '50%';
+            originLabel.style.transform = 'translate(2px, 2px)';
+            planeEl.appendChild(originLabel);
+        }
+
+        function spawnAnimal() {
+            if (!isPlaying) return;
+
+            if (currentAnimal && currentAnimal.el) currentAnimal.el.remove();
+
+            let x, y;
+            // Evitar bordes: reducimos el rango en 1 por cada lado del plano
+            const safeMinX = MIN_X + 1;
+            const safeMaxX = MAX_X - 1;
+            const safeMinY = MIN_Y + 1;
+            const safeMaxY = MAX_Y - 1;
+            
+            do {
+                x = Math.floor(Math.random() * (safeMaxX - safeMinX + 1)) + safeMinX;
+                y = Math.floor(Math.random() * (safeMaxY - safeMinY + 1)) + safeMinY;
+            } while (x === 0 && y === 0); 
+
+            const posX_pct = ((x - MIN_X) / (MAX_X - MIN_X)) * 100;
+            const posY_pct = 100 - (((y - MIN_Y) / (MAX_Y - MIN_Y)) * 100);
+
+            const animalEl = document.createElement('div');
+            animalEl.className = 'animal-target';
+            const iconClass = animalIcons[Math.floor(Math.random() * animalIcons.length)];
+            
+            animalEl.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+            animalEl.style.color = animalColors[Math.floor(Math.random() * animalColors.length)];
+            animalEl.style.left = `${posX_pct}%`;
+            animalEl.style.top = `${posY_pct}%`;
+            
+            const cellHeight = planeEl.clientHeight / (MAX_Y - MIN_Y);
+            animalEl.style.fontSize = `${cellHeight * 1.2}px`;
+
+            animalsLayer.appendChild(animalEl);
+            currentAnimal = { x, y, el: animalEl };
+            
+            generateOptions(x, y);
+        }
+
+        function generateOptions(correctX, correctY) {
+            const options = [{x: correctX, y: correctY}];
+            
+            // DDA logic: First 5 are strictly easy.
+            let diff = score < 5 ? 0 : currentDifficulty;
+
+            // Lógica adaptativa para opciones simétricas según dificultad
+            if (diff === 1) {
+                // Nivel intermedio: Agregar simetría respecto al eje X o eje Y
+                if (correctX !== 0 && correctY !== 0) {
+                    if (Math.random() > 0.5) {
+                        options.push({x: correctX, y: -correctY}); // Simétrico X
+                    } else {
+                        options.push({x: -correctX, y: correctY}); // Simétrico Y
+                    }
+                }
+            } else if (diff >= 2) {
+                // Nivel avanzado de racha: Agregar ambas opciones simétricas
+                if (correctX !== 0 && correctY !== 0) {
+                    options.push({x: correctX, y: -correctY}); // Simétrico X
+                    options.push({x: -correctX, y: correctY}); // Simétrico Y
+                }
+            }
+
+            while(options.length < 4) {
+                let nx, ny;
+
+                if (diff === 0) {
+                    // Level 0: Pure random across the board, very easy to spot. No sign swaps.
+                    nx = Math.floor(Math.random() * (MAX_X - MIN_X + 1)) + MIN_X;
+                    ny = Math.floor(Math.random() * (MAX_Y - MIN_Y + 1)) + MIN_Y;
+                } else if (diff === 1) {
+                    // Level 1: Medium. Random nearby to fill remaining slots.
+                    nx = correctX + (Math.floor(Math.random() * 11) - 5); // offset -5 to +5
+                    ny = correctY + (Math.floor(Math.random() * 11) - 5);
+                } else {
+                    // Level 2+: Hard. Close coordinates to fill remaining slots.
+                    nx = correctX + (Math.floor(Math.random() * 7) - 3); // offset -3 to +3
+                    ny = correctY + (Math.floor(Math.random() * 7) - 3);
+                }
+                
+                // Ensure bounds
+                nx = Math.max(MIN_X, Math.min(MAX_X, nx));
+                ny = Math.max(MIN_Y, Math.min(MAX_Y, ny));
+                
+                // Ensure uniqueness
+                if (!options.some(opt => opt.x === nx && opt.y === ny)) {
+                    options.push({x: nx, y: ny});
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            optionBtns.forEach((btn, index) => {
+                btn.textContent = `(${options[index].x}, ${options[index].y})`;
+                btn.disabled = false;
+                btn.classList.remove('shake-wrong', 'correct-btn');
+                
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                optionBtns[index] = newBtn;
+                
+                if (options[index].x === correctX && options[index].y === correctY) {
+                    newBtn.addEventListener('click', () => handleCorrectChoice(newBtn));
+                } else {
+                    newBtn.addEventListener('click', () => handleWrongChoice(newBtn));
+                }
+            });
+        }
+
+        function handleCorrectChoice(btn) {
+            if(!isPlaying) return;
+            btn.classList.add('correct-btn');
+            optionBtns.forEach(b => b.disabled = true);
+            
+            // Adjust DDA up
+            if (score >= 5) {
+                consecutiveCorrect++;
+                consecutiveWrong = 0;
+                if (consecutiveCorrect >= 3 && currentDifficulty < 2) {
+                    currentDifficulty++;
+                    consecutiveCorrect = 0; // Reset counter after leveling up
+                }
+            }
+
+            collectAnimal();
+        }
+
+        function handleWrongChoice(btn) {
+            if(!isPlaying) return;
+            
+            btn.classList.add('shake-wrong');
+            setTimeout(() => btn.classList.remove('shake-wrong'), 400);
+            
+            // Time Penalty
+            timeLeft -= PENALTY;
+            if(timeLeft < 0) timeLeft = 0;
+            updateTimerDisplay();
+            
+            // Adjust DDA down
+            if (score >= 5) {
+                consecutiveWrong++;
+                consecutiveCorrect = 0;
+                if (consecutiveWrong >= 2 && currentDifficulty > 0) {
+                    currentDifficulty--;
+                    consecutiveWrong = 0; // Reset counter after leveling down
+                }
+            }
+            
+            penaltyOverlay.classList.remove('animate-penalty');
+            void penaltyOverlay.offsetWidth; // Trigger reflow
+            penaltyOverlay.classList.add('animate-penalty');
+            
+            if(timeLeft === 0) endGame();
+        }
+
+        function collectAnimal() {
+            const el = currentAnimal.el;
+            const rectAnimal = el.getBoundingClientRect();
+            const rectBox = collectionBox.getBoundingClientRect();
+            
+            const dx = rectBox.left + (rectBox.width/2) - (rectAnimal.left + rectAnimal.width/2);
+            const dy = rectBox.top + (rectBox.height/2) - (rectAnimal.top + rectAnimal.height/2);
+
+            el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.1) rotate(720deg)`;
+            el.style.opacity = '0';
+            
+            score++;
+            scoreDisplay.textContent = score;
+            
+            collectionBox.style.transform = 'scale(1.1)';
+            setTimeout(() => collectionBox.style.transform = 'scale(1)', 200);
+
+            setTimeout(() => {
+                if(el && el.parentNode) el.remove();
+                if(isPlaying) spawnAnimal();
+            }, 500); 
+
+            currentAnimal = null;
+        }
+
+        function updateTimerDisplay() {
+            const percentage = (timeLeft / GAME_DURATION) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            if (timeLeft <= 15 && timeLeft > 5) {
+                timerBar.className = 'timer-orange';
+            } else if (timeLeft <= 5) {
+                timerBar.className = 'timer-red';
+            } else {
+                timerBar.className = ''; 
+            }
+        }
+
+        function tick() {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 0) endGame();
+        }
+
+        function startGame() {
+            playerName = playerNameInput.value.trim() || "Rescatista";
+            score = 0;
+            timeLeft = GAME_DURATION;
+            currentDifficulty = 0;
+            consecutiveCorrect = 0;
+            consecutiveWrong = 0;
+            
+            scoreDisplay.textContent = score;
+            updateTimerDisplay();
+            
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            penaltyOverlay.classList.remove('animate-penalty');
+            
+            isPlaying = true;
+            animalsLayer.innerHTML = '';
+            
+            timerInterval = setInterval(tick, 1000);
+            spawnAnimal();
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            optionBtns.forEach(b => b.disabled = true);
+            
+            gameOverGreeting.textContent = `¡Gran esfuerzo, ${playerName}!`;
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        
+        infoBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
+        closeInfoBtn.addEventListener('click', () => infoModal.classList.add('hidden'));
+        infoModal.addEventListener('click', (e) => {
+            if(e.target === infoModal) infoModal.classList.add('hidden');
+        });
+
+        window.addEventListener('resize', () => {
+            setupGrid();
+            if(currentAnimal && currentAnimal.el) {
+                 const cellHeight = planeEl.clientHeight / (MAX_Y - MIN_Y);
+                 currentAnimal.el.style.fontSize = `${cellHeight * 1.2}px`;
+            }
+        });
+
+        window.onload = function() {
+            setupGrid();
+        };
+    </script>
+</body>
+</html>
