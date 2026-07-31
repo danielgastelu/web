@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Atrapa los Animales! - Juego de Coordenadas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffedd5; /* Naranja clarito */
+            color: #1e3a8a; /* Letras azules */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden; /* Evitar scroll */
+            touch-action: none; /* Evitar zoom en móviles */
+        }
+
+        /* Contenedor principal */
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Panel superior (Tiempo y Puntaje) */
+        #header-panel {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+
+        /* Barra de tiempo */
+        #timer-container {
+            flex-grow: 1;
+            margin: 0 20px;
+            height: 20px;
+            background-color: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: #22c55e; /* Verde inicial */
+            transition: width 1s linear, background-color 0.3s ease;
+        }
+
+        #timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        /* Área del plano cartesiano */
+        #grid-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 4 / 3; /* Proporción para 40x (x) y 30y (y) */
+            background-color: white;
+            border: 2px solid #1e3a8a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        /* Ejes X e Y */
+        .axis {
+            position: absolute;
+            background-color: #1e3a8a;
+            z-index: 1;
+        }
+        #x-axis {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+        #y-axis {
+            left: 50%;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        /* Líneas de cuadrícula (opcional, pero ayuda) */
+        .grid-line-x, .grid-line-y {
+            position: absolute;
+            background-color: rgba(30, 58, 138, 0.1);
+            z-index: 0;
+        }
+
+        /* Etiquetas de los ejes */
+        .axis-label {
+            position: absolute;
+            font-size: 10px;
+            color: #1e3a8a;
+            user-select: none;
+        }
+
+        /* El animalito objetivo */
+        .animal-target {
+            position: absolute;
+            font-size: 24px; /* Tamaño del icono */
+            transform: translate(-50%, -50%); /* Centrar en la coordenada */
+            z-index: 5;
+            transition: all 0.5s ease-in-out; /* Para la animación de atrapar */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Animación cuando se atrapa */
+        .caught {
+            transform: translate(-50%, -50%) scale(0.1) !important;
+            opacity: 0;
+            /* La posición final se asignará en JS */
+        }
+
+        /* Panel de entrada de controles */
+        #controls-panel {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            border: 2px solid #93c5fd;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            color: #1e3a8a;
+            outline: none;
+        }
+        
+        input[type="number"]:focus {
+            border-color: #1e3a8a;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Cajón de animales recolectados */
+        #collection-box {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background-color: #8b5cf6;
+            border-radius: 15px;
+            border: 3px solid #6d28d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        
+        .box-bounce {
+            transform: scale(1.1);
+        }
+
+        /* Pantallas superpuestas (Inicio / Fin) */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 237, 213, 0.95); /* Fondo naranja claro translúcido */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #1e3a8a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        p.instructions {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 30px;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ea580c; /* Naranja oscuro */
+            margin: 20px 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            #grid-container { max-height: 50vh; }
+            .animal-target { font-size: 18px; }
+            input[type="number"] { width: 60px; font-size: 16px; }
+            button { padding: 8px 16px; font-size: 16px; }
+            #collection-box { width: 60px; height: 60px; font-size: 24px; bottom: 10px; right: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen" class="overlay">
+        <h1>🐾 ¡Atrapa los Animales! 🐾</h1>
+        <p class="instructions">
+            ¡Oh no! Los animales se han escapado en el plano cartesiano.<br><br>
+            Aparecerán de a uno. Mira en qué coordenada están y escribe los valores de <strong>X</strong> e <strong>Y</strong> rápidamente.<br>
+            ¡Tienes 60 segundos para atrapar la mayor cantidad posible en tu cajón!<br><br>
+            <em>Recuerda: Eje X (horizontal) va de -20 a 20. Eje Y (vertical) va de -15 a 15.</em>
+        </p>
+        <button id="start-btn">¡JUGAR AHORA!</button>
+    </div>
+
+    <!-- Pantalla de Fin de Juego -->
+    <div id="game-over-screen" class="overlay hidden">
+        <h1>¡TIEMPO AGOTADO!</h1>
+        <p class="instructions">¡Excelente trabajo! Has recolectado:</p>
+        <div class="score-display" id="final-score">0</div>
+        <p class="instructions" style="margin-top:0;">Animalitos 🐻🦊🐰</p>
+        <button id="restart-btn">Jugar de Nuevo</button>
+    </div>
+
+    <!-- Contenedor del Juego Principal -->
+    <div id="game-container">
+        
+        <!-- Panel de Estado -->
+        <div id="header-panel">
+            <div style="font-weight: bold; font-size: 1.2rem;">
+                Puntos: <span id="score">0</span>
+            </div>
+            
+            <div id="timer-container">
+                <div id="timer-bar"></div>
+                <div id="timer-text">60s</div>
+            </div>
+        </div>
+
+        <!-- Plano Cartesiano -->
+        <div id="grid-container">
+            <div id="x-axis"></div>
+            <div id="y-axis"></div>
+            <!-- Las líneas, etiquetas y animales se generarán aquí con JS -->
+        </div>
+
+        <!-- Cajón de recolección -->
+        <div id="collection-box" title="Cajón de Animales">
+            📦
+        </div>
+
+        <!-- Controles de Entrada -->
+        <div id="controls-panel">
+            <div class="input-group">
+                <label for="input-x" style="font-weight:bold; font-size: 1.2rem;">X:</label>
+                <input type="number" id="input-x" min="-20" max="20" step="1" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label for="input-y" style="font-weight:bold; font-size: 1.2rem;">Y:</label>
+                <input type="number" id="input-y" min="-15" max="15" step="1" placeholder="0">
+            </div>
+            <button id="submit-btn">¡ATRAPAR!</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Configuración del juego
+        const GAME_DURATION = 60;
+        const MIN_X = -20;
+        const MAX_X = 20;
+        const MIN_Y = -15;
+        const MAX_Y = 15;
+        
+        // Emojis de animales para atrapar
+        const animals = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵'];
+
+        // Variables de estado
+        let score = 0;
+        let timeLeft = GAME_DURATION;
+        let timerInterval;
+        let currentTarget = { x: 0, y: 0, element: null };
+        let isGameRunning = false;
+
+        // Elementos del DOM
+        const gridContainer = document.getElementById('grid-container');
+        const scoreEl = document.getElementById('score');
+        const timerBar = document.getElementById('timer-bar');
+        const timerText = document.getElementById('timer-text');
+        const inputX = document.getElementById('input-x');
+        const inputY = document.getElementById('input-y');
+        const submitBtn = document.getElementById('submit-btn');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const finalScoreEl = document.getElementById('final-score');
+        const collectionBox = document.getElementById('collection-box');
+
+        // Función para inicializar la cuadrícula visual
+        function initGrid() {
+            // Limpiar cuadrícula anterior (excepto ejes)
+            const elementsToRemove = gridContainer.querySelectorAll('.grid-line-x, .grid-line-y, .axis-label');
+            elementsToRemove.forEach(el => el.remove());
+
+            const rangeX = MAX_X - MIN_X;
+            const rangeY = MAX_Y - MIN_Y;
+
+            // Dibujar líneas y etiquetas para X
+            // Mostramos etiquetas cada 5 unidades para no saturar visualmente
+            for (let i = MIN_X; i <= MAX_X; i++) {
+                if (i !== 0) {
+                    const percentX = ((i - MIN_X) / rangeX) * 100;
+                    
+                    // Línea vertical tenue
+                    const line = document.createElement('div');
+                    line.className = 'grid-line-y';
+                    line.style.left = `${percentX}%`;
+                    line.style.top = '0';
+                    line.style.height = '100%';
+                    line.style.width = '1px';
+                    gridContainer.appendChild(line);
+
+                    // Etiqueta (solo múltiplos de 5)
+                    if (i % 5 === 0) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = i;
+                        label.style.left = `${percentX}%`;
+                        label.style.top = '51%'; // Justo debajo del eje X
+                        label.style.transform = 'translateX(-50%)';
+                        gridContainer.appendChild(label);
+                    }
+                }
+            }
+
+            // Dibujar líneas y etiquetas para Y
+            for (let i = MIN_Y; i <= MAX_Y; i++) {
+                if (i !== 0) {
+                    // Cuidado: Y en HTML crece hacia abajo, por lo que MAX_Y está en top:0% y MIN_Y en top:100%
+                    // Para que Y=15 esté arriba y Y=-15 abajo:
+                    const percentY = (1 - ((i - MIN_Y) / rangeY)) * 100;
+                    
+                    // Línea horizontal tenue
+                    const line = document.createElement('div');
+                    line.className = 'grid-line-x';
+                    line.style.top = `${percentY}%`;
+                    line.style.left = '0';
+                    line.style.width = '100%';
+                    line.style.height = '1px';
+                    gridContainer.appendChild(line);
+
+                    // Etiqueta (solo múltiplos de 5)
+                    if (i % 5 === 0) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = i;
+                        label.style.top = `${percentY}%`;
+                        label.style.left = '51%'; // Justo a la derecha del eje Y
+                        label.style.transform = 'translateY(-50%)';
+                        gridContainer.appendChild(label);
+                    }
+                }
+            }
+
+            // Añadir etiquetas para el origen
+            const originLabelX = document.createElement('div');
+            originLabelX.className = 'axis-label';
+            originLabelX.textContent = 'X';
+            originLabelX.style.right = '5px';
+            originLabelX.style.top = '52%';
+            originLabelX.style.fontWeight = 'bold';
+            originLabelX.style.fontSize = '14px';
+            gridContainer.appendChild(originLabelX);
+
+            const originLabelY = document.createElement('div');
+            originLabelY.className = 'axis-label';
+            originLabelY.textContent = 'Y';
+            originLabelY.style.top = '5px';
+            originLabelY.style.left = '52%';
+            originLabelY.style.fontWeight = 'bold';
+            originLabelY.style.fontSize = '14px';
+            gridContainer.appendChild(originLabelY);
+        }
+
+        // Función para convertir coordenadas del juego a porcentajes de CSS
+        function getCoordinatesPercent(x, y) {
+            const rangeX = MAX_X - MIN_X;
+            const rangeY = MAX_Y - MIN_Y;
+            
+            const percentX = ((x - MIN_X) / rangeX) * 100;
+            // Eje Y invertido para pantalla (positivo arriba)
+            const percentY = (1 - ((y - MIN_Y) / rangeY)) * 100;
+            
+            return { left: percentX, top: percentY };
+        }
+
+        // Generar un nuevo animal en una posición aleatoria (entera)
+        function spawnAnimal() {
+            // Eliminar el animal anterior si existe (por seguridad)
+            if (currentTarget.element) {
+                currentTarget.element.remove();
+            }
+
+            // Generar coordenadas enteras aleatorias dentro de los límites
+            // Evitar el (0,0) exacto para no tapar el centro a veces
+            let rx, ry;
+            do {
+                rx = Math.floor(Math.random() * (MAX_X - MIN_X + 1)) + MIN_X;
+                ry = Math.floor(Math.random() * (MAX_Y - MIN_Y + 1)) + MIN_Y;
+            } while (rx === 0 && ry === 0);
+
+            currentTarget.x = rx;
+            currentTarget.y = ry;
+
+            // Elegir animal aleatorio
+            const animalEmoji = animals[Math.floor(Math.random() * animals.length)];
+
+            // Crear elemento
+            const animalEl = document.createElement('div');
+            animalEl.className = 'animal-target';
+            animalEl.textContent = animalEmoji;
+            
+            // Posicionar
+            const pos = getCoordinatesPercent(rx, ry);
+            animalEl.style.left = `${pos.left}%`;
+            animalEl.style.top = `${pos.top}%`;
+
+            gridContainer.appendChild(animalEl);
+            currentTarget.element = animalEl;
+
+            // Limpiar inputs y hacer foco en X para rapidez
+            inputX.value = '';
+            inputY.value = '';
+            inputX.focus();
+        }
+
+        // Verificar si la respuesta ingresada es correcta
+        function checkAnswer() {
+            if (!isGameRunning) return;
+
+            const valX = parseInt(inputX.value);
+            const valY = parseInt(inputY.value);
+
+            if (isNaN(valX) || isNaN(valY)) return; // No hacer nada si están vacíos
+
+            if (valX === currentTarget.x && valY === currentTarget.y) {
+                // ¡Correcto!
+                catchAnimal();
+            } else {
+                // Incorrecto - Feedback visual rápido (shake en los inputs)
+                inputX.style.borderColor = 'red';
+                inputY.style.borderColor = 'red';
+                setTimeout(() => {
+                    inputX.style.borderColor = '#93c5fd';
+                    inputY.style.borderColor = '#93c5fd';
+                }, 300);
+            }
+        }
+
+        // Animación y lógica al atrapar el animal
+        function catchAnimal() {
+            score++;
+            scoreEl.textContent = score;
+
+            const el = currentTarget.element;
+            
+            // Animación hacia el cajón (aproximado usando la posición relativa al viewport)
+            const boxRect = collectionBox.getBoundingClientRect();
+            const gridRect = gridContainer.getBoundingClientRect();
+            
+            // Calcular destino relativo al grid-container
+            const targetLeft = boxRect.left - gridRect.left + (boxRect.width / 2);
+            const targetTop = boxRect.top - gridRect.top + (boxRect.height / 2);
+
+            el.style.left = `${targetLeft}px`;
+            el.style.top = `${targetTop}px`;
+            el.classList.add('caught');
+
+            // Feedback en el cajón
+            collectionBox.classList.add('box-bounce');
+            setTimeout(() => {
+                collectionBox.classList.remove('box-bounce');
+            }, 200);
+
+            // Generar el siguiente después de un breve instante
+            setTimeout(() => {
+                el.remove();
+                if(isGameRunning) spawnAnimal();
+            }, 500); // Tiempo que dura la animación CSS
+
+            currentTarget.element = null; // Desenlazar
+        }
+
+        // Actualizar la barra de tiempo
+        function updateTimerDisplay() {
+            timerText.textContent = `${timeLeft}s`;
+            
+            const percentLeft = (timeLeft / GAME_DURATION) * 100;
+            timerBar.style.width = `${percentLeft}%`;
+
+            // Lógica de colores según lo solicitado
+            if (timeLeft <= 5) {
+                timerBar.style.backgroundColor = '#ef4444'; // Rojo
+            } else if (timeLeft <= 15) {
+                timerBar.style.backgroundColor = '#f97316'; // Naranja
+            } else {
+                timerBar.style.backgroundColor = '#22c55e'; // Verde
+            }
+        }
+
+        // Bucle principal del temporizador
+        function tickTimer() {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // Iniciar el juego
+        function startGame() {
+            score = 0;
+            timeLeft = GAME_DURATION;
+            isGameRunning = true;
+            
+            scoreEl.textContent = score;
+            updateTimerDisplay();
+            
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            
+            initGrid();
+            spawnAnimal();
+            
+            // Asegurar que no haya múltiples intervalos
+            clearInterval(timerInterval);
+            timerInterval = setInterval(tickTimer, 1000);
+        }
+
+        // Finalizar el juego
+        function endGame() {
+            isGameRunning = false;
+            clearInterval(timerInterval);
+            
+            if (currentTarget.element) {
+                currentTarget.element.remove();
+            }
+            
+            finalScoreEl.textContent = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // Configurar Event Listeners
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        submitBtn.addEventListener('click', checkAnswer);
+
+        // Permitir usar "Enter" en los inputs para validar
+        inputX.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if(inputY.value === '') {
+                    inputY.focus();
+                } else {
+                    checkAnswer();
+                }
+            }
+        });
+
+        inputY.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Asegurar que la cuadrícula se dibuje correctamente si la ventana cambia de tamaño
+        window.addEventListener('resize', () => {
+            if (!startScreen.classList.contains('hidden') || !gameOverScreen.classList.contains('hidden')) return;
+            // Solo redibujar si el juego está activo o en pausa visual para ajustar escalas
+            initGrid();
+            // Reposicionar el animal actual si existe
+            if(currentTarget.element && isGameRunning) {
+                const pos = getCoordinatesPercent(currentTarget.x, currentTarget.y);
+                currentTarget.element.style.left = `${pos.left}%`;
+                currentTarget.element.style.top = `${pos.top}%`;
+            }
+        });
+
+        // Inicializar cuadrícula al cargar la página (fondo)
+        initGrid();
+
+    </script>
+</body>
+</html>

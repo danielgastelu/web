@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Coordenadas al Rescate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --grid-size: 20px; /* Tamaño de cada celda de la cuadrícula en píxeles (aproximado) */
+            --max-x: 20;
+            --min-x: -20;
+            --max-y: 15;
+            --min-y: -15;
+            --board-width: calc((var(--max-x) - var(--min-x)) * var(--grid-size));
+            --board-height: calc((var(--max-y) - var(--min-y)) * var(--grid-size));
+            --bg-color: #ffd8a8; /* Fondo naranja clarito */
+            --text-color: #1e3a8a; /* Letras azules (Tailwind blue-900) */
+            --grid-color-axis: #1e3a8a; /* Ejes principales en azul oscuro */
+            --grid-color-lines: rgba(0, 0, 0, 0.4); /* Líneas secundarias en negro semitransparente */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .fredoka {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        /* Contenedor del plano cartesiano */
+        #coordinate-plane {
+            position: relative;
+            /* Usamos porcentajes para la responsividad, pero mantenemos la proporción matemática */
+            width: 90vw; 
+            max-width: 800px;
+            aspect-ratio: 40 / 30; /* Proporción (20 - (-20)) / (15 - (-15)) */
+            background-color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Ejes X e Y */
+        .axis-x, .axis-y {
+            position: absolute;
+            background-color: var(--grid-color-axis);
+            z-index: 5;
+        }
+
+        .axis-x {
+            top: 50%; /* y = 0 */
+            left: 0;
+            right: 0;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .axis-y {
+            left: 50%; /* x = 0 */
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        /* Líneas de cuadrícula (opcional, pero ayuda) */
+        .grid-line-x, .grid-line-y {
+            position: absolute;
+            background-color: var(--grid-color-lines); /* Negras */
+            z-index: 0;
+        }
+
+        .grid-line-x {
+            left: 0;
+            right: 0;
+            height: 1px;
+        }
+
+        .grid-line-y {
+            top: 0;
+            bottom: 0;
+            width: 1px;
+        }
+
+        /* Etiquetas de los ejes */
+        .axis-label {
+            position: absolute;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--text-color);
+            z-index: 10;
+        }
+
+        /* El animalito objetivo */
+        .animal-target {
+            position: absolute;
+            font-size: 1.5rem; /* Tamaño base, se ajustará por JS */
+            z-index: 20;
+            transform: translate(-50%, -50%); /* Centrar en la coordenada exacta */
+            transition: all 0.5s ease-out; /* Para la animación al cajón */
+            cursor: pointer;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animación de recolección */
+        .collecting {
+            /* Estas coordenadas finales (bottom:0, left:0) son solo una aproximación CSS, 
+               la posición real se calcula en JS, pero añadimos rotación y escala */
+            transform: translate(-50%, -50%) scale(0.1) rotate(360deg) !important;
+            opacity: 0;
+            z-index: 50;
+        }
+
+        /* Barra de tiempo */
+        #timer-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 2px solid var(--text-color);
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: #10b981; /* Verde Tailwind emerald-500 */
+            transition: width 1s linear, background-color 0.3s;
+        }
+
+        .timer-orange { background-color: #f59e0b !important; } /* Naranja Tailwind amber-500 */
+        .timer-red { background-color: #ef4444 !important; } /* Rojo Tailwind red-500 */
+
+        /* Panel de Control (Inputs y Botones) */
+        #control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+            width: 100%;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 2px dashed var(--text-color);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .coord-input {
+            width: 60px;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid var(--text-color);
+            border-radius: 8px;
+            outline: none;
+            background-color: white;
+            color: var(--text-color);
+        }
+        
+        .coord-input:focus {
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.3);
+        }
+
+        /* Cajón de Recolección (Puntaje) */
+        #collection-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #fff;
+            border: 3px solid var(--text-color);
+            border-radius: 12px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1);
+            position: relative; /* Para animaciones relativas al cajón si se desea */
+        }
+
+        /* Pantallas superpuestas (Start / Game Over) */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 216, 168, 0.95); /* Fondo semitransparente que coincide con el tema */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 8px;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Botones personalizados */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background-color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #172554; /* Un azul más oscuro para la sombra */
+            transition: all 0.1s;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px #172554;
+        }
+        
+        .btn-green {
+            background-color: #10b981;
+            box-shadow: 0 4px 0px #047857;
+        }
+        .btn-green:active {
+            box-shadow: 0 0px 0px #047857;
+        }
+
+        /* Animación de feedback para respuestas incorrectas */
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="text-3xl md:text-5xl mt-4 mb-2 text-center text-blue-900 drop-shadow-md">¡Rescate en Coordenadas!</h1>
+    <p class="mb-4 text-center text-lg font-bold">Encuentra a los animalitos perdidos en el mapa</p>
+
+    <div id="game-container">
+        
+        <!-- Barra de progreso del tiempo -->
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+
+        <!-- El Plano Cartesiano donde ocurre la acción -->
+        <div id="coordinate-plane">
+            <!-- Los ejes y la grilla se dibujan vía JS para asegurar precisión -->
+            <div class="axis-x"></div>
+            <div class="axis-y"></div>
+            
+            <!-- Pantalla de Inicio -->
+            <div id="start-screen" class="overlay">
+                <h2 class="text-4xl mb-4 text-blue-900">¿Listo para rescatar?</h2>
+                <p class="mb-6 text-xl">Ingresa las coordenadas (X, Y) de cada animalito antes de que se acabe el tiempo (60s).</p>
+                <div class="flex gap-4 text-sm mb-6 bg-white p-3 rounded-lg border-2 border-blue-900 text-left">
+                    <div><strong>Eje X:</strong> Horizontal (-20 a +20)</div>
+                    <div><strong>Eje Y:</strong> Vertical (-15 a +15)</div>
+                </div>
+                <button id="start-btn" class="btn btn-green text-2xl"><i class="fa-solid fa-play mr-2"></i> INICIAR JUEGO</button>
+            </div>
+
+            <!-- Pantalla de Game Over -->
+            <div id="game-over-screen" class="overlay hidden">
+                <h2 class="text-5xl mb-4 text-red-600 fredoka">¡TIEMPO AGOTADO!</h2>
+                <div class="text-3xl mb-6">Animalitos rescatados: <span id="final-score" class="text-blue-900 font-bold fredoka text-5xl">0</span></div>
+                <button id="restart-btn" class="btn text-xl"><i class="fa-solid fa-rotate-right mr-2"></i> JUGAR DE NUEVO</button>
+            </div>
+            
+            <!-- Contenedor para los animales -->
+            <div id="animals-layer"></div>
+        </div>
+
+        <!-- Panel de Control Inferior -->
+        <div id="control-panel">
+            <div class="input-group">
+                <label for="input-x">X =</label>
+                <input type="number" id="input-x" class="coord-input" min="-20" max="20" placeholder="0" disabled>
+            </div>
+            
+            <div class="input-group">
+                <label for="input-y">Y =</label>
+                <input type="number" id="input-y" class="coord-input" min="-15" max="15" placeholder="0" disabled>
+            </div>
+
+            <button id="submit-btn" class="btn" disabled><i class="fa-solid fa-hand-holding-heart mr-2"></i> ¡Rescatar!</button>
+
+            <!-- Cajón de Recolección (Puntaje) -->
+            <div id="collection-box" title="Animales rescatados">
+                <i class="fa-solid fa-box-open text-amber-600"></i>
+                <span>x <span id="score-display">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constantes del Juego ---
+        const GAME_DURATION = 60; // Segundos
+        const MIN_X = -20;
+        const MAX_X = 20;
+        const MIN_Y = -15;
+        const MAX_Y = 15;
+        
+        // --- Lista de iconos de animales (FontAwesome) ---
+        const animalIcons = [
+            'fa-cat', 'fa-dog', 'fa-hippo', 'fa-fish', 
+            'fa-crow', 'fa-dove', 'fa-spider', 'fa-bug', 
+            'fa-otter', 'fa-kiwi-bird', 'fa-horse', 'fa-frog'
+        ];
+        const animalColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
+
+        // --- Elementos del DOM ---
+        const planeEl = document.getElementById('coordinate-plane');
+        const animalsLayer = document.getElementById('animals-layer');
+        const timerBar = document.getElementById('timer-bar');
+        const inputX = document.getElementById('input-x');
+        const inputY = document.getElementById('input-y');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const collectionBox = document.getElementById('collection-box');
+
+        // --- Estado del Juego ---
+        let score = 0;
+        let timeLeft = GAME_DURATION;
+        let timerInterval;
+        let currentAnimal = null; // Guardará objeto con {x, y, el}
+        let isPlaying = false;
+
+        // --- Dibujar la cuadrícula (se ejecuta una vez al cargar y redimensionar) ---
+        function drawGrid() {
+            // Limpiar grilla anterior (excepto ejes principales y pantallas)
+            const oldLines = planeEl.querySelectorAll('.grid-line-x, .grid-line-y, .axis-label');
+            oldLines.forEach(el => el.remove());
+
+            const rangeX = MAX_X - MIN_X;
+            const rangeY = MAX_Y - MIN_Y;
+
+            // Dibujar líneas verticales y etiquetas X
+            for (let i = MIN_X; i <= MAX_X; i++) {
+                if (i !== 0) { // No dibujar sobre el eje Y central
+                    const line = document.createElement('div');
+                    line.className = 'grid-line-y';
+                    // Calcular posición porcentual: (valor - min) / rango * 100
+                    const posPct = ((i - MIN_X) / rangeX) * 100;
+                    line.style.left = `${posPct}%`;
+                    
+                    // Hacer líneas cada 5 unidades un poco más opacas
+                    if (i % 5 === 0) {
+                        line.style.backgroundColor = 'rgba(0, 0, 0, 0.6)'; // Más oscuras
+                        line.style.width = '2px';
+                    } else {
+                         line.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'; // Líneas menores más tenues para no saturar
+                    }
+                    planeEl.appendChild(line);
+
+                    // Etiquetas X (solo algunas para no saturar visualmente)
+                    if (i % 5 === 0) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = i;
+                        label.style.left = `${posPct}%`;
+                        label.style.top = '51%'; // Justo debajo del eje X
+                        label.style.transform = 'translateX(-50%)';
+                        planeEl.appendChild(label);
+                    }
+                }
+            }
+
+            // Dibujar líneas horizontales y etiquetas Y
+            for (let j = MIN_Y; j <= MAX_Y; j++) {
+                if (j !== 0) { // No dibujar sobre el eje X central
+                    const line = document.createElement('div');
+                    line.className = 'grid-line-x';
+                    // Nota: Y crece hacia arriba, pero CSS 'top' crece hacia abajo. 
+                    // Por lo tanto, 100% es MIN_Y y 0% es MAX_Y
+                    const posPct = 100 - (((j - MIN_Y) / rangeY) * 100);
+                    line.style.top = `${posPct}%`;
+                    
+                    if (j % 5 === 0) {
+                        line.style.backgroundColor = 'rgba(0, 0, 0, 0.6)'; // Más oscuras
+                        line.style.height = '2px';
+                    }else {
+                         line.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                    }
+                    planeEl.appendChild(line);
+
+                    // Etiquetas Y
+                    if (j % 5 === 0) {
+                        const label = document.createElement('div');
+                        label.className = 'axis-label';
+                        label.textContent = j;
+                        label.style.top = `${posPct}%`;
+                        label.style.left = '51%'; // Justo a la derecha del eje Y
+                        label.style.transform = 'translateY(-50%)';
+                        planeEl.appendChild(label);
+                    }
+                }
+            }
+            
+            // Añadir etiquetas para el origen (0,0)
+            const originLabel = document.createElement('div');
+            originLabel.className = 'axis-label';
+            originLabel.textContent = '0';
+            originLabel.style.top = '51%';
+            originLabel.style.left = '51%';
+            planeEl.appendChild(originLabel);
+        }
+
+        // --- Generar un nuevo animal ---
+        function spawnAnimal() {
+            if (!isPlaying) return;
+
+            // Limpiar animal anterior si por alguna razón quedó
+            if (currentAnimal && currentAnimal.el) {
+                currentAnimal.el.remove();
+            }
+
+            // Generar coordenadas aleatorias enteras dentro de los rangos
+            // Aseguramos que no caiga exactamente en (0,0) siempre, aunque puede pasar
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * (MAX_X - MIN_X + 1)) + MIN_X;
+                y = Math.floor(Math.random() * (MAX_Y - MIN_Y + 1)) + MIN_Y;
+            } while (x === 0 && y === 0); // Evitar origen exacto para que sea más claro
+
+            // Calcular posición porcentual para CSS
+            const posX_pct = ((x - MIN_X) / (MAX_X - MIN_X)) * 100;
+            const posY_pct = 100 - (((y - MIN_Y) / (MAX_Y - MIN_Y)) * 100);
+
+            // Crear elemento DOM
+            const animalEl = document.createElement('div');
+            animalEl.className = 'animal-target';
+            
+            // Elegir icono y color aleatorio
+            const iconClass = animalIcons[Math.floor(Math.random() * animalIcons.length)];
+            const color = animalColors[Math.floor(Math.random() * animalColors.length)];
+            
+            animalEl.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+            animalEl.style.color = color;
+            
+            // Posicionar
+            animalEl.style.left = `${posX_pct}%`;
+            animalEl.style.top = `${posY_pct}%`;
+            
+            // Tamaño adaptativo basado en el tamaño del contenedor
+            // Queremos que el icono ocupe más o menos el tamaño de una "celda"
+            animalEl.style.fontSize = `calc(${planeEl.clientWidth / (MAX_X - MIN_X)}px * 1.5)`;
+
+            // Añadir al DOM
+            animalsLayer.appendChild(animalEl);
+
+            // Guardar estado actual
+            currentAnimal = { x, y, el: animalEl };
+            
+            // Limpiar inputs y hacer foco en X
+            inputX.value = '';
+            inputY.value = '';
+            inputX.focus();
+        }
+
+        // --- Procesar intento del jugador ---
+        function checkCoordinates() {
+            if (!isPlaying || !currentAnimal) return;
+
+            const userX = parseInt(inputX.value, 10);
+            const userY = parseInt(inputY.value, 10);
+
+            // Validar que se hayan ingresado números
+            if (isNaN(userX) || isNaN(userY)) {
+                shakeInputs();
+                return;
+            }
+
+            if (userX === currentAnimal.x && userY === currentAnimal.y) {
+                // ¡Correcto!
+                collectAnimal();
+            } else {
+                // Incorrecto
+                shakeInputs();
+                inputX.value = '';
+                inputY.value = '';
+                inputX.focus();
+            }
+        }
+
+        function shakeInputs() {
+            inputX.classList.add('shake');
+            inputY.classList.add('shake');
+            setTimeout(() => {
+                inputX.classList.remove('shake');
+                inputY.classList.remove('shake');
+            }, 500);
+        }
+
+        // --- Animación de recolección ---
+        function collectAnimal() {
+            const el = currentAnimal.el;
+            
+            // Calcular hacia dónde animar (aproximadamente la posición del cajón en la pantalla)
+            // Para simplificar, lo animamos hacia abajo y lo desvanecemos
+            
+            // Obtener posiciones absolutas para animar hacia el cajón
+            const rectAnimal = el.getBoundingClientRect();
+            const rectBox = collectionBox.getBoundingClientRect();
+            
+            // Calculamos desplazamiento relativo
+            const dx = rectBox.left + (rectBox.width/2) - (rectAnimal.left + rectAnimal.width/2);
+            const dy = rectBox.top + (rectBox.height/2) - (rectAnimal.top + rectAnimal.height/2);
+
+            // Aplicar transformación para que "vuele" al cajón
+            el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.1) rotate(720deg)`;
+            el.style.opacity = '0';
+            
+            // Actualizar puntaje inmediatamente visualmente
+            score++;
+            scoreDisplay.textContent = score;
+            
+            // Pequeña animación del cajón
+            collectionBox.style.transform = 'scale(1.1)';
+            setTimeout(() => collectionBox.style.transform = 'scale(1)', 200);
+
+            // Quitar del DOM después de la animación y crear uno nuevo
+            setTimeout(() => {
+                if(el && el.parentNode) el.remove();
+                if(isPlaying) spawnAnimal();
+            }, 500); // 500ms debe coincidir con la transition CSS
+
+            currentAnimal = null;
+        }
+
+        // --- Lógica del Temporizador ---
+        function updateTimerDisplay() {
+            const percentage = (timeLeft / GAME_DURATION) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            // Cambios de color
+            if (timeLeft <= 15 && timeLeft > 5) {
+                timerBar.className = 'timer-orange';
+            } else if (timeLeft <= 5) {
+                timerBar.className = 'timer-red';
+            } else {
+                timerBar.className = ''; // Vuelve al verde
+            }
+        }
+
+        function tick() {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // --- Control de Flujo del Juego ---
+        function startGame() {
+            // Reiniciar estado
+            score = 0;
+            timeLeft = GAME_DURATION;
+            scoreDisplay.textContent = score;
+            updateTimerDisplay();
+            
+            // Preparar UI
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            inputX.disabled = false;
+            inputY.disabled = false;
+            submitBtn.disabled = false;
+            
+            isPlaying = true;
+            
+            // Limpiar animales anteriores si los hay
+            animalsLayer.innerHTML = '';
+            
+            // Iniciar loops
+            timerInterval = setInterval(tick, 1000);
+            spawnAnimal();
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            
+            // Bloquear UI
+            inputX.disabled = true;
+            inputY.disabled = true;
+            submitBtn.disabled = true;
+            
+            // Mostrar Game Over
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        submitBtn.addEventListener('click', checkCoordinates);
+
+        // Permitir usar "Enter" en los inputs
+        inputX.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if(inputY.value === '') {
+                    inputY.focus();
+                } else {
+                    checkCoordinates();
+                }
+            }
+        });
+
+        inputY.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if(inputX.value === '') {
+                    inputX.focus();
+                } else {
+                    checkCoordinates();
+                }
+            }
+        });
+        
+        // Manejar redimensionamiento de ventana para redibujar grilla y ajustar tamaños
+        window.addEventListener('resize', () => {
+            drawGrid();
+            // Reajustar tamaño del animal actual si existe
+            if(currentAnimal && currentAnimal.el) {
+                 currentAnimal.el.style.fontSize = `calc(${planeEl.clientWidth / (MAX_X - MIN_X)}px * 1.5)`;
+            }
+        });
+
+        // --- Inicialización ---
+        // Asegurarse de que el DOM esté listo y estilos calculados antes de dibujar
+        window.onload = function() {
+            drawGrid();
+        };
+
+    </script>
+</body>
+</html>
