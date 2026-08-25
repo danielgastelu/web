@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AURA BOARD // 2026</title>
+    
+    <style>
+        /* =========================================================
+           1. ESTÉTICA NEON-BRUTALISTA (TIKTOK 2026 TRENDS)
+        ========================================================= */
+        :root {
+            --bg-dark: #0a0a0c;        /* Negro asfalto */
+            --fluo-green: #39FF14;     /* Verde radioactivo (Positivo) */
+            --fluo-orange: #FF5E00;    /* Naranja peligro (Negativo) */
+            --text-light: #ffffff;
+            --border-thick: 3px solid #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Evita que se pinte de azul al tocar rápido */
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.2);
+        }
+
+        /* =========================================================
+           2. REPRODUCTOR DE MÚSICA DE FONDO (BGM)
+        ========================================================= */
+        .music-player {
+            width: 100%;
+            max-width: 450px;
+            background: #18181b;
+            border: var(--border-thick);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 4px 4px 0px var(--text-light);
+        }
+
+        .music-header {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--fluo-green);
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .music-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-bgm {
+            background-color: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--text-light);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-weight: 800;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.1s;
+        }
+
+        .btn-bgm:active {
+            transform: translate(2px, 2px);
+            background-color: var(--text-light);
+            color: var(--bg-dark);
+        }
+
+        #track-name {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            text-align: center;
+            color: #a1a1aa;
+        }
+
+        /* =========================================================
+           3. GRILLA DE BOTONES DE EFECTO (SFX)
+        ========================================================= */
+        .grid {
+            display: grid;
+            /* Crea columnas adaptables. En celular se verán 3 o 4 por fila */
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .sfx-btn {
+            border: 3px solid var(--bg-dark);
+            border-radius: 12px;
+            padding: 15px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            transition: transform 0.05s, filter 0.2s;
+        }
+
+        /* Estilos condicionales que se asignarán vía JavaScript */
+        .sfx-btn.good {
+            background-color: var(--fluo-green);
+            color: var(--bg-dark);
+            box-shadow: 4px 4px 0px #1e8709;
+        }
+
+        .sfx-btn.bad {
+            background-color: var(--fluo-orange);
+            color: var(--bg-dark);
+            box-shadow: 4px 4px 0px #a13b00;
+        }
+
+        .sfx-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px transparent !important;
+            filter: brightness(1.2);
+        }
+
+        .sfx-btn .icon { font-size: 2.2rem; margin-bottom: 5px; }
+        .sfx-btn .label { font-size: 0.65rem; font-weight: 900; text-align: center; text-transform: uppercase; }
+
+    </style>
+</head>
+<body>
+
+    <h1>AURA SOUNDBOARD</h1>
+
+    <!-- Panel de control de música de fondo -->
+    <div class="music-player">
+        <div class="music-header">🎧 BACKGROUND MUSIC (70%)</div>
+        <div class="music-controls">
+            <button class="btn-bgm" onclick="playBGM()">▶️ PLAY</button>
+            <button class="btn-bgm" onclick="pauseBGM()">⏸️ PAUSA</button>
+            <button class="btn-bgm" onclick="nextBGM()">⏭️ NEXT</button>
+        </div>
+        <span id="track-name">LISTO PARA REPRODUCIR</span>
+    </div>
+
+    <!-- Contenedor donde JS inyectará los 12 botones -->
+    <div class="grid" id="sfx-grid"></div>
+
+    <!-- =========================================================
+         LÓGICA DEL PROGRAMA (JAVASCRIPT)
+    ========================================================= -->
+    <script>
+        // --- 1. CONFIGURACIÓN DE LA MÚSICA DE FONDO (BGM) ---
+        // Variables globales para la música
+        const bgmTracks = [
+            'sounds/fondos/AURA.mp3',
+            'sounds/fondos/hippie.mp3',
+            'sounds/fondos/SixSeven.mp3'
+        ];
+        let currentTrackIndex = 0;
+        
+        // Instanciamos un ÚNICO objeto de audio para el fondo
+        const backgroundAudio = new Audio();
+        backgroundAudio.volume = 0.7; // Requisito: Volumen al 70%
+        backgroundAudio.loop = true;  // Se repite al terminar
+
+        function playBGM() {
+            // Si el audio no tiene origen cargado, le asignamos el primero
+            if (!backgroundAudio.src) {
+                backgroundAudio.src = bgmTracks[currentTrackIndex];
+            }
+            backgroundAudio.play().catch(e => console.log("Falta archivo BGM."));
+            document.getElementById('track-name').textContent = "🎵 SONANDO: " + bgmTracks[currentTrackIndex].split('/').pop();
+        }
+
+        function pauseBGM() {
+            backgroundAudio.pause();
+            document.getElementById('track-name').textContent = "⏸️ EN PAUSA";
+        }
+
+        function nextBGM() {
+            // Avanzamos en la lista. El operador módulo (%) permite volver al inicio si llegamos al final.
+            currentTrackIndex = (currentTrackIndex + 1) % bgmTracks.length;
+            backgroundAudio.src = bgmTracks[currentTrackIndex];
+            
+            // Forzamos el play automático de la siguiente pista
+            backgroundAudio.play().catch(e => console.log("Falta archivo BGM."));
+            document.getElementById('track-name').textContent = "🎵 SONANDO: " + bgmTracks[currentTrackIndex].split('/').pop();
+        }
+
+        // --- 2. BASE DE DATOS DE EFECTOS (SFX) ---
+        // Categorizamos los archivos según su reacción cultural para pintar el fondo.
+        const sfxData = [
+            // Positivos (Verde Fluo)
+            { file: "bye-bye-mewing_vUvlJKN.mp3", icon: "🤫", label: "Bye Mewing", type: "good" },
+            { file: "fahhh_KcgAXfs.mp3", icon: "🤩", label: "Faaa", type: "good" },
+            { file: "farmer.mp3", icon: "📈", label: "Farmer", type: "good" },
+            { file: "melena-como-cannobio.mp3", icon: "⚽", label: "Canobbio", type: "good" }, // ¡Excelente guiño local!
+            { file: "mewing-bye-bye-sigma.mp3", icon: "🗿", label: "Sigma", type: "good" },
+            { file: "victory-royale.mp3", icon: "👑", label: "Victory", type: "good" },
+            
+            // Negativos / Disgusto / Impacto (Naranja Fluo)
+            { file: "crowd-gasp-ai.mp3", icon: "😱", label: "Gasp", type: "bad" },
+            { file: "downer_noise.mp3", icon: "📉", label: "Womp", type: "bad" },
+            { file: "dramatic-boomer.mp3", icon: "💥", label: "Boomer", type: "bad" },
+            { file: "emotional-damage-steven-he.mp3", icon: "😭", label: "Damage", type: "bad" },
+            { file: "fatality.mp3", icon: "💀", label: "Fatality", type: "bad" },
+            { file: "vine-boom.mp3", icon: "💣", label: "Boom", type: "bad" }
+        ];
+
+        // --- 3. GENERACIÓN DE LA BOTONERA ---
+        const sfxGrid = document.getElementById('sfx-grid');
+
+        sfxData.forEach(item => {
+            // Creamos el botón
+            const btn = document.createElement('div');
+            // Le asignamos la clase base y la clase 'good' o 'bad' para el color
+            btn.className = `sfx-btn ${item.type}`;
+            
+            // Contenido visual del botón
+            btn.innerHTML = `
+                <div class="icon">${item.icon}</div>
+                <div class="label">${item.label}</div>
+            `;
+
+            // EVENTO MULTI-TOQUE: Para celulares y PC
+            // Al tocar, instanciamos un nuevo Audio al 100% (1.0)
+            const playSound = (e) => {
+                if(e) e.preventDefault(); // Evita el zoom accidental en pantallas táctiles
+                const sfx = new Audio(`sounds/${item.file}`);
+                sfx.volume = 1.0; // Requisito: Volumen al 100%
+                sfx.play().catch(err => console.log(`Error al reproducir: sounds/${item.file}`));
+            };
+
+            // Registramos el evento para PC y para táctil
+            btn.onmousedown = playSound;
+            btn.ontouchstart = playSound;
+
+            sfxGrid.appendChild(btn);
+        });
+    </script>
+</body>
+</html>

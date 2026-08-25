@@ -1,0 +1,22 @@
+ El volumen de la unidad C es Acer
+ El n£mero de serie del volumen es: 3E34-E9B1
+
+ Directorio de C:\Users\admin\Documents\GitHub\web\farmer\sounds
+
+25/08/2026  11:39    <DIR>          .
+25/08/2026  11:33    <DIR>          ..
+25/08/2026  11:06           293.414 bye-bye-mewing_vUvlJKN.mp3
+25/08/2026  11:02            37.753 crowd-gasp-ai.mp3
+25/08/2026  11:03            59.603 downer_noise.mp3
+25/08/2026  10:30            55.465 dramatic-boomer.mp3
+25/08/2026  11:01            42.466 emotional-damage-steven-he.mp3
+25/08/2026  10:29            37.539 fahhh_KcgAXfs.mp3
+25/08/2026  11:32           120.770 farmer.mp3
+25/08/2026  11:11            33.398 fatality.mp3
+25/08/2026  11:39                 0 lista.txt
+25/08/2026  10:32           142.584 melena-como-cannobio.mp3
+25/08/2026  11:05           257.042 mewing-bye-bye-sigma.mp3
+25/08/2026  11:10            75.160 victory-royale.mp3
+25/08/2026  10:58            21.230 vine-boom.mp3
+              13 archivos      1.176.424 bytes
+               2 dirs   5.360.599.040 bytes libres
