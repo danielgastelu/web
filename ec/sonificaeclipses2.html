@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eclipse Solar 6 de febrero 2027. Una experiencia de sonificación.</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #f0f0f0;
+            --accent-color: #ff9800;
+            --border-color: #444;
+            --focus-color: #ffffff;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            font-size: 110%; /* Ligeramente más grande para baja visión */
+        }
+        h1 { color: var(--accent-color); font-size: 1.8em; }
+        h2 { color: var(--accent-color); font-size: 1.5em; border-bottom: 2px solid var(--border-color); padding-bottom: 5px;}
+        .panel {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        label { font-weight: bold; display: block; margin-top: 15px; cursor: pointer; }
+        select, input[type="range"], button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            box-sizing: border-box;
+        }
+        select { background-color: #333; color: white; }
+        button {
+            background-color: var(--accent-color);
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        button:focus, select:focus, input:focus { 
+            outline: 3px solid var(--focus-color); 
+            outline-offset: 2px;
+        }
+        .hidden { display: none; }
+        .status-box {
+            font-size: 1.3em;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 152, 0, 0.1);
+            padding: 10px 15px;
+            border-radius: 0 5px 5px 0;
+        }
+        .highlight { font-weight: bold; color: var(--accent-color); }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .checkbox-container input {
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+            margin-top: 0;
+        }
+        .checkbox-container label {
+            margin-top: 0;
+            font-size: 1.1em;
+        }
+        
+        /* Alto contraste automático según el sistema */
+        @media (prefers-contrast: high) {
+            :root { --bg-color: #000; --text-color: #fff; --accent-color: #ffff00; --border-color: #fff; }
+            .status-box { background-color: transparent; border: 2px solid var(--accent-color); }
+        }
+    </style>
+</head>
+<body>
+
+    <header role="banner">
+        <h1>Eclipse Solar 6 de febrero 2027.<br>Una experiencia de sonificación.</h1>
+        <p>Ubicación de referencia: Punta del Este, Uruguay (Eclipse Anular).</p>
+    </header>
+
+    <main role="main">
+        <section class="panel" aria-labelledby="como-funciona">
+            <h2 id="como-funciona">¿Qué es esta experiencia?</h2>
+            <p>Esta página traduce la cantidad de luz del eclipse en <strong>sonido</strong>. A medida que la Luna va cubriendo al Sol, el sonido cambiará de tonos altos (agudos) a tonos bajos (graves). Cuando el eclipse termine, el sonido volverá a subir.</p>
+            <p><strong>Para usarla:</strong> Coloque su teléfono completamente horizontal (apoyado sobre una mesa con la pantalla hacia arriba). Si lo levanta, el sonido se pausará. Esto permite sentir el evento de forma interactiva.</p>
+        </section>
+
+        <section class="panel" aria-labelledby="panel-control">
+            <h2 id="panel-control">Controles</h2>
+            
+            <button id="btn-start" aria-label="Botón para iniciar la experiencia y activar los sensores">Iniciar Experiencia</button>
+            
+            <div class="checkbox-container">
+                <input type="checkbox" id="narration-toggle" checked aria-label="Activar o desactivar el relato por voz del eclipse">
+                <label for="narration-toggle">Activar relato por voz (anuncia el avance cada 5%)</label>
+            </div>
+
+            <label for="instrument">Sonido preferido:</label>
+            <select id="instrument" aria-label="Seleccionar el tipo de sonido a reproducir">
+                <option value="triangle">Campanas Suaves</option>
+                <option value="sine">Flauta</option>
+                <option value="sawtooth">Cuerdas (Violín)</option>
+            </select>
+
+            <fieldset style="border:1px solid var(--border-color); margin-top:20px; padding:15px; border-radius:5px;">
+                <legend style="font-weight:bold; font-size:1.1em;">Modo de Uso</legend>
+                <label style="display:flex; align-items:center; margin-top:10px;">
+                    <input type="radio" name="mode" value="real" checked style="width:25px; height:25px; margin-right:10px;"> 
+                    Tiempo Real (Espera a la hora del eclipse)
+                </label>
+                <label style="display:flex; align-items:center; margin-top:15px;">
+                    <input type="radio" name="mode" value="sim" style="width:25px; height:25px; margin-right:10px;"> 
+                    Simulador (Adelantar el tiempo)
+                </label>
+            </fieldset>
+
+            <div id="sim-controls" class="hidden" style="margin-top: 20px;">
+                <label for="time-slider">Mover el tiempo del simulador:</label>
+                <input type="range" id="time-slider" min="0" max="1000" value="0" aria-label="Deslizador para avanzar en el tiempo simulado del eclipse">
+            </div>
+        </section>
+
+        <section class="panel" role="region" aria-labelledby="status-title">
+            <h2 id="status-title">Datos del Eclipse en Vivo</h2>
+            
+            <div class="status-box">
+                Posición del teléfono: <span id="orientation-display" class="highlight">Levantado (Sonido en pausa)</span>
+            </div>
+
+            <div class="status-box" aria-live="polite" aria-atomic="true">
+                Hora del evento: <span id="time-display" class="highlight">--:--:--</span>
+            </div>
+            
+            <div class="status-box" aria-live="assertive" aria-atomic="true">
+                Cobertura del Sol: <span id="coverage-display" class="highlight">0%</span>
+            </div>
+
+            <div class="status-box" id="eclipse-status" aria-live="polite">
+                Momento actual: Esperando que inicie la experiencia...
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Hitos del Eclipse (06/02/2027 - Punta del Este, UYT UTC-3)
+        const baseDate = "2027-02-06T";
+        const tC1 = new Date(`${baseDate}10:52:56-03:00`).getTime(); // Inicio parcial
+        const tC2 = new Date(`${baseDate}12:36:05-03:00`).getTime(); // Inicio anular
+        const tMax = new Date(`${baseDate}12:38:49-03:00`).getTime(); // Máximo
+        const tC3 = new Date(`${baseDate}12:41:34-03:00`).getTime(); // Fin anular
+        const tC4 = new Date(`${baseDate}14:21:14-03:00`).getTime(); // Fin parcial
+        const maxCoverage = 93; // Porcentaje de cobertura máxima en la anularidad
+
+        // Variables de estado
+        let audioCtx;
+        let isPlaying = false;
+        let isDeviceFlat = false;
+        let currentMode = "real";
+        let lastAnnouncedPercent = -1;
+        let lastAnnouncedMilestone = "";
+
+        // Elementos DOM
+        const btnStart = document.getElementById('btn-start');
+        const narrationToggle = document.getElementById('narration-toggle');
+        const modeRadios = document.getElementsByName('mode');
+        const simControls = document.getElementById('sim-controls');
+        const timeSlider = document.getElementById('time-slider');
+        const orientationDisplay = document.getElementById('orientation-display');
+        const timeDisplay = document.getElementById('time-display');
+        const coverageDisplay = document.getElementById('coverage-display');
+        const eclipseStatus = document.getElementById('eclipse-status');
+        const instrumentSelect = document.getElementById('instrument');
+
+        // Función para hablar (Relato por voz)
+        function speakText(text) {
+            if (narrationToggle.checked && 'speechSynthesis' in window) {
+                // Cancelar mensajes anteriores si hay muchos en cola
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-UY';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Inicializar Audio
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Generar notas armónicas
+        function playTone(coveragePercent) {
+            if (!isPlaying || !isDeviceFlat || !audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = instrumentSelect.value;
+
+            // Frecuencia base matemática: 
+            // 0% cobertura = 880Hz (agudo). 93% cobertura = 110Hz (grave).
+            const luzRestante = 1 - (coveragePercent / 100);
+            const baseFrequency = 110 + (luzRestante * 770);
+
+            // Escala armoniosa para que sea agradable
+            const pentatonicRatios = [1, 1.122, 1.25, 1.5, 1.681];
+            const randomRatio = pentatonicRatios[Math.floor(Math.random() * pentatonicRatios.length)];
+            
+            osc.frequency.setValueAtTime(baseFrequency * randomRatio, audioCtx.currentTime);
+
+            // Evitar clics al iniciar/detener el sonido
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6); 
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.6);
+        }
+
+        // Sonar cíclicamente
+        setInterval(() => {
+            const currentCoverage = parseFloat(coverageDisplay.innerText);
+            if (!isNaN(currentCoverage)) {
+                playTone(currentCoverage);
+            }
+        }, 500);
+
+        // Calcular porcentaje de cobertura según la hora
+        function calculateEclipseData(time) {
+            let coverage = 0;
+            let milestoneName = "";
+
+            if (time < tC1) {
+                coverage = 0;
+                milestoneName = "Antes del eclipse. El Sol brilla por completo.";
+            } else if (time >= tC1 && time < tC2) {
+                // Fase parcial creciente
+                const progress = (time - tC1) / (tC2 - tC1);
+                coverage = progress * maxCoverage;
+                milestoneName = "Fase parcial. La Luna está cubriendo al Sol.";
+            } else if (time >= tC2 && time <= tC3) {
+                // Anularidad (Anillo de fuego)
+                coverage = maxCoverage;
+                milestoneName = "¡Anularidad! Se ha formado el Anillo de Fuego (Máximo).";
+            } else if (time > tC3 && time <= tC4) {
+                // Fase parcial decreciente
+                const progress = (time - tC3) / (tC4 - tC3);
+                coverage = maxCoverage - (progress * maxCoverage);
+                milestoneName = "Fase parcial final. La Luna se está retirando.";
+            } else if (time > tC4) {
+                coverage = 0;
+                milestoneName = "El eclipse ha terminado. El Sol vuelve a brillar completo.";
+            }
+
+            return { coverage, milestoneName };
+        }
+
+        // Lógica Principal de actualización
+        function updateLogic() {
+            if (!isPlaying) return;
+
+            let evalTime;
+
+            if (currentMode === "sim") {
+                // Simulador: tC1 menos 30 min hasta tC4 más 30 min
+                const startTime = tC1 - (30 * 60 * 1000);
+                const endTime = tC4 + (30 * 60 * 1000);
+                const percentage = parseInt(timeSlider.value) / 1000;
+                evalTime = startTime + (endTime - startTime) * percentage;
+            } else {
+                // Tiempo real
+                evalTime = Date.now();
+            }
+
+            // Formatear hora
+            const dateObj = new Date(evalTime);
+            timeDisplay.innerText = dateObj.toLocaleTimeString('es-UY');
+
+            // Calcular y mostrar datos
+            const { coverage, milestoneName } = calculateEclipseData(evalTime);
+            const coverageRound = Math.round(coverage);
+            
+            coverageDisplay.innerText = `${coverageRound}%`;
+            eclipseStatus.innerText = `Momento actual: ${milestoneName}`;
+
+            // Lógica del Relato por Voz (Múltiplos de 5%)
+            if (coverageRound % 5 === 0 && coverageRound !== lastAnnouncedPercent && coverageRound > 0 && coverageRound < maxCoverage) {
+                speakText(`Cobertura del ${coverageRound} por ciento.`);
+                lastAnnouncedPercent = coverageRound;
+            } else if (coverageRound % 5 !== 0) {
+                // Restablecer para permitir anunciar de nuevo al bajar (ej: 90 subiendo y 90 bajando)
+                // Se simplifica evitando repetir el mismo número consecutivo
+                if (Math.abs(coverageRound - lastAnnouncedPercent) > 2) {
+                    lastAnnouncedPercent = -1; 
+                }
+            }
+
+            // Lógica de relato por voz de los Hitos
+            if (milestoneName !== lastAnnouncedMilestone) {
+                speakText(milestoneName);
+                lastAnnouncedMilestone = milestoneName;
+            }
+
+            requestAnimationFrame(updateLogic);
+        }
+
+        // Acelerómetro: Verificar si está horizontal
+        function handleOrientation(event) {
+            const beta = event.beta;
+            const gamma = event.gamma;
+            
+            if (beta !== null && gamma !== null) {
+                // Consideramos "apoyado en mesa" si está dentro de +/- 15 grados
+                if (Math.abs(beta) < 15 && Math.abs(gamma) < 15) {
+                    isDeviceFlat = true;
+                    orientationDisplay.innerText = "Horizontal (Sonando)";
+                    orientationDisplay.style.color = "lightgreen";
+                } else {
+                    isDeviceFlat = false;
+                    orientationDisplay.innerText = "Levantado (Sonido en pausa)";
+                    orientationDisplay.style.color = "var(--text-color)";
+                }
+            }
+        }
+
+        // Iniciar
+        btnStart.addEventListener('click', async () => {
+            initAudio();
+            isPlaying = true;
+            btnStart.innerText = "Experiencia Activa";
+            btnStart.style.backgroundColor = "lightgreen";
+            speakText("Experiencia iniciada. Apoye el teléfono sobre la mesa para escuchar.");
+
+            // Pedir permisos de giroscopio
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+
+            requestAnimationFrame(updateLogic);
+        });
+
+        // Controles de Modo
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                currentMode = e.target.value;
+                if (currentMode === "sim") {
+                    simControls.classList.remove('hidden');
+                    speakText("Modo simulador activado. Use el deslizador para avanzar el tiempo.");
+                } else {
+                    simControls.classList.add('hidden');
+                    speakText("Modo tiempo real activado.");
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
