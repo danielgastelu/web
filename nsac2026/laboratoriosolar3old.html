@@ -10,8 +10,8 @@
         :root {
             --primary: #1e272e;
             --secondary: #3c40c6;
-            --accent-spot: #00ff00; /* Punto Verde brillante */
-            --accent-group: #0000ff; /* Círculo Azul */
+            --accent-spot: #ff3f34;
+            --accent-group: #ffd32a;
             --bg: #f5f6fa;
             --surface: #ffffff;
             --text: #485460;
@@ -99,8 +99,8 @@
 
         /* Visual Markers (Percent-based to survive zooming) */
         .marker { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; }
-        .spot-marker { width: 6px; height: 6px; background-color: var(--accent-spot); border-radius: 50%; box-shadow: 0 0 6px rgba(0, 255, 0, 0.8); }
-        .group-marker { width: 7%; aspect-ratio: 1 / 1; border: 2px dotted var(--accent-group); border-radius: 50%; background-color: transparent; }
+        .spot-marker { width: 8px; height: 8px; background-color: var(--accent-spot); border-radius: 50%; box-shadow: 0 0 6px rgba(255, 255, 255, 0.9); }
+        .group-marker { width: 35px; height: 35px; border: 3px dashed var(--accent-group); border-radius: 50%; background-color: rgba(255, 211, 42, 0.2); }
 
         /* Math Section */
         .math-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
@@ -152,7 +152,6 @@
             <input type="date" id="datePicker" onchange="loadDate()">
             <button onclick="loadDate()" data-i18n="btn_load">📡 Cargar Datos</button>
             <button onclick="randomDate()" data-i18n="btn_random">🎲 Aleatorio</button>
-            <button onclick="undoLastMarker()" class="export" data-i18n="btn_undo">↩️ Deshacer</button>
             <button onclick="clearMarkers()" class="danger" data-i18n="btn_clear">🗑️ Limpiar</button>
         </div>
     </div>
@@ -233,7 +232,6 @@
             "placeholder_name": { es: "Tu Apellido", en: "Your Surname", pt: "Seu Sobrenome", fr: "Votre Nom", it: "Tuo Cognome", de: "Dein Nachname" },
             "btn_load": { es: "📡 Cargar", en: "📡 Load", pt: "📡 Carregar", fr: "📡 Charger", it: "📡 Carica", de: "📡 Laden" },
             "btn_random": { es: "🎲 Aleatorio", en: "🎲 Random", pt: "🎲 Aleatório", fr: "🎲 Aléatoire", it: "🎲 Casuale", de: "🎲 Zufällig" },
-            "btn_undo": { es: "↩️ Deshacer", en: "↩️ Undo", pt: "↩️ Desfazer", fr: "↩️ Annuler", it: "↩️ Annulla", de: "↩️ Rückgängig" },
             "btn_clear": { es: "🗑️ Limpiar", en: "🗑️ Clear", pt: "🗑️ Limpar", fr: "🗑️ Effacer", it: "🗑️ Pulisci", de: "🗑️ Löschen" },
             "obs_title": { es: "2. Observatorio", en: "2. Observatory", pt: "2. Observatório", fr: "2. Observatoire", it: "2. Osservatorio", de: "2. Observatorium" },
             "tool_spot": { es: "🔴 Mancha", en: "🔴 Spot", pt: "🔴 Mancha", fr: "🔴 Tache", it: "🔴 Macchia", de: "🔴 Fleck" },
@@ -283,7 +281,6 @@
         }
 
         let spots = 0, groups = 0, observationRecords = [];
-        let markerHistory = []; // Memoria para almacenar el orden de las marcas
         const observationTimes = ['0000', '1200', '0600', '1800', '0130', '1330']; 
         let currentTry = 0, currentYMD = '', currentYear = '';
 
@@ -357,43 +354,15 @@
             
             if (currentMode === 'group') {
                 marker.className = 'marker group-marker';
-                
-                // REQUISITO CUMPLIDO: La función obtiene implícitamente las dimensiones al inyectar el nodo en el contenedor.
-                // Al definir el tamaño en '7%', forzamos a que el navegador recalcule los píxeles reales dinámicamente
-                // garantizando que siempre sea exactamente el 7% del disco solar sin importar cuánto zoom haga el usuario.
-                
                 groups++;
                 document.getElementById('gVal').value = groups;
-                markerHistory.push({ type: 'group', element: marker });
             } else {
                 marker.className = 'marker spot-marker';
                 spots++;
                 document.getElementById('sVal').value = spots;
-                markerHistory.push({ type: 'spot', element: marker });
             }
             
             container.appendChild(marker);
-            calculateWolf();
-        }
-
-        function undoLastMarker() {
-            if (markerHistory.length === 0) return; // Si no hay historial, no hace nada
-            
-            // Extrae el último elemento del registro
-            const lastMarker = markerHistory.pop();
-            
-            // Lo elimina de la interfaz visual
-            lastMarker.element.parentNode.removeChild(lastMarker.element);
-            
-            // Resta el contador de la categoría correspondiente a la marca que se acaba de eliminar
-            if (lastMarker.type === 'group') {
-                groups = Math.max(0, groups - 1);
-                document.getElementById('gVal').value = groups;
-            } else {
-                spots = Math.max(0, spots - 1);
-                document.getElementById('sVal').value = spots;
-            }
-            
             calculateWolf();
         }
 
@@ -404,7 +373,6 @@
                 markers[i].parentNode.removeChild(markers[i]);
             }
             spots = 0; groups = 0;
-            markerHistory = []; // Vaciamos el historial también
             document.getElementById('sVal').value = 0;
             document.getElementById('gVal').value = 0;
             calculateWolf();
