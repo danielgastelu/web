@@ -18,9 +18,11 @@
                     },
                     colors: {
                         space: {
+                            950: '#06080C',
                             900: '#0B0E14',
                             800: '#151A23',
                             700: '#1F2937',
+                            600: '#374151',
                         },
                         solar: {
                             500: '#F59E0B',
@@ -32,6 +34,7 @@
             }
         }
     </script>
+    
     <style>
         body {
             background-color: #0B0E14;
@@ -43,9 +46,26 @@
         .sun-gradient {
             background: radial-gradient(circle at center, #FBBF24 0%, #D97706 40%, transparent 70%);
         }
+        
+        .tab-btn.active {
+            background-color: #F59E0B;
+            color: #0B0E14;
+            border-color: #F59E0B;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased selection:bg-solar-500 selection:text-space-900">
 
     <nav class="fixed w-full z-50 bg-space-900/90 backdrop-blur-md border-b border-solar-500/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,17 +76,16 @@
                         <span class="font-bold text-xl tracking-wider text-white">HELIOS</span>
                     </div>
                 </div>
-                <!-- Menú Desktop -->
+                <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center">
                     <div class="ml-10 flex items-baseline space-x-6">
                         <a href="#inicio" data-i18n="nav_home" class="hover:text-solar-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Inicio</a>
                         <a href="#fundamentos" data-i18n="nav_fund" class="hover:text-solar-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Fundamentos</a>
                         <a href="#laboratorio" data-i18n="nav_lab" class="hover:text-solar-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Laboratorio</a>
-                        <a href="#investigacion" data-i18n="nav_mist" class="hover:text-solar-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">El Misterio Solar</a>
+                        <a href="#investigacion" data-i18n="nav_mist" class="hover:text-solar-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Investigación</a>
                         <a href="#recursos" data-i18n="nav_res" class="bg-solar-500/10 text-solar-400 border border-solar-500 hover:bg-solar-500 hover:text-space-900 px-4 py-2 rounded-md text-sm font-bold transition-all">Recursos</a>
                     </div>
                     
-                    <!-- Selector de Idiomas (Desktop) -->
                     <div class="relative ml-6">
                         <button id="lang-menu-btn" class="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium focus:outline-none transition-colors border border-space-700 hover:border-space-500">
                             <i class="fa-solid fa-earth-americas text-solar-400"></i>
@@ -85,7 +104,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Botón Menú Mobile -->
+                <!-- Mobile menu toggle -->
                 <div class="-mr-2 flex md:hidden">
                     <button type="button" onclick="toggleMenu()" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-space-800 focus:outline-none">
                         <i class="fa-solid fa-bars text-xl"></i>
@@ -94,16 +113,15 @@
             </div>
         </div>
         
-        <!-- Menú Mobile Desplegable -->
+        <!-- Mobile menu dropdown -->
         <div class="md:hidden hidden bg-space-800 border-b border-solar-500/30" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#inicio" data-i18n="nav_home" class="hover:text-solar-400 block px-3 py-2 rounded-md text-base font-medium">Inicio</a>
                 <a href="#fundamentos" data-i18n="nav_fund" class="hover:text-solar-400 block px-3 py-2 rounded-md text-base font-medium">Fundamentos</a>
                 <a href="#laboratorio" data-i18n="nav_lab" class="hover:text-solar-400 block px-3 py-2 rounded-md text-base font-medium">Laboratorio</a>
-                <a href="#investigacion" data-i18n="nav_mist" class="hover:text-solar-400 block px-3 py-2 rounded-md text-base font-medium">El Misterio Solar</a>
+                <a href="#investigacion" data-i18n="nav_mist" class="hover:text-solar-400 block px-3 py-2 rounded-md text-base font-medium">Investigación</a>
                 <a href="#recursos" data-i18n="nav_res" class="hover:text-solar-400 block px-3 py-2 rounded-md text-base font-medium">Recursos</a>
             </div>
-            <!-- Banderas Mobile -->
             <div class="px-4 py-4 border-t border-space-700 bg-space-900 flex justify-around">
                 <button onclick="changeLang('es')" class="text-2xl hover:scale-110 transition-transform" title="Español">🇪🇸</button>
                 <button onclick="changeLang('en')" class="text-2xl hover:scale-110 transition-transform" title="English">🇬🇧</button>
@@ -116,15 +134,20 @@
     </nav>
 
     <main>
-        <section id="inicio" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex flex-col items-center justify-center min-h-screen text-center px-4">
+        <section id="inicio" class="relative pt-32 pb-20 lg:pt-40 lg:pb-24 overflow-hidden flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] sun-gradient opacity-20 blur-3xl -z-10 pointer-events-none"></div>
             
-            <h1 data-i18n="hero_title" class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-space-800 border border-space-700 text-sm text-gray-300 mb-8 shadow-lg">
+                <i class="fa-solid fa-clock text-solar-400"></i>
+                <span data-i18n="read_time">Tiempo estimado de lectura: ~15 minutos antes de la práctica.</span>
+            </div>
+
+            <h1 data-i18n="hero_title" class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight">
                 Descifra el latido <br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow">de nuestra estrella</span>
             </h1>
             <p data-i18n="hero_desc" class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto mb-10">
-                El Sol parece una esfera de luz tranquila, pero su superficie esconde violentas tormentas magnéticas. Tu misión es analizar datos satelitales reales para revelar un patrón oculto.
+                El Sol parece una esfera de luz tranquila, pero su superficie esconde violentas tormentas magnéticas. Tu misión es analizar datos satelitales reales para revelar su patrón oculto.
             </p>
             <div class="flex gap-4 justify-center">
                 <a href="#fundamentos" data-i18n="hero_btn" class="bg-solar-500 hover:bg-solar-400 text-space-900 font-bold py-3 px-8 rounded-full transition-transform hover:scale-105 shadow-lg shadow-solar-500/30">
@@ -133,49 +156,93 @@
             </div>
         </section>
 
-        <section id="fundamentos" class="py-20 bg-space-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 data-i18n="fund_title" class="text-3xl font-bold text-solar-400 mb-4">¿Qué estamos buscando?</h2>
-                    <p data-i18n="fund_desc" class="max-w-3xl mx-auto text-gray-400">Antes de analizar los datos, necesitas saber identificar a nuestro sujeto de estudio: las manchas solares.</p>
+        <section id="fundamentos" class="py-16 bg-space-800">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 data-i18n="fund_title" class="text-3xl font-bold text-solar-400 mb-4">Módulo de Teoría</h2>
+                    <p data-i18n="fund_desc" class="text-gray-400">Conoce a nuestro sujeto de estudio antes de entrar al laboratorio.</p>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-                    <div class="bg-space-900 p-8 rounded-2xl border border-space-700 shadow-xl">
-                        <h3 class="text-2xl font-semibold mb-4 flex items-center gap-3">
-                            <i class="fa-solid fa-fire-flame-curved text-orange-500"></i> <span data-i18n="spot_title">Manchas solares</span>
-                        </h3>
-                        
-                        <p data-i18n="spot_desc1" class="text-gray-300 mb-4">
-                        <p data-i18n="spot_desc2" class="text-gray-300 mb-6">
-                            Rara vez aparecen solas. Como los polos de un imán, suelen aparecer en <strong>grupos</strong>.
-                        </p>
+                <!-- Tab Controls -->
+                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                    <button onclick="openTab(event, 'tab1')" class="tab-btn active px-4 py-2 rounded-lg border border-space-600 text-gray-300 hover:bg-space-700 font-semibold transition-colors text-sm md:text-base" data-i18n="tab1_title">1. ¿Qué indagamos?</button>
+                    <button onclick="openTab(event, 'tab2')" class="tab-btn px-4 py-2 rounded-lg border border-space-600 text-gray-300 hover:bg-space-700 font-semibold transition-colors text-sm md:text-base" data-i18n="tab2_title">2. Las Manchas</button>
+                    <button onclick="openTab(event, 'tab3')" class="tab-btn px-4 py-2 rounded-lg border border-space-600 text-gray-300 hover:bg-space-700 font-semibold transition-colors text-sm md:text-base" data-i18n="tab3_title">3. El Ciclo Solar</button>
+                    <button onclick="openTab(event, 'tab4')" class="tab-btn px-4 py-2 rounded-lg border border-space-600 text-gray-300 hover:bg-space-700 font-semibold transition-colors text-sm md:text-base" data-i18n="tab4_title">4. Efectos en la Tierra</button>
+                </div>
 
-                        <div class="text-center bg-black/40 p-3 rounded-lg border border-space-700">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/2014.11.21.164512_Tree_silhouettes_sunspots_sunset_Xihu_Hangzhou.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Siluetas de árboles y manchas solares al atardecer" class="rounded-lg shadow-md w-full h-auto max-w-[200px] object-cover mx-auto mb-2 border border-space-600">
-                            <p class="text-[9px] text-gray-500">Hermann Luyken, CC0, via Wikimedia Commons</p>
-                        </div>
-                    </div>
+                <!-- Tab Contents (Spoiler-free inquiry texts) -->
+                <div class="bg-space-900 p-6 md:p-10 rounded-2xl border border-space-700 shadow-2xl min-h-[300px] flex items-center">
                     
-                    <div class="bg-space-900 p-8 rounded-2xl border border-space-700 shadow-xl flex flex-col justify-center">
-                        <h3 class="text-2xl font-semibold mb-4 flex items-center gap-3">
-                            <i class="fa-solid fa-calculator text-blue-400"></i> <span data-i18n="wolf_title">Número de Wolf</span>
-                        </h3>
-                        <p data-i18n="wolf_desc" class="text-gray-300 mb-4">
-                            Para medir la actividad del Sol no basta con contar manchas sueltas. En 1848, el astrónomo Rudolf Wolf ideó esta fórmula matemática para darle peso a los grupos y cuantificar la actividad solar:
-                        </p>
-                        <div class="bg-black/50 p-6 rounded-lg text-center border border-solar-500/20 font-mono text-xl mb-4">
-                            <span class="text-white">R</span> = <span class="text-green-400">k</span> ( <span class="text-solar-400">10</span><span class="text-blue-400">g</span> + <span class="text-red-400">f</span> )
-                        </div>
-                        <ul class="text-sm text-gray-400 space-y-2 mb-5">
-                            <li data-i18n="wolf_k"><strong class="text-green-400">k</strong> = Coeficiente de ajuste del observador.</li>
-                            <li data-i18n="wolf_g"><strong class="text-blue-400">g</strong> = Número de <em>grupos</em> de manchas.</li>
-                            <li data-i18n="wolf_f"><strong class="text-red-400">f</strong> = Número total de manchas <em>individuales</em>.</li>
-                        </ul>
-                        <div class="bg-solar-500/10 border-l-2 border-solar-500 p-4 rounded text-sm text-gray-300">
-                            <p data-i18n="wolf_history">¿Qué es esa <strong>k</strong>? Es la clave para viajar en el tiempo. Mirar el Sol en 1850 con un telescopio antiguo no es igual que usar el moderno satélite SOHO hoy. El factor 'k' compensa las diferencias entre telescopios, clima y observadores, permitiéndonos mantener un registro histórico coherente durante siglos.</p>
+                    <div id="tab1" class="tab-content active w-full">
+                        <div class="flex flex-col md:flex-row items-center gap-8">
+                            <div class="w-full md:w-2/3">
+                                <h3 class="text-2xl font-bold text-white mb-4"><i class="fa-solid fa-magnifying-glass text-solar-400 mr-2"></i> <span data-i18n="tab1_title_inner">El objetivo de la misión</span></h3>
+                                <p class="text-gray-300 text-lg leading-relaxed" data-i18n="tab1_desc">
+                                    El Sol parece una esfera constante de luz, pero en realidad es una estrella muy dinámica y cambiante. Vamos a investigar su actividad magnética y cómo evoluciona a lo largo del tiempo. Analizaremos imágenes reales para descubrir si nuestro astro funciona al azar o si tiene un "latido" periódico y predecible.
+                                </p>
+                            </div>
+                            <div class="w-full md:w-1/3 text-center">
+                                <i class="fa-solid fa-user-astronaut text-7xl text-gray-600"></i>
+                            </div>
                         </div>
                     </div>
+
+                    <div id="tab2" class="tab-content w-full">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="w-full md:w-2/3">
+                                <h3 class="text-2xl font-bold text-white mb-4"><i class="fa-solid fa-fire-flame-curved text-orange-500 mr-2"></i> <span data-i18n="tab2_title_inner">Manchas y Grupos</span></h3>
+                                <p class="text-gray-300 mb-4" data-i18n="tab2_desc1">
+                                    Las manchas solares son zonas en la superficie visible del Sol (fotosfera) que se ven oscuras porque están "más frías" (a unos 3.700°C) que su entorno (5.700°C). Campos magnéticos súper intensos actúan como un tapón, bloqueando el calor que intenta subir desde el interior.
+                                </p>
+                                <p class="text-gray-300 mb-4" data-i18n="tab2_desc2">
+                                    Tienen una zona central oscura (umbra) y un borde más claro (penumbra). Casi nunca están solas: aparecen en <strong>grupos</strong>, como si fueran los polos de un imán.
+                                </p>
+                                <div class="bg-black/40 p-4 rounded-lg border border-space-700 text-sm text-gray-400">
+                                    <strong class="text-solar-400" data-i18n="tab2_wolf_title">El Número de Wolf:</strong> <span data-i18n="tab2_wolf_desc">Para medir la actividad, los científicos no cuentan solo manchas sueltas, sino que le dan más importancia a los grupos. ¡Un grupo activo es mucho más poderoso que una mancha aislada!</span>
+                                </div>
+                            </div>
+                            <div class="w-full md:w-1/3 text-center bg-black/50 p-2 rounded border border-space-700">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/2014.11.21.164512_Tree_silhouettes_sunspots_sunset_Xihu_Hangzhou.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Manchas Solares" class="rounded w-full h-auto object-cover mb-2">
+                                <p class="text-[10px] text-gray-500">CC0, vía Wikimedia Commons</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab3" class="tab-content w-full">
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <div class="w-full md:w-2/3">
+                                <h3 class="text-2xl font-bold text-white mb-4"><i class="fa-solid fa-rotate text-solar-400 mr-2"></i> <span data-i18n="tab3_title_inner">El Latido Magnético</span></h3>
+                                <p class="text-gray-300 mb-4 text-lg" data-i18n="tab3_desc1">
+                                    El Sol es una estrella "viva" y dinámica. La cantidad de manchas en su superficie no es constante, sino que sube y baja con el paso del tiempo formando un ciclo o "latido" magnético.
+                                </p>
+                                <p class="text-gray-300" data-i18n="tab3_desc2">
+                                    En el Laboratorio Solar, tu misión será calcular el Número de Wolf (contando manchas y grupos) en diferentes fechas. ¡Al graficar estos datos a lo largo de los años, podrás descubrir por ti mismo cuánto tiempo dura este ciclo y cuándo ocurren sus misteriosos picos de máximo y mínimo!
+                                </p>
+                            </div>
+                            <div class="w-full md:w-1/3 text-center text-6xl text-gray-600">
+                                <i class="fa-solid fa-chart-area"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab4" class="tab-content w-full">
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <div class="w-full md:w-2/3">
+                                <h3 class="text-2xl font-bold text-white mb-4"><i class="fa-solid fa-earth-americas text-blue-400 mr-2"></i> <span data-i18n="tab4_title_inner">Impacto en nuestro planeta</span></h3>
+                                <p class="text-gray-300 mb-4 text-lg" data-i18n="tab4_desc1">
+                                    La actividad del Sol influye directamente en nuestro planeta. Nuestra estrella lanza constantemente partículas cargadas de energía hacia el espacio, fenómeno conocido como "viento solar".
+                                </p>
+                                <p class="text-gray-300" data-i18n="tab4_desc2">
+                                    Durante los picos de máxima actividad (cuando hay más manchas), ocurren violentas tormentas solares. Si estas partículas llegan a la Tierra, nuestro campo magnético las desvía hacia los polos, creando las espectaculares <strong>auroras boreales y australes</strong>. ¿Podrás descubrir en qué años las auroras fueron más intensas analizando los datos del laboratorio?
+                                </p>
+                            </div>
+                            <div class="w-full md:w-1/3 text-center text-6xl text-blue-500/50">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -183,26 +250,26 @@
         <section id="laboratorio" class="py-20 relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-12">
-                    <h2 data-i18n="lab_title" class="text-3xl font-bold text-white mb-2">Laboratorio de observación</h2>
-                    <p data-i18n="lab_desc" class="text-gray-400">Utiliza la herramienta a continuación para analizar imágenes satelitales y registrar el Número de Wolf.</p>
+                    <h2 data-i18n="lab_title" class="text-3xl font-bold text-white mb-2">Laboratorio de Observación</h2>
+                    <p data-i18n="lab_desc" class="text-gray-400">Analiza imágenes satelitales y recolecta datos como un verdadero astrónomo.</p>
                 </div>
 
-                <div class="bg-space-800 rounded-2xl border border-solar-500/50 overflow-hidden shadow-2xl shadow-solar-500/10 min-h-[500px] flex flex-col relative">
+                <div class="bg-space-800 rounded-2xl border border-solar-500/50 overflow-hidden shadow-2xl shadow-solar-500/10 flex flex-col relative">
                     <div class="bg-space-900 border-b border-space-700 px-4 py-3 flex justify-between items-center">
                         <div class="flex gap-2">
                             <div class="w-3 h-3 rounded-full bg-red-500"></div>
                             <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                             <div class="w-3 h-3 rounded-full bg-green-500"></div>
                         </div>
-                        <span class="text-xs font-mono text-gray-500 tracking-widest">SOHO/SDO DATA TERMINAL</span>
+                        <span class="text-xs font-mono text-gray-500 tracking-widest">SOHO/SDO TERMINAL</span>
                     </div>
 
                     <div class="bg-space-800 border-b border-space-700 px-4 py-2 text-center text-sm">
-                        <a href="laboratoriosolar3.html" target="_blank" data-i18n="lab_link" class="text-solar-400 hover:text-solar-500 underline transition-colors">¿No se ve correctamente? Abrir en nueva ventana.</a>
+                        <a href="laboratoriosolar3.html" target="_blank" data-i18n="lab_link" class="text-solar-400 hover:text-solar-500 underline transition-colors">¿No se ve bien? Abrir el laboratorio en ventana completa.</a>
                     </div>
 
-                    <div class="flex-grow flex bg-[#0a0a0a]">
-                        <iframe src="laboratoriosolar3.html" class="w-full h-full min-h-[600px] border-0" title="Laboratorio Solar"></iframe>
+                    <div class="w-full bg-[#0a0a0a]" style="height: 700px;">
+                        <iframe src="laboratoriosolar3.html" class="w-full h-full border-0" title="Laboratorio Solar"></iframe>
                     </div>
                 </div>
             </div>
@@ -211,281 +278,311 @@
         <section id="investigacion" class="py-20 bg-space-800 border-t border-space-700">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
-                    <h2 data-i18n="mist_title" class="text-3xl font-bold text-solar-400 mb-4">¡Hay un misterio por resolver!</h2>
+                    <h2 data-i18n="mist_title" class="text-3xl font-bold text-solar-400 mb-4">El Análisis Final</h2>
                     <p data-i18n="mist_desc" class="max-w-3xl mx-auto text-gray-300 text-lg">
-                        Calcular un Número de Wolf de un solo día es interesante, pero la verdadera ciencia requiere ver el panorama completo. La misión de la clase es juntar piezas de un rompecabezas temporal.
+                        Medir un solo día es interesante, pero la ciencia necesita perspectiva. Tienen que juntar las piezas del rompecabezas temporal reuniendo los datos de toda la clase.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="bg-space-900 p-6 rounded-xl border-l-4 border-solar-500">
-                        <i class="fa-solid fa-magnifying-glass-chart text-2xl text-solar-400 mb-4"></i>
-                        <h4 data-i18n="q1_title" class="text-xl font-bold text-white mb-2">Pista 1: el paso del tiempo</h4>
-                        <p data-i18n="q1_desc" class="text-gray-400 text-sm">
-                            Si tomas fotos del Sol hoy, dentro de un mes, y dentro de 3 años... ¿El Número de Wolf será siempre similar? Investiga datos de diferentes años. ¿Notan algún cambio extremo?
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div class="bg-space-900 p-8 rounded-xl border-l-4 border-solar-500 shadow-lg">
+                        <i class="fa-solid fa-users text-3xl text-solar-400 mb-4"></i>
+                        <h4 data-i18n="q2_title" class="text-xl font-bold text-white mb-2">Construir la gráfica</h4>
+                        <p data-i18n="q2_desc" class="text-gray-400">
+                            Cada estudiante evaluará imágenes de diferentes años. El objetivo es unir todos los conteos de la clase en un gran gráfico histórico. Solo al juntar la información de varias décadas se revelará visualmente el verdadero patrón y la duración del ciclo solar.
                         </p>
                     </div>
-                    <div class="bg-space-900 p-6 rounded-xl border-l-4 border-blue-500">
-                        <i class="fa-solid fa-chart-line text-2xl text-blue-400 mb-4"></i>
-                        <h4 data-i18n="q2_title" class="text-xl font-bold text-white mb-2">El objetivo: construir la gráfica</h4>
-                        <p data-i18n="q2_desc" class="text-gray-400 text-sm">
-                            Cada estudiante evaluará imágenes y recolectará datos de diferentes imágenes en el tiempo. Nuestro objetivo es unir todos los Números de Wolf de la clase en un gran gráfico histórico. Solo entonces revelaremos el comportamiento del Sol.
+                    <div class="bg-space-900 p-8 rounded-xl border-l-4 border-blue-500 shadow-lg">
+                        <i class="fa-solid fa-lightbulb text-3xl text-blue-400 mb-4"></i>
+                        <h4 data-i18n="q3_title" class="text-xl font-bold text-white mb-2">Conclusiones</h4>
+                        <p data-i18n="q3_desc" class="text-gray-400">
+                            Observen su gráfico final. ¿En qué año fue el "máximo solar" (más manchas)? ¿En qué año estuvo más tranquilo? Piensen cómo esto pudo haber afectado las auroras en la Tierra durante esos años.
                         </p>
                     </div>
-                    <div class="bg-space-900 p-6 rounded-xl border-l-4 border-red-500">
-                        <i class="fa-solid fa-question text-2xl text-red-400 mb-4"></i>
-                        <h4 data-i18n="q3_title" class="text-xl font-bold text-white mb-2">Pista 2: la década</h4>
-                        <p data-i18n="q3_desc" class="text-gray-400 text-sm">
-                            Se dice que nuestra estrella tiene "estaciones" que no duran meses, sino años. Aproximadamente a la edad de 11 años cambiaste de niño a adolescente. Curiosamente, ese número es clave para el Sol. ¿Por qué será?
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="mt-12 text-center">
-                    <p data-i18n="mist_quote" class="text-gray-400 italic">"Los datos guardan las respuestas, pero sólo una mente curiosa puede hacer las preguntas correctas."</p>
                 </div>
             </div>
         </section>
 
-        <section id="recursos" class="py-20 relative">
-            <div class="max-w-4xl mx-auto px-4 text-center">
-                <i class="fa-solid fa-book-journal-whills text-5xl text-solar-500 mb-6 block"></i>
-                <h2 data-i18n="res_title" class="text-3xl font-bold text-white mb-6">Materiales de la misión</h2>
+        <section id="recursos" class="py-20 relative bg-space-900">
+            <div class="max-w-4xl mx-auto px-4 text-center mb-16">
+                <i class="fa-solid fa-file-pdf text-5xl text-solar-500 mb-6 block"></i>
+                <h2 data-i18n="res_title" class="text-3xl font-bold text-white mb-6">Guía Práctica</h2>
+                <p data-i18n="res_desc" class="text-gray-300 mb-8 text-lg">Descarga las instrucciones paso a paso para identificar las manchas, registrar los datos en el sistema y colaborar con tu clase.</p>
                 
-                <div data-i18n="res_desc" class="text-gray-300 mb-10 text-lg leading-relaxed">
-                    <!-- El contenido de la lista se inyectará dinámicamente desde el traductor JS -->
-                </div>
-                
-                <!-- ENLACE PDF INSTRUCCIONES -->
-                <a href="#" data-i18n="res_btn" class="inline-flex items-center gap-3 bg-transparent border-2 border-solar-400 text-solar-400 hover:bg-solar-400 hover:text-space-900 font-bold py-4 px-8 rounded-lg transition-all text-lg group">
-                    <i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i>
-                    Descargar Guía de Observación (PDF)
+                <a href="#" class="inline-flex items-center gap-3 bg-transparent border-2 border-solar-400 text-solar-400 hover:bg-solar-400 hover:text-space-900 font-bold py-3 px-8 rounded-lg transition-all text-lg group">
+                    <i class="fa-solid fa-download group-hover:-translate-y-1 transition-transform"></i>
+                    <span data-i18n="res_btn">Descargar Guía (PDF)</span>
                 </a>
             </div>
-        </section>
 
-        <section id="creditos" class="py-16 bg-space-900 border-t border-space-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h3 data-i18n="credits_title" class="text-2xl font-bold text-solar-500 mb-6 text-center">Créditos, referencias, para saber más...</h3>
-                <ul class="list-disc text-gray-400 max-w-2xl mx-auto space-y-3 pl-6">
-                    <li><a href="https://www.google.com" target="_blank" data-i18n="credit_1" class="hover:text-solar-400 underline transition-colors">Ítem 1</a></li>
-                    <li><a href="https://www.google.com" target="_blank" data-i18n="credit_2" class="hover:text-solar-400 underline transition-colors">Ítem 2</a></li>
-                    <li><a href="https://www.google.com" target="_blank" data-i18n="credit_3" class="hover:text-solar-400 underline transition-colors">Ítem 3</a></li>
-                </ul>
+            <!-- APA Citations -->
+            <div class="max-w-5xl mx-auto px-4 border-t border-space-700 pt-16">
+                <h3 data-i18n="credits_title" class="text-2xl font-bold text-gray-300 mb-6 text-center"><i class="fa-solid fa-book mr-2"></i> Fuentes y Referencias (Normas APA)</h3>
+                <div class="bg-space-800 p-6 md:p-8 rounded-xl border border-space-700 shadow-inner">
+                    <ul class="text-gray-400 space-y-4 text-sm md:text-base text-left list-none">
+                        <li class="pl-4 border-l-2 border-space-600">Alberdi, A., & López de Lacalle, S. (Coords.). (2007). <em>Un viaje al Cosmos en 52 semanas</em>. Consejo Superior de Investigaciones Científicas (CSIC).</li>
+                        <li class="pl-4 border-l-2 border-space-600">Alfonso Garzón, J., Galadí Enríquez, D., & Morales Durán, C. (Coords.). (2009). <em>100 Conceptos básicos de Astronomía</em>. Instituto Nacional de Técnica Aeroespacial.</li>
+                        <li class="pl-4 border-l-2 border-space-600">Retré, J., Russo, P., Lee, H., Penteado, E., Salimpour, S., Fitzgerald, M., ... & Schrier, W. (2020). <em>Grandes Ideas de la Astronomía: Una propuesta para la alfabetización en Astronomía</em> (2da ed.). Leiden University.</li>
+                    </ul>
+                    <div class="mt-8 pt-6 border-t border-space-700 text-center">
+                        <p class="text-gray-500 text-sm" data-i18n="credits_images">
+                            Datos e imágenes satelitales simulados provistos para fines educativos. Créditos del instrumental real: SOHO Observatory (NASA/ESA) e instituciones científicas asociadas.
+                        </p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
-    <iframe src="footer.html" class="w-full h-48 border-0 mt-10 bg-space-900" title="Space Apps Footer"></iframe>
+    <!-- Footer -->
+    <footer class="w-full bg-space-950 py-8 border-t border-space-800 text-center text-gray-500 text-sm">
+        <p>Space Apps Education - Helios Mission</p>
+    </footer>
 
     <script>
+        // Tab switching function
+        function openTab(evt, tabId) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            const tabBtns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
         const i18n = {
             es: {
-                nav_home: "Inicio", nav_fund: "Fundamentos", nav_lab: "Laboratorio", nav_mist: "Misterio Solar", nav_res: "Recursos",
+                nav_home: "Inicio", nav_fund: "Fundamentos", nav_lab: "Laboratorio", nav_mist: "Investigación", nav_res: "Recursos",
+                read_time: "Tiempo estimado de lectura: ~15 minutos antes de la práctica.",
                 hero_title: "Descifra el latido <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>de nuestra estrella</span>",
-                hero_desc: "El Sol parece una esfera de luz tranquila, pero su superficie esconde violentas tormentas magnéticas. Tu misión es analizar datos satelitales reales para revelar un patrón oculto.",
+                hero_desc: "El Sol parece una esfera constante de luz, pero en realidad es una estrella muy dinámica y cambiante. Vamos a investigar su actividad magnética y descubrir sus patrones ocultos.",
                 hero_btn: "Comenzar Misión",
-                fund_title: "¿Qué estamos buscando?",
-                fund_desc: "Antes de analizar los datos, necesitas saber identificar a nuestro sujeto de estudio: las manchas solares.",
-                spot_title: "Manchas solares",
-                spot_desc1: "Son regiones en la superficie del Sol (fotosfera) que se ven oscuras. ¿Por qué? No es que estén frías, ¡siguen a miles de grados! Pero son ligeramente más frías que su entorno debido a <strong>campos magnéticos extremadamente intensos</strong> que bloquean el calor que sube desde el interior.",
-                spot_desc2: "Rara vez aparecen solas. Como los polos de un imán, suelen aparecer en <strong>grupos</strong>.",
-                wolf_title: "Número de Wolf",
-                wolf_desc: "Para medir la actividad del Sol no basta con contar manchas sueltas. En 1848, el astrónomo Rudolf Wolf ideó esta fórmula matemática para darle peso a los grupos y cuantificar la actividad solar:",
-                wolf_k: "<strong class='text-green-400'>k</strong> = Coeficiente de ajuste del observador.",
-                wolf_g: "<strong class='text-blue-400'>g</strong> = Número de <em>grupos</em> de manchas.",
-                wolf_f: "<strong class='text-red-400'>f</strong> = Número total de manchas <em>individuales</em>.",
-                wolf_history: "¿Qué es esa <strong>k</strong>? Es la clave para viajar en el tiempo. Mirar el Sol en 1850 con un telescopio antiguo no es igual que usar el moderno satélite SOHO hoy. El factor 'k' compensa las diferencias entre telescopios, clima y observadores, permitiéndonos mantener un registro histórico coherente durante siglos.",
-                lab_title: "Laboratorio de observación",
-                lab_desc: "Utiliza la herramienta a continuación para analizar imágenes satelitales y registrar el Número de Wolf.",
-                lab_link: "¿No se ve correctamente? Abrir en nueva ventana.",
-                mist_title: "¡Hay un misterio por resolver!",
-                mist_desc: "Calcular un Número de Wolf de un solo día es interesante, pero la verdadera ciencia requiere ver el panorama completo. La misión de la clase es juntar piezas de un rompecabezas temporal.",
-                q1_title: "Pista 1: el paso del tiempo",
-                q1_desc: "Si tomas fotos del Sol hoy, dentro de un mes, y dentro de 3 años... ¿El Número de Wolf será siempre similar? Investiga datos de diferentes años. ¿Notan algún cambio extremo?",
-                q2_title: "El objetivo: construir la gráfica",
-                q2_desc: "Cada estudiante evaluará imágenes y recolectará datos de diferentes imágenes en el tiempo. Nuestro objetivo es unir todos los Números de Wolf de la clase en un gran gráfico histórico. Solo entonces revelaremos el comportamiento del Sol.",
-                q3_title: "Pista 2: la década",
-                q3_desc: "Se dice que nuestra estrella tiene 'estaciones' que no duran meses, sino años. Aproximadamente a la edad de 11 años cambiaste de niño a adolescente. Curiosamente, ese número es clave para el Sol. ¿Por qué será?",
-                mist_quote: "\"Los datos guardan las respuestas, pero sólo una mente curiosa puede hacer las preguntas correctas.\"",
-                res_title: "Materiales de la misión",
-                res_desc: "Este material contiene tu guía de trabajo para la investigación. Aquí encontrarás:<br><ul class='list-disc text-left inline-block mt-4 space-y-2 mb-6 max-w-2xl mx-auto'><li><strong>El protocolo de análisis:</strong> Los pasos para explorar las imágenes, identificando y marcando tanto las manchas solares individuales como los grupos.</li><li><strong>El registro de datos:</strong> El método para documentar las mediciones exactas de cada imagen.</li><li><strong>La carga de información:</strong> Las instrucciones para subir tus resultados a la base de datos central de la clase.</li></ul><br>Al procesar y graficar los datos recolectados por todo el grupo, podremos visualizar el comportamiento del Sol a largo plazo. La pregunta científica es: ¿realmente existe un ciclo solar periódico? ¡Vamos a analizar los datos y comprobarlo con evidencia!",
-                res_btn: '<i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i> Descargar Guía de Observación (PDF)',
-                credits_title: "Créditos, referencias, para saber más..."
+                fund_title: "Módulo de Teoría",
+                fund_desc: "Conoce a nuestro sujeto de estudio antes de entrar al laboratorio.",
+                tab1_title: "1. ¿Qué indagamos?", tab2_title: "2. Las Manchas", tab3_title: "3. El Ciclo Solar", tab4_title: "4. La Tierra",
+                tab1_title_inner: "El objetivo de la misión",
+                tab1_desc: "El Sol parece una esfera constante de luz, pero en realidad es una estrella muy dinámica y cambiante. Vamos a investigar su actividad magnética y cómo evoluciona a lo largo del tiempo. Analizaremos imágenes reales para descubrir si nuestro astro funciona al azar o si tiene un 'latido' periódico y predecible.",
+                tab2_title_inner: "Manchas y Grupos",
+                tab2_desc1: "Las manchas solares son zonas en la superficie visible del Sol (fotosfera) que se ven oscuras porque están 'más frías' (a unos 3.700°C) que su entorno (5.700°C). Campos magnéticos súper intensos actúan como un tapón, bloqueando el calor que intenta subir desde el interior.",
+                tab2_desc2: "Tienen una zona central oscura (umbra) y un borde más claro (penumbra). Casi nunca están solas: aparecen en <strong>grupos</strong>, como si fueran los polos de un imán.",
+                tab2_wolf_title: "El Número de Wolf:",
+                tab2_wolf_desc: "Para medir la actividad, los científicos no cuentan solo manchas sueltas, sino que le dan más importancia a los grupos. ¡Un grupo activo es mucho más poderoso que una mancha aislada!",
+                tab3_title_inner: "El Latido Magnético",
+                tab3_desc1: "El Sol es una estrella 'viva' y dinámica. La cantidad de manchas en su superficie no es constante, sino que sube y baja con el paso del tiempo formando un ciclo o 'latido' magnético.",
+                tab3_desc2: "En el Laboratorio Solar, tu misión será calcular el Número de Wolf (contando manchas y grupos) en diferentes fechas. ¡Al graficar estos datos a lo largo de los años, podrás descubrir por ti mismo cuánto tiempo dura este ciclo y cuándo ocurren sus misteriosos picos de máximo y mínimo!",
+                tab4_title_inner: "Impacto en nuestro planeta",
+                tab4_desc1: "La actividad del Sol influye directamente en nuestro planeta. Nuestra estrella lanza constantemente partículas cargadas de energía hacia el espacio, fenómeno conocido como 'viento solar'.",
+                tab4_desc2: "Durante los picos de máxima actividad (cuando hay más manchas), ocurren violentas tormentas solares. Si estas partículas llegan a la Tierra, nuestro campo magnético las desvía hacia los polos, creando las espectaculares <strong>auroras boreales y australes</strong>. ¿Podrás descubrir en qué años las auroras fueron más intensas analizando los datos del laboratorio?",
+                lab_title: "Laboratorio de Observación",
+                lab_desc: "Analiza imágenes satelitales y recolecta datos como un verdadero astrónomo.",
+                lab_link: "¿No se ve bien? Abrir el laboratorio en ventana completa.",
+                mist_title: "El Análisis Final",
+                mist_desc: "Medir un solo día es interesante, pero la ciencia necesita perspectiva. Tienen que juntar las piezas del rompecabezas temporal reuniendo los datos de toda la clase.",
+                q2_title: "Construir la gráfica",
+                q2_desc: "Cada estudiante evaluará imágenes de diferentes años. El objetivo es unir todos los conteos de la clase en un gran gráfico histórico. Solo al juntar la información de varias décadas se revelará visualmente el verdadero patrón y la duración del ciclo solar.",
+                q3_title: "Conclusiones",
+                q3_desc: "Observen su gráfico final. ¿En qué año fue el 'máximo solar' (más manchas)? ¿En qué año estuvo más tranquilo? Piensen cómo esto pudo haber afectado las auroras en la Tierra.",
+                res_title: "Guía Práctica",
+                res_desc: "Descarga las instrucciones paso a paso para identificar las manchas, registrar los datos y colaborar con tu clase.",
+                res_btn: "Descargar Guía (PDF)",
+                credits_title: "<i class='fa-solid fa-book mr-2'></i> Fuentes y Referencias (Normas APA)",
+                credits_images: "Datos e imágenes satelitales simulados provistos para fines educativos. Créditos del instrumental real: SOHO Observatory (NASA/ESA) e instituciones científicas asociadas."
             },
             en: {
-                nav_home: "Home", nav_fund: "Fundamentals", nav_lab: "Laboratory", nav_mist: "Solar Mystery", nav_res: "Resources",
+                nav_home: "Home", nav_fund: "Fundamentals", nav_lab: "Laboratory", nav_mist: "Research", nav_res: "Resources",
+                read_time: "Estimated reading time: ~15 minutes before practice.",
                 hero_title: "Decode the heartbeat <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>of our star</span>",
-                hero_desc: "The Sun looks like a quiet sphere of light, but its surface hides violent magnetic storms. Your mission is to analyze real satellite data to reveal a hidden pattern.",
+                hero_desc: "The Sun seems like a constant sphere of light, but it is actually a dynamic and changing star. We will investigate its magnetic activity and discover its hidden patterns.",
                 hero_btn: "Start Mission",
-                fund_title: "What are we looking for?",
-                fund_desc: "Before analyzing the data, you need to know how to identify our study subject: sunspots.",
-                spot_title: "Sunspots",
-                spot_desc1: "They are regions on the surface of the Sun (photosphere) that look dark. Why? They're not cold, they are still at thousands of degrees! But they are slightly cooler than their surroundings due to <strong>extremely intense magnetic fields</strong> that block the heat rising from the interior.",
-                spot_desc2: "They rarely appear alone. Like the poles of a magnet, they usually appear in <strong>groups</strong>.",
-                wolf_title: "Wolf number",
-                wolf_desc: "To measure the activity of the Sun, counting single spots is not enough. In 1848, astronomer Rudolf Wolf devised this mathematical formula to give weight to groups and quantify solar activity:",
-                wolf_k: "<strong class='text-green-400'>k</strong> = Observer adjustment coefficient.",
-                wolf_g: "<strong class='text-blue-400'>g</strong> = Number of sunspot <em>groups</em>.",
-                wolf_f: "<strong class='text-red-400'>f</strong> = Total number of <em>individual</em> spots.",
-                wolf_history: "What is that <strong>k</strong>? It's the key to time travel. Looking at the Sun in 1850 with an old telescope is not the same as using the modern SOHO satellite today. The 'k' factor compensates for differences in telescopes, weather, and observers, allowing us to maintain a consistent historical record over centuries.",
-                lab_title: "Observation laboratory",
-                lab_desc: "Use the tool below to analyze satellite images and record the Wolf number.",
-                lab_link: "Not displaying correctly? Open in new window.",
-                mist_title: "There is a mystery to solve!",
-                mist_desc: "Calculating a Wolf number for a single day is interesting, but real science requires seeing the big picture. The class's mission is to piece together a temporal puzzle.",
-                q1_title: "Clue 1: the passage of time",
-                q1_desc: "If you take photos of the Sun today, in a month, and in 3 years... Will the Wolf number always be similar? Investigate data from different years. Do you notice any extreme changes?",
-                q2_title: "The goal: build the graph",
-                q2_desc: "Each student will evaluate images and collect data from different images over time. Our goal is to combine all the Wolf numbers from the class into a large historical graph. Only then will we reveal the Sun's behavior.",
-                q3_title: "Clue 2: the decade",
-                q3_desc: "It is said that our star has 'seasons' that don't last months, but years. At about 11 years old, you changed from a child to a teenager. Curiously, that number is key for the Sun. Why?",
-                mist_quote: "\"Data holds the answers, but only a curious mind can ask the right questions.\"",
-                res_title: "Mission materials",
-                res_desc: "This material contains your workbook for the investigation. Here you will find:<br><ul class='list-disc text-left inline-block mt-4 space-y-2 mb-6 max-w-2xl mx-auto'><li><strong>The analysis protocol:</strong> The steps to explore the images, identifying and marking both individual sunspots and groups.</li><li><strong>The data record:</strong> The method to document the exact measurements of each image.</li><li><strong>The information upload:</strong> The instructions to upload your results to the central class database.</li></ul><br>By processing and graphing the data collected by the entire group, we will be able to visualize the long-term behavior of the Sun. The scientific question is: is there really a periodic solar cycle? Let's analyze the data and prove it with evidence!",
-                res_btn: '<i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i> Download Observation Guide (PDF)',
-                credits_title: "Credits, references, to know more..."
+                fund_title: "Theory Module",
+                fund_desc: "Get to know our subject before entering the lab.",
+                tab1_title: "1. The Mission", tab2_title: "2. Sunspots", tab3_title: "3. Solar Cycle", tab4_title: "4. The Earth",
+                tab1_title_inner: "Mission Objective",
+                tab1_desc: "The Sun seems like a constant sphere of light, but it is a very dynamic star. We will investigate its magnetic activity and how it evolves over time. We will analyze real images to discover if our star works randomly or if it has a predictable 'heartbeat'.",
+                tab2_title_inner: "Sunspots and Groups",
+                tab2_desc1: "Sunspots are areas on the visible surface (photosphere) that look dark because they are 'cooler' (about 3,700°C) than their surroundings (5,700°C). Super intense magnetic fields act as a plug, blocking heat rising from the inside.",
+                tab2_desc2: "They have a dark central zone (umbra) and a lighter edge (penumbra). They are almost never alone: they appear in <strong>groups</strong>, like the poles of a magnet.",
+                tab2_wolf_title: "The Wolf Number:",
+                tab2_wolf_desc: "To measure activity, scientists don't just count single spots; they give more weight to groups. An active group is much more powerful than an isolated spot!",
+                tab3_title_inner: "The Magnetic Heartbeat",
+                tab3_desc1: "The Sun is a 'living' and dynamic star. The number of spots on its surface is not constant; it goes up and down over time, forming a magnetic cycle or 'heartbeat'.",
+                tab3_desc2: "In the Solar Laboratory, your mission will be to calculate the Wolf Number (counting spots and groups) on different dates. By graphing this data over the years, you will discover for yourself how long this cycle lasts and when its mysterious peaks and minimums occur!",
+                tab4_title_inner: "Impact on our planet",
+                tab4_desc1: "The Sun's activity directly influences our planet. Our star constantly throws energy-charged particles into space, a phenomenon known as the 'solar wind'.",
+                tab4_desc2: "During peaks of maximum activity (when there are more spots), violent solar storms occur. If these particles reach Earth, our magnetic field deflects them to the poles, creating spectacular <strong>auroras</strong>. Will you be able to discover in which years the auroras were most intense by analyzing the lab data?",
+                lab_title: "Observation Laboratory",
+                lab_desc: "Analyze satellite images and collect data like a real astronomer.",
+                lab_link: "Not looking right? Open the lab in full window.",
+                mist_title: "The Final Analysis",
+                mist_desc: "Measuring a single day is interesting, but science needs perspective. You must put together the pieces of the time puzzle by gathering data from the whole class.",
+                q2_title: "Build the graph",
+                q2_desc: "Each student will evaluate images from different years. The goal is to unite all the class counts in a large historical graph. Only by gathering decades of information will the true pattern and duration of the solar cycle be visually revealed.",
+                q3_title: "Conclusions",
+                q3_desc: "Look at your final graph. In which year was the 'solar maximum'? When was it quietest? Think about how this might have affected auroras on Earth.",
+                res_title: "Practical Guide",
+                res_desc: "Download step-by-step instructions to identify spots, record data, and collaborate with your class.",
+                res_btn: "Download Guide (PDF)",
+                credits_title: "<i class='fa-solid fa-book mr-2'></i> Sources and References (APA format)",
+                credits_images: "Simulated satellite data and images provided for educational purposes. Real instrument credits: SOHO Observatory (NASA/ESA) and associated scientific institutions."
             },
             fr: {
-                nav_home: "Accueil", nav_fund: "Fondamentaux", nav_lab: "Laboratoire", nav_mist: "Mystère Solaire", nav_res: "Ressources",
+                nav_home: "Accueil", nav_fund: "Fondements", nav_lab: "Laboratoire", nav_mist: "Recherche", nav_res: "Ressources",
+                read_time: "Temps de lecture estimé : ~15 minutes avant la pratique.",
                 hero_title: "Décryptez le battement <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>de notre étoile</span>",
-                hero_desc: "Le Soleil ressemble à une sphère de lumière tranquille, mais sa surface cache de violentes tempêtes magnétiques. Votre mission : analyser de vraies données satellites pour révéler un motif caché.",
+                hero_desc: "Le Soleil semble une sphère de lumière constante, mais c'est une étoile très dynamique. Nous allons enquêter sur son activité magnétique et découvrir ses motifs.",
                 hero_btn: "Commencer la Mission",
-                fund_title: "Que cherchons-nous ?",
-                fund_desc: "Avant d'analyser les données, vous devez savoir identifier notre sujet d'étude : les taches solaires.",
-                spot_title: "Taches solaires",
-                spot_desc1: "Ce sont des régions sur la surface du Soleil (photosphère) qui paraissent sombres. Pourquoi ? Elles ne sont pas froides (des milliers de degrés !) mais légèrement plus froides que leur environnement à cause de <strong>champs magnétiques très intenses</strong> qui bloquent la chaleur.",
-                spot_desc2: "Elles apparaissent rarement seules. Comme les pôles d'un aimant, elles se présentent souvent en <strong>groupes</strong>.",
-                wolf_title: "Nombre de Wolf",
-                wolf_desc: "Pour mesurer l'activité du Soleil, compter les taches isolées ne suffit pas. En 1848, l'astronome Rudolf Wolf a conçu cette formule mathématique pour donner du poids aux groupes et quantifier l'activité solaire :",
-                wolf_k: "<strong class='text-green-400'>k</strong> = Coefficient d'ajustement de l'observateur.",
-                wolf_g: "<strong class='text-blue-400'>g</strong> = Nombre de <em>groupes</em> de taches.",
-                wolf_f: "<strong class='text-red-400'>f</strong> = Nombre total de taches <em>individuelles</em>.",
-                wolf_history: "Qu'est-ce que ce <strong>k</strong> ? C'est la clé du voyage dans le temps. Regarder le Soleil en 1850 avec un vieux télescope n'est pas la même chose qu'utiliser le satellite moderne SOHO aujourd'hui. Le facteur 'k' compense les différences entre les télescopes, la météo et les observateurs, ce qui nous permet de conserver un historique cohérent pendant des siècles.",
-                lab_title: "Laboratoire d'observation",
-                lab_desc: "Utilisez l'outil ci-dessous pour analyser des images satellites et enregistrer le Nombre de Wolf.",
-                lab_link: "Ne s'affiche pas correctement ? Ouvrir dans une nouvelle fenêtre.",
-                mist_title: "Il y a un mystère à résoudre !",
-                mist_desc: "Calculer un Nombre de Wolf pour un seul jour est intéressant, mais la vraie science nécessite une vue d'ensemble. La mission de la classe est de reconstituer un puzzle temporel.",
-                q1_title: "Indice 1 : le temps qui passe",
-                q1_desc: "Si vous prenez des photos du Soleil aujourd'hui, dans un mois et dans 3 ans... Le Nombre de Wolf sera-t-il toujours similaire ? Cherchez des données de différentes années.",
-                q2_title: "L'objectif : construire le graphique",
-                q2_desc: "Chaque élève évaluera des images et collectera des données de différentes images au fil du temps. Notre objectif est de réunir tous les Nombres de Wolf de la classe dans un grand graphique historique.",
-                q3_title: "Indice 2 : la décennie",
-                q3_desc: "On dit que notre étoile a des 'saisons' qui ne durent pas des mois, mais des années. Vers 11 ans, vous êtes passé de l'enfance à l'adolescence. Curieusement, ce nombre est clé pour le Soleil.",
-                mist_quote: "\"Les données détiennent les réponses, mais seule une curiosité d'esprit peut poser les bonnes questions.\"",
-                res_title: "Matériel de mission",
-                res_desc: "Ce matériel contient votre guide de travail pour l'investigation. Vous y trouverez :<br><ul class='list-disc text-left inline-block mt-4 space-y-2 mb-6 max-w-2xl mx-auto'><li><strong>Le protocole d'analyse :</strong> Les étapes pour explorer les images, en identifiant et en marquant à la fois les taches solaires individuelles et les groupes.</li><li><strong>L'enregistrement des données :</strong> La méthode pour documenter les mesures exactes de chaque image.</li><li><strong>Le téléchargement d'informations :</strong> Les instructions pour télécharger vos résultats dans la base de données centrale de la classe.</li></ul><br>En traitant et en représentant graphiquement les données collectées par l'ensemble du groupe, nous pourrons visualiser le comportement à long terme du Soleil. La question scientifique est : y a-t-il vraiment un cycle solaire périodique ? Analysons les données et prouvons-le avec des preuves !",
-                res_btn: '<i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i> Télécharger le Guide d\'Observation (PDF)',
-                credits_title: "Crédits, références, pour en savoir plus..."
+                fund_title: "Module Théorique",
+                fund_desc: "Apprenez à connaître notre sujet d'étude avant d'entrer au laboratoire.",
+                tab1_title: "1. La Mission", tab2_title: "2. Les Taches", tab3_title: "3. Le Cycle Solaire", tab4_title: "4. La Terre",
+                tab1_title_inner: "Objectif de la mission",
+                tab1_desc: "Le Soleil semble constant, mais c'est une étoile très dynamique. Nous allons étudier son activité magnétique et son évolution. Nous analyserons des images réelles pour découvrir si notre astre a un 'battement' périodique.",
+                tab2_title_inner: "Taches et Groupes",
+                tab2_desc1: "Les taches solaires sont des zones sur la surface visible (photosphère) qui semblent sombres car elles sont 'plus froides' (3 700°C) que leur environnement (5 700°C). Des champs magnétiques intenses bloquent la chaleur.",
+                tab2_desc2: "Elles ont une zone centrale (ombre) et un bord (pénombre). Elles ne sont presque jamais seules : elles apparaissent en <strong>groupes</strong>, comme les pôles d'un aimant.",
+                tab2_wolf_title: "Le Nombre de Wolf :",
+                tab2_wolf_desc: "Pour mesurer l'activité, les scientifiques donnent plus de poids aux groupes. Un groupe actif est bien plus puissant qu'une tache isolée !",
+                tab3_title_inner: "Le Battement Magnétique",
+                tab3_desc1: "Le Soleil est une étoile 'vivante' et dynamique. Le nombre de taches sur sa surface n'est pas constant : il monte et descend au fil du temps, formant un cycle ou 'battement' magnétique.",
+                tab3_desc2: "Dans le Laboratoire Solaire, votre mission sera de calculer le Nombre de Wolf à différentes dates. En traçant ces données sur plusieurs années, vous découvrirez par vous-même la durée de ce cycle et quand se produisent ses mystérieux maximums et minimums !",
+                tab4_title_inner: "Impact sur notre planète",
+                tab4_desc1: "L'activité du Soleil influence directement notre planète. Notre étoile projette constamment des particules chargées d'énergie dans l'espace (le 'vent solaire').",
+                tab4_desc2: "Lors des pics d'activité maximale, de violentes tempêtes solaires se produisent. Si ces particules atteignent la Terre, notre champ magnétique les dévie vers les pôles, créant les spectaculaires <strong>aurores</strong>. Pourrez-vous découvrir quelles années les aurores ont été les plus intenses grâce aux données du laboratoire ?",
+                lab_title: "Laboratoire d'Observation",
+                lab_desc: "Analysez des images satellites et collectez des données comme un véritable astronome.",
+                lab_link: "Ça ne s'affiche pas bien ? Ouvrez le laboratoire en plein écran.",
+                mist_title: "L'Analyse Finale",
+                mist_desc: "Mesurer un seul jour est intéressant, mais la science a besoin de perspective. Vous devez assembler le puzzle en rassemblant les données de la classe.",
+                q2_title: "Construire le graphique",
+                q2_desc: "Chaque élève évaluera des images de différentes années. Le but est d'unir tous les comptages dans un grand graphique historique. C'est seulement en rassemblant ces informations sur plusieurs décennies que le véritable motif et la durée du cycle solaire seront révélés.",
+                q3_title: "Conclusions",
+                q3_desc: "Regardez votre graphique final. Quelle année fut le 'maximum solaire' ? Quand fut-il le plus calme ? Pensez à comment cela a affecté les aurores sur Terre.",
+                res_title: "Guide Pratique",
+                res_desc: "Téléchargez les instructions pour identifier les taches et collaborer avec votre classe.",
+                res_btn: "Télécharger le Guide (PDF)",
+                credits_title: "<i class='fa-solid fa-book mr-2'></i> Sources et Références (Normes APA)",
+                credits_images: "Données satellites simulées fournies à des fins éducatives. Crédits des instruments : SOHO Observatory (NASA/ESA) et institutions associées."
             },
             de: {
-                nav_home: "Startseite", nav_fund: "Grundlagen", nav_lab: "Labor", nav_mist: "Sonnenrätsel", nav_res: "Ressourcen",
+                nav_home: "Startseite", nav_fund: "Grundlagen", nav_lab: "Labor", nav_mist: "Forschung", nav_res: "Ressourcen",
+                read_time: "Geschätzte Lesezeit: ~15 Minuten vor der Praxis.",
                 hero_title: "Entschlüssele den Herzschlag <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>unseres Sterns</span>",
-                hero_desc: "Die Sonne wirkt wie eine ruhige Lichtkugel, aber ihre Oberfläche verbirgt heftige Magnetstürme. Deine Mission: Analysiere echte Satellitendaten, um ein verborgenes Muster zu enthüllen.",
-                hero_btn: "Mission Starten",
-                fund_title: "Wonach suchen wir?",
-                fund_desc: "Bevor wir die Daten analysieren, musst du lernen, unser Untersuchungsobjekt zu identifizieren: die Sonnenflecken.",
-                spot_title: "Sonnenflecken",
-                spot_desc1: "Es sind Regionen auf der Oberfläche der Sonne (Photosphäre), die dunkel erscheinen. Warum? Sie sind nicht kalt, sie sind immer noch tausende Grad heiß! Aber sie sind etwas kühler als ihre Umgebung aufgrund <strong>extrem starker Magnetfelder</strong>, die die aufsteigende Hitze blockieren.",
-                spot_desc2: "Sie treten selten allein auf. Wie die Pole eines Magneten erscheinen sie meistens in <strong>Gruppen</strong>.",
-                wolf_title: "Wolf-Zahl",
-                wolf_desc: "Um die Aktivität der Sonne zu messen, reicht es nicht aus, einzelne Flecken zu zählen. 1848 entwickelte der Astronom Rudolf Wolf diese mathematische Formel, um Gruppen zu gewichten und die Sonnenaktivität zu quantifizieren:",
-                wolf_k: "<strong class='text-green-400'>k</strong> = Anpassungskoeffizient des Beobachters.",
-                wolf_g: "<strong class='text-blue-400'>g</strong> = Anzahl der Sonnenflecken-<em>Gruppen</em>.",
-                wolf_f: "<strong class='text-red-400'>f</strong> = Gesamtzahl der <em>einzelnen</em> Flecken.",
-                wolf_history: "Was ist dieses <strong>k</strong>? Es ist der Schlüssel zur Zeitreise. Die Sonne 1850 durch ein altes Teleskop zu betrachten, ist nicht dasselbe wie heute den modernen SOHO-Satelliten zu nutzen. Der Faktor 'k' gleicht Unterschiede zwischen Teleskopen, Wetter und Beobachtern aus, damit wir über Jahrhunderte hinweg konsistente historische Aufzeichnungen führen können.",
+                hero_desc: "Die Sonne scheint eine konstante Lichtkugel zu sein, ist aber ein sehr dynamischer Stern. Wir werden ihre magnetische Aktivität untersuchen.",
+                hero_btn: "Mission starten",
+                fund_title: "Theoriemodul",
+                fund_desc: "Lerne unser Studienobjekt kennen, bevor du das Labor betrittst.",
+                tab1_title: "1. Die Mission", tab2_title: "2. Sonnenflecken", tab3_title: "3. Sonnenzyklus", tab4_title: "4. Die Erde",
+                tab1_title_inner: "Missionsziel",
+                tab1_desc: "Wir werden untersuchen, wie sich die magnetische Aktivität der Sonne im Laufe der Zeit entwickelt. Wir analysieren echte Bilder, um herauszufinden, ob unser Stern einen periodischen 'Herzschlag' hat.",
+                tab2_title_inner: "Flecken und Gruppen",
+                tab2_desc1: "Sonnenflecken sind Bereiche auf der Oberfläche (Photosphäre), die dunkel erscheinen, weil sie 'kühler' (ca. 3.700°C) sind als ihre Umgebung (5.700°C).",
+                tab2_desc2: "Sie haben eine dunkle zentrale Zone (Umbra) und einen Rand (Penumbra). Sie treten fast immer in <strong>Gruppen</strong> auf, wie die Pole eines Magneten.",
+                tab2_wolf_title: "Die Wolf-Zahl:",
+                tab2_wolf_desc: "Um die Aktivität zu messen, zählen Wissenschaftler Gruppen stärker. Eine aktive Gruppe ist viel straker als ein einzelner Fleck!",
+                tab3_title_inner: "Der magnetische Herzschlag",
+                tab3_desc1: "Die Sonne ist ein 'lebendiger' und dynamischer Stern. Die Anzahl der Flecken auf ihrer Oberfläche ist nicht konstant; sie steigt und fällt im Laufe der Zeit und bildet einen magnetischen Zyklus.",
+                tab3_desc2: "Im Sonnenlabor ist es deine Aufgabe, die Wolf-Zahl an verschiedenen Daten zu berechnen. Wenn du diese Daten über die Jahre hinweg aufzeichnest, wirst du selbst herausfinden, wie lange dieser Zyklus dauert und wann seine Maxima und Minima auftreten!",
+                tab4_title_inner: "Auswirkungen auf unseren Planeten",
+                tab4_desc1: "Die Aktivität der Sonne beeinflusst unseren Planeten direkt. Unser Stern schleudert ständig geladene Teilchen in den Weltraum (den 'Sonnenwind').",
+                tab4_desc2: "Während der Aktivitätsspitzen treten heftige Sonnenstürme auf. Wenn diese Teilchen die Erde erreichen, lenkt unser Magnetfeld sie zu den Polen ab und erzeugt spektakuläre <strong>Polarlichter</strong>. Wirst du herausfinden können, in welchen Jahren die Polarlichter am intensivsten waren?",
                 lab_title: "Beobachtungslabor",
-                lab_desc: "Nutze das untenstehende Werkzeug, um Satellitenbilder zu analysieren und die Wolf-Zahl aufzuzeichnen.",
-                lab_link: "Wird nicht richtig angezeigt? In neuem Fenster öffnen.",
-                mist_title: "Es gibt ein Rätsel zu lösen!",
-                mist_desc: "Eine Wolf-Zahl für einen einzelnen Tag zu berechnen, ist interessant, aber echte Wissenschaft erfordert den Blick auf das große Ganze. Die Mission der Klasse ist es, ein zeitliches Puzzle zusammenzusetzen.",
-                q1_title: "Hinweis 1: der Lauf der Zeit",
-                q1_desc: "Wenn du heute, in einem Monat und in 3 Jahren Fotos der Sonne machst... Wird die Wolf-Zahl immer ähnlich sein? Untersuche Daten aus verschiedenen Jahren.",
-                q2_title: "Das Ziel: die Grafik erstellen",
-                q2_desc: "Jeder Schüler wird Bilder auswerten und im Laufe der Zeit Daten sammeln. Unser Ziel ist es, alle Wolf-Zahlen der Klasse in einem großen historischen Diagramm zusammenzufassen.",
-                q3_title: "Hinweis 2: das Jahrzehnt",
-                q3_desc: "Man sagt, unser Stern hat 'Jahreszeiten', die nicht Monate, sondern Jahre dauern. Mit etwa 11 Jahren wurdest du vom Kind zum Teenager. Kurioserweise ist diese Zahl für die Sonne entscheidend.",
-                mist_quote: "\"Daten bergen die Antworten, aber nur ein neugieriger Geist kann die richtigen Fragen stellen.\"",
-                res_title: "Missionsmaterialien",
-                res_desc: "Dieses Material enthält deinen Leitfaden für die Untersuchung. Hier findest du:<br><ul class='list-disc text-left inline-block mt-4 space-y-2 mb-6 max-w-2xl mx-auto'><li><strong>Das Analyseprotokoll:</strong> Die Schritte zur Untersuchung der Bilder, bei denen sowohl einzelne Sonnenflecken als auch Gruppen identifiziert und markiert werden.</li><li><strong>Die Datenaufzeichnung:</strong> Die Methode zur Dokumentation der genauen Messungen jedes Bildes.</li><li><strong>Das Hochladen von Informationen:</strong> Die Anweisungen zum Hochladen deiner Ergebnisse in die zentrale Datenbank der Klasse.</li></ul><br>Durch die Verarbeitung und grafische Darstellung der von der gesamten Gruppe gesammelten Daten können wir das langfristige Verhalten der Sonne visualisieren. Die wissenschaftliche Frage lautet: Gibt es wirklich einen periodischen Sonnenzyklus? Lasst uns die Daten analysieren und mit Beweisen belegen!",
-                res_btn: '<i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i> Beobachtungsleitfaden (PDF)',
-                credits_title: "Credits, Referenzen, um mehr zu erfahren..."
+                lab_desc: "Analysiere Satellitenbilder und sammle Daten wie ein echter Astronom.",
+                lab_link: "Wird nicht richtig angezeigt? Labor im Vollbild öffnen.",
+                mist_title: "Die Endanalyse",
+                mist_desc: "Die Messung eines einzigen Tages ist interessant, aber die Wissenschaft braucht Perspektive. Setzt das Puzzle mit Daten der ganzen Klasse zusammen.",
+                q2_title: "Grafik erstellen",
+                q2_desc: "Jeder Schüler wertet Bilder aus verschiedenen Jahren aus. Ziel ist es, alle Zählungen in einem großen historischen Diagramm zu vereinen. Nur durch das Sammeln dieser Informationen aus mehreren Jahrzehnten wird das wahre Muster und die Dauer des Sonnenzyklus sichtbar.",
+                q3_title: "Fazit",
+                q3_desc: "Schau dir das Diagramm an. In welchem Jahr war das 'Sonnenmaximum'? Wann war es am ruhigsten? Wie könnte das die Polarlichter beeinflusst haben?",
+                res_title: "Praxisleitfaden",
+                res_desc: "Lade die Schritt-für-Schritt-Anleitung herunter, um Flecken zu identifizieren.",
+                res_btn: "Leitfaden herunterladen (PDF)",
+                credits_title: "<i class='fa-solid fa-book mr-2'></i> Quellen und Referenzen (APA-Format)",
+                credits_images: "Simulierte Satellitendaten für Bildungszwecke. Echte Instrumente: SOHO Observatory (NASA/ESA)."
             },
             pt: {
-                nav_home: "Início", nav_fund: "Fundamentos", nav_lab: "Laboratório", nav_mist: "Mistério Solar", nav_res: "Recursos",
+                nav_home: "Início", nav_fund: "Fundamentos", nav_lab: "Laboratório", nav_mist: "Pesquisa", nav_res: "Recursos",
+                read_time: "Tempo estimado de leitura: ~15 minutos antes da prática.",
                 hero_title: "Decifre o pulso <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>da nossa estrela</span>",
-                hero_desc: "O Sol parece uma esfera de luz tranquila, mas a sua superfície esconde violentas tempestades magnéticas. A sua missão é analisar dados reais de satélites para revelar um padrão oculto.",
+                hero_desc: "O Sol parece uma esfera constante, mas é uma estrela muito dinâmica. Vamos investigar sua atividade magnética e descobrir seus padrões.",
                 hero_btn: "Iniciar Missão",
-                fund_title: "O que estamos procurando?",
-                fund_desc: "Antes de analisar os dados, você precisa saber identificar nosso sujeito de estudo: as manchas solares.",
-                spot_title: "Manchas solares",
-                spot_desc1: "São regiões na superfície do Sol (fotosfera) que parecem escuras. Por quê? Não que estejam frias, continuam a milhares de graus! Mas são um pouco mais frias que o entorno devido a <strong>campos magnéticos extremamente intensos</strong> que bloqueiam o calor.",
-                spot_desc2: "Raramente aparecem sozinhas. Como os polos de um ímã, geralmente surgem em <strong>grupos</strong>.",
-                wolf_title: "Número de Wolf",
-                wolf_desc: "Para medir a atividade do Sol não basta contar manchas isoladas. Em 1848, o astrônomo Rudolf Wolf idealizou esta fórmula matemática para dar peso aos grupos e quantificar a atividade solar:",
-                wolf_k: "<strong class='text-green-400'>k</strong> = Coeficiente de ajuste do observador.",
-                wolf_g: "<strong class='text-blue-400'>g</strong> = Número de <em>grupos</em> de manchas.",
-                wolf_f: "<strong class='text-red-400'>f</strong> = Número total de manchas <em>individuais</em>.",
-                wolf_history: "O que é esse <strong>k</strong>? É a chave para viajar no tempo. Olhar para o Sol em 1850 com um telescópio antigo não é o mesmo que usar o moderno satélite SOHO hoje. O fator 'k' compensa as diferenças entre telescópios, clima e observadores, permitindo-nos manter um registro histórico coerente durante séculos.",
-                lab_title: "Laboratório de observação",
-                lab_desc: "Use a ferramenta abaixo para analisar imagens de satélite e registrar o Número de Wolf.",
-                lab_link: "Não está exibindo corretamente? Abrir em nova janela.",
-                mist_title: "Há um mistério a resolver!",
-                mist_desc: "Calcular um Número de Wolf de um único dia é interessante, mas a verdadeira ciência requer ver o panorama geral. A missão da turma é montar um quebra-cabeça temporal.",
-                q1_title: "Pista 1: a passagem do tempo",
-                q1_desc: "Se você tirar fotos do Sol hoje, daqui a um mês e daqui a 3 anos... O Número de Wolf será sempre parecido? Investigue dados de anos diferentes.",
-                q2_title: "O objetivo: construir o gráfico",
-                q2_desc: "Cada aluno avaliará imagens e coletará dados de diferentes imagens ao longo do tempo. Nosso objetivo é unir todos os Números de Wolf da turma em um grande gráfico histórico.",
-                q3_title: "Pista 2: a década",
-                q3_desc: "Diz-se que nossa estrela tem 'estações' que não duram meses, mas anos. Com cerca de 11 anos você passou de criança para adolescente. Curiosamente, esse número é fundamental para o Sol. Por que será?",
-                mist_quote: "\"Os dados guardam as respostas, mas só uma mente curiosa pode fazer as perguntas corretas.\"",
-                res_title: "Materiais da missão",
-                res_desc: "Este material contém seu guia de trabalho para a investigação. Aqui você encontrará:<br><ul class='list-disc text-left inline-block mt-4 space-y-2 mb-6 max-w-2xl mx-auto'><li><strong>O protocolo de análise:</strong> Os passos para explorar as imagens, identificando e marcando tanto as manchas solares individuais quanto os grupos.</li><li><strong>O registro de dados:</strong> O método para documentar as medições exatas de cada imagem.</li><li><strong>O envio de informações:</strong> As instruções para enviar seus resultados para o banco de dados central da turma.</li></ul><br>Ao processar e criar gráficos dos dados coletados por todo o grupo, poderemos visualizar o comportamento de longo prazo do Sol. A questão científica é: existe realmente um ciclo solar periódico? Vamos analisar os dados e comprovar com evidências!",
-                res_btn: '<i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i> Baixar Guia de Observação (PDF)',
-                credits_title: "Créditos, referências, para saber mais..."
+                fund_title: "Módulo de Teoria",
+                fund_desc: "Conheça o nosso sujeito de estudo antes de entrar no laboratório.",
+                tab1_title: "1. A Missão", tab2_title: "2. As Manchas", tab3_title: "3. Ciclo Solar", tab4_title: "4. A Terra",
+                tab1_title_inner: "Objetivo da missão",
+                tab1_desc: "O Sol parece constante, mas é muito dinâmico. Vamos investigar sua atividade magnética e evolução. Analisaremos imagens reais para descobrir se tem um 'pulso' periódico.",
+                tab2_title_inner: "Manchas e Grupos",
+                tab2_desc1: "As manchas solares são zonas na superfície (fotosfera) que parecem escuras porque são 'mais frias' (3.700°C) que o ambiente (5.700°C). Campos magnéticos intensos bloqueiam o calor.",
+                tab2_desc2: "Elas têm uma zona central (umbra) e uma borda (penumbra). Quase nunca estão sozinhas: aparecem em <strong>grupos</strong>, como os polos de um ímã.",
+                tab2_wolf_title: "O Número de Wolf:",
+                tab2_wolf_desc: "Para medir a atividade, os cientistas dão mais peso aos grupos. Um grupo ativo é muito mais poderoso que uma mancha isolada!",
+                tab3_title_inner: "O Pulso Magnético",
+                tab3_desc1: "O Sol é uma estrela 'viva' e dinâmica. A quantidade de manchas em sua superfície não é constante; ela sobe e desce ao longo do tempo, formando um ciclo ou 'pulso' magnético.",
+                tab3_desc2: "No Laboratório Solar, sua missão será calcular o Número de Wolf (contando manchas e grupos) em diferentes datas. Ao fazer um gráfico desses dados ao longo dos anos, você descobrirá por si mesmo quanto tempo dura esse ciclo e quando ocorrem seus misteriosos picos de máximo e mínimo!",
+                tab4_title_inner: "Impacto no nosso planeta",
+                tab4_desc1: "A atividade do Sol influencia diretamente o nosso planeta. Nossa estrela lança constantemente partículas carregadas de energia no espaço, fenômeno conhecido como 'vento solar'.",
+                tab4_desc2: "Durante os picos de atividade máxima, ocorrem violentas tempestades solares. Se essas partículas chegam à Terra, nosso campo magnético as desvia para os polos, criando as espetaculares <strong>auroras</strong>. Você consegue descobrir em que anos as auroras foram mais intensas analisando os dados do laboratório?",
+                lab_title: "Laboratório de Observação",
+                lab_desc: "Analise imagens de satélite e colete dados como um verdadeiro astrônomo.",
+                lab_link: "Não está vendo bem? Abra o laboratório em tela cheia.",
+                mist_title: "A Análise Final",
+                mist_desc: "Medir um único dia é interessante, mas a ciência precisa de perspectiva. Juntem as peças do quebra-cabeça temporal reunindo os dados da turma.",
+                q2_title: "Construir o gráfico",
+                q2_desc: "Cada aluno avaliará imagens de anos diferentes. O objetivo é unir todas as contagens em um grande gráfico histórico. Somente reunindo essas informações de várias décadas, o verdadeiro padrão e a duração do ciclo solar serão revelados visualmente.",
+                q3_title: "Conclusões",
+                q3_desc: "Observem o gráfico final. Em que ano foi o 'máximo solar'? Quando esteve mais calmo? Pensem como isso pode ter afetado as auroras na Terra.",
+                res_title: "Guia Prático",
+                res_desc: "Baixe as instruções passo a passo para identificar manchas e colaborar com a turma.",
+                res_btn: "Baixar Guia (PDF)",
+                credits_title: "<i class='fa-solid fa-book mr-2'></i> Fontes e Referências (Normas APA)",
+                credits_images: "Dados de satélite simulados fornecidos para fins educacionais. Créditos dos instrumentos: SOHO Observatory (NASA/ESA)."
             },
             it: {
-                nav_home: "Home", nav_fund: "Fondamenti", nav_lab: "Laboratorio", nav_mist: "Mistero Solare", nav_res: "Risorse",
+                nav_home: "Home", nav_fund: "Fondamenti", nav_lab: "Laboratorio", nav_mist: "Ricerca", nav_res: "Risorse",
+                read_time: "Tempo di lettura stimato: ~15 minuti prima della pratica.",
                 hero_title: "Decifra il battito <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>della nostra stella</span>",
-                hero_desc: "Il Sole sembra una tranquilla sfera di luce, ma la sua superficie nasconde violente tempeste magnetiche. La tua missione è analizzare dati satellitari reali per rivelare uno schema nascosto.",
+                hero_desc: "Il Sole sembra una sfera di luce costante, ma in realtà è una stella molto dinamica. Indagheremo la sua attività magnetica.",
                 hero_btn: "Inizia Missione",
-                fund_title: "Cosa stiamo cercando?",
-                fund_desc: "Prima di analizzare i dati, devi sapere come identificare il nostro soggetto di studio: le macchie solari.",
-                spot_title: "Macchie solari",
-                spot_desc1: "Sono regioni sulla superficie del Sole (fotosfera) che appaiono scure. Perché? Non sono fredde, sono ancora a migliaia di gradi! Ma sono leggermente più fredde dell'ambiente circostante a causa di <strong>campi magnetici estremamente intensi</strong> che bloccano il calore che sale dall'interno.",
-                spot_desc2: "Raramente appaiono da sole. Come i poli di un magnete, di solito appaiono in <strong>gruppi</strong>.",
-                wolf_title: "Numero di Wolf",
-                wolf_desc: "Per misurare l'attività del Sole non basta contare le singole macchie. Nel 1848, l'astronomo Rudolf Wolf ideò questa formula matematica per dare peso ai gruppi e quantificare l'attività solare:",
-                wolf_k: "<strong class='text-green-400'>k</strong> = Coefficiente di regolazione dell'osservatore.",
-                wolf_g: "<strong class='text-blue-400'>g</strong> = Numero di <em>gruppi</em> di macchie.",
-                wolf_f: "<strong class='text-red-400'>f</strong> = Numero totale di macchie <em>individuali</em>.",
-                wolf_history: "Cos'è quel <strong>k</strong>? È la chiave per viaggiare nel tempo. Guardare il Sole nel 1850 con un vecchio telescopio non è la stessa cosa che usare oggi il moderno satellite SOHO. Il fattore 'k' compensa le differenze tra telescopi, clima e osservatori, permettendoci di mantenere una registrazione storica coerente per secoli.",
-                lab_title: "Laboratorio di osservazione",
-                lab_desc: "Usa lo strumento qui sotto per analizzare le immagini satellitari e registrare il Numero di Wolf.",
-                lab_link: "Non viene visualizzato correttamente? Apri in una nuova finestra.",
-                mist_title: "C'è un mistero da risolvere!",
-                mist_desc: "Calcolare un Numero di Wolf per un solo giorno è interessante, ma la vera scienza richiede di vedere il quadro generale. La missione della classe è mettere insieme un puzzle temporale.",
-                q1_title: "Indizio 1: il passare del tempo",
-                q1_desc: "Se scatti foto del Sole oggi, tra un mese e tra 3 anni... Il Numero di Wolf sarà sempre simile? Indaga sui dati di anni diversi.",
-                q2_title: "L'obiettivo: costruire il grafico",
-                q2_desc: "Ogni studente valuterà le immagini e raccoglierà dati da diverse immagini nel tempo. Il nostro obiettivo è unire tutti i Numeri di Wolf della classe in un grande grafico storico.",
-                q3_title: "Indizio 2: il decennio",
-                q3_desc: "Si dice che la nostra stella abbia delle 'stagioni' che non durano mesi, ma anni. A circa 11 anni sei passato da bambino ad adolescente. Curiosamente, questo numero è fondamentale per il Sole. Come mai?",
-                mist_quote: "\"I dati contengono le risposte, ma solo una mente curiosa può fare le domande giuste.\"",
-                res_title: "Materiali della missione",
-                res_desc: "Questo materiale contiene la tua guida di lavoro per l'indagine. Qui troverai:<br><ul class='list-disc text-left inline-block mt-4 space-y-2 mb-6 max-w-2xl mx-auto'><li><strong>Il protocollo di analisi:</strong> I passaggi per esplorare le immagini, identificando e marcando sia le macchie solari singole che i gruppi.</li><li><strong>La registrazione dei dati:</strong> Il metodo per documentare le misurazioni esatte di ogni immagine.</li><li><strong>Il caricamento delle informazioni:</strong> Le istruzioni per caricare i tuoi risultati nel database centrale della classe.</li></ul><br>Elaborando e rappresentando graficamente i dati raccolti dall'intero gruppo, saremo in grado di visualizzare il comportamento a lungo termine del Sole. La domanda scientifica è: esiste davvero un ciclo solare periodico? Analizziamo i dati e dimostriamolo con prove!",
-                res_btn: '<i class="fa-solid fa-file-pdf group-hover:-translate-y-1 transition-transform"></i> Scarica Guida all\'Osservazione (PDF)',
-                credits_title: "Crediti, riferimenti, per saperne di più..."
+                fund_title: "Modulo di Teoria",
+                fund_desc: "Conosci il nostro soggetto di studio prima di entrare nel laboratorio.",
+                tab1_title: "1. La Missione", tab2_title: "2. Le Macchie", tab3_title: "3. Ciclo Solare", tab4_title: "4. La Terra",
+                tab1_title_inner: "Obiettivo della missione",
+                tab1_desc: "Il Sole sembra costante, ma è molto dinamico. Indagheremo la sua attività magnetica e la sua evoluzione nel tempo. Analizzeremo immagini reali per scoprire se la nostra stella ha un 'battito' periodico.",
+                tab2_title_inner: "Macchie e Gruppi",
+                tab2_desc1: "Le macchie solari sono zone sulla superficie (fotosfera) che appaiono scure perché sono 'più fredde' (3.700°C) dell'ambiente circostante (5.700°C).",
+                tab2_desc2: "Hanno una zona centrale (ombra) e un bordo (penombra). Non sono quasi mai sole: appaiono in <strong>gruppi</strong>, come i poli di un magnete.",
+                tab2_wolf_title: "Il Numero di Wolf:",
+                tab2_wolf_desc: "Per misurare l'attività, gli scienziati danno più peso ai gruppi. Un gruppo attivo è molto più potente di una macchia isolata!",
+                tab3_title_inner: "Il Battito Magnetico",
+                tab3_desc1: "Il Sole è una stella 'viva' e dinamica. La quantità di macchie sulla sua superficie non è costante; sale e scende nel tempo, formando un ciclo o 'battito' magnetico.",
+                tab3_desc2: "Nel Laboratorio Solare, la tua missione sarà calcolare il Numero di Wolf in diverse date. Mettendo in grafico questi dati nel corso degli anni, scoprirai da solo quanto dura questo ciclo e quando si verificano i suoi misteriosi picchi di massimo e minimo!",
+                tab4_title_inner: "Impatto sul nostro pianeta",
+                tab4_desc1: "L'attività del Sole influenza direttamente il nostro pianeta. La nostra stella lancia costantemente particelle cariche di energia nello spazio, fenomeno noto come 'vento solare'.",
+                tab4_desc2: "Durante i picchi di massima attività si verificano violente tempeste solari. Se queste particelle raggiungono la Terra, il nostro campo magnetico le devia verso i poli, creando le spettaculari <strong>aurore</strong>. Riuscirai a scoprire in quali anni le aurore sono state più intense analizzando i dati del laboratorio?",
+                lab_title: "Laboratorio di Osservazione",
+                lab_desc: "Analizza immagini satellitari e raccogli dati come un vero astronomo.",
+                lab_link: "Non si vede bene? Apri il laboratorio a schermo intero.",
+                mist_title: "L'Analisi Finale",
+                mist_desc: "Misurare un singolo giorno è interessante, ma la scienza ha bisogno di prospettiva. Mettete insieme i pezzi del puzzle raccogliendo i dati di tutta la classe.",
+                q2_title: "Costruire il grafico",
+                q2_desc: "Ogni studente valuterà immagini di anni diversi. L'obiettivo è unire tutti i conteggi in un grande grafico storico. Solo raccogliendo queste informazioni su vari decenni verrà svelato visivamente il vero modello e la durata del ciclo solare.",
+                q3_title: "Conclusioni",
+                q3_desc: "Guardate il grafico finale. In quale anno c'è stato il 'massimo solare'? Pensate a come questo potrebbe aver influenzato le aurore sulla Terra.",
+                res_title: "Guida Pratica",
+                res_desc: "Scarica le istruzioni passo-passo per identificare le macchie e collaborare con la classe.",
+                res_btn: "Scarica la Guida (PDF)",
+                credits_title: "<i class='fa-solid fa-book mr-2'></i> Fonti e Riferimenti (Norme APA)",
+                credits_images: "Dati satellitari simulati forniti per scopi educativi. Crediti strumentali: SOHO Observatory (NASA/ESA)."
             }
         };
 
-        // Lógica de menús y traducción
         const langMenuBtn = document.getElementById('lang-menu-btn');
         const langDropdown = document.getElementById('lang-dropdown');
         const currentLangText = document.getElementById('current-lang-text');
 
-        // Toggle dropdown de escritorio
         if(langMenuBtn) {
             langMenuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -493,16 +590,13 @@
             });
         }
 
-        // Cierra dropdowns al hacer clic fuera
         document.addEventListener('click', () => {
             if (langDropdown && !langDropdown.classList.contains('hidden')) {
                 langDropdown.classList.add('hidden');
             }
         });
 
-        // Función principal para cambiar de idioma
         function changeLang(lang) {
-            // Actualizar textos en la página
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (i18n[lang] && i18n[lang][key]) {
@@ -510,28 +604,20 @@
                 }
             });
 
-            // Actualizar indicador del botón de escritorio
             const flags = { es: '🇪🇸 ES', en: '🇬🇧 EN', fr: '🇫🇷 FR', de: '🇩🇪 DE', pt: '🇵🇹 PT', it: '🇮🇹 IT' };
             if(currentLangText) currentLangText.innerText = flags[lang];
 
-            // Cerrar menú móvil si está abierto
             const mobileMenu = document.getElementById('mobile-menu');
             if(mobileMenu && !mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.add('hidden');
             }
         }
 
-        // Script original de menú móvil
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
+            menu.classList.toggle('hidden');
         }
 
-        // Cierra el menú al hacer clic en un enlace (mobile)
         document.querySelectorAll('#mobile-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 document.getElementById('mobile-menu').classList.add('hidden');
