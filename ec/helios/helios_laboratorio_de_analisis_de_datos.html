@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión Helios - Laboratorio de Análisis de Datos</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- PapaParse for CSV processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        space: {
+                            950: '#06080C',
+                            900: '#0B0E14',
+                            850: '#101520',
+                            800: '#151A23',
+                            700: '#1F2937',
+                            600: '#374151',
+                        },
+                        solar: {
+                            500: '#F59E0B',
+                            400: '#FBBF24',
+                            300: '#FCD34D',
+                            glow: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0B0E14;
+            color: #E5E7EB;
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        .sun-gradient {
+            background: radial-gradient(circle at center, rgba(251, 191, 36, 0.15) 0%, rgba(217, 119, 6, 0.05) 50%, transparent 70%);
+        }
+        .dropzone-active {
+            border-color: #F59E0B !important;
+            background-color: rgba(245, 158, 11, 0.08) !important;
+            transform: scale(1.01);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0E14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="antialiased bg-space-900 text-gray-200 min-h-screen flex flex-col selection:bg-solar-500 selection:text-space-900">
+
+    <!-- Navigation Header -->
+    <nav class="sticky top-0 z-50 bg-space-900/90 backdrop-blur-md border-b border-solar-500/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand -->
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="flex items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-solar-500/10 border border-solar-500/40 flex items-center justify-center group-hover:bg-solar-500/20 transition-colors">
+                            <i class="fa-solid fa-chart-scatter text-solar-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-lg tracking-wider text-white block leading-none">HELIOS</span>
+                            <span class="text-[10px] text-solar-400 font-mono tracking-widest uppercase" data-i18n="nav_subtitle">Data Lab</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Links & Language Selector -->
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-300 hover:text-solar-400 px-3 py-2 rounded-lg border border-space-700 hover:border-space-600 transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span data-i18n="nav_back">Volver a la Misión</span>
+                    </a>
+
+                    <!-- Language Switcher Dropdown -->
+                    <div class="relative">
+                        <button id="lang-menu-btn" class="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium focus:outline-none transition-colors border border-space-700 hover:border-space-600 bg-space-850">
+                            <i class="fa-solid fa-earth-americas text-solar-400"></i>
+                            <span id="current-lang-text">🇪🇸 ES</span>
+                            <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-40 rounded-xl shadow-2xl bg-space-800 ring-1 ring-black ring-opacity-5 divide-y divide-space-700 border border-solar-500/30 overflow-hidden origin-top-right transition-all z-50">
+                            <div class="py-1">
+                                <button onclick="changeLang('es')" class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇪🇸</span> Español</button>
+                                <button onclick="changeLang('en')" class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇬🇧</span> English</button>
+                                <button onclick="changeLang('fr')" class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇫🇷</span> Français</button>
+                                <button onclick="changeLang('de')" class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇩🇪</span> Deutsch</button>
+                                <button onclick="changeLang('pt')" class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇵🇹</span> Português</button>
+                                <button onclick="changeLang('it')" class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇮🇹</span> Italiano</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Page Banner -->
+        <section class="relative rounded-2xl bg-space-850 p-6 md:p-8 border border-space-700 overflow-hidden shadow-xl">
+            <div class="absolute -right-20 -bottom-20 w-96 h-96 sun-gradient rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-solar-500/10 border border-solar-500/30 text-solar-400 text-xs font-semibold mb-3">
+                        <i class="fa-solid fa-microchip"></i>
+                        <span data-i18n="badge_tool">Módulo de Fusión y Visualización Data Science</span>
+                    </div>
+                    <h1 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight" data-i18n="hero_title">
+                        Laboratorio de Análisis de Datos Solares
+                    </h1>
+                    <p class="mt-2 text-gray-400 text-sm md:text-base max-w-2xl" data-i18n="hero_subtitle">
+                        Carga múltiples archivos CSV recolectados por ti y tus compañeros, une automáticamente todos los registros e investiga la dispersión para descubrir patrones históricos ocultos.
+                    </p>
+                </div>
+                <!-- Action Buttons -->
+                <div class="flex-shrink-0 w-full md:w-auto flex flex-col sm:flex-row gap-3">
+                    <button id="load-sample-btn" onclick="loadSampleData()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-space-700 hover:bg-space-600 text-solar-300 border border-solar-500/30 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-md hover:scale-105 active:scale-95">
+                        <i class="fa-solid fa-flask"></i>
+                        <span data-i18n="btn_sample">Cargar Datos de Muestra (1996-2026)</span>
+                    </button>
+                    <button id="reset-all-btn" onclick="clearAllData()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span data-i18n="btn_reset">Reiniciar</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 1: File Drag and Drop Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Dropzone Card -->
+            <div class="lg:col-span-2 bg-space-800 rounded-2xl p-6 border border-space-700 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-solar-500/20 text-solar-400 text-xs flex items-center justify-center border border-solar-500/40">1</span>
+                            <span data-i18n="step1_title">Cargar Archivos CSV</span>
+                        </h2>
+                        <span class="text-xs text-gray-400 font-mono" id="file-counter">0 archivos cargados</span>
+                    </div>
+
+                    <!-- Interactive Drag and Drop Zone -->
+                    <div id="dropzone" class="border-2 border-dashed border-space-600 rounded-xl p-8 text-center bg-space-900/50 hover:border-solar-500/60 transition-all cursor-pointer group select-none">
+                        <input type="file" id="csv-file-input" multiple accept=".csv, text/csv, text/plain" class="hidden" onchange="handleFileSelect(event)">
+                        <div class="space-y-3 pointer-events-none">
+                            <div class="w-16 h-16 mx-auto rounded-2xl bg-space-800 border border-space-700 flex items-center justify-center text-solar-400 group-hover:scale-110 group-hover:border-solar-500 transition-all">
+                                <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-200" data-i18n="dropzone_prompt">
+                                    Arrastra tus archivos <span class="text-solar-400 font-mono">.csv</span> aquí o haz clic para explorar
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1" data-i18n="dropzone_help">
+                                    Admite archivos de 3, 7 o N columnas generados en el Laboratorio Solar.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Merge Status Info -->
+                <div class="mt-4 pt-4 border-t border-space-700/60 flex items-center justify-between text-xs text-gray-400">
+                    <span id="merge-status-text" data-i18n="status_waiting">Esperando archivos...</span>
+                    <span class="font-mono text-solar-400" id="total-records-badge">0 registros en total</span>
+                </div>
+            </div>
+
+            <!-- Uploaded Files Panel -->
+            <div class="bg-space-800 rounded-2xl p-6 border border-space-700 shadow-xl flex flex-col">
+                <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span data-i18n="files_list_title">Archivos Procesados</span>
+                    <i class="fa-solid fa-folder-open text-solar-400"></i>
+                </h3>
+                
+                <!-- Scrollable Files List -->
+                <div id="files-list-container" class="flex-grow overflow-y-auto max-h-52 lg:max-h-64 space-y-2 pr-1">
+                    <div id="empty-files-placeholder" class="h-full flex flex-col items-center justify-center text-center p-6 border border-dashed border-space-700 rounded-xl text-gray-500 text-xs">
+                        <i class="fa-solid fa-file-csv text-3xl mb-2 opacity-40"></i>
+                        <p data-i18n="no_files_yet">Aún no has añadido ningún archivo .csv</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Plot Controls & Chart Canvas -->
+        <section class="bg-space-800 rounded-2xl p-6 border border-space-700 shadow-xl space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-space-700 pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-solar-500/20 text-solar-400 text-xs flex items-center justify-center border border-solar-500/40">2</span>
+                        <span data-i18n="step2_title">Configurar Gráfica de Dispersión XY</span>
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="step2_desc">
+                        Selecciona las variables para cada eje. Las fechas completas (AAAA-MM-DD) se posicionarán con exactitud.
+                    </p>
+                </div>
+
+                <!-- Toggles & Options -->
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <label class="flex items-center gap-2 bg-space-900 px-3 py-2 rounded-lg border border-space-700 cursor-pointer hover:border-space-600 select-none">
+                        <input type="checkbox" id="toggle-color-by-file" onchange="updateChart()" checked class="rounded border-space-700 text-solar-500 focus:ring-solar-500 bg-space-800">
+                        <span data-i18n="opt_color_file">Colorear por archivo</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-space-900 px-3 py-2 rounded-lg border border-space-700 cursor-pointer hover:border-space-600 select-none">
+                        <input type="checkbox" id="toggle-trendline" onchange="updateChart()" checked class="rounded border-space-700 text-solar-500 focus:ring-solar-500 bg-space-800">
+                        <span data-i18n="opt_trendline">Mostrar Media Móvil (Tendencia)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Controls Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- X Axis Selection -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-gray-300" data-i18n="lbl_x_axis">
+                        Eje X (Variable Independiente):
+                    </label>
+                    <select id="select-x-axis" onchange="updateChart()" class="w-full bg-space-900 border border-space-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-solar-500 font-mono">
+                        <option value="" data-i18n="select_placeholder">-- Seleccionar Encabezado --</option>
+                    </select>
+                </div>
+
+                <!-- Y Axis Selection -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-gray-300" data-i18n="lbl_y_axis">
+                        Eje Y (Variable Dependiente):
+                    </label>
+                    <select id="select-y-axis" onchange="updateChart()" class="w-full bg-space-900 border border-space-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-solar-500 font-mono">
+                        <option value="" data-i18n="select_placeholder">-- Seleccionar Encabezado --</option>
+                    </select>
+                </div>
+
+                <!-- Point Size Slider -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-gray-300 flex justify-between">
+                        <span data-i18n="lbl_point_size">Tamaño de Punto:</span>
+                        <span id="point-size-val" class="font-mono text-solar-400">5px</span>
+                    </label>
+                    <input type="range" id="input-point-size" min="2" max="12" value="5" oninput="document.getElementById('point-size-val').innerText=this.value+'px'; updateChart()" class="w-full accent-solar-500 bg-space-900 rounded-lg h-2 cursor-pointer mt-3">
+                </div>
+
+                <!-- Moving Average Window -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-gray-300 flex justify-between">
+                        <span data-i18n="lbl_ma_window">Ventana Suavizado:</span>
+                        <span id="ma-window-val" class="font-mono text-solar-400">5 puntos</span>
+                    </label>
+                    <input type="range" id="input-ma-window" min="2" max="25" value="5" oninput="document.getElementById('ma-window-val').innerText=this.value+' puntos'; updateChart()" class="w-full accent-solar-500 bg-space-900 rounded-lg h-2 cursor-pointer mt-3">
+                </div>
+            </div>
+
+            <!-- Chart Canvas Container -->
+            <div class="relative bg-space-950 rounded-xl p-4 border border-space-700/80 shadow-inner min-h-[400px] flex items-center justify-center">
+                <!-- Empty Chart Overlay -->
+                <div id="chart-placeholder" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-space-950/90 rounded-xl text-center p-6 space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-space-800 border border-space-700 flex items-center justify-center text-solar-400">
+                        <i class="fa-solid fa-chart-line text-2xl"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-300" data-i18n="chart_prompt">
+                        Carga archivos CSV y selecciona las variables X e Y para visualizar los datos.
+                    </p>
+                </div>
+
+                <!-- Chart Canvas -->
+                <div class="w-full h-[420px]">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 3: Consolidated Data Table & Export -->
+        <section class="bg-space-800 rounded-2xl p-6 border border-space-700 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-space-700 pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-solar-500/20 text-solar-400 text-xs flex items-center justify-center border border-solar-500/40">3</span>
+                        <span data-i18n="step3_title">Tabla de Datos Unificados</span>
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="step3_desc">
+                        Explora la lista combinada de todos los archivos procesados y descárgala como un CSV consolidado.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Search input -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+                        <input type="text" id="table-search" oninput="filterTable()" placeholder="Buscar registros..." class="pl-8 pr-3 py-2 bg-space-900 border border-space-700 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-solar-500 w-44 sm:w-60">
+                    </div>
+
+                    <!-- Export Button -->
+                    <button id="export-csv-btn" onclick="exportMergedCSV()" disabled class="px-4 py-2 rounded-xl bg-solar-500 hover:bg-solar-400 disabled:opacity-40 disabled:hover:bg-solar-500 text-space-900 font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-solar-500/20 active:scale-95">
+                        <i class="fa-solid fa-file-export"></i>
+                        <span data-i18n="btn_export">Exportar CSV Único</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto rounded-xl border border-space-700 bg-space-900 max-h-80">
+                <table class="w-full text-left text-xs font-mono text-gray-300">
+                    <thead id="data-table-head" class="bg-space-850 text-solar-400 sticky top-0 border-b border-space-700 uppercase tracking-wider">
+                        <tr>
+                            <th class="p-3 font-semibold text-center">#</th>
+                            <th class="p-3 font-semibold" data-i18n="th_source">Archivo Origen</th>
+                            <th class="p-3 font-semibold text-gray-500 italic" data-i18n="th_empty">Sin datos cargados</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body" class="divide-y divide-space-800">
+                        <tr>
+                            <td colspan="3" class="p-8 text-center text-gray-500 font-sans" data-i18n="td_no_records">
+                                No se han cargado datos aún.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer -->
+            <div class="flex items-center justify-between text-xs text-gray-400 pt-2">
+                <span id="table-showing-info" data-i18n="info_showing">Mostrando 0 registros</span>
+                <span class="font-mono text-gray-500" id="headers-count-info">0 columnas detectadas</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="w-full bg-space-950 py-6 border-t border-space-800 text-center text-gray-500 text-xs">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>Misión Helios - Space Apps Education Data Analytics Lab</p>
+            <p class="text-gray-600">Herramienta Didáctica para la Fusión y Análisis de Manchas Solares</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* Global Application State */
+        let filesList = []; // Array of { id, name, rowsCount, headers, rawData, color }
+        let mergedRecords = []; // Unified master array of objects
+        let unifiedHeaders = []; // Unique set of all column headers across all files
+        let chartInstance = null;
+
+        /* Multi-language Translation Resources */
+        const i18n = {
+            es: {
+                nav_subtitle: "Data Lab",
+                nav_back: "Volver a la Misión",
+                badge_tool: "Módulo de Fusión y Visualización Data Science",
+                hero_title: "Laboratorio de Análisis de Datos Solares",
+                hero_subtitle: "Carga múltiples archivos CSV recolectados por ti y tus compañeros, une automáticamente todos los registros e investiga la dispersión para descubrir patrones históricos ocultos.",
+                btn_sample: "Cargar Datos de Muestra (1996-2026)",
+                btn_reset: "Reiniciar",
+                step1_title: "Cargar Archivos CSV",
+                dropzone_prompt: "Arrastra tus archivos <span class='text-solar-400 font-mono'>.csv</span> aquí o haz clic para explorar",
+                dropzone_help: "Admite archivos de 3, 7 o N columnas generados en el Laboratorio Solar.",
+                status_waiting: "Esperando archivos...",
+                files_list_title: "Archivos Procesados",
+                no_files_yet: "Aún no has añadido ningún archivo .csv",
+                step2_title: "Configurar Gráfica de Dispersión XY",
+                step2_desc: "Selecciona las variables para cada eje. Las fechas completas (AAAA-MM-DD) se posicionarán con exactitud.",
+                opt_color_file: "Colorear por archivo",
+                opt_trendline: "Mostrar Media Móvil (Tendencia)",
+                lbl_x_axis: "Eje X (Variable Independiente):",
+                lbl_y_axis: "Eje Y (Variable Dependiente):",
+                lbl_point_size: "Tamaño de Punto:",
+                lbl_ma_window: "Ventana Suavizado:",
+                select_placeholder: "-- Seleccionar Encabezado --",
+                chart_prompt: "Carga archivos CSV y selecciona las variables X e Y para visualizar los datos.",
+                step3_title: "Tabla de Datos Unificados",
+                step3_desc: "Explora la lista combinada de todos los archivos procesados y descárgala como un CSV consolidado.",
+                btn_export: "Exportar CSV Único",
+                th_source: "Archivo Origen",
+                th_empty: "Sin datos cargados",
+                td_no_records: "No se han cargado datos aún.",
+                info_showing: "Mostrando 0 registros"
+            },
+            en: {
+                nav_subtitle: "Data Lab",
+                nav_back: "Back to Mission",
+                badge_tool: "Data Science Fusion & Visualization Module",
+                hero_title: "Solar Data Analysis Laboratory",
+                hero_subtitle: "Upload multiple CSV files collected by you and your classmates, merge all records automatically, and analyze dispersion to uncover hidden historical patterns.",
+                btn_sample: "Load Sample Data (1996-2026)",
+                btn_reset: "Reset",
+                step1_title: "Upload CSV Files",
+                dropzone_prompt: "Drag your <span class='text-solar-400 font-mono'>.csv</span> files here or click to browse",
+                dropzone_help: "Supports 3-column, 7-column or N-column files generated in the Solar Lab.",
+                status_waiting: "Waiting for files...",
+                files_list_title: "Processed Files",
+                no_files_yet: "No .csv files added yet",
+                step2_title: "Configure XY Scatter Plot",
+                step2_desc: "Select variables for each axis. Full dates (YYYY-MM-DD) will be positioned precisely.",
+                opt_color_file: "Color by file",
+                opt_trendline: "Show Moving Average (Trend)",
+                lbl_x_axis: "X Axis (Independent Variable):",
+                lbl_y_axis: "Y Axis (Dependent Variable):",
+                lbl_point_size: "Point Size:",
+                lbl_ma_window: "Smoothing Window:",
+                select_placeholder: "-- Select Header --",
+                chart_prompt: "Upload CSV files and select X and Y variables to plot the data.",
+                step3_title: "Unified Data Table",
+                step3_desc: "Explore the combined list of all processed files and download it as a consolidated CSV.",
+                btn_export: "Export Single CSV",
+                th_source: "Source File",
+                th_empty: "No data loaded",
+                td_no_records: "No data loaded yet.",
+                info_showing: "Showing 0 records"
+            },
+            fr: {
+                nav_subtitle: "Data Lab",
+                nav_back: "Retour à la Mission",
+                badge_tool: "Module de Fusion et Visualisation des Données",
+                hero_title: "Laboratoire d'Analyse de Données Solaires",
+                hero_subtitle: "Téléchargez plusieurs fichiers CSV, fusionnez tous les enregistrements et analysez la dispersion.",
+                btn_sample: "Charger Échantillon (1996-2026)",
+                btn_reset: "Réinitialiser",
+                step1_title: "Charger les fichiers CSV",
+                dropzone_prompt: "Glissez vos fichiers <span class='text-solar-400 font-mono'>.csv</span> ici ou cliquez",
+                dropzone_help: "Prend en charge les fichiers à 3, 7 ou N colonnes du Laboratoire Solaire.",
+                status_waiting: "En attente de fichiers...",
+                files_list_title: "Fichiers Traités",
+                no_files_yet: "Aucun fichier .csv ajouté",
+                step2_title: "Configurer Graphique de Dispersion XY",
+                step2_desc: "Sélectionnez les variables pour chaque axe.",
+                opt_color_file: "Colorer par fichier",
+                opt_trendline: "Moyenne Mobile (Tendance)",
+                lbl_x_axis: "Axe X (Variable Indépendante):",
+                lbl_y_axis: "Axe Y (Variable Dépendante):",
+                lbl_point_size: "Taille des Points:",
+                lbl_ma_window: "Fenêtre de Lissage:",
+                select_placeholder: "-- Sélectionner En-tête --",
+                chart_prompt: "Téléchargez des CSV et sélectionnez les variables X et Y.",
+                step3_title: "Tableau de Données Unifiées",
+                step3_desc: "Explorez la liste combinée de tous les fichiers et téléchargez-la au format CSV.",
+                btn_export: "Exporter CSV Unique",
+                th_source: "Fichier Source",
+                th_empty: "Aucune donnée",
+                td_no_records: "Aucune donnée chargée.",
+                info_showing: "Affichage de 0 enregistrements"
+            },
+            de: {
+                nav_subtitle: "Data Lab",
+                nav_back: "Zurück zur Mission",
+                badge_tool: "Datenfusion & Visualisierungsmodul",
+                hero_title: "Sonnendaten-Analyselabor",
+                hero_subtitle: "Lade mehrere CSV-Dateien hoch, führe alle Datensätze zusammen und untersuche die Streuung.",
+                btn_sample: "Beispieldaten Laden (1996-2026)",
+                btn_reset: "Zurücksetzen",
+                step1_title: "CSV-Dateien Hochladen",
+                dropzone_prompt: "Ziehe deine <span class='text-solar-400 font-mono'>.csv</span> Dateien hierher oder klicke",
+                dropzone_help: "Unterstützt CSV-Dateien mit 3, 7 oder N Spalten.",
+                status_waiting: "Warte auf Dateien...",
+                files_list_title: "Verarbeitete Dateien",
+                no_files_yet: "Noch keine CSV-Dateien hinzugefügt",
+                step2_title: "XY-Streudiagramm Konfigurieren",
+                step2_desc: "Wähle Felder für jede Achse aus.",
+                opt_color_file: "Nach Datei einfärben",
+                opt_trendline: "Gleitenden Mittelwert anzeigen",
+                lbl_x_axis: "X-Achse (Unabhängige Variable):",
+                lbl_y_axis: "Y-Achse (Abhängige Variable):",
+                lbl_point_size: "Punktgröße:",
+                lbl_ma_window: "Glättungsfenster:",
+                select_placeholder: "-- Kopfzeile Auswählen --",
+                chart_prompt: "Lade CSV-Dateien hoch und wähle Variablen für X und Y.",
+                step3_title: "Vereinigte Datentabelle",
+                step3_desc: "Erkunde die kombinierte Liste aller verarbeiteten Dateien und lade sie als CSV herunter.",
+                btn_export: "Einzelne CSV Exportieren",
+                th_source: "Quelldatei",
+                th_empty: "Keine Daten geladen",
+                td_no_records: "Noch keine Daten geladen.",
+                info_showing: "Zeige 0 Datensätze"
+            },
+            pt: {
+                nav_subtitle: "Data Lab",
+                nav_back: "Voltar à Missão",
+                badge_tool: "Módulo de Fusão e Visualização de Dados",
+                hero_title: "Laboratório de Análise de Dados Solares",
+                hero_subtitle: "Carregue múltiplos arquivos CSV, una todos os registros e analise a dispersão.",
+                btn_sample: "Carregar Amostra (1996-2026)",
+                btn_reset: "Reiniciar",
+                step1_title: "Carregar Arquivos CSV",
+                dropzone_prompt: "Arraste seus arquivos <span class='text-solar-400 font-mono'>.csv</span> aqui ou clique",
+                dropzone_help: "Suporta arquivos de 3, 7 ou N colunas do Laboratório Solar.",
+                status_waiting: "Aguardando arquivos...",
+                files_list_title: "Arquivos Processados",
+                no_files_yet: "Nenhum arquivo .csv adicionado ainda",
+                step2_title: "Configurar Gráfico de Dispersão XY",
+                step2_desc: "Selecione os campos para cada eixo e personalize a visualização.",
+                opt_color_file: "Colorir por arquivo",
+                opt_trendline: "Média Móvel (Tendência)",
+                lbl_x_axis: "Eixo X (Variável Independente):",
+                lbl_y_axis: "Eixo Y (Variável Dependente):",
+                lbl_point_size: "Tamanho do Ponto:",
+                lbl_ma_window: "Janela de Suavização:",
+                select_placeholder: "-- Selecionar Cabeçalho --",
+                chart_prompt: "Carregue CSVs e selecione variáveis X e Y para visualizar.",
+                step3_title: "Tabela de Dados Unificados",
+                step3_desc: "Explore a lista combinada de todos os arquivos e baixe como CSV único.",
+                btn_export: "Exportar CSV Único",
+                th_source: "Arquivo de Origem",
+                th_empty: "Sem dados carregados",
+                td_no_records: "Nenhum dado carregado ainda.",
+                info_showing: "Mostrando 0 registros"
+            },
+            it: {
+                nav_subtitle: "Data Lab",
+                nav_back: "Torna alla Missione",
+                badge_tool: "Modulo di Fusione e Visualizzazione Dati",
+                hero_title: "Laboratorio di Analisi Dati Solari",
+                hero_subtitle: "Carica più file CSV, unisci tutti i record e analizza la dispersione.",
+                btn_sample: "Carica Campione (1996-2026)",
+                btn_reset: "Reimposta",
+                step1_title: "Carica File CSV",
+                dropzone_prompt: "Trascina i tuoi file <span class='text-solar-400 font-mono'>.csv</span> qui o clicca",
+                dropzone_help: "Supporta file a 3, 7 o N colonne generati nel Laboratorio Solare.",
+                status_waiting: "In attesa dei file...",
+                files_list_title: "File Elaborati",
+                no_files_yet: "Nessun file .csv ancora aggiunto",
+                step2_title: "Configura Grafico di Dispersione XY",
+                step2_desc: "Seleziona i campi per ogni asse e personalizza la visualizzazione.",
+                opt_color_file: "Colora per file",
+                opt_trendline: "Mostra Media Mobile (Tendenza)",
+                lbl_x_axis: "Asse X (Variabile Indipendente):",
+                lbl_y_axis: "Asse Y (Variabile Dipendente):",
+                lbl_point_size: "Dimensione Punto:",
+                lbl_ma_window: "Finestra di Levigatura:",
+                select_placeholder: "-- Seleziona Intestazione --",
+                chart_prompt: "Carica i file CSV e seleziona le variabili X e Y.",
+                step3_title: "Tabella Dati Unificati",
+                step3_desc: "Esplora l'elenco combinato di tutti i file ed espostalo come un unico CSV.",
+                btn_export: "Esporta CSV Unico",
+                th_source: "File Origine",
+                th_empty: "Nessun dato caricato",
+                td_no_records: "Nessun dato ancora caricato.",
+                info_showing: "Mostra 0 record"
+            }
+        };
+
+        // Distinct color palette for differentiating up to 10 source CSV files
+        const FILE_COLORS = [
+            { bg: 'rgba(245, 158, 11, 0.8)', border: '#F59E0B' },   // Solar Amber
+            { bg: 'rgba(59, 130, 246, 0.8)', border: '#3B82F6' },   // Blue
+            { bg: 'rgba(16, 185, 129, 0.8)', border: '#10B981' },   // Emerald
+            { bg: 'rgba(236, 72, 153, 0.8)', border: '#EC4899' },   // Pink
+            { bg: 'rgba(139, 92, 246, 0.8)', border: '#8B5CF6' },   // Purple
+            { bg: 'rgba(20, 184, 166, 0.8)', border: '#14B8A6' },   // Teal
+            { bg: 'rgba(249, 115, 22, 0.8)', border: '#F97316' },   // Orange
+            { bg: 'rgba(99, 102, 241, 0.8)', border: '#6366F1' },   // Indigo
+            { bg: 'rgba(234, 179, 8, 0.8)', border: '#EAB308' },    // Yellow
+            { bg: 'rgba(239, 68, 68, 0.8)', border: '#EF4444' }     // Red
+        ];
+
+        /* DOM Initializer & Drag/Drop Listener Registration */
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('csv-file-input');
+
+            // Click dropzone triggers hidden input
+            dropzone.addEventListener('click', (e) => {
+                if (e.target !== fileInput) {
+                    fileInput.click();
+                }
+            });
+
+            // Drag over effects
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('dropzone-active');
+            });
+
+            dropzone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('dropzone-active');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('dropzone-active');
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    processFiles(e.dataTransfer.files);
+                }
+            });
+
+            // Language Menu Dropdown Listener
+            const langBtn = document.getElementById('lang-menu-btn');
+            const langDropdown = document.getElementById('lang-dropdown');
+            if (langBtn) {
+                langBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    langDropdown.classList.toggle('hidden');
+                });
+            }
+            document.addEventListener('click', () => {
+                if (langDropdown && !langDropdown.classList.contains('hidden')) {
+                    langDropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        /* File Handling Functions */
+        function handleFileSelect(event) {
+            if (event.target.files && event.target.files.length > 0) {
+                processFiles(event.target.files);
+                event.target.value = ''; // Reset input value to allow re-selection
+            }
+        }
+
+        function processFiles(files) {
+            const filesToProcess = Array.from(files);
+
+            if (filesToProcess.length === 0) {
+                showToast('Por favor selecciona un archivo con extensión .csv', 'error');
+                return;
+            }
+
+            let loadedCount = 0;
+
+            filesToProcess.forEach(file => {
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: 'greedy',
+                    dynamicTyping: true,
+                    complete: function(results) {
+                        if (results.data && results.data.length > 0) {
+                            // Extract and sanitize column headers
+                            const rawFields = results.meta.fields || Object.keys(results.data[0]);
+                            const detectedHeaders = rawFields
+                                .map(h => h ? String(h).replace(/^\uFEFF/, '').replace(/["']/g, '').trim() : '')
+                                .filter(h => h.length > 0);
+                            
+                            // Sanitize rows by trimming keys
+                            const sanitizedData = results.data.map(row => {
+                                let cleanRow = {};
+                                Object.keys(row).forEach(k => {
+                                    if (k) {
+                                        const cleanKey = String(k).replace(/^\uFEFF/, '').replace(/["']/g, '').trim();
+                                        cleanRow[cleanKey] = row[k];
+                                    }
+                                });
+                                return cleanRow;
+                            });
+
+                            const fileObj = {
+                                id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                                name: file.name,
+                                rowsCount: sanitizedData.length,
+                                headers: detectedHeaders,
+                                rawData: sanitizedData,
+                                color: FILE_COLORS[filesList.length % FILE_COLORS.length]
+                            };
+
+                            filesList.push(fileObj);
+                            showToast(`Archivo "${file.name}" cargado (${sanitizedData.length} registros, ${detectedHeaders.length} col.)`, 'success');
+                        } else {
+                            showToast(`El archivo "${file.name}" está vacío o tiene formato inválido`, 'error');
+                        }
+
+                        loadedCount++;
+                        if (loadedCount === filesToProcess.length) {
+                            unifyAndMergeData();
+                        }
+                    },
+                    error: function(err) {
+                        showToast(`Error al leer "${file.name}": ${err.message}`, 'error');
+                        loadedCount++;
+                        if (loadedCount === filesToProcess.length) {
+                            unifyAndMergeData();
+                        }
+                    }
+                });
+            });
+        }
+
+        function unifyAndMergeData() {
+            mergedRecords = [];
+            let headerSet = new Set();
+
+            filesList.forEach(fileObj => {
+                fileObj.headers.forEach(h => headerSet.add(h));
+            });
+
+            unifiedHeaders = Array.from(headerSet);
+
+            // Construct unified master record array with source metadata
+            filesList.forEach(fileObj => {
+                fileObj.rawData.forEach(row => {
+                    let unifiedRow = { _source_file: fileObj.name, _source_id: fileObj.id };
+                    unifiedHeaders.forEach(h => {
+                        unifiedRow[h] = row[h] !== undefined ? row[h] : null;
+                    });
+                    mergedRecords.push(unifiedRow);
+                });
+            });
+
+            updateUI();
+        }
+
+        /* Date Parsing & Formatting Helpers */
+        function parseDateString(str) {
+            if (str === null || str === undefined) return null;
+            const s = String(str).trim();
+            if (!s) return null;
+
+            // ISO / Standard format YYYY-MM-DD or YYYY/MM/DD
+            if (/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}/.test(s)) {
+                const cleanDate = s.split('T')[0];
+                const parts = cleanDate.split(/[-/.]/);
+                const yr = parseInt(parts[0], 10);
+                const mo = parseInt(parts[1], 10) - 1;
+                const da = parseInt(parts[2], 10);
+                const d = new Date(Date.UTC(yr, mo, da));
+                return isNaN(d.getTime()) ? null : d;
+            }
+            // European format DD/MM/YYYY or DD-MM-YYYY
+            if (/^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}/.test(s)) {
+                const cleanDate = s.split('T')[0];
+                const parts = cleanDate.split(/[-/.]/);
+                const da = parseInt(parts[0], 10);
+                const mo = parseInt(parts[1], 10) - 1;
+                const yr = parseInt(parts[2], 10);
+                const d = new Date(Date.UTC(yr, mo, da));
+                return isNaN(d.getTime()) ? null : d;
+            }
+            // Pure Year (e.g. 2024)
+            if (/^\d{4}$/.test(s)) {
+                const yr = parseInt(s, 10);
+                const d = new Date(Date.UTC(yr, 0, 1));
+                return isNaN(d.getTime()) ? null : d;
+            }
+            return null;
+        }
+
+        function formatDateFromTimestamp(ms) {
+            if (ms === null || ms === undefined || isNaN(ms)) return '';
+            const d = new Date(ms);
+            if (isNaN(d.getTime())) return String(ms);
+            const yyyy = d.getUTCFullYear();
+            const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(d.getUTCDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function parseAxisVal(val) {
+            if (val === null || val === undefined || val === '') return null;
+            if (typeof val === 'number') {
+                if (isNaN(val)) return null;
+                return { numeric: val, isDate: false, raw: val };
+            }
+
+            const str = String(val).trim();
+            if (str === '' || str === 'null' || str === 'undefined' || str === 'NaN') return null;
+
+            const dateObj = parseDateString(str);
+            if (dateObj) {
+                return {
+                    numeric: dateObj.getTime(),
+                    isDate: true,
+                    formatted: formatDateFromTimestamp(dateObj.getTime()),
+                    raw: str
+                };
+            }
+
+            // Numeric parsing with comma-decimal support ("12,5" -> 12.5)
+            const cleanStr = str.replace(',', '.').replace(/[^0-9.-]/g, '');
+            if (cleanStr !== '' && cleanStr !== '-' && cleanStr !== '.') {
+                const parsedNum = parseFloat(cleanStr);
+                if (!isNaN(parsedNum)) {
+                    return { numeric: parsedNum, isDate: false, raw: parsedNum };
+                }
+            }
+
+            return null;
+        }
+
+        /* UI State Updates */
+        function updateUI() {
+            document.getElementById('file-counter').innerText = `${filesList.length} archivo(s) cargado(s)`;
+            document.getElementById('total-records-badge').innerText = `${mergedRecords.length} registros en total`;
+            document.getElementById('merge-status-text').innerText = filesList.length > 0 ? 'Fusión completada exitosamente' : 'Esperando archivos...';
+
+            renderFilesList();
+            populateAxisSelects();
+            renderDataTable();
+
+            document.getElementById('export-csv-btn').disabled = mergedRecords.length === 0;
+
+            updateChart();
+        }
+
+        function renderFilesList() {
+            const container = document.getElementById('files-list-container');
+            if (filesList.length === 0) {
+                container.innerHTML = `
+                    <div id="empty-files-placeholder" class="h-full flex flex-col items-center justify-center text-center p-6 border border-dashed border-space-700 rounded-xl text-gray-500 text-xs">
+                        <i class="fa-solid fa-file-csv text-3xl mb-2 opacity-40"></i>
+                        <p data-i18n="no_files_yet">${i18n[getCurrentLang()].no_files_yet}</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filesList.map(file => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-space-900 border border-space-700 text-xs transition-all hover:border-space-600">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${file.color.border}"></span>
+                        <div class="truncate">
+                            <p class="font-mono text-gray-200 truncate font-semibold">${file.name}</p>
+                            <p class="text-[10px] text-gray-400 font-mono">${file.rowsCount} filas • ${file.headers.length} col.</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFile('${file.id}')" class="p-1.5 text-gray-500 hover:text-red-400 transition-colors" title="Eliminar archivo">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(fileId) {
+            filesList = filesList.filter(f => f.id !== fileId);
+            showToast('Archivo eliminado', 'info');
+            unifyAndMergeData();
+        }
+
+        function populateAxisSelects() {
+            const selectX = document.getElementById('select-x-axis');
+            const selectY = document.getElementById('select-y-axis');
+
+            const prevX = selectX.value;
+            const prevY = selectY.value;
+
+            const placeholderText = i18n[getCurrentLang()].select_placeholder;
+
+            let optionsHtml = `<option value="">${placeholderText}</option>`;
+            unifiedHeaders.forEach(h => {
+                optionsHtml += `<option value="${h}">${h}</option>`;
+            });
+
+            selectX.innerHTML = optionsHtml;
+            selectY.innerHTML = optionsHtml;
+
+            // Auto-detection for X Axis (Fecha / Date / Timestamp)
+            if (prevX && unifiedHeaders.includes(prevX)) {
+                selectX.value = prevX;
+            } else {
+                const autoX = unifiedHeaders.find(h => /fecha|date|dia|día|year|año|time|tiempo|timestamp|obs_date/i.test(h));
+                if (autoX) selectX.value = autoX;
+            }
+
+            // Auto-detection for Y Axis (Número de Wolf / SSN / Manchas / Grupos)
+            if (prevY && unifiedHeaders.includes(prevY)) {
+                selectY.value = prevY;
+            } else {
+                const autoY = unifiedHeaders.find(h => /wolf|ssn|r_wolf|n_wolf|numero.*wolf|número.*wolf|wolf_number/i.test(h)) ||
+                              unifiedHeaders.find(h => /mancha|spot|count|resultado|valor|value|total|\br\b/i.test(h));
+                if (autoY) selectY.value = autoY;
+            }
+        }
+
+        /* Smart Value Extractor with Header Alias & Fuzzy Matching */
+        function getSmartRowValue(row, targetCol) {
+            if (!row || !targetCol) return null;
+            if (row[targetCol] !== undefined && row[targetCol] !== null && row[targetCol] !== '') {
+                return row[targetCol];
+            }
+
+            // Normalize key for matching (lowercase, alphanumeric only)
+            const normTarget = String(targetCol).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+            const keys = Object.keys(row).filter(k => !k.startsWith('_'));
+
+            // 1. Normalized key match
+            for (let k of keys) {
+                const normK = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+                if (normK === normTarget && row[k] !== undefined && row[k] !== null && row[k] !== '') {
+                    return row[k];
+                }
+            }
+
+            // 2. Fallback for Date / X Axis
+            if (/fecha|date|dia|time|timestamp|year|ano/i.test(targetCol)) {
+                for (let k of keys) {
+                    if (/fecha|date|dia|time|timestamp|year|ano/i.test(k) && row[k] !== undefined && row[k] !== null && row[k] !== '') {
+                        return row[k];
+                    }
+                }
+            }
+
+            // 3. Fallback for Wolf Number / Y Axis
+            if (/wolf|ssn|mancha|spot|count|valor|resultado/i.test(targetCol)) {
+                for (let k of keys) {
+                    if (/wolf|ssn|mancha|spot|count|valor|resultado/i.test(k) && row[k] !== undefined && row[k] !== null && row[k] !== '') {
+                        return row[k];
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /* Scatter Chart Rendering */
+        function updateChart() {
+            const xCol = document.getElementById('select-x-axis').value;
+            const yCol = document.getElementById('select-y-axis').value;
+            const chartPlaceholder = document.getElementById('chart-placeholder');
+            const colorByFile = document.getElementById('toggle-color-by-file').checked;
+            const showTrendline = document.getElementById('toggle-trendline').checked;
+            const pointRadius = parseInt(document.getElementById('input-point-size').value, 10);
+            const maWindow = parseInt(document.getElementById('input-ma-window').value, 10);
+
+            if (!xCol || !yCol || mergedRecords.length === 0) {
+                if (chartPlaceholder) chartPlaceholder.classList.remove('hidden');
+                if (chartInstance) chartInstance.destroy();
+                return;
+            }
+
+            if (chartPlaceholder) chartPlaceholder.classList.add('hidden');
+
+            let datasets = [];
+            let allValidPoints = [];
+            let isXDate = false;
+            let isYDate = false;
+
+            const extractPoint = (r) => {
+                const valX = getSmartRowValue(r, xCol);
+                const valY = getSmartRowValue(r, yCol);
+                const px = parseAxisVal(valX);
+                const py = parseAxisVal(valY);
+                if (!px || !py) return null;
+                if (px.isDate) isXDate = true;
+                if (py.isDate) isYDate = true;
+                return {
+                    x: px.numeric,
+                    y: py.numeric,
+                    formattedX: px.isDate ? px.formatted : px.numeric,
+                    formattedY: py.isDate ? py.formatted : py.numeric,
+                    raw: r
+                };
+            };
+
+            if (colorByFile && filesList.length > 0) {
+                filesList.forEach(fileObj => {
+                    const filePoints = mergedRecords
+                        .filter(r => r._source_id === fileObj.id)
+                        .map(extractPoint)
+                        .filter(p => p !== null);
+
+                    allValidPoints.push(...filePoints);
+
+                    datasets.push({
+                        type: 'scatter',
+                        label: fileObj.name,
+                        data: filePoints,
+                        backgroundColor: fileObj.color.bg,
+                        borderColor: fileObj.color.border,
+                        pointRadius: pointRadius,
+                        pointHoverRadius: pointRadius + 3,
+                    });
+                });
+            } else {
+                const singlePoints = mergedRecords
+                    .map(extractPoint)
+                    .filter(p => p !== null);
+
+                allValidPoints = singlePoints;
+
+                datasets.push({
+                    type: 'scatter',
+                    label: 'Datos Fusionados',
+                    data: singlePoints,
+                    backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                    borderColor: '#F59E0B',
+                    pointRadius: pointRadius,
+                    pointHoverRadius: pointRadius + 3,
+                });
+            }
+
+            // Calculate moving average line dataset across all valid points from all files
+            if (showTrendline && allValidPoints.length > 1) {
+                const sortedPoints = [...allValidPoints].sort((a, b) => a.x - b.x);
+                const maData = [];
+
+                for (let i = 0; i < sortedPoints.length; i++) {
+                    const start = Math.max(0, i - Math.floor(maWindow / 2));
+                    const end = Math.min(sortedPoints.length, i + Math.ceil(maWindow / 2));
+                    const subset = sortedPoints.slice(start, end);
+                    const avgY = subset.reduce((sum, p) => sum + p.y, 0) / subset.length;
+                    maData.push({ x: sortedPoints[i].x, y: avgY });
+                }
+
+                datasets.push({
+                    type: 'line',
+                    label: `Media Móvil (${maWindow} pts)`,
+                    data: maData,
+                    borderColor: '#38BDF8', // Cyan trendline
+                    borderWidth: 2.5,
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.3
+                });
+            }
+
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 300 },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: xCol,
+                                color: '#FBBF24',
+                                font: { family: 'JetBrains Mono', weight: 'bold', size: 12 }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.06)' },
+                            ticks: {
+                                color: '#9CA3AF',
+                                font: { family: 'JetBrains Mono' },
+                                callback: function(val) {
+                                    return isXDate ? formatDateFromTimestamp(val) : val;
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: yCol,
+                                color: '#FBBF24',
+                                font: { family: 'JetBrains Mono', weight: 'bold', size: 12 }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.06)' },
+                            ticks: {
+                                color: '#9CA3AF',
+                                font: { family: 'JetBrains Mono' },
+                                callback: function(val) {
+                                    return isYDate ? formatDateFromTimestamp(val) : val;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#E5E7EB',
+                                font: { family: 'Inter', size: 11 },
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#151A23',
+                            titleColor: '#F59E0B',
+                            bodyColor: '#E5E7EB',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const p = context.raw;
+                                    if (!p) return '';
+                                    const datasetName = context.dataset.label || '';
+                                    const xVal = isXDate ? formatDateFromTimestamp(p.x) : p.x;
+                                    const yVal = isYDate ? formatDateFromTimestamp(p.y) : p.y;
+                                    return `${datasetName}: (${xVal}, ${yVal})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* Consolidated Data Table Rendering */
+        function renderDataTable() {
+            const headEl = document.getElementById('data-table-head');
+            const bodyEl = document.getElementById('data-table-body');
+            const query = (document.getElementById('table-search').value || '').toLowerCase();
+
+            if (mergedRecords.length === 0 || unifiedHeaders.length === 0) {
+                headEl.innerHTML = `
+                    <tr>
+                        <th class="p-3 font-semibold text-center">#</th>
+                        <th class="p-3 font-semibold">${i18n[getCurrentLang()].th_source}</th>
+                        <th class="p-3 font-semibold text-gray-500 italic">${i18n[getCurrentLang()].th_empty}</th>
+                    </tr>`;
+                bodyEl.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="p-8 text-center text-gray-500 font-sans">
+                            ${i18n[getCurrentLang()].td_no_records}
+                        </td>
+                    </tr>`;
+                document.getElementById('table-showing-info').innerText = i18n[getCurrentLang()].info_showing;
+                document.getElementById('headers-count-info').innerText = '0 columnas detectadas';
+                return;
+            }
+
+            // Table Header
+            headEl.innerHTML = `
+                <tr>
+                    <th class="p-3 font-semibold text-center w-12">#</th>
+                    <th class="p-3 font-semibold">${i18n[getCurrentLang()].th_source}</th>
+                    ${unifiedHeaders.map(h => `<th class="p-3 font-semibold">${h}</th>`).join('')}
+                </tr>`;
+
+            // Filter records
+            const filtered = mergedRecords.filter(row => {
+                if (!query) return true;
+                return Object.values(row).some(v => String(v).toLowerCase().includes(query));
+            });
+
+            // Limit table preview to max 150 rows for fast performance
+            const previewRows = filtered.slice(0, 150);
+
+            bodyEl.innerHTML = previewRows.map((row, idx) => `
+                <tr class="hover:bg-space-800/80 transition-colors">
+                    <td class="p-3 text-center text-gray-500">${idx + 1}</td>
+                    <td class="p-3 text-solar-400 font-semibold truncate max-w-[120px]">${row._source_file}</td>
+                    ${unifiedHeaders.map(h => `<td class="p-3 text-gray-300">${row[h] !== null ? row[h] : '<span class="text-gray-600">-</span>'}</td>`).join('')}
+                </tr>
+            `).join('');
+
+            document.getElementById('table-showing-info').innerText = `Mostrando ${previewRows.length} de ${filtered.length} registros (${mergedRecords.length} total)`;
+            document.getElementById('headers-count-info').innerText = `${unifiedHeaders.length} columnas detectadas`;
+        }
+
+        function filterTable() {
+            renderDataTable();
+        }
+
+        function exportMergedCSV() {
+            if (mergedRecords.length === 0) return;
+
+            const cleanRecords = mergedRecords.map(r => {
+                let clean = {};
+                unifiedHeaders.forEach(h => clean[h] = r[h]);
+                return clean;
+            });
+
+            const csvString = Papa.unparse(cleanRecords);
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'Helios_Datos_Solares_Fusionados.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast('Archivo CSV unificado exportado con éxito', 'success');
+        }
+
+        /* Sample Data Generator (1996 - 2026 inclusive) */
+        function loadSampleData() {
+            // Check if sample data is already loaded to prevent duplicate insertion
+            const existingSample = filesList.find(f => f.id === 'sample_1');
+            if (existingSample) {
+                showToast('Los datos de muestra ya están presentes en el laboratorio', 'info');
+                return;
+            }
+
+            // Generate synthetic solar observations across 1996-2026 inclusive (Ciclos 23, 24 y 25)
+            const file1Data = [];
+            for (let yr = 1996; yr <= 2005; yr++) {
+                for (let m = 1; m <= 12; m++) {
+                    let mStr = String(m).padStart(2, '0');
+                    let dateStr = `${yr}-${mStr}-15`;
+                    let t = yr + (m - 1) / 12;
+                    let val = Math.round(70 + 60 * Math.sin(2 * Math.PI * (t - 1996) / 11 - Math.PI / 2) + (Math.random() * 24 - 12));
+                    val = Math.max(0, val);
+                    file1Data.push({
+                        "Fecha": dateStr,
+                        "Grupos": Math.floor(val / 10),
+                        "Manchas_Aisladas": val % 10,
+                        "Numero_de_Wolf": val,
+                        "Observador": "Equipo Alfa",
+                        "Calidad_Imagen": "Excelente",
+                        "Notas": "SOHO MDI"
+                    });
+                }
+            }
+
+            const file2Data = [];
+            for (let yr = 2006; yr <= 2015; yr++) {
+                for (let m = 1; m <= 12; m++) {
+                    let mStr = String(m).padStart(2, '0');
+                    let dateStr = `${yr}-${mStr}-15`;
+                    let t = yr + (m - 1) / 12;
+                    let val = Math.round(65 + 50 * Math.sin(2 * Math.PI * (t - 1996) / 11 - Math.PI / 2) + (Math.random() * 24 - 12));
+                    val = Math.max(0, val);
+                    file2Data.push({
+                        "Fecha": dateStr,
+                        "Grupos": Math.floor(val / 10),
+                        "Manchas_Aisladas": val % 10,
+                        "Numero_de_Wolf": val,
+                        "Observador": "Equipo Beta",
+                        "Calidad_Imagen": "Buena",
+                        "Notas": "SDO HMI"
+                    });
+                }
+            }
+
+            const file3Data = [];
+            for (let yr = 2016; yr <= 2026; yr++) {
+                for (let m = 1; m <= 12; m++) {
+                    let mStr = String(m).padStart(2, '0');
+                    let dateStr = `${yr}-${mStr}-15`;
+                    let t = yr + (m - 1) / 12;
+                    let val = Math.round(75 + 65 * Math.sin(2 * Math.PI * (t - 1996) / 11 - Math.PI / 2) + (Math.random() * 24 - 12));
+                    val = Math.max(0, val);
+                    file3Data.push({
+                        "Fecha": dateStr,
+                        "Grupos": Math.floor(val / 10),
+                        "Manchas_Aisladas": val % 10,
+                        "Numero_de_Wolf": val,
+                        "Observador": "Equipo Gamma",
+                        "Calidad_Imagen": "Excelente",
+                        "Notas": "SDO HMI"
+                    });
+                }
+            }
+
+            const sampleFiles = [
+                {
+                    id: 'sample_1',
+                    name: 'Observaciones_1996_2005.csv',
+                    rowsCount: file1Data.length,
+                    headers: ["Fecha", "Grupos", "Manchas_Aisladas", "Numero_de_Wolf", "Observador", "Calidad_Imagen", "Notas"],
+                    rawData: file1Data,
+                    color: FILE_COLORS[filesList.length % FILE_COLORS.length]
+                },
+                {
+                    id: 'sample_2',
+                    name: 'Observaciones_2006_2015.csv',
+                    rowsCount: file2Data.length,
+                    headers: ["Fecha", "Grupos", "Manchas_Aisladas", "Numero_de_Wolf", "Observador", "Calidad_Imagen", "Notas"],
+                    rawData: file2Data,
+                    color: FILE_COLORS[(filesList.length + 1) % FILE_COLORS.length]
+                },
+                {
+                    id: 'sample_3',
+                    name: 'Observaciones_2016_2026.csv',
+                    rowsCount: file3Data.length,
+                    headers: ["Fecha", "Grupos", "Manchas_Aisladas", "Numero_de_Wolf", "Observador", "Calidad_Imagen", "Notas"],
+                    rawData: file3Data,
+                    color: FILE_COLORS[(filesList.length + 2) % FILE_COLORS.length]
+                }
+            ];
+
+            // Push sample files into existing filesList without overwriting user files
+            filesList.push(...sampleFiles);
+
+            showToast('Datos de muestra del Ciclo Solar (1996-2026) añadidos con éxito', 'success');
+            unifyAndMergeData();
+        }
+
+        function clearAllData() {
+            filesList = [];
+            mergedRecords = [];
+            unifiedHeaders = [];
+            showToast('Todos los datos han sido borrados', 'info');
+            updateUI();
+        }
+
+        /* Toast Notifications */
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = 'bg-space-800 border-space-600 text-gray-200';
+            let icon = 'fa-circle-info text-blue-400';
+
+            if (type === 'success') {
+                bgClass = 'bg-space-800 border-green-500/50 text-green-300';
+                icon = 'fa-circle-check text-green-400';
+            } else if (type === 'error') {
+                bgClass = 'bg-space-800 border-red-500/50 text-red-300';
+                icon = 'fa-triangle-exclamation text-red-400';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl text-xs transition-all duration-300 transform translate-x-10 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-x-10', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-10');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function getCurrentLang() {
+            return window.currentLang || 'es';
+        }
+
+        function changeLang(lang) {
+            window.currentLang = lang;
+            const flags = { es: '🇪🇸 ES', en: '🇬🇧 EN', fr: '🇫🇷 FR', de: '🇩🇪 DE', pt: '🇵🇹 PT', it: '🇮🇹 IT' };
+            document.getElementById('current-lang-text').innerText = flags[lang] || '🇪🇸 ES';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerHTML = i18n[lang][key];
+                }
+            });
+
+            populateAxisSelects();
+            renderFilesList();
+            renderDataTable();
+        }
+    </script>
+</body>
+</html>

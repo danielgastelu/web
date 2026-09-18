@@ -2,22 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tag clave para bloquear el zoom accidental en móviles -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Configuración del Viewport: Permite escalar hasta 150% (1.5) y hacer pan/arrastrar -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Laboratorio Solar: Número de Wolf</title>
+    
     <style>
         :root {
             --primary: #1e272e;
             --secondary: #3c40c6;
             --accent-spot: #ff3f34;
             --accent-group: #ffd32a;
-            --bg: #f2f2f2;
+            --bg: #f5f6fa;
             --surface: #ffffff;
             --text: #485460;
             --border-radius: 12px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -28,54 +29,65 @@
             line-height: 1.5;
         }
 
+        /* Top Bar */
         .header-bar {
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; 
+            flex-wrap: wrap; gap: 10px; margin-bottom: 15px;
+            background: var(--surface); padding: 15px; border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        h1 { color: var(--primary); font-size: 1.4rem; margin: 0; flex: 1; min-width: 250px; }
+        h1 { color: var(--primary); font-size: 1.3rem; margin: 0; flex: 1; min-width: 200px; }
 
         .lang-selector {
-            padding: 10px; border-radius: 8px; border: 1px solid #d2dae2;
-            background: var(--surface); font-size: 1rem; font-weight: bold; color: var(--primary);
+            padding: 8px; border-radius: 8px; border: 1px solid #d2dae2;
+            background: var(--bg); font-size: 0.95rem; font-weight: bold; color: var(--primary);
+            outline: none;
         }
 
+        /* App Panels */
         .panel {
             background: var(--surface); padding: 20px; border-radius: var(--border-radius);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
         }
 
-        h2 { font-size: 1.2rem; color: var(--primary); border-bottom: 2px solid #efefef; padding-bottom: 10px; margin-top: 0; }
+        h2 { font-size: 1.15rem; color: var(--primary); border-bottom: 2px solid #efefef; padding-bottom: 10px; margin-top: 0; }
 
-        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-        .controls > * { flex: 1; min-width: 140px; }
+        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
         
-        input, button { padding: 12px 15px; border-radius: 8px; border: 1px solid #d2dae2; font-size: 1rem; }
+        input[type="text"], input[type="number"], input[type="date"], button { 
+            padding: 12px; border-radius: 8px; border: 1px solid #d2dae2; font-size: 1rem; width: 100%;
+        }
         
         button {
             background-color: var(--secondary); color: white; font-weight: bold; border: none;
-            cursor: pointer; transition: transform 0.1s;
-            touch-action: manipulation; /* Bloquea el delay táctil de 300ms */
+            cursor: pointer; transition: opacity 0.2s;
         }
-        button:active { transform: scale(0.97); }
+        button:active { opacity: 0.8; }
         button.danger { background-color: #ff3f34; }
-        button.success { background-color: #05c46b; width: 100%; margin-top: 15px; font-size: 1.1rem; padding: 15px;}
+        button.success { background-color: #05c46b; font-size: 1.1rem; padding: 15px; margin-top: 10px;}
         button.export { background-color: #8e44ad; }
 
-        /* Control Segmentado (Botones de Estado) optimizados para pulgares */
-        .mode-selector { display: flex; background: #e1e5ea; border-radius: 10px; padding: 5px; gap: 5px; margin-bottom: 15px; }
+        /* Segmented Controller (Tool Selector for Mobile) */
+        .mode-selector { 
+            display: flex; background: #e1e5ea; border-radius: 10px; padding: 5px; gap: 5px; margin-bottom: 15px; width: 100%;
+        }
         .mode-btn {
-            flex: 1; background: transparent; color: #808e9b; padding: 15px 5px; font-size: 1.05rem;
+            flex: 1; background: transparent; color: #808e9b; padding: 12px 5px; font-size: 1rem;
             border-radius: 8px; border: 2px solid transparent; transition: all 0.2s;
         }
         .mode-btn.active-spot { background: var(--surface); color: var(--primary); border: 2px solid var(--accent-spot); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .mode-btn.active-group { background: var(--surface); color: var(--primary); border: 2px solid var(--accent-group); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
+        /* Image Container configured for Native Zoom & Pan */
         .image-container-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; }
         
         #imageContainer {
             position: relative; display: inline-block; cursor: crosshair; background: #000;
-            border-radius: 50%; overflow: hidden; width: 100%; max-width: 500px;
-            aspect-ratio: 1 / 1; touch-action: manipulation;
+            border-radius: 50%; width: 100%; max-width: 600px; aspect-ratio: 1 / 1;
+            /* Explicitly allow native panning and pinch-zooming */
+            touch-action: pan-x pan-y pinch-zoom;
+            overflow: hidden;
         }
         #sunImage { width: 100%; height: 100%; object-fit: cover; display: block; }
         
@@ -85,21 +97,26 @@
             justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; z-index: 10;
         }
 
-        .marker { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
-        .spot-marker { width: 10px; height: 10px; background-color: var(--accent-spot); border-radius: 50%; box-shadow: 0 0 6px rgba(255, 255, 255, 0.9); }
-        .group-marker { width: 45px; height: 45px; border: 3px dashed var(--accent-group); border-radius: 50%; background-color: rgba(255, 211, 42, 0.2); }
+        /* Visual Markers (Percent-based to survive zooming) */
+        .marker { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; }
+        .spot-marker { width: 8px; height: 8px; background-color: var(--accent-spot); border-radius: 50%; box-shadow: 0 0 6px rgba(255, 255, 255, 0.9); }
+        .group-marker { width: 35px; height: 35px; border: 3px dashed var(--accent-group); border-radius: 50%; background-color: rgba(255, 211, 42, 0.2); }
 
-        .math-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .math-input-group { display: flex; flex-direction: column; font-size: 0.9rem; font-weight: bold; }
-        .math-input-group input { margin-top: 5px; text-align: center; font-size: 1.1rem;}
+        /* Math Section */
+        .math-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .math-input-group { display: flex; flex-direction: column; font-size: 0.85rem; font-weight: bold; text-align: center; }
+        .math-input-group input { margin-top: 5px; text-align: center; font-size: 1.1rem; padding: 10px;}
 
-        .formula-box { background: #dff9fb; padding: 15px; border-radius: 8px; border-left: 5px solid #22a6b3; font-family: 'Courier New', Courier, monospace; text-align: center; font-size: 1.1rem; }
-        .data-source { font-size: 0.75rem; color: #a4b0be; margin-top: 10px; word-break: break-all; text-align: center;}
+        .formula-box { 
+            background: #dff9fb; padding: 15px; border-radius: 8px; border-left: 5px solid #22a6b3; 
+            font-family: 'Courier New', Courier, monospace; text-align: center; font-size: 1.1rem; 
+        }
+
+        .data-source { font-size: 0.75rem; color: #a4b0be; margin-top: 10px; word-break: break-all; text-align: center; width: 100%;}
         
-        .white-box { background: #fff9e6; padding: 15px; border-radius: 8px; border: 1px dashed #f6b93b; font-size: 0.85rem; margin-top: 15px; }
-
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
+        /* Table Responsive */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 8px;}
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; background: white;}
         th, td { border: 1px solid #d2dae2; padding: 10px; text-align: center; }
         th { background: var(--primary); color: white; }
         tr:nth-child(even) { background-color: #f8f9fa; }
@@ -114,25 +131,24 @@
 <body>
 
     <div class="header-bar">
-        <h1 data-i18n="app_title">Lab Solar: Espectro Visual</h1>
+        <h1 data-i18n="app_title">Laboratorio Solar Web</h1>
         <select class="lang-selector" id="langSelector" onchange="changeLanguage()">
-            <option value="es" selected>🇪🇸 Español</option>
-            <option value="en">🇬🇧 English</option>
-            <option value="pt">🇧🇷 Português</option>
-            <option value="fr">🇫🇷 Français</option>
-            <option value="it">🇮🇹 Italiano</option>
-            <option value="de">🇩🇪 Deutsch</option>
+            <option value="es" selected>🇪🇸 ES</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="pt">🇧🇷 PT</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="it">🇮🇹 IT</option>
+            <option value="de">🇩🇪 DE</option>
         </select>
     </div>
 
     <div class="panel">
         <h2 data-i18n="setup_title">1. Configuración</h2>
-        <div class="controls">
+        <div class="controls-grid">
             <input type="text" id="schoolInput" data-i18n="placeholder_school" placeholder="Centro Educativo (Opcional)">
-            <input type="text" id="nameInput" data-i18n="placeholder_name" placeholder="Tu Apellido (Opcional)">
+            <input type="text" id="nameInput" data-i18n="placeholder_name" placeholder="Tu Nombre (Opcional)">
         </div>
-        <div class="controls">
-            <!-- Evento onchange añadido para actualizar la imagen si el alumno cambia la fecha a mano -->
+        <div class="controls-grid">
             <input type="date" id="datePicker" onchange="loadDate()">
             <button onclick="loadDate()" data-i18n="btn_load">📡 Cargar Datos</button>
             <button onclick="randomDate()" data-i18n="btn_random">🎲 Aleatorio</button>
@@ -142,18 +158,18 @@
 
     <div class="app-layout">
         <div class="panel image-container-wrapper">
-            <h2 data-i18n="obs_title" style="width: 100%;">2. Instrumento de Conteo</h2>
+            <h2 data-i18n="obs_title" style="width: 100%;">2. Observatorio (Zoom Disp.)</h2>
             
-            <div class="mode-selector" style="width: 100%;">
+            <div class="mode-selector">
                 <button id="btnSpot" class="mode-btn active-spot" onclick="setMode('spot')" data-i18n="tool_spot">🔴 Mancha (s)</button>
                 <button id="btnGroup" class="mode-btn" onclick="setMode('group')" data-i18n="tool_group">🟡 Grupo (g)</button>
             </div>
 
             <div id="imageContainer" onclick="addMarker(event)">
-                <div id="loadingOverlay">Cargando datos NASA...</div>
+                <div id="loadingOverlay" data-i18n="loading_txt">Cargando SOHO...</div>
                 <img id="sunImage" src="" alt="Fondo negro estelar">
             </div>
-            <div class="data-source" id="urlDisplay">Fuente: Esperando...</div>
+            <div class="data-source" id="urlDisplay">URL: Esperando...</div>
         </div>
 
         <div class="panel">
@@ -180,16 +196,11 @@
             </div>
 
             <button class="success" onclick="saveRecord()" data-i18n="btn_save">💾 Guardar Registro</button>
-
-            <div class="white-box">
-                <strong data-i18n="wb_title">🔧 Lógica Caja Blanca: i18n Estable</strong>
-                <p data-i18n="wb_desc">Se utilizan bucles "for" tradicionales en lugar de funciones modernas. Esto permite que el traductor interactúe con el DOM sin colgar navegadores antiguos de celulares, garantizando la accesibilidad escolar.</p>
-            </div>
         </div>
 
         <div class="panel table-panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <h2 data-i18n="table_title" style="border: none; margin: 0;">Histórico</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                <h2 data-i18n="table_title" style="border: none; margin: 0;">Histórico de Registros</h2>
                 <button class="export" onclick="exportCSV()" data-i18n="btn_export">📥 CSV ISO-8601</button>
             </div>
             
@@ -213,25 +224,25 @@
     </div>
 
     <script>
-        // 1. DICCIONARIO DE DATOS (Manejado por Objeto JS)
+        // DICCIONARIO DE DATOS MULTILINGÜE
         const i18n = {
-            "app_title": { es: "Lab Solar: Espectro Visual", en: "Solar Lab: Visual Spectrum", pt: "Lab Solar: Espectro Visual", fr: "Lab Solaire", it: "Lab Solare", de: "Sonnenlabor" },
+            "app_title": { es: "Laboratorio Solar", en: "Solar Laboratory", pt: "Laboratório Solar", fr: "Laboratoire Solaire", it: "Laboratorio Solare", de: "Sonnenlabor" },
             "setup_title": { es: "1. Configuración", en: "1. Settings", pt: "1. Configuração", fr: "1. Paramètres", it: "1. Impostazioni", de: "1. Einstellungen" },
-            "placeholder_school": { es: "Centro Educativo (Opcional)", en: "School (Optional)", pt: "Escola (Opcional)", fr: "École (Optionnel)", it: "Scuola (Opzionale)", de: "Schule (Optional)" },
-            "placeholder_name": { es: "Tu Apellido (Opcional)", en: "Surname (Optional)", pt: "Sobrenome (Opcional)", fr: "Nom (Optionnel)", it: "Cognome (Opzionale)", de: "Nachname (Optional)" },
-            "btn_load": { es: "📡 Cargar Datos", en: "📡 Load Data", pt: "📡 Carregar Dados", fr: "📡 Charger", it: "📡 Carica", de: "📡 Laden" },
+            "placeholder_school": { es: "Centro Educativo", en: "School Name", pt: "Nome da Escola", fr: "Nom de l'École", it: "Nome della Scuola", de: "Schulname" },
+            "placeholder_name": { es: "Tu Apellido", en: "Your Surname", pt: "Seu Sobrenome", fr: "Votre Nom", it: "Tuo Cognome", de: "Dein Nachname" },
+            "btn_load": { es: "📡 Cargar", en: "📡 Load", pt: "📡 Carregar", fr: "📡 Charger", it: "📡 Carica", de: "📡 Laden" },
             "btn_random": { es: "🎲 Aleatorio", en: "🎲 Random", pt: "🎲 Aleatório", fr: "🎲 Aléatoire", it: "🎲 Casuale", de: "🎲 Zufällig" },
             "btn_clear": { es: "🗑️ Limpiar", en: "🗑️ Clear", pt: "🗑️ Limpar", fr: "🗑️ Effacer", it: "🗑️ Pulisci", de: "🗑️ Löschen" },
-            "obs_title": { es: "2. Instrumento de Conteo", en: "2. Counting Instrument", pt: "2. Instrumento de Contagem", fr: "2. Comptage", it: "2. Strumento", de: "2. Zählinstrument" },
-            "tool_spot": { es: "🔴 Mancha (s)", en: "🔴 Spot (s)", pt: "🔴 Mancha (s)", fr: "🔴 Tache (s)", it: "🔴 Macchia (s)", de: "🔴 Fleck (s)" },
-            "tool_group": { es: "🟡 Grupo (g)", en: "🟡 Group (g)", pt: "🟡 Grupo (g)", fr: "🟡 Groupe (g)", it: "🟡 Gruppo (g)", de: "🟡 Gruppe (g)" },
-            "math_title": { es: "3. Procesamiento Matemático", en: "3. Math Processing", pt: "3. Processamento Matemático", fr: "3. Calcul", it: "3. Calcolo", de: "3. Berechnung" },
+            "obs_title": { es: "2. Observatorio", en: "2. Observatory", pt: "2. Observatório", fr: "2. Observatoire", it: "2. Osservatorio", de: "2. Observatorium" },
+            "tool_spot": { es: "🔴 Mancha", en: "🔴 Spot", pt: "🔴 Mancha", fr: "🔴 Tache", it: "🔴 Macchia", de: "🔴 Fleck" },
+            "tool_group": { es: "🟡 Grupo", en: "🟡 Group", pt: "🟡 Grupo", fr: "🟡 Groupe", it: "🟡 Gruppo", de: "🟡 Gruppe" },
+            "math_title": { es: "3. Cálculo de Wolf", en: "3. Wolf Calculation", pt: "3. Cálculo de Wolf", fr: "3. Calcul de Wolf", it: "3. Calcolo di Wolf", de: "3. Wolf-Berechnung" },
             "lbl_groups": { es: "Grupos (g)", en: "Groups (g)", pt: "Grupos (g)", fr: "Groupes (g)", it: "Gruppi (g)", de: "Gruppen (g)" },
             "lbl_spots": { es: "Manchas (s)", en: "Spots (s)", pt: "Manchas (s)", fr: "Taches (s)", it: "Macchie (s)", de: "Flecken (s)" },
             "lbl_factor": { es: "Factor (k)", en: "Factor (k)", pt: "Fator (k)", fr: "Facteur (k)", it: "Fattore (k)", de: "Faktor (k)" },
-            "btn_save": { es: "💾 Guardar Registro", en: "💾 Save Record", pt: "💾 Salvar Registro", fr: "💾 Enregistrer", it: "💾 Salva", de: "💾 Speichern" },
+            "btn_save": { es: "💾 Guardar Registro", en: "💾 Save Record", pt: "💾 Salvar Registro", fr: "💾 Enregistrer", it: "💾 Salva Record", de: "💾 Speichern" },
             "table_title": { es: "Histórico", en: "History", pt: "Histórico", fr: "Historique", it: "Storico", de: "Verlauf" },
-            "btn_export": { es: "📥 CSV ISO-8601", en: "📥 Export CSV", pt: "📥 Exportar CSV", fr: "📥 Exporter CSV", it: "📥 Esporta CSV", de: "📥 CSV Export" },
+            "btn_export": { es: "📥 Exportar CSV", en: "📥 Export CSV", pt: "📥 Exportar CSV", fr: "📥 Exporter CSV", it: "📥 Esporta CSV", de: "📥 CSV Exportieren" },
             "th_date": { es: "Fecha", en: "Date", pt: "Data", fr: "Date", it: "Data", de: "Datum" },
             "th_g": { es: "g", en: "g", pt: "g", fr: "g", it: "g", de: "g" },
             "th_s": { es: "s", en: "s", pt: "s", fr: "s", it: "s", de: "s" },
@@ -239,12 +250,9 @@
             "th_r": { es: "Wolf (R)", en: "Wolf (R)", pt: "Wolf (R)", fr: "Wolf (R)", it: "Wolf (R)", de: "Wolf (R)" },
             "th_school": { es: "Centro", en: "School", pt: "Escola", fr: "École", it: "Scuola", de: "Schule" },
             "th_name": { es: "Nombre", en: "Name", pt: "Nome", fr: "Nom", it: "Nome", de: "Name" },
-            "msg_err_data": { es: "Error: Sin datos NASA para esta fecha.", en: "Error: No NASA data for this date.", pt: "Erro: Sem dados NASA.", fr: "Erreur: Pas de données.", it: "Errore: Nessun dato.", de: "Fehler: Keine Daten." },
-            "msg_no_date": { es: "Selecciona fecha primero.", en: "Select date first.", pt: "Selecione a data primeiro.", fr: "Sélectionnez la date.", it: "Seleziona la data.", de: "Datum wählen." },
+            "msg_err_data": { es: "Error: Sin datos SOHO/SDO.", en: "Error: No SOHO/SDO data.", pt: "Erro: Sem dados.", fr: "Erreur: Pas de données.", it: "Errore: Nessun dato.", de: "Fehler: Keine Daten." },
             "str_nodata": { es: "sin dato", en: "no data", pt: "sem dados", fr: "sans donnée", it: "nessun dato", de: "keine Daten" },
-            "wb_title": { es: "🔧 Lógica Caja Blanca: i18n Estable", en: "🔧 White Box: Stable i18n", pt: "🔧 Lógica Caixa Branca", fr: "🔧 Logique Boîte Blanche", it: "🔧 Logica Scatola Bianca", de: "🔧 White-Box-Logik" },
-            "wb_desc": { es: "Usamos bucles 'for' clásicos para compatibilidad móvil universal...", en: "Using classic 'for' loops for universal mobile compatibility...", pt: "Loops clássicos para compatibilidade...", fr: "Boucles classiques...", it: "Cicli classici...", de: "Klassische Schleifen..." },
-            "loading_txt": { es: "Cargando datos NASA...", en: "Loading NASA data...", pt: "Carregando dados NASA...", fr: "Chargement...", it: "Caricamento...", de: "Laden..." }
+            "loading_txt": { es: "Cargando SOHO...", en: "Loading SOHO...", pt: "Carregando...", fr: "Chargement...", it: "Caricamento...", de: "Laden..." }
         };
 
         function t(key) {
@@ -252,42 +260,29 @@
             return i18n[key] && i18n[key][lang] ? i18n[key][lang] : key;
         }
 
-        // Corrección Crítica: Uso de Bucle for estándar (Evita cuelgues en móviles por no soportar forEach en NodeLists)
         function changeLanguage() {
-            try {
-                const lang = document.getElementById('langSelector').value;
-                const elements = document.querySelectorAll('[data-i18n]');
-                for (let i = 0; i < elements.length; i++) {
-                    const el = elements[i];
-                    const key = el.getAttribute('data-i18n');
-                    if(i18n[key] && i18n[key][lang]) {
-                        if (el.tagName === 'INPUT') {
-                            el.placeholder = i18n[key][lang];
-                        } else {
-                            el.innerHTML = i18n[key][lang];
-                        }
-                    }
+            const lang = document.getElementById('langSelector').value;
+            const elements = document.querySelectorAll('[data-i18n]');
+            for (let i = 0; i < elements.length; i++) {
+                const el = elements[i];
+                const key = el.getAttribute('data-i18n');
+                if(i18n[key] && i18n[key][lang]) {
+                    if (el.tagName === 'INPUT') el.placeholder = i18n[key][lang];
+                    else el.innerHTML = i18n[key][lang];
                 }
-                document.getElementById('loadingOverlay').innerText = t('loading_txt');
-            } catch (err) {
-                console.error("Error en traduccion:", err);
             }
         }
 
-        // 2. VARIABLES DE ESTADO Y UX
         let currentMode = 'spot';
-
         function setMode(mode) {
             currentMode = mode;
             document.getElementById('btnSpot').className = mode === 'spot' ? 'mode-btn active-spot' : 'mode-btn';
             document.getElementById('btnGroup').className = mode === 'group' ? 'mode-btn active-group' : 'mode-btn';
         }
 
-        // 3. CONEXIÓN AL SATÉLITE SDO (Solar Dynamics Observatory - NASA)
         let spots = 0, groups = 0, observationRecords = [];
-        // Tiempos estandarizados del instrumento HMI de la misión SDO
-        const sdoTimes = ['000000', '120000', '060000', '180000', '040000', '200000']; 
-        let currentTry = 0, currentYMD = '', currentYear = '', currentMonth = '', currentDay = '';
+        const observationTimes = ['0000', '1200', '0600', '1800', '0130', '1330']; 
+        let currentTry = 0, currentYMD = '', currentYear = '';
 
         function loadDate() {
             const dateInput = document.getElementById('datePicker').value;
@@ -295,69 +290,67 @@
             
             const date = new Date(dateInput);
             currentYear = date.getUTCFullYear();
-            currentMonth = String(date.getUTCMonth() + 1).padStart(2, '0');
-            currentDay = String(date.getUTCDate()).padStart(2, '0');
-            currentYMD = `${currentYear}${currentMonth}${currentDay}`;
+            const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(date.getUTCDate()).padStart(2, '0');
+            currentYMD = `${currentYear}${mm}${dd}`;
             
             currentTry = 0;
-            document.getElementById('urlDisplay').innerText = "Conectando con NASA SDO...";
+            document.getElementById('urlDisplay').innerText = "Conectando con SOHO/NASA...";
             document.getElementById('loadingOverlay').style.display = 'flex';
             requestNASAData();
         }
 
         function requestNASAData() {
-            if (currentTry >= sdoTimes.length) {
+            if (currentTry >= observationTimes.length) {
                 document.getElementById('loadingOverlay').style.display = 'none';
                 alert(t('msg_err_data'));
-                document.getElementById('urlDisplay').innerText = "Abortado: Datos no disponibles.";
+                document.getElementById('urlDisplay').innerText = "Archivo no disponible para esta fecha.";
                 return;
             }
-            const time = sdoTimes[currentTry];
-            // Ruta estable del servidor SDO para imágenes de espectro visible (HMI Continuum)
-            const url = `https://sdo.gsfc.nasa.gov/assets/img/browse/${currentYear}/${currentMonth}/${currentDay}/${currentYMD}_${time}_1024_HMIIC.jpg`;
+            const time = observationTimes[currentTry];
+            // Recuperamos la URL original del archivo Reprocessing de SOHO (hmiigr)
+            const url = `https://soho.nascom.nasa.gov/data/REPROCESSING/Completed/${currentYear}/hmiigr/${currentYMD}/${currentYMD}_${time}_hmiigr_1024.jpg`;
             
             const tempImg = new Image();
             tempImg.onload = function() {
                 document.getElementById('sunImage').src = url;
-                document.getElementById('urlDisplay').innerText = `Origen: SDO HMIIC (${time} UTC)`;
+                document.getElementById('urlDisplay').innerText = `Origen: SOHO HMIIGR (${time} UTC)`;
                 document.getElementById('loadingOverlay').style.display = 'none';
                 clearMarkers(); 
             };
             tempImg.onerror = function() {
                 currentTry++;
-                requestNASAData(); // Bucle de reintento
+                requestNASAData();
             };
             tempImg.src = url;
         }
 
         function randomDate() {
-            // El SDO tiene datos continuos y confiables desde 2011 a la fecha
-            const start = new Date(2013, 0, 1).getTime();
+            // Rango seguro para datos SOHO hmiigr en la versión inicial
+            const start = new Date(2015, 0, 1).getTime();
             const end = new Date(2023, 11, 31).getTime();
-            const randomTime = start + Math.random() * (end - start);
-            const date = new Date(randomTime);
-            
-            const yyyy = date.getFullYear();
-            const mm = String(date.getMonth() + 1).padStart(2, '0');
-            const dd = String(date.getDate()).padStart(2, '0');
-            
-            document.getElementById('datePicker').value = `${yyyy}-${mm}-${dd}`;
+            const date = new Date(start + Math.random() * (end - start));
+            document.getElementById('datePicker').value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             loadDate();
         }
 
-        // 4. LÓGICA DE HERRAMIENTA DE CONTEO
         function addMarker(e) {
             if(!document.getElementById('sunImage').getAttribute('src')) return;
 
             const container = document.getElementById('imageContainer');
             const rect = container.getBoundingClientRect();
             
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            // Cálculo en PORCENTAJES: Mantiene los marcadores correctos sin importar el Zoom (150%) o arrastre.
+            // e.clientX es la posición respecto a la pantalla. rect.left es la posición del contenedor.
+            const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+            const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
             
+            // Filtro de seguridad por si el click ocurre fuera de la zona útil al arrastrar rápido
+            if(xPercent < 0 || xPercent > 100 || yPercent < 0 || yPercent > 100) return;
+
             const marker = document.createElement('div');
-            marker.style.left = x + 'px';
-            marker.style.top = y + 'px';
+            marker.style.left = xPercent + '%';
+            marker.style.top = yPercent + '%';
             
             if (currentMode === 'group') {
                 marker.className = 'marker group-marker';
@@ -375,7 +368,6 @@
 
         function clearMarkers() {
             const container = document.getElementById('imageContainer');
-            // Compatibilidad móvil asegurada: Bucle clásico para remover marcadores
             const markers = container.querySelectorAll('.marker');
             for (let i = 0; i < markers.length; i++) {
                 markers[i].parentNode.removeChild(markers[i]);
@@ -406,7 +398,7 @@
 
         function saveRecord() {
             const currentDate = document.getElementById('datePicker').value;
-            if (!currentDate) { alert(t('msg_no_date')); return; }
+            if (!currentDate) return;
 
             const g = parseInt(document.getElementById('gVal').value) || 0;
             const s = parseInt(document.getElementById('sVal').value) || 0;
@@ -445,21 +437,16 @@
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `registro_wolf_${document.getElementById('langSelector').value}.csv`;
+            link.download = `Wolf_Data_${document.getElementById('langSelector').value}.csv`;
             link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        // Ejecución segura una vez que el DOM está completamente cargado
         window.onload = function() {
-            try {
-                changeLanguage();
-                randomDate();
-            } catch (err) {
-                console.error("Error al inicializar la app:", err);
-            }
+            changeLanguage();
+            randomDate();
         };
     </script>
 </body>

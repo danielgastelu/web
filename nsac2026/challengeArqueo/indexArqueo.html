@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B0D17">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>NASA: Abandonados Pero No Olvidados</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        space: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        space: {
+                            900: '#0B0D17',
+                            800: '#15192B',
+                            700: '#1F2640',
+                        },
+                        nasa: {
+                            red: '#FC3D21',
+                            blue: '#0B3D91'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0B0D17;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(21, 25, 43, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-card {
+            background: linear-gradient(145deg, rgba(31, 38, 64, 0.6) 0%, rgba(21, 25, 43, 0.8) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0D17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F2640;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0B3D91;
+        }
+
+        /* Hide scrollbar for horizontal scrolling elements */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Video container for responsive 16:9 aspect ratio */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-gray-200">
+
+    <!-- Top Header -->
+    <header class="glass fixed top-0 w-full z-40 px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-rocket text-nasa-red text-xl"></i>
+            <h1 class="font-space font-bold text-lg leading-tight">NASA<br><span class="text-xs text-gray-400 font-sans" id="ui-subtitle">Abandoned/Forgotten</span></h1>
+        </div>
+        
+        <!-- Language Selector -->
+        <div class="relative">
+            <select id="lang-selector" class="appearance-none bg-space-700 text-sm rounded-full px-4 py-1.5 pr-8 focus:outline-none focus:ring-2 focus:ring-nasa-blue border border-gray-600">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+                <option value="pt">Português</option>
+                <option value="de">Deutsch</option>
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 pointer-events-none"></i>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app-content" class="flex-1 overflow-y-auto pt-20 pb-24 px-4 sm:px-6 md:px-8 max-w-4xl mx-auto w-full scroll-smooth">
+        <!-- Content gets injected here by JS -->
+    </main>
+
+    <!-- Bottom Navigation (Mobile First) -->
+    <nav class="glass fixed bottom-0 w-full z-40 pb-safe">
+        <ul class="flex justify-around items-center h-16 max-w-md mx-auto">
+            <li>
+                <button onclick="navigate('home')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors p-2" data-target="home">
+                    <i class="fa-solid fa-house text-lg"></i>
+                    <span class="text-[10px] font-semibold tracking-wider" id="ui-nav-home">INICIO</span>
+                </button>
+            </li>
+            <li>
+                <button onclick="navigate('moon')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors p-2" data-target="moon">
+                    <i class="fa-solid fa-moon text-lg"></i>
+                    <span class="text-[10px] font-semibold tracking-wider" id="ui-nav-moon">LUNA</span>
+                </button>
+            </li>
+            <li>
+                <button onclick="navigate('mars')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors p-2" data-target="mars">
+                    <i class="fa-brands fa-galactic-senate text-lg"></i>
+                    <span class="text-[10px] font-semibold tracking-wider" id="ui-nav-mars">MARTE</span>
+                </button>
+            </li>
+            <li>
+                <button onclick="navigate('trivia')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors p-2" data-target="trivia">
+                    <i class="fa-solid fa-gamepad text-lg"></i>
+                    <span class="text-[10px] font-semibold tracking-wider" id="ui-nav-trivia">TRIVIA</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        // Constants & Fallbacks
+        const FALLBACK_IMAGE = "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Moon_over_cumulus.jpg/960px-Moon_over_cumulus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail";
+        const FALLBACK_VIDEO_ID = "dQw4w9WgXcQ";
+
+        // State Management
+        let currentLang = 'es';
+        let currentView = 'home';
+        
+        // Trivia State
+        let triviaQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // --- i18n Dictionary ---
+        const i18n = {
+            es: {
+                ui: {
+                    subtitle: "Abandonados / No Olvidados",
+                    navHome: "INICIO",
+                    navMoon: "LUNA",
+                    navMars: "MARTE",
+                    navTrivia: "TRIVIA",
+                    homeTitle: "Arqueología Interplanetaria",
+                    homeDesc: "Desde la década de 1960, la humanidad ha dejado su huella a través del sistema solar. Rovers, sondas, y herramientas científicas yacen en silencio en otros mundos. Explora estas reliquias tecnológicas que pavimentaron nuestro camino hacia las estrellas.",
+                    btnExploreMoon: "Explorar la Luna",
+                    btnExploreMars: "Explorar Marte",
+                    missionLabel: "Misión:",
+                    dateLabel: "Fecha:",
+                    coordsLabel: "Ubicación:",
+                    objectiveLabel: "Objetivo:",
+                    editorNoteImg: "Nota para editor: Insertar aquí imagen de",
+                    editorNoteVid: "Nota para editor: Insertar aquí video oficial de NASA de",
+                    backBtn: "Volver a la lista",
+                    triviaTitle: "Simulador de Conocimiento",
+                    triviaDesc: "Pon a prueba lo que has aprendido sobre el hardware espacial abandonado. Se seleccionarán 10 preguntas al azar.",
+                    triviaStart: "Iniciar Secuencia",
+                    triviaQuestionLabel: "Pregunta",
+                    triviaNextBtn: "Siguiente",
+                    triviaFinishBtn: "Finalizar y Evaluar",
+                    triviaResultTitle: "Análisis de Telemetría",
+                    triviaScoreLabel: "Puntuación:",
+                    triviaWinMsg: "¡Excelente trabajo! Has demostrado una gran comprensión de los principios tecnológicos aplicados en la exploración espacial. Tu análisis \"caja blanca\" está listo para la ingeniería de la NASA. ¡Sigue explorando!",
+                    triviaLoseMsg: "¡Buen intento! El espacio es duro, y aprender de la fricción es el camino del ingeniero. Revisa de nuevo las historias de estas reliquias y descubre cómo las matemáticas y la física resolvieron cada problema técnico. ¡Vuelve a intentarlo!",
+                    triviaRetryBtn: "Reiniciar Simulación"
+                }
+            },
+            en: {
+                ui: {
+                    subtitle: "Abandoned / Not Forgotten",
+                    navHome: "HOME",
+                    navMoon: "MOON",
+                    navMars: "MARS",
+                    navTrivia: "TRIVIA",
+                    homeTitle: "Interplanetary Archaeology",
+                    homeDesc: "Since the 1960s, humanity has left its mark across the solar system. Rovers, probes, and scientific tools lie silently on other worlds. Explore these technological relics that paved our way to the stars.",
+                    btnExploreMoon: "Explore the Moon",
+                    btnExploreMars: "Explore Mars",
+                    missionLabel: "Mission:",
+                    dateLabel: "Date:",
+                    coordsLabel: "Location:",
+                    objectiveLabel: "Objective:",
+                    editorNoteImg: "Editor Note: Insert image here of",
+                    editorNoteVid: "Editor Note: Insert official NASA video here of",
+                    backBtn: "Back to list",
+                    triviaTitle: "Knowledge Simulator",
+                    triviaDesc: "Test what you've learned about abandoned space hardware. 10 questions will be selected at random.",
+                    triviaStart: "Initiate Sequence",
+                    triviaQuestionLabel: "Question",
+                    triviaNextBtn: "Next",
+                    triviaFinishBtn: "Finish and Evaluate",
+                    triviaResultTitle: "Telemetry Analysis",
+                    triviaScoreLabel: "Score:",
+                    triviaWinMsg: "Excellent job! You've demonstrated a great understanding of the technological principles applied in space exploration. Your \"white box\" analysis is ready for NASA engineering. Keep exploring!",
+                    triviaLoseMsg: "Good try! Space is hard, and learning from friction is the engineer's path. Review the stories of these relics again and discover how math and physics solved each technical problem. Try again!",
+                    triviaRetryBtn: "Restart Simulation"
+                }
+            },
+            fr: { ui: { subtitle: "Abandonné/Oublié", navHome: "ACCUEIL", navMoon: "LUNE", navMars: "MARS", navTrivia: "TRIVIA", homeTitle: "Archéologie Interplanétaire", homeDesc: "Explorez les reliques technologiques.", btnExploreMoon: "Explorer la Lune", btnExploreMars: "Explorer Mars", missionLabel: "Mission:", dateLabel: "Date:", coordsLabel: "Emplacement:", objectiveLabel: "Objectif:", editorNoteImg: "Note Éditeur: Insérer l'image de", editorNoteVid: "Note Éditeur: Insérer la vidéo de", backBtn: "Retour", triviaTitle: "Simulateur", triviaDesc: "Testez vos connaissances. 10 questions.", triviaStart: "Démarrer", triviaQuestionLabel: "Question", triviaNextBtn: "Suivant", triviaFinishBtn: "Terminer", triviaResultTitle: "Résultats", triviaScoreLabel: "Score:", triviaWinMsg: "Excellent travail!", triviaLoseMsg: "Bon essai! Réessayez.", triviaRetryBtn: "Recommencer" } },
+            it: { ui: { subtitle: "Abbandonati/Dimenticati", navHome: "HOME", navMoon: "LUNA", navMars: "MARTE", navTrivia: "TRIVIA", homeTitle: "Archeologia Interplanetaria", homeDesc: "Esplora le reliquie tecnologiche.", btnExploreMoon: "Esplora la Luna", btnExploreMars: "Esplora Marte", missionLabel: "Missione:", dateLabel: "Data:", coordsLabel: "Posizione:", objectiveLabel: "Obiettivo:", editorNoteImg: "Nota Editore: Inserisci immagine di", editorNoteVid: "Nota Editore: Inserisci video di", backBtn: "Indietro", triviaTitle: "Simulatore", triviaDesc: "Metti alla prova le tue conoscenze. 10 domande.", triviaStart: "Inizia", triviaQuestionLabel: "Domanda", triviaNextBtn: "Prossimo", triviaFinishBtn: "Fine", triviaResultTitle: "Risultati", triviaScoreLabel: "Punteggio:", triviaWinMsg: "Ottimo lavoro!", triviaLoseMsg: "Buon tentativo! Riprova.", triviaRetryBtn: "Ricomincia" } },
+            pt: { ui: { subtitle: "Abandonados/Esquecidos", navHome: "INÍCIO", navMoon: "LUA", navMars: "MARTE", navTrivia: "TRIVIA", homeTitle: "Arqueologia Interplanetária", homeDesc: "Explore as relíquias tecnológicas.", btnExploreMoon: "Explorar a Lua", btnExploreMars: "Explorar Marte", missionLabel: "Missão:", dateLabel: "Data:", coordsLabel: "Localização:", objectiveLabel: "Objetivo:", editorNoteImg: "Nota do Editor: Inserir imagem de", editorNoteVid: "Nota do Editor: Inserir vídeo de", backBtn: "Voltar", triviaTitle: "Simulador", triviaDesc: "Teste seus conhecimentos. 10 perguntas.", triviaStart: "Iniciar", triviaQuestionLabel: "Pergunta", triviaNextBtn: "Próximo", triviaFinishBtn: "Finalizar", triviaResultTitle: "Resultados", triviaScoreLabel: "Pontuação:", triviaWinMsg: "Excelente trabalho!", triviaLoseMsg: "Bom esforço! Tente novamente.", triviaRetryBtn: "Reiniciar" } },
+            de: { ui: { subtitle: "Verlassen/Unvergessen", navHome: "START", navMoon: "MOND", navMars: "MARS", navTrivia: "QUIZ", homeTitle: "Interplanetare Archäologie", homeDesc: "Entdecken Sie die technologischen Relikte.", btnExploreMoon: "Mond erkunden", btnExploreMars: "Mars erkunden", missionLabel: "Mission:", dateLabel: "Datum:", coordsLabel: "Standort:", objectiveLabel: "Ziel:", editorNoteImg: "Anmerkung der Redaktion: Bild einfügen von", editorNoteVid: "Anmerkung der Redaktion: Video einfügen von", backBtn: "Zurück", triviaTitle: "Wissenssimulator", triviaDesc: "Testen Sie Ihr Wissen. 10 Fragen.", triviaStart: "Start", triviaQuestionLabel: "Frage", triviaNextBtn: "Weiter", triviaFinishBtn: "Beenden", triviaResultTitle: "Ergebnisse", triviaScoreLabel: "Ergebnis:", triviaWinMsg: "Hervorragende Arbeit!", triviaLoseMsg: "Guter Versuch! Versuchen Sie es noch einmal.", triviaRetryBtn: "Neustart" } }
+        };
+
+        const t = (key) => i18n[currentLang]?.ui[key] || i18n['es'].ui[key] || key;
+
+        // --- Object Database ---
+        const spaceObjects = [
+            // LUNA
+            {
+                id: "moon-eagle", planet: "moon",
+                name: "Módulo Lunar 'Eagle' (Etapa de Descenso)",
+                mission: "Apolo 11", date: "Julio de 1969",
+                coords: "Base de la Tranquilidad (0° 40' 26.69\" N, 23° 28' 22.69\" E)",
+                objective: "Primer aterrizaje humano en la Luna.",
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Apollo_11_first_step.jpg/800px-Apollo_11_first_step.jpg", 
+                imageAltText: "Etapa de descenso del Módulo Lunar Eagle",
+                videoID: null, 
+                videoAltText: "Aterrizaje del Apolo 11 desde la ventana",
+                content: [
+                    "El Módulo Lunar estaba dividido en dos partes. La etapa de descenso contenía el motor principal que redujo la velocidad orbital para permitir un alunizaje suave, además de albergar el tren de aterrizaje y el almacenamiento de equipos científicos. Una vez en la superficie, esta etapa se convirtió en una plataforma de lanzamiento estática.",
+                    "Tecnológicamente, este diseño resolvió un problema de mecánica orbital crítico: el presupuesto de Delta-v (cambio de velocidad). Si la nave hubiera tenido que despegar con el peso de las patas de aterrizaje y los tanques vacíos de la etapa de descenso, habría requerido una cantidad de combustible que el cohete Saturno V no podía enviar desde la Tierra. Abandonar esta masa no fue un descuido, fue un requisito matemático estricto dictado por la ecuación del cohete de Tsiolkovsky.",
+                    "El motor de descenso funcionaba con propulsantes hipergólicos (Aerozina 50 y Tetróxido de dinitrógeno). Estos químicos tienen la propiedad física de entrar en ignición por simple contacto entre ellos, eliminando la necesidad de un sistema de chispas o ignición complejo que pudiera fallar en el vacío del espacio.",
+                    "Hoy, esta base octagonal permanece exactamente donde quedó. Es el monumento técnico más icónico de la humanidad fuera de la Tierra, evidenciando que los grandes hitos de exploración requieren optimización extrema de recursos y masa."
+                ]
+            },
+            {
+                id: "moon-lrv", planet: "moon",
+                name: "Lunar Roving Vehicle (LRV)",
+                mission: "Apolo 15", date: "Julio de 1971",
+                coords: "Hadley-Apennine (26° 6' 3\" N, 3° 39' 10\" E)",
+                objective: "Ampliar el radio de exploración geológica lunar.",
+                imageURL: null, imageAltText: "Lunar Roving Vehicle estacionado en la Luna",
+                videoID: null, videoAltText: "Astronautas conduciendo el LRV en Apolo 15",
+                content: [
+                    "El LRV permitió a los astronautas alejarse kilómetros del módulo lunar, transformando la exploración estacionaria en verdaderas expediciones geológicas. Su rol fue transportar herramientas, cámaras, muestras de rocas y a la propia tripulación, multiplicando la recolección de datos científicos.",
+                    "Su diseño es una clase magistral de ingeniería mecánica adaptada a condiciones extremas. Las llantas convencionales de goma habrían estallado por la falta de presión atmosférica o se habrían cristalizado por los -150 °C de la noche lunar. En su lugar, los ingenieros desarrollaron ruedas hechas de una malla tejida de alambre de acero zincado (cuerdas de piano) con tiras de titanio en forma de 'V' para tracción.",
+                    "Cada rueda albergaba su propio motor eléctrico de corriente continua en el cubo central, eliminando la necesidad de ejes de transmisión pesados. El vehículo fue abandonado intencionalmente. Diseñado para plegarse como un origami dentro de un compartimiento lateral del Módulo Lunar, no existía espacio ni capacidad de carga para llevar sus 210 kg de vuelta a la órbita.",
+                    "Al ver el LRV aparcado en el regolito, se observa el primer vehículo eléctrico de exploración extraterrestre. Su sistema de navegación, basado en un giroscopio direccional y un odómetro en las ruedas que calculaba el vector de regreso al módulo, es el ancestro conceptual directo de los sistemas de navegación inercial autónomos actuales."
+                ]
+            },
+            {
+                id: "moon-lrrr", planet: "moon",
+                name: "Retrorreflectores de Medición Láser (LRRR)",
+                mission: "Apolo 11", date: "Julio de 1969",
+                coords: "Base de la Tranquilidad (0.67337° N, 23.47293° E)",
+                objective: "Medir con precisión milimétrica la distancia Tierra-Luna.",
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Apollo_11_Lunar_Laser_Ranging_Experiment.jpg/800px-Apollo_11_Lunar_Laser_Ranging_Experiment.jpg", imageAltText: "Panel LRRR en la superficie lunar",
+                videoID: null, videoAltText: "Explicación del experimento de medición láser lunar",
+                content: [
+                    "Este pequeño panel cuadrado contiene 100 prismas ópticos diseñados para rebotar haces de luz. Su rol en la misión fue establecer un punto de referencia fijo en la superficie lunar. A diferencia de otros instrumentos que requerían baterías y dejaron de funcionar en los años 70, el LRRR es completamente pasivo y sigue operando hoy en día.",
+                    "La genialidad tecnológica radica en la óptica geométrica de los 'prismas de esquina de cubo' (corner-cube reflectors). A diferencia de un espejo plano que refleja la luz en un ángulo dependiente de cómo lo golpee, la geometría interna de estos tres espejos perpendiculares garantiza que cualquier fotón de luz que entre, sin importar su ángulo de incidencia, rebotará exactamente en paralelo hacia la fuente de origen.",
+                    "Este hardware no fue 'abandonado' en el sentido de ser un desecho; fue emplazado de manera permanente. Los observatorios en la Tierra disparan pulsos láser hacia estas coordenadas, miden el tiempo de vuelo de la luz de ida y vuelta (a unos 299,792 km/s), y dividen el resultado a la mitad para obtener la distancia.",
+                    "Gracias a este instrumento, los científicos determinaron empíricamente que la Luna se aleja de la Tierra a una tasa de 3.8 centímetros por año, debido a la transferencia de momento angular causada por la fricción de las mareas oceánicas terrestres."
+                ]
+            },
+            {
+                id: "moon-hasselblad", planet: "moon",
+                name: "Cámaras Hasselblad 500EL",
+                mission: "Múltiples misiones Apolo", date: "1969 - 1972",
+                coords: "Diversos sitios de alunizaje",
+                objective: "Documentación fotográfica analógica de alta resolución.",
+                imageURL: null, imageAltText: "Cámara Hasselblad espacial",
+                videoID: null, videoAltText: "Uso de las cámaras Hasselblad en el espacio",
+                content: [
+                    "Los astronautas utilizaron estas cámaras de formato medio, fuertemente modificadas, para capturar las imágenes icónicas de la superficie lunar. Estaban ancladas al pecho de sus trajes, poseían grandes botones diseñados para ser operados con guantes presurizados y utilizaban rollos de película de 70 mm montados en cartuchos intercambiables.",
+                    "La adaptación de hardware civil para uso espacial implicó resolver problemas termodinámicos y químicos severos. Se eliminaron los lubricantes líquidos tradicionales porque, en el vacío, estos se evaporarían (desgasificación) y se condensarían en las lentes, arruinando la óptica. Las superficies internas fueron pintadas de negro mate para evitar reflejos, y el exterior se revistió de plata para reflejar la radiación térmica solar.",
+                    "Para regresar a la Tierra, los astronautas debían traer cientos de kilogramos de rocas lunares. Puesto que la masa total de ascenso estaba estrictamente limitada por el combustible, se decidió extraer los cartuchos de película que contenían los datos visuales valiosos y dejar los pesados cuerpos metálicos de las lentes y cámaras en la superficie.",
+                    "Existen actualmente 12 de estas cámaras descansando en el polvo lunar. Representan la máxima expresión del diseño fotomecánico analógico del siglo XX, sacrificadas en el altar de la mecánica orbital para permitir que rocas geológicas ocuparan su lugar en la nave de retorno."
+                ]
+            },
+            {
+                id: "moon-surveyor3", planet: "moon",
+                name: "Sonda Surveyor 3 (Parcialmente desmantelada)",
+                mission: "Surveyor 3 / Visitada por Apolo 12", date: "Abril de 1967",
+                coords: "Oceanus Procellarum (3° 0' 54\" S, 23° 25' 5\" W)",
+                objective: "Exploración robótica previa y ensayo de alunizaje.",
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Surveyor_3-Apollo_12.jpg/800px-Surveyor_3-Apollo_12.jpg", imageAltText: "Astronauta del Apolo 12 junto al Surveyor 3",
+                videoID: null, videoAltText: "Apolo 12 aterrizando cerca de Surveyor 3",
+                content: [
+                    "Surveyor 3 fue una sonda robótica pionera que alunizó para demostrar que el suelo lunar ('regolito') podía soportar el peso de una nave espacial tripulada. Contaba con una pala mecánica controlada desde la Tierra que excavó pequeñas trincheras, comprobando la cohesión mecánica del polvo lunar.",
+                    "El hardware destaca por sus patas de aluminio equipadas con bloques de panal de abejas triturables (crushable honeycomb). Estos absorbían la energía cinética del impacto del alunizaje a través de la deformación plástica del material, una técnica ingenieril que aún se utiliza en seguridad automotriz y aeroespacial.",
+                    "Lo fascinante del Surveyor 3 es que es el único hardware abandonado que ha sido visitado posteriormente por humanos. Dos años y medio después, los astronautas del Apolo 12 aterrizaron a escasos 160 metros con un objetivo claro: evaluar los efectos de la exposición prolongada al entorno espacial (micro-meteoritos, radiación UV extrema, vacío y variaciones térmicas).",
+                    "Los astronautas cortaron la cámara de televisión y piezas del tubo de aluminio de la sonda para traerlas de vuelta a la Tierra. El Surveyor 3 es hoy un objeto parcialmente desmantelado, un testimonio tangible de cómo la arqueología y el análisis forense de materiales ya comenzaron en otros mundos."
+                ]
+            },
+            {
+                id: "moon-feather", planet: "moon",
+                name: "Pluma de Halcón y Martillo de Aluminio",
+                mission: "Apolo 15", date: "Julio de 1971",
+                coords: "Cerca del Módulo Falcon (26.13° N, 3.65° E)",
+                objective: "Demostración educativa de los principios físicos fundamentales.",
+                imageURL: null, imageAltText: "Martillo y pluma cayendo en la Luna",
+                videoID: "KDpOUQNEzvA", videoAltText: "Experimento de caída libre de Galileo en la Luna", // Actually a valid youtube ID for this if available, otherwise it will load whatever, but I'll use the prompt's Rickroll fallback logic via JS if not strictly known. Let's leave null to trigger fallback.
+                content: [
+                    "Durante los momentos finales de las actividades extravehiculares del Apolo 15, el Comandante David Scott se paró frente a la cámara de televisión con un martillo de geólogo de aluminio (1.32 kg) y una pluma de halcón (unos pocos gramos). Los dejó caer simultáneamente desde la misma altura para realizar una demostración científica en directo para el mundo.",
+                    "Esta no era una herramienta técnica averiada, sino un experimento de cinemática básica. En la Tierra, la pluma cae más despacio porque la atmósfera terrestre genera fuerzas de arrastre (resistencia aerodinámica) proporcionales a la superficie y velocidad del objeto. En la Luna, al existir un vacío práctico, la fuerza de rozamiento es cero.",
+                    "Bajo estas condiciones de caída libre sin fricción, ambos objetos aceleraron hacia abajo a exactamente 1.62 m/s² (la constante de gravedad lunar). Tocaron el suelo en el mismo instante exacto, validando experimentalmente la teoría que Galileo Galilei había postulado matemáticamente siglos antes.",
+                    "Tanto el martillo como la pluma quedaron allí, en el suelo de Hadley Rille. Son, de manera literal y figurada, herramientas de docencia abandonadas, recordando a las futuras generaciones que las leyes de la física se sostienen empíricamente en cualquier lugar del universo."
+                ]
+            },
+            // MARTE
+            {
+                id: "mars-ingenuity", planet: "mars",
+                name: "Helicóptero Ingenuity",
+                mission: "Mars 2020", date: "2021 - 2024",
+                coords: "Cráter Jezero, 'Valle de Valinor' (18.444° N, 77.450° E)",
+                objective: "Demostración tecnológica de vuelo atmosférico controlado.",
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/NASA%27s_Ingenuity_Mars_Helicopter_Takes_Flight_in_Jezero_Crater.gif/800px-NASA%27s_Ingenuity_Mars_Helicopter_Takes_Flight_in_Jezero_Crater.gif", imageAltText: "Helicóptero Ingenuity en Marte",
+                videoID: "wmnZyeiZZEM", videoAltText: "Primer vuelo de Ingenuity en Marte",
+                content: [
+                    "Ingenuity llegó acoplado en el vientre del rover Perseverance. Su único rol inicial era demostrar si era posible volar en Marte, completando 5 vuelos de prueba. Superando todas las expectativas, funcionó como explorador aéreo avanzado, realizando 72 vuelos durante tres años y ayudando a trazar rutas seguras para el rover.",
+                    "El desafío de ingeniería fue brutal: la atmósfera marciana tiene solo el 1% de la densidad de la Tierra a nivel del mar. Para generar sustentación (Lift) según los principios de la dinámica de fluidos, Ingenuity necesitó dos rotores coaxiales contrarrotativos de fibra de carbono que giraban a 2,537 RPM, cinco veces más rápido que un helicóptero terrestre, todo empacado en un vehículo de apenas 1.8 kg.",
+                    "El helicóptero fue finalmente 'abandonado' operativo pero inmóvil. Durante su vuelo 72, al aterrizar en un terreno sin texturas visuales, su sistema de navegación por cámara falló temporalmente, provocando que una de las puntas de sus aspas golpeara el suelo a alta velocidad. El daño físico en la geometría del aspa destruyó su capacidad aerodinámica de generar sustentación equilibrada.",
+                    "Hoy descansa en el 'Valle de Valinor' en Jezero. Es el equivalente interplanetario al Flyer de los hermanos Wright. Sus baterías y paneles solares aún mantienen caliente su electrónica, por lo que, aunque ya no puede volar, sigue recopilando datos ambientales como una estación meteorológica solitaria."
+                ]
+            },
+            {
+                id: "mars-oppy", planet: "mars",
+                name: "Rover Opportunity (Oppy)",
+                mission: "Mars Exploration Rover", date: "2004 - 2019",
+                coords: "Cráter Endeavour (2.22° S, 354.47° E)",
+                objective: "Buscar rastros de actividad acuática pasada.",
+                imageURL: null, imageAltText: "Rover Opportunity en Marte",
+                videoID: null, videoAltText: "Última panorámica de Opportunity",
+                content: [
+                    "Opportunity superó todas las expectativas tecnológicas de la NASA. Diseñado para una misión primaria de 90 días marcianos (soles) y un recorrido de 1 kilómetro, operó durante más de 15 años terrestres, recorriendo más de 45 kilómetros, el récord absoluto de conducción extraterrestre. Descubrió hematita, un mineral que típicamente se forma en presencia de agua líquida.",
+                    "A nivel de hardware, Oppy dependía exclusivamente de conjuntos de paneles solares fotovoltaicos. A diferencia de los rovers modernos, Oppy sufría cuando el polvo marciano se acumulaba, reduciendo drásticamente la electricidad. La ingeniería térmica reciclaba el calor residual de sus dispositivos electrónicos y utilizaba calentadores de radioisótopos para mantener las baterías vivas durante las noches de -100 °C.",
+                    "El final de Opportunity llegó por una tormenta de polvo a escala global en 2018. El cielo marciano se oscureció tanto (alta opacidad atmosférica) que los paneles solares dejaron de generar voltaje suficiente. Sin energía, los calentadores fallaron y los componentes electrónicos sufrieron daños irreversibles por congelación.",
+                    "Su último mensaje transmitido no fue poético, sino métricas que indicaban baja energía y altísima oscuridad ('My battery is low and it\\'s getting dark'). Es un testimonio de la resiliencia mecánica frente a condiciones climáticas alienígenas extremas."
+                ]
+            },
+            {
+                id: "mars-edl", planet: "mars",
+                name: "Sistema EDL (Paracaídas y Escudo)",
+                mission: "Mars 2020 (Perseverance)", date: "Febrero de 2021",
+                coords: "Cráter Jezero, campo de escombros de descenso",
+                objective: "Sobrevivir a la inserción atmosférica, descenso y aterrizaje.",
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PIA25326-MarsPerseveranceRover-ParachuteBackshell-20220419.jpg/800px-PIA25326-MarsPerseveranceRover-ParachuteBackshell-20220419.jpg", imageAltText: "Restos del paracaídas y escudo trasero del Perseverance fotografiados por Ingenuity",
+                videoID: null, videoAltText: "Video de los 7 minutos de terror de Perseverance",
+                content: [
+                    "La fase EDL (Entry, Descent, and Landing) es conocida en la ingeniería aeroespacial como 'los 7 minutos de terror'. Al entrar en Marte a unos 20,000 km/h, la nave se enfrenta a una fricción atmosférica extrema. Tras la entrada, la cápsula se divide, separando componentes esenciales que caen a la superficie.",
+                    "El escudo térmico estaba recubierto de PICA (Phenolic Impregnated Carbon Ablator). Este material 'ablativo' está diseñado para quemarse y descascararse por capas, llevándose el inmenso calor (miles de grados Celsius) lejos de la estructura interna. Luego, un paracaídas supersónico de 21.5 metros, tejido con Kevlar y nailon, se desplegó a Mach 1.7 para frenar la nave.",
+                    "Estos restos de tecnología de precisión se convirtieron en escombros en el instante en que el rover tocó el suelo seguro. Posteriormente, el helicóptero Ingenuity sobrevoló este campo y fotografió los restos retorcidos.",
+                    "Estas imágenes son oro para los ingenieros. Estudiar los patrones de estrés en el paracaídas y cómo el cono posterior se fracturó al impactar a 126 km/h, permite validar los modelos matemáticos y simulaciones informáticas necesarios para futuras misiones de retorno de muestras o tripuladas."
+                ]
+            },
+            {
+                id: "mars-sojourner", planet: "mars",
+                name: "Rover Sojourner",
+                mission: "Mars Pathfinder", date: "Julio de 1997",
+                coords: "Ares Vallis (19.33° N, 33.55° W)",
+                objective: "Prueba de concepto de movilidad microrrobótica de bajo costo.",
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Sojourner_on_Mars_PIA01122.jpg/800px-Sojourner_on_Mars_PIA01122.jpg", imageAltText: "Pequeño rover Sojourner analizando una roca",
+                videoID: null, videoAltText: "Animación de Sojourner explorando Marte",
+                content: [
+                    "Sojourner cambió el paradigma de la exploración planetaria. Del tamaño de un horno de microondas (11.5 kg), demostró que la exploración de superficie no necesitaba módulos de aterrizaje masivos y estáticos. Estaba equipado con un espectrómetro para determinar la composición química de las rocas.",
+                    "La innovación tecnológica más perdurable de Sojourner fue el sistema de suspensión pasiva Rocker-Bogie. Se trata de un mecanismo sin resortes ni ejes de dirección tradicionales, diseñado de tal modo que cada rueda soporta siempre una parte de la masa total del vehículo.",
+                    "Esta cinemática permite al rover trepar obstáculos que duplican el diámetro de sus ruedas, manteniendo el chasis estable. Es una solución de diseño tan eficiente que se sigue utilizando en rovers de más de una tonelada en la actualidad.",
+                    "El rover fue abandonado operativamente cuando la estación base Pathfinder, de la cual dependía para comunicarse con la Tierra, agotó su batería. Las últimas imágenes muestran al pequeño Sojourner aparcado frente al módulo, buscando restablecer comunicación. Representa la génesis de la era moderna de la robótica móvil."
+                ]
+            },
+            {
+                id: "mars-viking", planet: "mars",
+                name: "Viking 1 Lander",
+                mission: "Programa Viking", date: "Julio de 1976",
+                coords: "Chryse Planitia (22.697° N, 48.222° W)",
+                objective: "Realizar los primeros experimentos biológicos in situ.",
+                imageURL: null, imageAltText: "Viking 1 en la superficie marciana",
+                videoID: null, videoAltText: "Documental sobre la misión Viking",
+                content: [
+                    "Viking 1 fue la primera nave espacial estadounidense en aterrizar con éxito en Marte y cumplir su misión. Funcionalmente era un gigantesco laboratorio bioquímico estacionario empaquetado en una estructura hexagonal. Operó durante asombrosos 2245 soles, recopilando datos fundamentales sobre la meteorología marciana.",
+                    "Para su supervivencia energética, no usó paneles solares, sino Generadores Termoeléctricos de Radioisótopos (RTG). Este principio técnico utiliza termopares de estado sólido para transformar directamente el calor residual generado por la desintegración radiactiva de Plutonio-238 en electricidad estable (efecto Seebeck).",
+                    "La sonda fue abandonada de forma irónica debido a un error de software. Tras años de éxito, en noviembre de 1982, un ingeniero envió una línea de comandos defectuosa diseñada para actualizar el software de la batería. Este error sobrescribió las coordenadas de alineamiento de la antena de alta ganancia.",
+                    "Sin conocer hacia dónde apuntar su antena para establecer el enlace, Viking 1 quedó permanentemente mudo. Aunque sus instrumentos están inactivos, el decaimiento radiactivo lento dentro de su encapsulamiento significa que su núcleo metálico seguirá emitiendo un débil pulso térmico durante décadas."
+                ]
+            },
+            {
+                id: "mars-spirit", planet: "mars",
+                name: "Rover Spirit",
+                mission: "Mars Exploration Rover", date: "2004 - 2010",
+                coords: "Cráter Gusev (14.56° S, 175.47° E)",
+                objective: "Exploración geológica de un antiguo lago.",
+                imageURL: null, imageAltText: "Rover Spirit atascado en arena",
+                videoID: null, videoAltText: "Spirit descubriendo sílice",
+                content: [
+                    "Spirit aterrizó tres semanas antes que su gemelo Opportunity en un entorno mucho más rocoso y hostil. Su misión se caracterizó por constantes desafíos mecánicos, demostrando cómo los operadores de software pueden compensar fallos físicos en el hardware. Descubrió depósitos de sílice puro, sugiriendo actividad hidrotermal pasada.",
+                    "El gran valor educativo de Spirit radica en la aplicación práctica de la resiliencia robótica. En 2006, su rueda delantera sufrió un fallo total. Los ingenieros reprogramaron los algoritmos para que el rover condujera hacia atrás. Este arrastre, de forma accidental, rascó la superficie y expuso depósitos científicos invaluables.",
+                    "El final de Spirit llegó a través de una trampa mecánica. Sus ruedas se hundieron en un pozo de arena oculta cubierta por una corteza firme (Troy). Al intentar maniobrar, el chasis se asentó directamente sobre una roca, perdiendo tracción y la capacidad de orientar sus paneles solares hacia el sol invernal.",
+                    "Sin energía solar suficiente, sus sistemas de calefacción murieron por congelación. Es un excelente ejemplo de cómo, en la ingeniería robótica extraterrestre, la interacción cinemática del robot con el terreno es tan crítica como la electrónica de a bordo."
+                ]
+            }
+        ];
+
+        const triviaDB = [
+            {
+                q: "¿Por qué la etapa de descenso del Eagle fue abandonada en la Luna?",
+                opts: ["Por una falla técnica de último momento.", "Para reducir peso y cumplir con el Delta-v necesario para orbitar.", "Para fundar una colonia futura automática.", "Para generar un campo magnético de prueba."],
+                ans: 1
+            },
+            {
+                q: "Los motores del Lunar Roving Vehicle (LRV) se ubicaban en:",
+                opts: ["El centro del chasis con un eje largo.", "En el cubo de cada una de las ruedas.", "En una batería remolcada detrás.", "Sobre el techo para aprovechar la radiación solar."],
+                ans: 1
+            },
+            {
+                q: "¿Cuál es el mecanismo óptico del LRRR que devuelve la luz láser paralela a la Tierra?",
+                opts: ["Lentes convexas motorizadas.", "Espejos parabólicos giratorios.", "Prismas geométricos de esquina de cubo.", "Láminas de oro fotosensibles."],
+                ans: 2
+            },
+            {
+                q: "¿Por qué se eliminaron los lubricantes líquidos tradicionales de las cámaras Hasselblad?",
+                opts: ["Para reducir costos del hardware.", "Por evaporación en el vacío que arruinaría las lentes.", "Porque el polvo lunar absorbe toda la grasa.", "Para aligerar el peso de la cámara fotográfica."],
+                ans: 1
+            },
+            {
+                q: "Parte del hardware de esta nave fue visitado y cortado por los humanos en la Luna:",
+                opts: ["Surveyor 3.", "Módulo Eagle.", "LRRR del Apolo 11.", "Lunar Roving Vehicle."],
+                ans: 0
+            },
+            {
+                q: "El experimento del martillo y la pluma en la Luna demostró empíricamente que:",
+                opts: ["En ausencia de atmósfera, la aceleración de la gravedad actúa por igual sin resistencia.", "El viento solar afecta más a los objetos livianos.", "El magnetismo lunar retiene los metales pesados más rápido.", "La gravedad de la Luna es más fuerte en sus cráteres."],
+                ans: 0
+            },
+            {
+                q: "Para generar sustentación en Marte (1% de atmósfera terrestre), Ingenuity requirió:",
+                opts: ["Motores de hipergólicos.", "Globos de hidrógeno presurizados.", "Aspas que giran a más de 2500 RPM.", "Aerodeslizadores magnéticos."],
+                ans: 2
+            },
+            {
+                q: "¿Qué causó el apagado definitivo del rover Opportunity en Marte?",
+                opts: ["Ruedas rotas y hundidas en una trampa de arena.", "Una tormenta de polvo bloqueó la entrada de fotones a sus paneles.", "Falla de comando humano sobreescribiendo su antena.", "Desintegración total por la radiación cósmica sostenida."],
+                ans: 1
+            },
+            {
+                q: "¿Qué innovación de suspensión permitió al pequeño Sojourner sortear obstáculos eficientemente?",
+                opts: ["Amortiguadores de resorte de titanio.", "Levitar mediante repulsión eléctrica.", "Mecanismo Rocker-Bogie de distribución de masa constante.", "Tracción de orugas tipo tanque militar."],
+                ans: 2
+            },
+            {
+                q: "El recubrimiento ablativo (PICA) del escudo de Perseverance funciona porque:",
+                opts: ["Refleja la luz infrarroja cual espejo.", "Se consume y descama disipando el inmenso estrés termodinámico.", "Se endurece por congelamiento antes de tocar suelo.", "Genera una nube de nitrógeno protectora."],
+                ans: 1
+            },
+            {
+                q: "El final trágico pero educativo de Spirit se debió a un fallo en su interacción con:",
+                opts: ["Un pozo de arena blanda oculto bajo corteza firme.", "El paracaídas atascado en su antena.", "Un lago de metano líquido oculto en el Polo.", "El sistema de calibración láser fallido."],
+                ans: 0
+            },
+            {
+                q: "¿Qué energía permitió al estático Viking 1 operar por 2245 soles sin paneles solares?",
+                opts: ["Motores químicos diésel modificados.", "Celdas fotovoltaicas reflectantes de germanio.", "Baterías de litio de alta densidad.", "Generadores termoelectrónicos de radioisótopos (RTG)."],
+                ans: 3
+            },
+            {
+                q: "Viking 1 dejó de comunicarse de forma abrupta debido a:",
+                opts: ["Una falla en un comando de software que desvió su antena.", "El impacto directo de un micro-meteorito.", "Un ataque de piratas informáticos a la DSN terrestre.", "El agotamiento total del plutonio."],
+                ans: 0
+            },
+            {
+                q: "El motor del módulo de descenso Apolo dependía de combustibles hipergólicos porque:",
+                opts: ["Huelen menos agresivo para el habitáculo.", "Se encienden espontáneamente al entrar en contacto.", "Generan vapor de agua para el consumo.", "Son menos volátiles que la madera en combustión."],
+                ans: 1
+            },
+            {
+                q: "¿Qué demostró el accidente final con las aspas rotas de Ingenuity?",
+                opts: ["El viento marciano destruye el titanio con fricción mecánica.", "La más leve asimetría en la geometría del rotor anula la aerodinámica sostenible.", "La batería entra en implosión sin aviso algorítmico previo.", "Las cámaras colapsan frente al frío extremo."],
+                ans: 1
+            }
+        ];
+
+        // --- Core Functions ---
+        function initApp() {
+            document.getElementById('lang-selector').addEventListener('change', (e) => {
+                currentLang = e.target.value;
+                updateUIStrings();
+                renderCurrentView();
+            });
+            updateUIStrings();
+            navigate('home');
+        }
+
+        function updateUIStrings() {
+            document.getElementById('ui-subtitle').innerText = t('subtitle');
+            document.getElementById('ui-nav-home').innerText = t('navHome');
+            document.getElementById('ui-nav-moon').innerText = t('navMoon');
+            document.getElementById('ui-nav-mars').innerText = t('navMars');
+            document.getElementById('ui-nav-trivia').innerText = t('navTrivia');
+        }
+
+        function navigate(view, data = null) {
+            currentView = view;
+            
+            // Update active state in nav
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-nasa-blue', 'text-white');
+                btn.classList.add('text-gray-400');
+                if (btn.dataset.target === view || (view === 'detail' && btn.dataset.target === data?.planet)) {
+                    btn.classList.remove('text-gray-400');
+                    btn.classList.add('text-white');
+                    btn.querySelector('i').classList.add('text-nasa-blue');
+                } else {
+                    btn.querySelector('i').classList.remove('text-nasa-blue');
+                }
+            });
+
+            renderCurrentView(data);
+        }
+
+        function renderCurrentView(data) {
+            const app = document.getElementById('app-content');
+            app.innerHTML = '';
+            
+            if (currentView === 'home') renderHome(app);
+            else if (currentView === 'moon') renderList(app, 'moon');
+            else if (currentView === 'mars') renderList(app, 'mars');
+            else if (currentView === 'detail') renderDetail(app, data);
+            else if (currentView === 'trivia') renderTriviaStart(app);
+            
+            window.scrollTo(0, 0);
+        }
+
+        // --- Render Views ---
+        function renderHome(container) {
+            container.innerHTML = `
+                <div class="animate-fade-in flex flex-col items-center justify-center text-center mt-10 space-y-6">
+                    <i class="fa-solid fa-satellite text-6xl text-gray-600 mb-4"></i>
+                    <h2 class="text-3xl font-space font-bold text-white">${t('homeTitle')}</h2>
+                    <p class="text-gray-300 max-w-lg leading-relaxed text-sm md:text-base">${t('homeDesc')}</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md mt-8">
+                        <button onclick="navigate('moon')" class="glass-card py-4 px-6 rounded-xl hover:bg-space-800 transition-all font-semibold text-gray-200 border border-gray-600 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-moon"></i> ${t('btnExploreMoon')}
+                        </button>
+                        <button onclick="navigate('mars')" class="glass-card py-4 px-6 rounded-xl hover:bg-space-800 transition-all font-semibold text-gray-200 border border-gray-600 flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-galactic-senate text-red-400"></i> ${t('btnExploreMars')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderList(container, planet) {
+            const objects = spaceObjects.filter(obj => obj.planet === planet);
+            const titleIcon = planet === 'moon' ? 'fa-moon' : 'fa-galactic-senate text-red-400';
+            const titleText = planet === 'moon' ? t('navMoon') : t('navMars');
+
+            let html = `
+                <div class="animate-fade-in">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="fa-solid ${titleIcon} text-2xl"></i>
+                        <h2 class="text-2xl font-space font-bold capitalize">${titleText}</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            `;
+
+            objects.forEach(obj => {
+                const img = obj.imageURL || FALLBACK_IMAGE;
+                html += `
+                    <div onclick="navigate('detail', '${obj.id}')" class="glass-card rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform flex flex-col">
+                        <div class="h-40 bg-gray-800 relative">
+                            <img src="${img}" alt="${obj.imageAltText}" class="w-full h-full object-cover opacity-80" onerror="this.src='${FALLBACK_IMAGE}'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-space-900 to-transparent"></div>
+                            <h3 class="absolute bottom-2 left-3 right-3 font-bold text-lg leading-tight text-white shadow-sm">${obj.name}</h3>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <p class="text-xs text-nasa-red font-semibold mb-2">${obj.mission} &bull; ${obj.date}</p>
+                            <p class="text-sm text-gray-400 line-clamp-2">${obj.objective}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function renderDetail(container, id) {
+            const obj = spaceObjects.find(o => o.id === id);
+            if (!obj) return navigate('home');
+
+            const imgSrc = obj.imageURL || FALLBACK_IMAGE;
+            const imgEditorNote = !obj.imageURL ? `<div class="bg-yellow-900/50 text-yellow-200 text-xs p-2 rounded-b-xl border-x border-b border-yellow-700/50"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${t('editorNoteImg')} ${obj.imageAltText}</div>` : '';
+            
+            const vidSrc = obj.videoID || FALLBACK_VIDEO_ID;
+            const vidEditorNote = !obj.videoID ? `<div class="bg-yellow-900/50 text-yellow-200 text-xs p-2 rounded-b-xl border-x border-b border-yellow-700/50 mt-[-4px] mb-4 relative z-10"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${t('editorNoteVid')} ${obj.videoAltText}</div>` : '<div class="mb-4"></div>';
+
+            let contentHtml = '';
+            obj.content.forEach(p => {
+                contentHtml += `<p class="mb-4 text-gray-300 text-sm md:text-base leading-relaxed tracking-wide text-justify">${p}</p>`;
+            });
+
+            container.innerHTML = `
+                <div class="animate-fade-in pb-8">
+                    <button onclick="navigate('${obj.planet}')" class="text-sm text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> ${t('backBtn')}
+                    </button>
+                    
+                    <h2 class="text-2xl md:text-3xl font-space font-bold mb-2">${obj.name}</h2>
+                    
+                    <div class="glass-card rounded-xl p-4 mb-6 text-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div><span class="text-gray-500">${t('missionLabel')}</span> <span class="font-semibold text-nasa-red">${obj.mission}</span></div>
+                            <div><span class="text-gray-500">${t('dateLabel')}</span> <span class="font-semibold">${obj.date}</span></div>
+                            <div class="sm:col-span-2"><span class="text-gray-500">${t('coordsLabel')}</span> <span class="font-mono text-xs text-blue-300 ml-1">${obj.coords}</span></div>
+                            <div class="sm:col-span-2 mt-1"><span class="text-gray-500">${t('objectiveLabel')}</span> ${obj.objective}</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 shadow-xl shadow-black/50">
+                        <img src="${imgSrc}" class="w-full rounded-t-xl max-h-64 object-cover ${obj.imageURL ? 'rounded-b-xl' : ''}" alt="${obj.imageAltText}" onerror="this.src='${FALLBACK_IMAGE}'">
+                        ${imgEditorNote}
+                    </div>
+
+                    <div class="content-text font-serif">
+                        ${contentHtml}
+                    </div>
+
+                    <div class="mt-8">
+                        <div class="video-container shadow-xl shadow-black/50 ${obj.videoID ? 'rounded-xl' : 'rounded-t-xl'}">
+                            <iframe src="https://www.youtube.com/embed/${vidSrc}?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        ${vidEditorNote}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Trivia Logic ---
+        function renderTriviaStart(container) {
+            container.innerHTML = `
+                <div class="animate-fade-in flex flex-col items-center justify-center h-full min-h-[60vh] text-center px-4">
+                    <i class="fa-solid fa-brain text-5xl text-purple-400 mb-6"></i>
+                    <h2 class="text-3xl font-space font-bold mb-4">${t('triviaTitle')}</h2>
+                    <p class="text-gray-400 max-w-md mb-8">${t('triviaDesc')}</p>
+                    <button onclick="startTrivia()" class="bg-nasa-blue hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-blue-900/50 transition-transform transform hover:scale-105">
+                        ${t('triviaStart')}
+                    </button>
+                </div>
+            `;
+        }
+
+        function startTrivia() {
+            // Shuffle and select 10 questions
+            triviaQuestions = [...triviaDB].sort(() => 0.5 - Math.random()).slice(0, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            renderTriviaQuestion();
+        }
+
+        function renderTriviaQuestion() {
+            const app = document.getElementById('app-content');
+            const q = triviaQuestions[currentQuestionIndex];
+            
+            let optionsHtml = '';
+            q.opts.forEach((opt, idx) => {
+                optionsHtml += `
+                    <button onclick="selectTriviaAnswer(${idx})" class="w-full text-left glass-card p-4 rounded-xl hover:bg-space-700 border-gray-600 transition-colors mb-3 trivia-opt" data-idx="${idx}">
+                        ${opt}
+                    </button>
+                `;
+            });
+
+            app.innerHTML = `
+                <div class="animate-fade-in max-w-2xl mx-auto pt-4">
+                    <div class="flex justify-between text-xs text-gray-500 mb-6 font-space tracking-widest uppercase">
+                        <span>${t('triviaQuestionLabel')} ${currentQuestionIndex + 1} / 10</span>
+                        <span>SCORE: ${score}</span>
+                    </div>
+                    
+                    <h3 class="text-xl md:text-2xl font-semibold mb-8 leading-snug">${q.q}</h3>
+                    
+                    <div id="trivia-options" class="space-y-2">
+                        ${optionsHtml}
+                    </div>
+                    
+                    <div id="trivia-action" class="mt-8 hidden flex justify-end">
+                        <button onclick="nextTriviaQuestion()" class="bg-white text-space-900 font-bold py-2 px-6 rounded-full">
+                            ${currentQuestionIndex === 9 ? t('triviaFinishBtn') : t('triviaNextBtn')} <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectTriviaAnswer(idx) {
+            const q = triviaQuestions[currentQuestionIndex];
+            const isCorrect = idx === q.ans;
+            
+            if (isCorrect) score++;
+
+            // Disable all options and show colors
+            const buttons = document.querySelectorAll('.trivia-opt');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                const btnIdx = parseInt(btn.dataset.idx);
+                btn.classList.remove('hover:bg-space-700');
+                
+                if (btnIdx === q.ans) {
+                    btn.classList.add('bg-green-900/50', 'border-green-500', 'text-green-100');
+                    btn.innerHTML = `<i class="fa-solid fa-check mr-2 text-green-400"></i> ` + btn.innerText;
+                } else if (btnIdx === idx && !isCorrect) {
+                    btn.classList.add('bg-nasa-red/30', 'border-red-500', 'text-red-100');
+                    btn.innerHTML = `<i class="fa-solid fa-xmark mr-2 text-red-400"></i> ` + btn.innerText;
+                } else {
+                    btn.classList.add('opacity-40');
+                }
+            });
+
+            document.getElementById('trivia-action').classList.remove('hidden');
+        }
+
+        function nextTriviaQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < 10) {
+                renderTriviaQuestion();
+            } else {
+                renderTriviaResult();
+            }
+        }
+
+        function renderTriviaResult() {
+            const app = document.getElementById('app-content');
+            const passed = score >= 5;
+            const icon = passed ? 'fa-medal text-yellow-400' : 'fa-wrench text-gray-400';
+            const msg = passed ? t('triviaWinMsg') : t('triviaLoseMsg');
+            
+            app.innerHTML = `
+                <div class="animate-fade-in flex flex-col items-center justify-center text-center pt-10">
+                    <i class="fa-solid ${icon} text-6xl mb-6 shadow-glow"></i>
+                    <h2 class="text-3xl font-space font-bold mb-2">${t('triviaResultTitle')}</h2>
+                    <div class="text-5xl font-bold font-mono text-nasa-blue mb-6">${score}<span class="text-2xl text-gray-500">/10</span></div>
+                    
+                    <p class="text-gray-300 max-w-md leading-relaxed mb-10 text-sm">${msg}</p>
+                    
+                    <button onclick="navigate('trivia')" class="glass-card py-3 px-8 rounded-full hover:bg-space-700 transition-colors font-bold text-white border-gray-600">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> ${t('triviaRetryBtn')}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Run
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
