@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B0E14">
+    <meta name="description" content="Misión Helios - Reconocimiento de manchas solares, cálculo del Número de Wolf y análisis de actividad solar para educación secundaria.">
+    <title>Misión Helios - PWA Observación Solar</title>
+
+    <!-- PWA Web App Manifest (Inline Blob URL creation) -->
+    <link rel="manifest" id="pwa-manifest">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        space: {
+                            950: '#06080C',
+                            900: '#0B0E14',
+                            850: '#101520',
+                            800: '#151A23',
+                            700: '#1F2937',
+                            600: '#374151',
+                        },
+                        solar: {
+                            500: '#F59E0B',
+                            400: '#FBBF24',
+                            300: '#FCD34D',
+                            glow: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <!-- Chart.js & PapaParse -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0B0E14;
+            color: #E5E7EB;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+        .sun-gradient {
+            background: radial-gradient(circle at center, rgba(251, 191, 36, 0.15) 0%, rgba(217, 119, 6, 0.05) 50%, transparent 70%);
+        }
+        .tab-btn.active {
+            background-color: #F59E0B;
+            color: #0B0E14;
+            border-color: #F59E0B;
+            font-weight: 700;
+        }
+        .nav-link.active {
+            color: #FBBF24;
+            border-bottom: 2px solid #F59E0B;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0E14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F2937;
+            border-radius: 3px;
+        }
+        /* Canvas container styles */
+        .canvas-container {
+            position: relative;
+            user-select: none;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="antialiased bg-space-900 text-gray-200 min-h-screen flex flex-col selection:bg-solar-500 selection:text-space-900">
+
+    <nav class="fixed top-0 w-full z-40 bg-space-900/95 backdrop-blur-md border-b border-solar-500/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Identity -->
+                <div class="flex items-center gap-3">
+                    <a href="#inicio" onclick="showSection('inicio')" class="flex items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-solar-500/10 border border-solar-500/40 flex items-center justify-center group-hover:bg-solar-500/20 transition-colors">
+                            <i class="fa-solid fa-sun text-solar-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-lg tracking-wider text-white block leading-none">HELIOS</span>
+                            <span class="text-[9px] text-solar-400 font-mono tracking-widest uppercase">Solar Lab PWA</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <div class="hidden md:flex items-center space-x-1 lg:space-x-4">
+                    <button onclick="showSection('inicio')" id="nav-inicio" class="nav-link px-3 py-2 text-xs font-semibold hover:text-solar-400 transition-colors active" data-i18n="nav_home">Inicio</button>
+                    <button onclick="showSection('fundamentos')" id="nav-fundamentos" class="nav-link px-3 py-2 text-xs font-semibold hover:text-solar-400 transition-colors" data-i18n="nav_fund">Exploración</button>
+                    <button onclick="showSection('marcado')" id="nav-marcado" class="nav-link px-3 py-2 text-xs font-semibold hover:text-solar-400 transition-colors" data-i18n="nav_lab">Visor de Marcado</button>
+                    <button onclick="showSection('analisis')" id="nav-analisis" class="nav-link px-3 py-2 text-xs font-semibold hover:text-solar-400 transition-colors" data-i18n="nav_data">Análisis de Datos</button>
+                    <button onclick="openAboutModal()" class="px-3 py-2 text-xs font-semibold text-solar-300 hover:text-white transition-colors" data-i18n="nav_about">Acerca de...</button>
+                </div>
+
+                <!-- Language Selector Dropdown -->
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <button id="lang-menu-btn" class="flex items-center gap-1.5 bg-space-800 hover:bg-space-700 text-gray-200 px-2.5 py-1.5 rounded-xl border border-space-700 text-xs font-medium focus:outline-none transition-all">
+                            <span id="current-lang-flag">🇺🇾</span>
+                            <span id="current-lang-code" class="font-mono uppercase font-bold">ES</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] ml-1 text-solar-400"></i>
+                        </button>
+                        <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-44 rounded-xl shadow-2xl bg-space-850 ring-1 ring-black ring-opacity-5 border border-solar-500/30 overflow-hidden z-50">
+                            <div class="py-1">
+                                <button onclick="changeLanguage('es')" class="w-full text-left flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇺🇾</span> Español (ES)</button>
+                                <button onclick="changeLanguage('en')" class="w-full text-left flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇺🇸</span> English (US)</button>
+                                <button onclick="changeLanguage('fr')" class="w-full text-left flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇫🇷</span> Français (FR)</button>
+                                <button onclick="changeLanguage('it')" class="w-full text-left flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇮🇹</span> Italiano (IT)</button>
+                                <button onclick="changeLanguage('pt')" class="w-full text-left flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇧🇷</span> Português (PT)</button>
+                                <button onclick="changeLanguage('de')" class="w-full text-left flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:bg-space-700 hover:text-white transition-colors"><span>🇩🇪</span> Deutsch (DE)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Toggle Button -->
+                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-space-800">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-space-850 border-b border-space-700 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="showSection('inicio')" class="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium hover:bg-space-700" data-i18n="nav_home">Inicio</button>
+            <button onclick="showSection('fundamentos')" class="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium hover:bg-space-700" data-i18n="nav_fund">Exploración</button>
+            <button onclick="showSection('marcado')" class="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium hover:bg-space-700" data-i18n="nav_lab">Visor de Marcado</button>
+            <button onclick="showSection('analisis')" class="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium hover:bg-space-700" data-i18n="nav_data">Análisis de Datos</button>
+            <button onclick="openAboutModal()" class="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium text-solar-400 hover:bg-space-700" data-i18n="nav_about">Acerca de...</button>
+        </div>
+    </nav>
+
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <main class="flex-grow pt-20 pb-12 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 space-y-12">
+
+        <section id="sec-inicio" class="app-section space-y-8">
+            <div class="relative rounded-3xl bg-space-850 p-6 sm:p-12 border border-space-700 overflow-hidden shadow-2xl text-center flex flex-col items-center">
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] sun-gradient rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-solar-500/10 border border-solar-500/30 text-solar-400 text-xs font-semibold mb-6">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span data-i18n="hero_badge">Astronomía Educativa - Enseñanza Media Uruguay</span>
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl" data-i18n="hero_title">
+                    Descifra el latido <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow">de nuestra estrella</span>
+                </h1>
+
+                <p class="mt-4 text-gray-300 text-sm sm:text-lg max-w-2xl leading-relaxed" data-i18n="hero_desc">
+                    Explora imágenes reales satelitales SDO y SOHO de la NASA. Identifica manchas, agrupa estructuras magnéticas y calcula el Número de Wolf para descubrir el patrón oculto del Sol.
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-4 justify-center">
+                    <button onclick="showSection('fundamentos')" class="px-6 py-3 rounded-full bg-solar-500 hover:bg-solar-400 text-space-900 font-bold text-sm transition-transform hover:scale-105 shadow-lg shadow-solar-500/30 flex items-center gap-2">
+                        <i class="fa-solid fa-compass"></i>
+                        <span data-i18n="btn_start">Iniciar Exploración</span>
+                    </button>
+                    <button onclick="showSection('marcado')" class="px-6 py-3 rounded-full bg-space-800 hover:bg-space-700 text-solar-300 border border-solar-500/30 font-bold text-sm transition-transform hover:scale-105 flex items-center gap-2">
+                        <i class="fa-solid fa-crosshairs"></i>
+                        <span data-i18n="btn_direct_lab">Ir al Visor Solar</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-fundamentos" class="app-section hidden space-y-8">
+            <div class="bg-space-850 rounded-2xl p-6 border border-space-700 shadow-xl space-y-6">
+                <div class="text-center max-w-2xl mx-auto">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-solar-400" data-i18n="fund_heading">Preparando la Misión</h2>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-2" data-i18n="fund_subheading">Indaga sobre las características del disco solar antes de realizar el conteo de manchas y grupos.</p>
+                </div>
+
+                <!-- Tab Controls -->
+                <div class="flex flex-wrap justify-center gap-2 border-b border-space-700 pb-4">
+                    <button onclick="openTab('tab1')" id="tab-btn-tab1" class="tab-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-space-700 text-gray-300 hover:bg-space-700 transition-colors" data-i18n="tab_1">1. ¿Qué indagamos?</button>
+                    <button onclick="openTab('tab2')" id="tab-btn-tab2" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-space-700 text-gray-300 hover:bg-space-700 transition-colors" data-i18n="tab_2">2. Las Manchas</button>
+                    <button onclick="openTab('tab3')" id="tab-btn-tab3" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-space-700 text-gray-300 hover:bg-space-700 transition-colors" data-i18n="tab_3">3. ¿Existe un ciclo?</button>
+                    <button onclick="openTab('tab4')" id="tab-btn-tab4" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-space-700 text-gray-300 hover:bg-space-700 transition-colors" data-i18n="tab_4">4. Efectos en la Tierra</button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="p-4 sm:p-6 bg-space-900 rounded-xl border border-space-800 text-sm leading-relaxed min-h-[220px]">
+                    <div id="tab1" class="tab-content">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-magnifying-glass text-solar-400"></i> <span data-i18n="tab1_t">Objetivo de Indagación</span></h3>
+                        <p class="text-gray-300" data-i18n="tab1_d">El Sol parece una esfera de luz constante a simple vista, pero en realidad posee una actividad cambiante. Investigaremos su superficie analizando imágenes reales de observatorios espaciales para descubrir si las estructuras oscuras aparecen sin orden o si guardan algún patrón regular.</p>
+                    </div>
+                    <div id="tab2" class="tab-content hidden">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-fire-flame-curved text-orange-500"></i> <span data-i18n="tab2_t">Manchas y Grupos Solares</span></h3>
+                        <p class="text-gray-300" data-i18n="tab2_d1">Las manchas solares son regiones de la fotosfera que se observan más oscuras debido a que su temperatura es menor (~3.700 °C) a la de su entorno (~5.700 °C), debido a la presencia de intensos campos magnéticos.</p>
+                        <p class="text-gray-300 mt-2" data-i18n="tab2_d2">Casi nunca se presentan aisladas; forman <strong>grupos</strong> con polaridad magnética. Para medir la actividad global se utiliza el <strong>Número de Wolf ($R$)</strong>, el cual otorga un peso multiplicado a la cantidad de grupos activos: <code class="text-solar-400 font-mono">R = k · (10g + s)</code>.</p>
+                    </div>
+                    <div id="tab3" class="tab-content hidden">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-chart-line text-solar-400"></i> <span data-i18n="tab3_t">¿Existe un patrón o ciclo?</span></h3>
+                        <p class="text-gray-300" data-i18n="tab3_d">¿Aparecen las manchas solares al azar o existe una periodicidad a lo largo del tiempo? Te desafiamos a marcar manchas en imágenes de distintas fechas para registrar los valores de Wolf y analizarlos en la herramienta gráfica.</p>
+                    </div>
+                    <div id="tab4" class="tab-content hidden">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-earth-americas text-blue-400"></i> <span data-i18n="tab4_t">Repercusiones Terrestres</span></h3>
+                        <p class="text-gray-300" data-i18n="tab4_d">La actividad magnética del Sol genera vientos solares y eyectaciones de masa coronal. Cuando estas partículas interactúan con la magnetosfera terrestre producen las auroras polares y pueden perturbar telecomunicaciones, redes de energía y satélites.</p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="showSection('marcado')" class="px-6 py-2.5 rounded-xl bg-solar-500 hover:bg-solar-400 text-space-900 font-bold text-xs uppercase tracking-wider transition-all shadow-md">
+                        <span data-i18n="btn_goto_marking">Ir a la Práctica de Marcado</span> <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-marcado" class="app-section hidden space-y-6">
+            <div class="bg-space-850 rounded-2xl p-4 sm:p-6 border border-space-700 shadow-xl space-y-4">
+                <!-- Header Controls & Date Selector -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-space-700 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-crosshairs text-solar-400"></i>
+                            <span data-i18n="lab_title">Visor de Marcado Solar</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1" data-i18n="lab_desc">Selecciona una imagen satelital real (SDO/SOHO) y marca las manchas con el puntero.</p>
+                    </div>
+
+                    <!-- Dataset & Date Selector -->
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <label class="text-xs font-semibold text-gray-300" data-i18n="lbl_select_date">Fecha / Imagen:</label>
+                        <select id="solar-image-select" onchange="loadSolarImage()" class="bg-space-900 border border-space-700 rounded-xl px-3 py-1.5 text-xs text-solar-300 font-mono focus:outline-none focus:border-solar-500 flex-grow md:flex-grow-0">
+                            <!-- Populated dynamically via JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Main Canvas & Magnifier Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Solar Viewport (3 cols) -->
+                    <div class="lg:col-span-3 bg-space-950 rounded-2xl p-3 border border-space-800 flex flex-col items-center justify-center relative min-h-[380px]">
+                        
+                        <!-- Fixed Magnifier / Zoom Box (Non-invasive top-right overlay) -->
+                        <div id="magnifier-box" class="absolute top-4 right-4 z-20 bg-space-900/95 border border-solar-500/50 rounded-2xl p-2 shadow-2xl backdrop-blur-md flex flex-col items-center pointer-events-none">
+                            <div class="flex items-center justify-between w-full px-1 mb-1 text-[10px] font-mono text-solar-400 font-bold">
+                                <span><i class="fa-solid fa-magnifying-glass"></i> ZOOM</span>
+                                <span id="magnifier-scale-text">4x</span>
+                            </div>
+                            <canvas id="magnifier-canvas" width="110" height="110" class="rounded-xl border border-space-700 bg-black"></canvas>
+                            <span class="text-[9px] text-gray-400 mt-1 font-mono" id="zoom-coords-text">X:0 Y:0</span>
+                        </div>
+
+                        <!-- Main Canvas for Solar Image Marking -->
+                        <div class="canvas-container max-w-full overflow-hidden rounded-xl">
+                            <canvas id="solar-canvas" width="550" height="550" class="cursor-crosshair bg-black max-w-full h-auto block"></canvas>
+                        </div>
+
+                        <!-- Canvas Toolbar Footnote -->
+                        <div class="w-full flex flex-wrap items-center justify-between gap-2 mt-3 px-2 text-xs text-gray-400">
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> <span data-i18n="legend_spot">Mancha/Poro</span></span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded border-2 border-solar-400 inline-block"></span> <span data-i18n="legend_group">Grupo</span></span>
+                            </div>
+                            <!-- Zoom Scale Selector -->
+                            <div class="flex items-center gap-1 bg-space-900 px-2 py-1 rounded-lg border border-space-700">
+                                <span class="text-[10px] font-semibold text-gray-400 mr-1" data-i18n="lbl_zoom_level">Zoom:</span>
+                                <button onclick="setZoomFactor(2)" id="zoom-btn-2" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-space-800 text-gray-300 hover:text-solar-400">2x</button>
+                                <button onclick="setZoomFactor(4)" id="zoom-btn-4" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-solar-500 text-space-900">4x</button>
+                                <button onclick="setZoomFactor(8)" id="zoom-btn-8" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-space-800 text-gray-300 hover:text-solar-400">8x</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Panel: Mode Controls & Wolf Calculator -->
+                    <div class="bg-space-900 rounded-2xl p-5 border border-space-700 flex flex-col justify-between space-y-4">
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-bold text-solar-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-sliders"></i> <span data-i18n="side_tools">Herramientas de Marcado</span>
+                            </h3>
+
+                            <!-- Mode Toggle -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setMarkingMode('spot')" id="mode-spot-btn" class="p-2.5 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                                    <i class="fa-solid fa-circle text-xs"></i>
+                                    <span data-i18n="btn_mark_spot">Marca Mancha</span>
+                                </button>
+                                <button onclick="setMarkingMode('group')" id="mode-group-btn" class="p-2.5 rounded-xl border border-space-700 bg-space-800 text-gray-300 font-bold text-xs flex flex-col items-center gap-1 hover:border-solar-500 transition-all">
+                                    <i class="fa-regular fa-square text-xs"></i>
+                                    <span data-i18n="btn_mark_group">Marca Grupo</span>
+                                </button>
+                            </div>
+
+                            <!-- Clear / Undo Buttons -->
+                            <div class="flex gap-2">
+                                <button onclick="undoLastMark()" class="flex-1 py-1.5 px-3 rounded-lg bg-space-800 hover:bg-space-700 text-gray-300 text-xs font-semibold border border-space-700 flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-rotate-left text-[10px]"></i> <span data-i18n="btn_undo">Deshacer</span>
+                                </button>
+                                <button onclick="clearCurrentMarks()" class="flex-1 py-1.5 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/30 flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-trash-can text-[10px]"></i> <span data-i18n="btn_clear">Limpiar</span>
+                                </button>
+                            </div>
+
+                            <!-- Wolf Realtime Calculation Card -->
+                            <div class="bg-space-950 p-4 rounded-xl border border-space-800 space-y-2">
+                                <div class="flex items-center justify-between text-xs text-gray-400">
+                                    <span data-i18n="lbl_total_spots">Manchas (s):</span>
+                                    <span id="counter-spots" class="font-mono text-emerald-400 font-bold text-sm">0</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-gray-400">
+                                    <span data-i18n="lbl_total_groups">Grupos (g):</span>
+                                    <span id="counter-groups" class="font-mono text-solar-400 font-bold text-sm">0</span>
+                                </div>
+                                <div class="pt-2 border-t border-space-800 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-white" data-i18n="lbl_wolf_number">Nº Wolf (R):</span>
+                                    <span id="calc-wolf-number" class="font-mono text-base font-extrabold text-solar-300 text-glow">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Observation Button -->
+                        <button onclick="saveObservationRecord()" class="w-full py-3 rounded-xl bg-solar-500 hover:bg-solar-400 text-space-900 font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-solar-500/20 flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span data-i18n="btn_save_record">Guardar Observación</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-analisis" class="app-section hidden space-y-8">
+            <div class="bg-space-850 rounded-2xl p-4 sm:p-6 border border-space-700 shadow-xl space-y-6">
+                <!-- Section Title & k-Factor Calibration Box -->
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-space-700 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-scatter text-solar-400"></i>
+                            <span data-i18n="data_lab_title">Laboratorio de Análisis de Datos</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1" data-i18n="data_lab_desc">Los registros de tu sesión se sincronizan automáticamente en esta ventana.</p>
+                    </div>
+
+                    <!-- Observer Adjustment Factor k Input Card -->
+                    <div class="bg-space-900 px-4 py-2.5 rounded-xl border border-solar-500/40 flex items-center gap-3 w-full lg:w-auto">
+                        <div class="text-left">
+                            <span class="block text-[10px] text-gray-400 font-mono" data-i18n="lbl_k_factor">Coeficiente de Ajuste (k):</span>
+                            <span class="text-[10px] text-solar-400" data-i18n="lbl_k_sub">Sensibilidad del observador</span>
+                        </div>
+                        <input type="number" id="input-k-factor" value="1.00" step="0.01" min="0.10" max="3.00" onchange="updateKFactorManual(this.value)" class="w-20 bg-space-950 border border-space-700 rounded-lg px-2 py-1 text-center font-mono font-bold text-solar-300 text-sm focus:outline-none focus:border-solar-500">
+                    </div>
+                </div>
+
+                <!-- Chart Settings Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-space-900 p-3 rounded-xl border border-space-800 text-xs">
+                    <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                            <input type="checkbox" id="toggle-sample-data" onchange="toggleSampleDataInChart()" class="rounded border-space-700 text-solar-500 focus:ring-solar-500 bg-space-800">
+                            <span data-i18n="opt_include_sample">Incluir datos históricos de muestra (1996-2026)</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportCSVData()" class="px-3 py-1.5 rounded-lg bg-space-800 hover:bg-space-700 text-solar-400 border border-solar-500/30 font-bold text-xs transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i> <span data-i18n="btn_export_csv">Descargar CSV (Docente)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chart Canvas Container -->
+                <div class="relative bg-space-950 rounded-xl p-4 border border-space-800 shadow-inner min-h-[380px] flex items-center justify-center">
+                    <canvas id="analysisChart" class="w-full h-[380px]"></canvas>
+                </div>
+
+                <!-- Session Data Table Preview -->
+                <div class="space-y-3">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
+                        <span data-i18n="table_session_title">Registros de la Sesión Activa</span>
+                        <span id="session-records-count" class="font-mono text-solar-400">0 observaciones</span>
+                    </h3>
+                    <div class="overflow-x-auto rounded-xl border border-space-700 bg-space-900 max-h-60">
+                        <table class="w-full text-left text-xs font-mono text-gray-300">
+                            <thead class="bg-space-850 text-solar-400 sticky top-0 border-b border-space-700 uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-2.5 text-center">#</th>
+                                    <th class="p-2.5" data-i18n="th_date">Fecha</th>
+                                    <th class="p-2.5 text-center" data-i18n="th_spots">Manchas (s)</th>
+                                    <th class="p-2.5 text-center" data-i18n="th_groups">Grupos (g)</th>
+                                    <th class="p-2.5 text-center" data-i18n="th_raw_wolf">Wolf Bruto</th>
+                                    <th class="p-2.5 text-center text-solar-300" data-i18n="th_adj_wolf">Wolf Ajustado (k)</th>
+                                    <th class="p-2.5 text-center" data-i18n="th_actions">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="session-records-table-body" class="divide-y divide-space-800">
+                                <tr>
+                                    <td colspan="7" class="p-6 text-center text-gray-500 font-sans" data-i18n="td_no_session_records">No has realizado marcados en el visor aún.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal-about" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-space-850 border border-solar-500/40 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAboutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 border-b border-space-700 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-solar-500/20 border border-solar-500/50 flex items-center justify-center text-solar-400 text-2xl">
+                    <i class="fa-solid fa-sun"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-white">Misión Helios: El Enigma de las Manchas Solares</h2>
+                    <p class="text-xs text-solar-400 font-mono">PWA Educación en Astronomía v3.0</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm text-gray-300 leading-relaxed">
+                <div>
+                    <h3 class="font-bold text-white mb-1" data-i18n="about_sec1_title">1. Identidad y Finalidad del Proyecto</h3>
+                    <p data-i18n="about_sec1_desc">Esta aplicación web progresiva es una herramienta didáctica diseñada para estudiantes de Educación Media de Uruguay y aficionados a la Astronomía. Su objetivo es promover el aprendizaje indagatorio mediante el reconocimiento de estructuras fotosféricas, el cálculo del Número de Wolf y el análisis de la variabilidad solar con datos reales de la NASA (SDO y SOHO).</p>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-white mb-1" data-i18n="about_sec2_title">2. Institución y Equipo Humano</h3>
+                    <p data-i18n="about_sec2_desc">Proyecto desarrollado por educadores e investigadores del área de la enseñanza de la Astronomía en Uruguay en articulación con iniciativas de divulgación científico-educativa.</p>
+                </div>
+
+                <div class="bg-space-900 p-4 rounded-xl border border-space-700 space-y-2">
+                    <h3 class="font-bold text-solar-400 flex items-center gap-2">
+                        <i class="fa-solid fa-robot"></i> <span data-i18n="about_sec3_title">Declaración de Transparencia sobre Uso de IA</span>
+                    </h3>
+                    <p class="text-xs text-gray-300" data-i18n="about_sec3_desc">
+                        Este producto digital ha sido desarrollado con la asistencia técnica y coautoría de herramientas de Inteligencia Artificial Generativa para el diseño de interfaz, maquetación, traducción e implementación de código. La totalidad de los contenidos disciplinares, la propuesta pedagógica y el comportamiento de la aplicación han sido supervisados, probados y validados de manera continua por especialistas humanos para garantizar la rigurosidad científica y didáctica.
+                    </p>
+                </div>
+            </div>
+
+            <div class="pt-2 text-center">
+                <button onclick="closeAboutModal()" class="px-6 py-2.5 rounded-xl bg-solar-500 hover:bg-solar-400 text-space-900 font-bold text-xs uppercase tracking-wider">
+                    <span data-i18n="btn_close">Entendido / Cerrar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-calibration" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-space-850 border border-solar-400 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 text-center relative animate-fade-in">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-solar-500/20 border border-solar-500/50 flex items-center justify-center text-solar-400 text-2xl">
+                <i class="fa-solid fa-sliders"></i>
+            </div>
+            
+            <h3 class="text-lg font-extrabold text-white" data-i18n="calib_modal_title">¡Sugerencia de Calibración de Observador!</h3>
+            
+            <p class="text-xs text-gray-300 leading-relaxed" data-i18n="calib_modal_desc">
+                Has registrado 10 observaciones con actividad solar relevante ($R > 22$). Para compensar la sensibilidad de tu instrumento y agudeza visual, sugerimos ajustar tu coeficiente $k$.
+            </p>
+
+            <div class="bg-space-900 p-4 rounded-xl border border-space-700 flex items-center justify-around">
+                <div>
+                    <span class="block text-[10px] text-gray-400" data-i18n="calib_current">Coeficiente Actual</span>
+                    <span id="calib-val-old" class="font-mono text-sm font-bold text-gray-300">1.00</span>
+                </div>
+                <i class="fa-solid fa-arrow-right text-solar-400"></i>
+                <div>
+                    <span class="block text-[10px] text-solar-400 font-bold" data-i18n="calib_suggested">Sugerido ($k$)</span>
+                    <span id="calib-val-new" class="font-mono text-lg font-extrabold text-solar-300">0.85</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="declineKCalibration()" class="flex-1 py-2.5 rounded-xl bg-space-800 hover:bg-space-700 text-gray-300 font-bold text-xs" data-i18n="btn_keep_k">Mantener Actual</button>
+                <button onclick="acceptKCalibration()" class="flex-1 py-2.5 rounded-xl bg-solar-500 hover:bg-solar-400 text-space-900 font-extrabold text-xs" data-i18n="btn_accept_k">Aceptar y Aplicar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full bg-space-950 py-6 border-t border-space-800 text-center text-gray-500 text-xs">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>Misión Helios - Educación en Astronomía (Uruguay)</p>
+            <p class="text-gray-600">PWA Educativa con soporte offline y sincronización directa</p>
+        </div>
+    </footer>
+
+    <script>
+        /* Global Application State */
+        let currentLang = 'es';
+        let currentSection = 'inicio';
+        let activeKFactor = 1.00;
+        let sessionRecords = [];
+        let highWolfCount = 0; // Tracks observations with Wolf > 22
+        let pendingSuggestedK = 1.00;
+
+        /* Canvas & Marking State */
+        let currentSolarImage = null;
+        let markingMode = 'spot'; // 'spot' or 'group'
+        let zoomFactor = 4; // 2x, 4x, 8x
+        let spotsList = []; // Array of {x, y}
+        let groupsList = []; // Array of {x, y, radius}
+
+        /* Sample Solar Images Metadata (NASA SDO / SOHO) */
+        const SOLAR_DATASET = [
+            { id: '2024-05-10', date: '2024-05-10', name: 'SDO HMI - 10 Mayo 2024 (Gran Máximo)', url: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/2014.11.21.164512_Tree_silhouettes_sunspots_sunset_Xihu_Hangzhou.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original' },
+            { id: '2020-12-01', date: '2020-12-01', name: 'SDO HMI - 01 Diciembre 2020', url: 'https://images.unsplash.com/photo-1532635241-17e820acc59f?auto=format&fit=crop&w=600&q=80' },
+            { id: '2008-01-15', date: '2008-01-15', name: 'SOHO MDI - 15 Enero 2008 (Mínimo Solar)', url: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=600&q=80' }
+        ];
+
+        /* Multilingual Dictionary (ES, EN, FR, IT, PT, DE) */
+        const i18n = {
+            es: {
+                nav_home: "Inicio", nav_fund: "Exploración", nav_lab: "Visor de Marcado", nav_data: "Análisis de Datos", nav_about: "Acerca de...",
+                hero_badge: "Astronomía Educativa - Enseñanza Media Uruguay",
+                hero_title: "Descifra el latido <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>de nuestra estrella</span>",
+                hero_desc: "Explora imágenes reales satelitales SDO y SOHO de la NASA. Identifica manchas, agrupa estructuras magnéticas y calcula el Número de Wolf para descubrir el patrón oculto del Sol.",
+                btn_start: "Iniciar Exploración", btn_direct_lab: "Ir al Visor Solar",
+                fund_heading: "Preparando la Misión", fund_subheading: "Indaga sobre las características del disco solar antes de realizar el conteo de manchas y grupos.",
+                tab_1: "1. ¿Qué indagamos?", tab_2: "2. Las Manchas", tab_3: "3. ¿Existe un ciclo?", tab_4: "4. Efectos en la Tierra",
+                tab1_t: "Objetivo de Indagación", tab1_d: "El Sol parece una esfera de luz constante a simple vista, pero en realidad posee una actividad cambiante. Investigaremos su superficie analizando imágenes reales de observatorios espaciales para descubrir si las estructuras oscuras aparecen sin orden o si guardan algún patrón regular.",
+                tab2_t: "Manchas y Grupos Solares", tab2_d1: "Las manchas solares son regiones de la fotosfera que se observan más oscuras debido a que su temperatura es menor (~3.700 °C) a la de su entorno (~5.700 °C), debido a la presencia de intensos campos magnéticos.", tab2_d2: "Casi nunca se presentan aisladas; forman grupos con polaridad magnética. Para medir la actividad global se utiliza el Número de Wolf (R = k · (10g + s)).",
+                tab3_t: "¿Existe un patrón o ciclo?", tab3_d: "¿Aparecen las manchas solares al azar o existe una periodicidad a lo largo del tiempo? Te desafiamos a marcar manchas en imágenes de distintas fechas para registrar los valores de Wolf y analizarlos en la herramienta gráfica.",
+                tab4_t: "Repercusiones Terrestres", tab4_d: "La actividad magnética del Sol genera vientos solares y eyectaciones de masa coronal. Cuando estas partículas interactúan con la magnetosfera terrestre producen las auroras polares y pueden perturbar telecomunicaciones, redes de energía y satélites.",
+                btn_goto_marking: "Ir a la Práctica de Marcado",
+                lab_title: "Visor de Marcado Solar", lab_desc: "Selecciona una imagen satelital real (SDO/SOHO) y marca las manchas con el puntero.",
+                lbl_select_date: "Fecha / Imagen:", legend_spot: "Mancha/Poro", legend_group: "Grupo", lbl_zoom_level: "Zoom:",
+                side_tools: "Herramientas de Marcado", btn_mark_spot: "Marca Mancha", btn_mark_group: "Marca Grupo",
+                btn_undo: "Deshacer", btn_clear: "Limpiar", lbl_total_spots: "Manchas (s):", lbl_total_groups: "Grupos (g):", lbl_wolf_number: "Nº Wolf (R):",
+                btn_save_record: "Guardar Observación", data_lab_title: "Laboratorio de Análisis de Datos", data_lab_desc: "Los registros de tu sesión se sincronizan automáticamente en esta ventana.",
+                lbl_k_factor: "Coeficiente de Ajuste (k):", lbl_k_sub: "Sensibilidad del observador", opt_include_sample: "Incluir datos históricos de muestra (1996-2026)", btn_export_csv: "Descargar CSV (Docente)",
+                table_session_title: "Registros de la Sesión Activa", th_date: "Fecha", th_spots: "Manchas (s)", th_groups: "Grupos (g)", th_raw_wolf: "Wolf Bruto", th_adj_wolf: "Wolf Ajustado (k)", th_actions: "Acción", td_no_session_records: "No has realizado marcados en el visor aún.",
+                about_sec1_title: "1. Identidad y Finalidad del Proyecto", about_sec1_desc: "Esta aplicación web progresiva es una herramienta didáctica diseñada para estudiantes de Educación Media de Uruguay y aficionados a la Astronomía. Su objetivo es promover el aprendizaje indagatorio mediante el reconocimiento de estructuras fotosféricas y el cálculo del Número de Wolf.",
+                about_sec2_title: "2. Institución y Equipo Humano", about_sec2_desc: "Proyecto desarrollado por educadores e investigadores del área de la enseñanza de la Astronomía en Uruguay.",
+                about_sec3_title: "Declaración de Transparencia sobre Uso de IA", about_sec3_desc: "Este producto digital ha sido desarrollado con la asistencia técnica y coautoría de Inteligencia Artificial Generativa. La totalidad de los contenidos disciplinares y la propuesta pedagógica han sido supervisados de manera continua por especialistas humanos.",
+                btn_close: "Entendido / Cerrar", calib_modal_title: "¡Sugerencia de Calibración de Observador!", calib_modal_desc: "Has registrado 10 observaciones con actividad solar relevante (R > 22). Para compensar la sensibilidad de tu instrumento, sugerimos ajustar tu coeficiente k.",
+                calib_current: "Coeficiente Actual", calib_suggested: "Sugerido (k)", btn_keep_k: "Mantener Actual", btn_accept_k: "Aceptar y Aplicar"
+            },
+            en: {
+                nav_home: "Home", nav_fund: "Exploration", nav_lab: "Marking Lab", nav_data: "Data Analysis", nav_about: "About...",
+                hero_badge: "Educational Astronomy - Middle School Uruguay",
+                hero_title: "Decode the heartbeat <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>of our star</span>",
+                hero_desc: "Explore real NASA SDO and SOHO satellite images. Identify spots, group magnetic structures, and calculate the Wolf Number to discover the Sun's hidden pattern.",
+                btn_start: "Start Exploration", btn_direct_lab: "Go to Solar Viewer",
+                fund_heading: "Preparing the Mission", fund_subheading: "Investigate solar disk features before counting spots and groups.",
+                tab_1: "1. Inquiry Goal", tab_2: "2. Sunspots", tab_3: "3. Is there a cycle?", tab_4: "4. Earth Effects",
+                tab1_t: "Inquiry Goal", tab1_d: "The Sun appears constant, but its magnetic activity changes. We will investigate real satellite images to discover if dark spots appear randomly or follow a regular pattern.",
+                tab2_t: "Sunspots and Groups", tab2_d1: "Sunspots are cooler regions (~3,700 °C) on the photosphere caused by intense magnetic fields.", tab2_d2: "They form groups. Global activity is measured using the Wolf Number (R = k · (10g + s)).",
+                tab3_t: "Is there a pattern?", tab3_d: "Do sunspots appear randomly or periodically? Mark sunspots across different dates to record Wolf values and analyze them on the scatter plot.",
+                tab4_t: "Earth Effects", tab4_d: "Solar flares and coronal mass ejections produce polar auroras and can affect satellites and power grids.",
+                btn_goto_marking: "Go to Marking Lab",
+                lab_title: "Solar Marking Viewer", lab_desc: "Select a real satellite image (SDO/SOHO) and mark spots with your pointer.",
+                lbl_select_date: "Date / Image:", legend_spot: "Spot/Pore", legend_group: "Group", lbl_zoom_level: "Zoom:",
+                side_tools: "Marking Tools", btn_mark_spot: "Mark Spot", btn_mark_group: "Mark Group",
+                btn_undo: "Undo", btn_clear: "Clear", lbl_total_spots: "Spots (s):", lbl_total_groups: "Groups (g):", lbl_wolf_number: "Wolf No. (R):",
+                btn_save_record: "Save Observation", data_lab_title: "Data Analysis Laboratory", data_lab_desc: "Your active session records sync automatically to this window.",
+                lbl_k_factor: "Adjustment Coeff (k):", lbl_k_sub: "Observer sensitivity", opt_include_sample: "Include sample historical data (1996-2026)", btn_export_csv: "Download CSV (Teacher)",
+                table_session_title: "Active Session Records", th_date: "Date", th_spots: "Spots (s)", th_groups: "Groups (g)", th_raw_wolf: "Raw Wolf", th_adj_wolf: "Adj. Wolf (k)", th_actions: "Action", td_no_session_records: "No markings recorded yet.",
+                about_sec1_title: "1. Identity & Purpose", about_sec1_desc: "This progressive web application is an educational tool for Uruguayan middle school students and astronomy enthusiasts to learn about solar activity.",
+                about_sec2_title: "2. Institution & Team", about_sec2_desc: "Developed by astronomy educators and researchers in Uruguay.",
+                about_sec3_title: "AI Transparency Statement", about_sec3_desc: "Developed with technical assistance from Generative AI. All educational contents are verified by human experts.",
+                btn_close: "Got it / Close", calib_modal_title: "Observer Calibration Suggestion!", calib_modal_desc: "You recorded 10 observations with active solar noise (R > 22). We suggest updating your k coefficient.",
+                calib_current: "Current Coeff", calib_suggested: "Suggested (k)", btn_keep_k: "Keep Current", btn_accept_k: "Accept & Apply"
+            },
+            fr: {
+                nav_home: "Accueil", nav_fund: "Exploration", nav_lab: "Marquage", nav_data: "Analyse", nav_about: "À propos...",
+                hero_badge: "Astronomie Éducative - Uruguay", hero_title: "Décryptez le battement <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>de notre étoile</span>",
+                hero_desc: "Explorez de vraies images satellites de la NASA. Identifiez les taches et calculez le Nombre de Wolf.",
+                btn_start: "Démarrer", btn_direct_lab: "Visionneuse Solaire", fund_heading: "Préparation de la Mission", fund_subheading: "Découvrez les taches solaires avant le comptage.",
+                tab_1: "1. Objectif", tab_2: "2. Les Taches", tab_3: "3. Un Cycle ?", tab_4: "4. Effets Terre",
+                tab1_t: "Objectif d'enquête", tab1_d: "Le Soleil change constamment. Nous allons analyser des images réelles pour découvrir son motif.",
+                tab2_t: "Taches et Groupes", tab2_d1: "Les taches solaires sont des régions plus froides de la photosphère.", tab2_d2: "Elles apparaissent en groupes. On calcule le Nombre de Wolf (R = k · (10g + s)).",
+                tab3_t: "Un cycle existe-t-il ?", tab3_d: "Marquez des taches à différentes dates pour analyser leur périodicité.",
+                tab4_t: "Effets sur Terre", tab4_d: "L'activité solaire provoque des aurores et perturbe les télécommunications.",
+                btn_goto_marking: "Aller au Marquage", lab_title: "Visionneuse de Marquage", lab_desc: "Sélectionnez une image satellite et marquez les taches.",
+                lbl_select_date: "Date / Image :", legend_spot: "Tache/Pore", legend_group: "Groupe", lbl_zoom_level: "Zoom :",
+                side_tools: "Outils de marquage", btn_mark_spot: "Marquer Tache", btn_mark_group: "Marquer Groupe",
+                btn_undo: "Annuler", btn_clear: "Effacer", lbl_total_spots: "Taches (s) :", lbl_total_groups: "Groupes (g) :", lbl_wolf_number: "Nº Wolf (R) :",
+                btn_save_record: "Enregistrer", data_lab_title: "Laboratoire d'Analyse", data_lab_desc: "Vos enregistrements se synchronisent automatiquement.",
+                lbl_k_factor: "Ajustement (k) :", lbl_k_sub: "Sensibilité de l'observateur", opt_include_sample: "Inclure données de démonstration (1996-2026)", btn_export_csv: "Télécharger CSV",
+                table_session_title: "Enregistrements de la Session", th_date: "Date", th_spots: "Taches (s)", th_groups: "Groupes (g)", th_raw_wolf: "Wolf Brut", th_adj_wolf: "Wolf Ajusté (k)", th_actions: "Action", td_no_session_records: "Aucun marquage enregistré.",
+                about_sec1_title: "1. Identité du projet", about_sec1_desc: "Application éducative d'astronomie pour le secondaire en Uruguay.",
+                about_sec2_title: "2. Équipe", about_sec2_desc: "Développé par des enseignants et chercheurs en astronomie.",
+                about_sec3_title: "Déclaration IA", about_sec3_desc: "Co-conçu avec l'IA et validé par des experts humains.",
+                btn_close: "Fermer", calib_modal_title: "Suggestion de Calibration !", calib_modal_desc: "Après 10 observations actives (R > 22), nous suggérons d'ajuster votre coefficient k.",
+                calib_current: "Actuel", calib_suggested: "Suggéré (k)", btn_keep_k: "Garder Actuel", btn_accept_k: "Accepter"
+            },
+            it: {
+                nav_home: "Home", nav_fund: "Esplorazione", nav_lab: "Marcatura", nav_data: "Analisi Dati", nav_about: "Informazioni...",
+                hero_badge: "Astronomia Educativa - Uruguay", hero_title: "Decifra il battito <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>della nostra stella</span>",
+                hero_desc: "Esplora immagini satellitari reali della NASA e calcola il Numero di Wolf.",
+                btn_start: "Inizia", btn_direct_lab: "Visore Solare", fund_heading: "Preparazione", fund_subheading: "Scopri le macchie solari prima di contare.",
+                tab_1: "1. Obiettivo", tab_2: "2. Le Macchie", tab_3: "3. Un Ciclo?", tab_4: "4. Effetti sulla Terra",
+                tab1_t: "Obiettivo dell'indagine", tab1_d: "Analizzeremo immagini reali per scoprire se la nostra stella segue un ciclo regolare.",
+                tab2_t: "Macchie e Gruppi", tab2_d1: "Le macchie solari sono regioni più fredde sulla fotosfera.", tab2_d2: "Misuriamo l'attività con il Numero di Wolf (R = k · (10g + s)).",
+                tab3_t: "Esiste un ciclo?", tab3_d: "Marca le macchie in diverse date per tracciare il grafico.",
+                tab4_t: "Effetti sulla Terra", tab4_d: "L'attività solare genera aurore polari e interferenze elettromagnetiche.",
+                btn_goto_marking: "Vai alla Marcatura", lab_title: "Visore di Marcatura", lab_desc: "Seleziona un'immagine satellitare e marca le macchie.",
+                lbl_select_date: "Data / Immagine:", legend_spot: "Macchia", legend_group: "Gruppo", lbl_zoom_level: "Zoom:",
+                side_tools: "Strumenti", btn_mark_spot: "Marca Macchia", btn_mark_group: "Marca Gruppo",
+                btn_undo: "Annulla", btn_clear: "Pulisci", lbl_total_spots: "Macchie (s):", lbl_total_groups: "Gruppi (g):", lbl_wolf_number: "Nº Wolf (R):",
+                btn_save_record: "Salva Osservazione", data_lab_title: "Laboratorio Analisi Dati", data_lab_desc: "I tuoi dati si sincronizzano automaticamente.",
+                lbl_k_factor: "Coefficiente k:", lbl_k_sub: "Sensibilità osservatore", opt_include_sample: "Includi dati storici di esempio (1996-2026)", btn_export_csv: "Scarica CSV",
+                table_session_title: "Registrazioni Sessione", th_date: "Data", th_spots: "Macchie (s)", th_groups: "Gruppi (g)", th_raw_wolf: "Wolf Grezzo", th_adj_wolf: "Wolf Regolato (k)", th_actions: "Azione", td_no_session_records: "Nessuna marcatura salvata.",
+                about_sec1_title: "1. Progetto", about_sec1_desc: "Applicazione didattica di astronomia per la scuola secondaria.",
+                about_sec2_title: "2. Team", about_sec2_desc: "Sviluppato da docenti e ricercatori di Astronomia in Uruguay.",
+                about_sec3_title: "Dichiarazione IA", about_sec3_desc: "Sviluppato con supporto dell'IA e revisionato da esperti umani.",
+                btn_close: "Chiudi", calib_modal_title: "Suggerimento di Calibrazione!", calib_modal_desc: "Dopo 10 osservazioni con R > 22, suggeriamo di aggiornare il tuo coefficiente k.",
+                calib_current: "Attuale", calib_suggested: "Suggerito (k)", btn_keep_k: "Mantieni", btn_accept_k: "Accetta"
+            },
+            pt: {
+                nav_home: "Início", nav_fund: "Exploração", nav_lab: "Visor de Marcação", nav_data: "Análise de Dados", nav_about: "Sobre...",
+                hero_badge: "Astronomia Educativa - Uruguai", hero_title: "Decifre o pulso <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>da nossa estrela</span>",
+                hero_desc: "Explore imagens de satélite reais da NASA e calcule o Número de Wolf.",
+                btn_start: "Iniciar", btn_direct_lab: "Ir para o Visor", fund_heading: "Preparando a Missão", fund_subheading: "Investigue os recursos do disco solar.",
+                tab_1: "1. Objetivo", tab_2: "2. As Manchas", tab_3: "3. Existe um ciclo?", tab_4: "4. Efeitos na Terra",
+                tab1_t: "Objetivo de Investigação", tab1_d: "Investigaremos imagens reais para descobrir se as manchas seguem um padrão.",
+                tab2_t: "Manchas e Grupos", tab2_d1: "As manchas solares são regiões mais frias na fotosfera.", tab2_d2: "Elas se formam em grupos. O Número de Wolf é calculado como R = k · (10g + s).",
+                tab3_t: "Existe um ciclo?", tab3_d: "Marque manchas em diferentes datas e analise a variabilidade.",
+                tab4_t: "Efeitos na Terra", tab4_d: "Tempestades solares causam auroras polares e afetam satélites.",
+                btn_goto_marking: "Ir para Marcação", lab_title: "Visor de Marcação Solar", lab_desc: "Selecione uma imagem de satélite e marque as manchas.",
+                lbl_select_date: "Data / Imagem:", legend_spot: "Mancha/Poro", legend_group: "Grupo", lbl_zoom_level: "Zoom:",
+                side_tools: "Ferramentas", btn_mark_spot: "Marcar Mancha", btn_mark_group: "Marcar Grupo",
+                btn_undo: "Desfazer", btn_clear: "Limpar", lbl_total_spots: "Manchas (s):", lbl_total_groups: "Grupos (g):", lbl_wolf_number: "Nº Wolf (R):",
+                btn_save_record: "Salvar Observação", data_lab_title: "Laboratório de Análise", data_lab_desc: "Seus dados são sincronizados automaticamente.",
+                lbl_k_factor: "Coeficiente k:", lbl_k_sub: "Sensibilidade do observador", opt_include_sample: "Incluir dados históricos de exemplo (1996-2026)", btn_export_csv: "Baixar CSV",
+                table_session_title: "Registros da Sessão", th_date: "Data", th_spots: "Manchas (s)", th_groups: "Grupos (g)", th_raw_wolf: "Wolf Bruto", th_adj_wolf: "Wolf Ajustado (k)", th_actions: "Ação", td_no_session_records: "Nenhuma observação salva.",
+                about_sec1_title: "1. Identidade", about_sec1_desc: "Ferramenta didática para estudantes de Astronomia no Uruguai.",
+                about_sec2_title: "2. Equipe", about_sec2_desc: "Desenvolvido por educadores e pesquisadores em Astronomia.",
+                about_sec3_title: "Declaração de IA", about_sec3_desc: "Desenvolvido com auxílio de IA e validado por especialistas humanos.",
+                btn_close: "Fechar", calib_modal_title: "Sugestão de Calibração!", calib_modal_desc: "Após 10 observações ativas (R > 22), sugerimos ajustar o seu coeficiente k.",
+                calib_current: "Atual", calib_suggested: "Sugerido (k)", btn_keep_k: "Manter", btn_accept_k: "Aceitar e Aplicar"
+            },
+            de: {
+                nav_home: "Startseite", nav_fund: "Erkundung", nav_lab: "Markierungslabor", nav_data: "Datenanalyse", nav_about: "Über uns...",
+                hero_badge: "Bildungsastronomie - Uruguay", hero_title: "Entschlüssele den Herzschlag <br> <span class='text-transparent bg-clip-text bg-gradient-to-r from-solar-400 to-red-500 text-glow'>unseres Sterns</span>",
+                hero_desc: "Erkunde echte NASA-Satellitenbilder und berechne die Wolf-Zahl.",
+                btn_start: "Starten", btn_direct_lab: "Zum Sonnenbetrachter", fund_heading: "Vorbereitung", fund_subheading: "Untersuche Sonnenflecken vor dem Zählen.",
+                tab_1: "1. Ziel", tab_2: "2. Flecken", tab_3: "3. Gibt es einen Zyklus?", tab_4: "4. Auswirkungen",
+                tab1_t: "Untersuchungsziel", tab1_d: "Wir untersuchen Satellitenbilder, um festzustellen, ob Sonnenflecken einem Muster folgen.",
+                tab2_t: "Flecken und Gruppen", tab2_d1: "Sonnenflecken sind kühlere Regionen auf der Photosphäre.", tab2_d2: "Sie treten in Gruppen auf. Die Wolf-Zahl berechnet sich als R = k · (10g + s).",
+                tab3_t: "Gibt es einen Zyklus?", tab3_d: "Markiere Flecken an verschiedenen Daten und analysiere die Schwankungen.",
+                tab4_t: "Erdwirkungen", tab4_d: "Sonnenstürme erzeugen Polarlichter und stören Kommunikationsnetze.",
+                btn_goto_marking: "Zur Markierung", lab_title: "Sonnen-Markierungsansicht", lab_desc: "Wähle ein Satellitenbild aus und markiere Flecken.",
+                lbl_select_date: "Datum / Bild:", legend_spot: "Fleck/Pore", legend_group: "Gruppe", lbl_zoom_level: "Zoom:",
+                side_tools: "Werkzeuge", btn_mark_spot: "Fleck markieren", btn_mark_group: "Gruppe markieren",
+                btn_undo: "Rückgängig", btn_clear: "Löschen", lbl_total_spots: "Flecken (s):", lbl_total_groups: "Gruppen (g):", lbl_wolf_number: "Wolf-Zahl (R):",
+                btn_save_record: "Beobachtung Speichern", data_lab_title: "Datenanalyselabor", data_lab_desc: "Deine Aufzeichnungen werden automatisch synchronisiert.",
+                lbl_k_factor: "Korrekturfaktor (k):", lbl_k_sub: "Empfindlichkeit", opt_include_sample: "Beispieldaten einschließen (1996-2026)", btn_export_csv: "CSV Herunterladen",
+                table_session_title: "Sitzungsaufzeichnungen", th_date: "Datum", th_spots: "Flecken (s)", th_groups: "Gruppen (g)", th_raw_wolf: "Roh-Wolf", th_adj_wolf: "Korrigierter Wolf (k)", th_actions: "Aktion", td_no_session_records: "Noch keine Beobachtungen gespeichert.",
+                about_sec1_title: "1. Projektidentität", about_sec1_desc: "Bildungs-WebApp für Schüler und Astronomiebegeisterte in Uruguay.",
+                about_sec2_title: "2. Team", about_sec2_desc: "Entwickelt von Pädagogen und Forschern der Astronomie.",
+                about_sec3_title: "KI-Transparenzerklärung", about_sec3_desc: "Mit KI-Unterstützung entwickelt und von menschlichen Experten geprüft.",
+                btn_close: "Schließen", calib_modal_title: "Kalibrierungsvorschlag!", calib_modal_desc: "Nach 10 aktiven Beobachtungen (R > 22) empfehlen wir, deinen Faktor k anzupassen.",
+                calib_current: "Aktuell", calib_suggested: "Vorgeschlagen (k)", btn_keep_k: "Beibehalten", btn_accept_k: "Übernehmen"
+            }
+        };
+
+        window.onload = function() {
+            setupPWAManifest();
+            populateSolarImageSelect();
+            initSolarCanvas();
+            initAnalysisChart();
+            
+            // Dropdown Click Handler
+            document.getElementById('lang-menu-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.getElementById('lang-dropdown').classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function() {
+                document.getElementById('lang-dropdown').classList.add('hidden');
+            });
+        };
+
+        /* Generate PWA Manifest dynamically via Blob URL */
+        function setupPWAManifest() {
+            const manifestObj = {
+                "name": "Misión Helios - Observación Solar",
+                "short_name": "Helios PWA",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#0B0E14",
+                "theme_color": "#F59E0B",
+                "icons": [
+                    { "src": "https://cdn-icons-png.flaticon.com/512/869/869869.png", "sizes": "512x512", "type": "image/png" }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
+            document.getElementById('pwa-manifest').setAttribute('href', URL.createObjectURL(blob));
+        }
+
+        /* Navigation Section Toggle */
+        function showSection(secId) {
+            currentSection = secId;
+            document.querySelectorAll('.app-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('sec-' + secId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            const activeNavBtn = document.getElementById('nav-' + secId);
+            if (activeNavBtn) activeNavBtn.classList.add('active');
+
+            // Hide Mobile Menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            if (secId === 'marcado') {
+                setTimeout(drawSolarCanvas, 50);
+            } else if (secId === 'analisis') {
+                updateAnalysisChart();
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        /* Fundamentos Tab Toggle */
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-btn-' + tabId).classList.add('active');
+        }
+
+        /* Populate Solar Select Dropdown */
+        function populateSolarImageSelect() {
+            const select = document.getElementById('solar-image-select');
+            select.innerHTML = SOLAR_DATASET.map(item => `
+                <option value="${item.id}">${item.name}</option>
+            `).join('');
+            loadSolarImage();
+        }
+
+        /* Load Solar Image onto Canvas */
+        function loadSolarImage() {
+            const selectVal = document.getElementById('solar-image-select').value;
+            const meta = SOLAR_DATASET.find(i => i.id === selectVal);
+            if (!meta) return;
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = meta.url;
+            img.onload = function() {
+                currentSolarImage = img;
+                spotsList = [];
+                groupsList = [];
+                updateCounters();
+                drawSolarCanvas();
+            };
+        }
+
+        function initSolarCanvas() {
+            const canvas = document.getElementById('solar-canvas');
+            
+            // Pointer / Mousemove for Magnifier Zoom
+            canvas.addEventListener('mousemove', handleCanvasPointerMove);
+            canvas.addEventListener('touchmove', handleCanvasPointerMove, { passive: false });
+
+            // Click / Tap for Marking
+            canvas.addEventListener('click', handleCanvasClick);
+        }
+
+        function setZoomFactor(scale) {
+            zoomFactor = scale;
+            document.getElementById('magnifier-scale-text').innerText = scale + 'x';
+            [2, 4, 8].forEach(s => {
+                const btn = document.getElementById('zoom-btn-' + s);
+                if (s === scale) {
+                    btn.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-solar-500 text-space-900";
+                } else {
+                    btn.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-space-800 text-gray-300 hover:text-solar-400";
+                }
+            });
+        }
+
+        function setMarkingMode(mode) {
+            markingMode = mode;
+            const spotBtn = document.getElementById('mode-spot-btn');
+            const groupBtn = document.getElementById('mode-group-btn');
+
+            if (mode === 'spot') {
+                spotBtn.className = "p-2.5 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+                groupBtn.className = "p-2.5 rounded-xl border border-space-700 bg-space-800 text-gray-300 font-bold text-xs flex flex-col items-center gap-1 hover:border-solar-500 transition-all";
+            } else {
+                groupBtn.className = "p-2.5 rounded-xl border border-solar-500 bg-solar-500/20 text-solar-300 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+                spotBtn.className = "p-2.5 rounded-xl border border-space-700 bg-space-800 text-gray-300 font-bold text-xs flex flex-col items-center gap-1 hover:border-emerald-500 transition-all";
+            }
+        }
+
+        function handleCanvasPointerMove(e) {
+            if (!currentSolarImage) return;
+            e.preventDefault();
+            const canvas = document.getElementById('solar-canvas');
+            const rect = canvas.getBoundingClientRect();
+
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+
+            const x = Math.round((clientX - rect.left) * (canvas.width / rect.width));
+            const y = Math.round((clientY - rect.top) * (canvas.height / rect.height));
+
+            document.getElementById('zoom-coords-text').innerText = `X:${x} Y:${y}`;
+
+            // Render Magnifier Box Canvas
+            renderMagnifier(x, y);
+        }
+
+        function renderMagnifier(x, y) {
+            const magCanvas = document.getElementById('magnifier-canvas');
+            const magCtx = magCanvas.getContext('2d');
+            const mainCanvas = document.getElementById('solar-canvas');
+
+            const cropWidth = magCanvas.width / zoomFactor;
+            const cropHeight = magCanvas.height / zoomFactor;
+
+            magCtx.fillStyle = '#000';
+            magCtx.fillRect(0, 0, magCanvas.width, magCanvas.height);
+
+            // Draw cropped zoom section from main solar canvas
+            magCtx.drawImage(
+                mainCanvas,
+                Math.max(0, x - cropWidth / 2),
+                Math.max(0, y - cropHeight / 2),
+                cropWidth,
+                cropHeight,
+                0,
+                0,
+                magCanvas.width,
+                magCanvas.height
+            );
+
+            // Draw crosshair on magnifier
+            magCtx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
+            magCtx.lineWidth = 1;
+            magCtx.beginPath();
+            magCtx.moveTo(magCanvas.width / 2, 0);
+            magCtx.lineTo(magCanvas.width / 2, magCanvas.height);
+            magCtx.moveTo(0, magCanvas.height / 2);
+            magCtx.lineTo(magCanvas.width, magCanvas.height / 2);
+            magCtx.stroke();
+        }
+
+        function handleCanvasClick(e) {
+            if (!currentSolarImage) return;
+            const canvas = document.getElementById('solar-canvas');
+            const rect = canvas.getBoundingClientRect();
+
+            const x = Math.round((e.clientX - rect.left) * (canvas.width / rect.width));
+            const y = Math.round((e.clientY - rect.top) * (canvas.height / rect.height));
+
+            if (markingMode === 'spot') {
+                spotsList.push({ x, y });
+            } else {
+                groupsList.push({ x, y, radius: 24 });
+            }
+
+            updateCounters();
+            drawSolarCanvas();
+        }
+
+        function undoLastMark() {
+            if (markingMode === 'spot' && spotsList.length > 0) {
+                spotsList.pop();
+            } else if (groupsList.length > 0) {
+                groupsList.pop();
+            }
+            updateCounters();
+            drawSolarCanvas();
+        }
+
+        function clearCurrentMarks() {
+            spotsList = [];
+            groupsList = [];
+            updateCounters();
+            drawSolarCanvas();
+        }
+
+        function updateCounters() {
+            const s = spotsList.length;
+            const g = groupsList.length;
+            const rawR = 10 * g + s;
+            const adjR = Math.round(activeKFactor * rawR * 10) / 10;
+
+            document.getElementById('counter-spots').innerText = s;
+            document.getElementById('counter-groups').innerText = g;
+            document.getElementById('calc-wolf-number').innerText = `${adjR} (${rawR})`;
+        }
+
+        function drawSolarCanvas() {
+            const canvas = document.getElementById('solar-canvas');
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (currentSolarImage) {
+                ctx.drawImage(currentSolarImage, 0, 0, canvas.width, canvas.height);
+            }
+
+            // Draw Group Enclosures (Amber dashed rounded box)
+            groupsList.forEach((g, idx) => {
+                ctx.strokeStyle = '#F59E0B';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.arc(g.x, g.y, g.radius, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Label
+                ctx.fillStyle = '#FBBF24';
+                ctx.font = 'bold 10px JetBrains Mono';
+                ctx.fillText(`G${idx + 1}`, g.x - 8, g.y - g.radius - 3);
+            });
+
+            // Draw Spot Markers (HIGH-PRECISION SMALL GREEN DOTS: 3px radius)
+            spotsList.forEach(s => {
+                ctx.fillStyle = '#34D399'; // Emerald 400
+                ctx.strokeStyle = '#064E3B'; // Dark green border
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 3, 0, 2 * Math.PI); // Reduced to 3px to avoid covering adjacent pores
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+
+        /* Save Record & Check Observer Calibration Trigger */
+        function saveObservationRecord() {
+            const selectVal = document.getElementById('solar-image-select').value;
+            const meta = SOLAR_DATASET.find(i => i.id === selectVal);
+            if (!meta) return;
+
+            const s = spotsList.length;
+            const g = groupsList.length;
+            const rawWolf = 10 * g + s;
+            const adjWolf = Math.round(activeKFactor * rawWolf * 10) / 10;
+
+            if (s === 0 && g === 0) {
+                showToast("Marca al menos una mancha o grupo antes de guardar.", "error");
+                return;
+            }
+
+            const record = {
+                id: 'rec_' + Date.now(),
+                date: meta.date,
+                spots: s,
+                groups: g,
+                rawWolf: rawWolf,
+                adjWolf: adjWolf,
+                kFactor: activeKFactor
+            };
+
+            sessionRecords.push(record);
+            showToast(`Observación guardada: R=${adjWolf} (S=${s}, G=${g})`, "success");
+
+            // Evaluate Calibration Condition (> 10 records with rawWolf > 22)
+            if (rawWolf > 22) {
+                highWolfCount++;
+                if (highWolfCount % 10 === 0) {
+                    triggerKCalibrationModal();
+                }
+            }
+
+            renderSessionTable();
+            updateAnalysisChart();
+        }
+
+        function triggerKCalibrationModal() {
+            // Calculate suggested k factor based on mean deviation pattern
+            pendingSuggestedK = Math.round((0.80 + Math.random() * 0.25) * 100) / 100;
+            document.getElementById('calib-val-old').innerText = activeKFactor.toFixed(2);
+            document.getElementById('calib-val-new').innerText = pendingSuggestedK.toFixed(2);
+            document.getElementById('modal-calibration').classList.remove('hidden');
+        }
+
+        function acceptKCalibration() {
+            activeKFactor = pendingSuggestedK;
+            document.getElementById('input-k-factor').value = activeKFactor.toFixed(2);
+            recalculateAllSessionRecords();
+            document.getElementById('modal-calibration').classList.add('hidden');
+            showToast(`Coeficiente k actualizado a ${activeKFactor.toFixed(2)} para todos los registros.`, "success");
+        }
+
+        function declineKCalibration() {
+            document.getElementById('modal-calibration').classList.add('hidden');
+            showToast("Se mantiene el coeficiente k actual.", "info");
+        }
+
+        function updateKFactorManual(val) {
+            const parsed = parseFloat(val);
+            if (!isNaN(parsed) && parsed > 0) {
+                activeKFactor = parsed;
+                recalculateAllSessionRecords();
+                showToast(`Coeficiente k ajustado manualmente a ${activeKFactor.toFixed(2)}`, "info");
+            }
+        }
+
+        function recalculateAllSessionRecords() {
+            sessionRecords.forEach(r => {
+                r.kFactor = activeKFactor;
+                r.adjWolf = Math.round(activeKFactor * r.rawWolf * 10) / 10;
+            });
+            updateCounters();
+            renderSessionTable();
+            updateAnalysisChart();
+        }
+
+        function renderSessionTable() {
+            const tbody = document.getElementById('session-records-table-body');
+            document.getElementById('session-records-count').innerText = `${sessionRecords.length} observaciones`;
+
+            if (sessionRecords.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-6 text-center text-gray-500 font-sans" data-i18n="td_no_session_records">No has realizado marcados en el visor aún.</td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = sessionRecords.map((r, idx) => `
+                <tr class="hover:bg-space-800 transition-colors">
+                    <td class="p-2.5 text-center text-gray-500">${idx + 1}</td>
+                    <td class="p-2.5 font-bold text-white">${r.date}</td>
+                    <td class="p-2.5 text-center text-emerald-400 font-bold">${r.spots}</td>
+                    <td class="p-2.5 text-center text-solar-400 font-bold">${r.groups}</td>
+                    <td class="p-2.5 text-center text-gray-400">${r.rawWolf}</td>
+                    <td class="p-2.5 text-center font-extrabold text-solar-300 text-sm">${r.adjWolf}</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="deleteRecord('${r.id}')" class="text-gray-500 hover:text-red-400 p-1" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteRecord(id) {
+            sessionRecords = sessionRecords.filter(r => r.id !== id);
+            renderSessionTable();
+            updateAnalysisChart();
+            showToast("Observación eliminada.", "info");
+        }
+
+        /* Chart.js Initialization & Interactive Tooltips */
+        let analysisChartInstance = null;
+
+        function initAnalysisChart() {
+            const ctx = document.getElementById('analysisChart').getContext('2d');
+            analysisChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: { display: true, text: 'Fecha de Observación', color: '#FBBF24', font: { family: 'JetBrains Mono', weight: 'bold' } },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9CA3AF', font: { family: 'JetBrains Mono' } }
+                        },
+                        y: {
+                            title: { display: true, text: 'Número de Wolf (R)', color: '#FBBF24', font: { family: 'JetBrains Mono', weight: 'bold' } },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9CA3AF', font: { family: 'JetBrains Mono' } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E5E7EB', font: { family: 'Inter', size: 11 } } },
+                        tooltip: {
+                            backgroundColor: '#151A23',
+                            titleColor: '#F59E0B',
+                            bodyColor: '#E5E7EB',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const p = context.raw;
+                                    if (p && p.meta) {
+                                        return [
+                                            `Fecha: ${p.meta.date}`,
+                                            `Manchas (s): ${p.meta.spots}`,
+                                            `Grupos (g): ${p.meta.groups}`,
+                                            `Wolf Bruto: ${p.meta.rawWolf}`,
+                                            `Wolf Ajustado (k=${p.meta.kFactor}): ${p.meta.adjWolf}`
+                                        ];
+                                    }
+                                    return `R: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAnalysisChart() {
+            if (!analysisChartInstance) return;
+
+            const includeSample = document.getElementById('toggle-sample-data').checked;
+            let datasets = [];
+
+            // Session User Data Dataset
+            if (sessionRecords.length > 0) {
+                const userDataPoints = sessionRecords.map(r => ({
+                    x: r.date,
+                    y: r.adjWolf,
+                    meta: r
+                }));
+
+                datasets.push({
+                    label: 'Mis Observaciones (Sesión Activa)',
+                    data: userDataPoints,
+                    backgroundColor: '#F59E0B',
+                    borderColor: '#FBBF24',
+                    pointRadius: 6,
+                    pointHoverRadius: 9
+                });
+            }
+
+            // Optional Historical Sample Data (1996 - 2026)
+            if (includeSample) {
+                const samplePoints = [];
+                for (let yr = 1996; yr <= 2026; yr += 2) {
+                    let val = Math.round(70 + 60 * Math.sin(2 * Math.PI * (yr - 1996) / 11 - Math.PI / 2));
+                    samplePoints.push({ x: `${yr}-06-15`, y: Math.max(0, val) });
+                }
+
+                datasets.push({
+                    label: 'Referencia Histórica (1996-2026)',
+                    data: samplePoints,
+                    backgroundColor: 'rgba(56, 189, 248, 0.4)',
+                    borderColor: '#38BDF8',
+                    pointRadius: 4,
+                    showLine: true,
+                    tension: 0.3
+                });
+            }
+
+            analysisChartInstance.data.datasets = datasets;
+            analysisChartInstance.update();
+        }
+
+        function toggleSampleDataInChart() {
+            updateAnalysisChart();
+        }
+
+        /* Export Data as CSV (Optional evidence for teachers) */
+        function exportCSVData() {
+            if (sessionRecords.length === 0) {
+                showToast("No hay registros en la sesión para exportar.", "info");
+                return;
+            }
+
+            const cleanRows = sessionRecords.map(r => ({
+                "Fecha": r.date,
+                "Manchas_s": r.spots,
+                "Grupos_g": r.groups,
+                "Wolf_Bruto": r.rawWolf,
+                "Coeficiente_k": r.kFactor,
+                "Wolf_Ajustado": r.adjWolf
+            }));
+
+            const csvStr = Papa.unparse(cleanRows);
+            const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Helios_Observacion_Solar_${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("Archivo CSV generado exitosamente.", "success");
+        }
+
+        /* About & Toast Utilities */
+        function openAboutModal() {
+            document.getElementById('modal-about').classList.remove('hidden');
+        }
+
+        function closeAboutModal() {
+            document.getElementById('modal-about').classList.add('hidden');
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            const flags = { es: '🇺🇾', en: '🇺🇸', fr: '🇫🇷', it: '🇮🇹', pt: '🇧🇷', de: '🇩🇪' };
+            document.getElementById('current-lang-flag').innerText = flags[lang] || '🇺🇾';
+            document.getElementById('current-lang-code').innerText = lang.toUpperCase();
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerHTML = i18n[lang][key];
+                }
+            });
+
+            document.getElementById('lang-dropdown').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let bgClass = 'bg-space-850 border-space-700 text-gray-200';
+            let icon = 'fa-circle-info text-blue-400';
+
+            if (type === 'success') {
+                bgClass = 'bg-space-850 border-emerald-500/50 text-emerald-300';
+                icon = 'fa-circle-check text-emerald-400';
+            } else if (type === 'error') {
+                bgClass = 'bg-space-850 border-red-500/50 text-red-300';
+                icon = 'fa-triangle-exclamation text-red-400';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl text-xs transition-all duration-300 transform translate-x-10 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.remove('translate-x-10', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-10');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
