@@ -310,6 +310,8 @@ main:focus { outline: none; }
 .saved-line { margin: 0.9rem 0 0; font-size: var(--step--1); color: var(--muted); display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: center; max-width: none; }
 .link-btn { background: none; border: 0; padding: 0; color: var(--link); text-decoration: underline; text-underline-offset: 0.18em; cursor: pointer; font-weight: 700; }
 .pending { margin-top: 0.85rem; }
+.kbar { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.kbar .btn { min-height: 2.75rem; }
 
 /* ---------- Laboratorio de datos ---------- */
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-block: 1rem 0.5rem; border-block: 2px solid var(--ink); }

@@ -29,7 +29,8 @@ export function initDataLab() {
   if (!VARS[varKey]) varKey = 'r';
 
   bindKInput(kInput);
-  pendingBtn.addEventListener('click', openKDialog);
+  pendingBtn.addEventListener('click', () => openKDialog());
+  $('#k-recalc').addEventListener('click', () => openKDialog());   // evaluación a demanda, sin esperar el aviso automático
 
   // ---------- gráfica ----------
   const chart = createChart(chartHost, {

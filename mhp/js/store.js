@@ -97,11 +97,12 @@ export function computeKSuggestion() {
   return { type: 'suggest', ks, n: qs.length, used };
 }
 
-/** Cierra la evaluación vigente: acepta el k sugerido o mantiene el actual; la próxima llega tras otras K_STEP. */
+/** Cierra la evaluación (automática o pedida con «Recalcular k ahora»): acepta el k sugerido o mantiene el actual; la próxima llega tras otras K_STEP. */
 export function resolveK(accepted, ks) {
   if (accepted) state.k = round2(clampK(ks));
   state.kState.pending = false;
-  state.kState.nextAt = qualifyingCount() + LAB.K_STEP;
+  // Una evaluación manual anterior a la primera automática (menos de K_FIRST observaciones) no corre el cronograma.
+  if (qualifyingCount() >= LAB.K_FIRST) state.kState.nextAt = qualifyingCount() + LAB.K_STEP;
   emit(accepted ? 'k' : 'kstate');
 }
 export const kPending = () => state.kState.pending && qualifyingCount() >= state.kState.nextAt;

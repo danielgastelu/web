@@ -128,21 +128,28 @@ export function initObservatory() {
     live.textContent = t('marks_live', counts());
   }
 
+  // Solo se descartan los repetidos accidentales: el mismo punto exacto (< 0,5 px de pantalla) o un
+  // segundo toque casi idéntico (< 2 px) dentro de 450 ms. Dos poros o manchas distintos, por cercanos
+  // que estén, siempre se pueden marcar: la lupa es la que permite apuntarles por separado.
+  let lastMark = null;
+  function isAccidentalRepeat(px, py) {
+    const S = stage.clientWidth, now = performance.now();
+    const samePoint = marks.some(m => m.type === tool && Math.hypot(m.x / 100 * S - px, m.y / 100 * S - py) < 0.5);
+    const quickRetap = lastMark && lastMark.type === tool && now - lastMark.t < 450 && Math.hypot(lastMark.px - px, lastMark.py - py) < 2;
+    return samePoint || !!quickRetap;
+  }
+
   function addMark(px, py) {
+    if (isAccidentalRepeat(px, py)) return;
     const S = stage.clientWidth;
-    const x = round(px / S * 100), y = round(py / S * 100);
-    // Doble toque accidental: una marca del mismo tipo a menos de ~1 % del ancho del disco no se cuenta dos veces.
-    if (marks.some(m => m.type === tool && Math.hypot(m.x - x, m.y - y) < 1)) {
-      toast(t('mark_dup'), { kind: 'warn' });
-      return;
-    }
-    marks.push({ type: tool, x, y });
+    marks.push({ type: tool, x: round(px / S * 100, 3), y: round(py / S * 100, 3) });
+    lastMark = { type: tool, px, py, t: performance.now() };
     marksByDate.set(cur.date, marks);
     renderMarks();
     try { navigator.vibrate && navigator.vibrate(10); } catch (e) { /* sin vibración */ }
   }
-  btnUndo.addEventListener('click', () => { marks.pop(); renderMarks(); });
-  btnClear.addEventListener('click', () => { marks.length = 0; renderMarks(); });
+  btnUndo.addEventListener('click', () => { marks.pop(); lastMark = null; renderMarks(); });
+  btnClear.addEventListener('click', () => { marks.length = 0; lastMark = null; renderMarks(); });
 
   // ---------- lupa ----------
   function updateLens(px, py) {
@@ -215,7 +222,8 @@ export function initObservatory() {
   stage.addEventListener('blur', () => { if (!aim) hideLens(); });
   stage.addEventListener('keydown', e => {
     if (stageState !== 'ready') return;
-    const step = e.shiftKey ? 0.2 : 1;
+    // El paso del cursor de teclado se achica con el aumento (2 %, 1 %, 0,5 % del disco ÷ zoom/2); con Shift, cinco veces más fino.
+    const step = (e.shiftKey ? 0.2 : 1) * 2 / zoom;
     const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
     if (move) {
       e.preventDefault();
