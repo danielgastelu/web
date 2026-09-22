@@ -146,6 +146,7 @@ textarea{resize:vertical;}
 .filmstrip .thumb .thumb-dots span{width:6px; height:6px; border-radius:50%; display:block; box-shadow:0 0 0 1px #000;}
 .filmstrip .thumb.loading{opacity:.4;}
 .filmstrip .thumb.error{opacity:.5; outline:1px dashed var(--danger);}
+.filmstrip .thumb.dup{opacity:.55; outline:2px dashed var(--accent);}
 
 .report-preview{
   white-space:pre-wrap; background:#0a0e22; border:1px solid var(--border); border-radius:8px;

@@ -1,5 +1,5 @@
 // app.js — controlador principal de la PWA Sungrazer Hunter
-import { CAMERA_INFO, IMAGE_SIZE, buildTimeline, makeFrame } from "./helioviewer.js";
+import { CAMERA_INFO, IMAGE_SIZE, buildTimeline, makeFrame, resolveActualDate } from "./helioviewer.js";
 import { trackMetrics } from "./coords.js";
 import * as storage from "./storage.js";
 import { buildReportText, buildReportJson, buildReportZip, downloadBlob } from "./report.js";
@@ -116,6 +116,44 @@ function generateSet() {
   loadFrame(0);
   resetZoom();
   persistSession();
+  resolveFrameDates(session);
+}
+
+// ---------- verificación de fechas reales de imagen (detecta cuadros "duplicados") ----------
+// takeScreenshot devuelve la imagen real más cercana al instante pedido. Si el intervalo
+// elegido es menor que la cadencia real de datos disponibles (o hay un hueco de cobertura),
+// varios cuadros pedidos pueden coincidir con la MISMA imagen real: la animación avanza en
+// el reloj pero se ve siempre la misma foto. Esto lo verifica en segundo plano y avisa.
+async function resolveFrameDates(sess) {
+  const CONC = 4;
+  let i = 0;
+  async function worker() {
+    while (i < sess.frames.length) {
+      const idx = i++;
+      const f = sess.frames[idx];
+      const real = await resolveActualDate(new Date(f.tISO), sess.camera);
+      if (real) f.actualISO = real;
+    }
+  }
+  await Promise.all(Array.from({ length: CONC }, worker));
+  if (session !== sess) return; // el usuario ya generó/cargó otra sesión mientras tanto
+  let dupCount = 0;
+  for (let idx = 1; idx < sess.frames.length; idx++) {
+    const prev = sess.frames[idx - 1];
+    const cur = sess.frames[idx];
+    if (prev.actualISO && cur.actualISO && prev.actualISO === cur.actualISO) {
+      cur.duplicateOf = prev.actualISO;
+      dupCount++;
+    }
+  }
+  if (dupCount > 0) {
+    $("#setStatus").textContent =
+      `Set generado: ${sess.frames.length} cuadro(s) de ${CAMERA_INFO[sess.camera].label}. ` +
+      `Aviso: ${dupCount} de esos cuadros corresponden a la MISMA imagen real (Helioviewer no tiene ` +
+      `datos nuevos en ese tramo con esta cadencia) — probá un intervalo mayor o revisá otro rango horario.`;
+  }
+  renderFilmstrip();
+  loadFrame(frameIndex);
 }
 
 function extendSet(direction) {
@@ -137,6 +175,7 @@ function extendSet(direction) {
   renderFilmstrip();
   loadFrame(frameIndex);
   persistSession();
+  resolveFrameDates(session);
 }
 
 // ================= VISOR / FRAMES =================
@@ -150,7 +189,10 @@ function loadFrame(idx) {
   frameIndex = idx;
   const f = session.frames[idx];
   frameImg.src = f.url;
-  $("#frameLabel").textContent = `Cuadro ${idx + 1} / ${session.frames.length} — ${fmtUTShort(f.tISO)} · ${fmtLocal(f.tISO)}`;
+  const realNote = f.actualISO && f.actualISO !== f.tISO ? ` (imagen real: ${fmtUTShort(f.actualISO)})` : "";
+  const dupNote = f.duplicateOf ? " ⚠ imagen repetida, sin dato nuevo" : "";
+  $("#frameLabel").textContent =
+    `Cuadro ${idx + 1} / ${session.frames.length} — ${fmtUTShort(f.tISO)} · ${fmtLocal(f.tISO)}${realNote}${dupNote}`;
   $$("#filmstrip .thumb").forEach((t, i) => t.classList.toggle("active", i === idx));
   const activeThumb = $(`#filmstrip .thumb[data-idx="${idx}"]`);
   // "block: nearest" es clave: sin especificarlo, el navegador puede scrollear
@@ -197,9 +239,11 @@ function renderFilmstrip() {
   el.innerHTML = "";
   session.frames.forEach((f, i) => {
     const div = document.createElement("div");
-    div.className = "thumb";
+    div.className = "thumb" + (f.duplicateOf ? " dup" : "");
     div.dataset.idx = i;
-    div.title = fmtUTShort(f.tISO);
+    div.title = f.duplicateOf
+      ? `${fmtUTShort(f.tISO)} — imagen repetida (sin dato nuevo)`
+      : fmtUTShort(f.tISO);
     const img = document.createElement("img");
     img.src = f.url;
     img.loading = "lazy";

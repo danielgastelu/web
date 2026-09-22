@@ -61,6 +61,30 @@ navegador note la actualización incluso si alguien tiene una pestaña vieja abi
 respuestas conocidas para entrenar antes de reportar candidatos reales (la guía los ofrece
 para descarga). Es una buena mejora a futuro si te sirve para uso en clase.
 
+### Bug: "las imágenes son todas iguales, del mismo tiempo"
+
+Se detectó y corrigió la causa de este síntoma. La app pide a Helioviewer una imagen para
+cada instante de la secuencia (`takeScreenshot`), pero ese servicio siempre devuelve la
+imagen real **más cercana** al instante pedido — no genera una imagen nueva por arte de
+magia. Si el intervalo elegido es más chico que la cadencia real de datos disponibles en ese
+tramo (o hay un hueco de cobertura de un rato), varios cuadros pedidos con horarios distintos
+pueden terminar coincidiendo con la **misma imagen real**: el reloj de la app avanza cuadro a
+cuadro, pero la foto de fondo es la misma, así que a simple vista (y en la animación) se ven
+"todas iguales".
+
+Ahora, después de generar (o extender) un set, la app verifica en segundo plano —consultando
+la fecha real de cada imagen vía la API de Helioviewer— si esto está pasando, y si encuentra
+cuadros duplicados:
+- Lo avisa en el estado del set ("N cuadros corresponden a la MISMA imagen real...").
+- Marca esas miniaturas en el filmstrip con un borde punteado.
+- Muestra en el cuadro la hora real de la imagen entre paréntesis cuando difiere de la hora
+  pedida, y un aviso "⚠ imagen repetida, sin dato nuevo" cuando corresponde.
+
+Si te aparece este aviso, conviene agrandar el intervalo entre cuadros o probar otro rango
+horario/fecha con mejor cobertura de datos. Esta verificación es best-effort: si por algún
+motivo no se puede consultar (sin conexión, etc.), la app sigue funcionando igual, sólo sin
+el aviso.
+
 ## Qué hace
 
 1. **Explorar sets de imágenes en vivo**: elegís fecha, cámara (LASCO C2 o C3) y rango

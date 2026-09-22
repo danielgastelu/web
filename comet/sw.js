@@ -7,7 +7,7 @@
 // el navegador detecte "este sw.js cambió" y reemplace la versión instalada — sin este
 // cambio de contenido, un usuario que ya visitó la app antes puede quedar viendo
 // index.html/app.js viejos indefinidamente por más que se suba una versión nueva al servidor.
-const CACHE_VERSION = "sg-hunter-v2";
+const CACHE_VERSION = "sg-hunter-v3";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
