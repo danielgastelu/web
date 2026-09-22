@@ -10,14 +10,16 @@ export const CAMERA_INFO = {
     imageScale: 11.9,           // arcsec/pixel, escala nativa de C2
     layers: "[SOHO,LASCO,C2,white-light,1,100]",
     defaultIntervalMin: 12,     // cadencia típica aproximada
-    speedWarnPxH: 70,           // referencia orientativa (grupo Kreutz en C2)
+    speedTypicalPxH: 70,        // velocidad típica de un cometa Kreutz en C2 (guía oficial)
+    speedJumpTolerancePxH: 60,  // tolerancia de variación entre cuadros consecutivos (guía oficial)
   },
   C3: {
     label: "LASCO C3",
     imageScale: 56.0,           // arcsec/pixel, escala nativa de C3
     layers: "[SOHO,LASCO,C3,white-light,1,100]",
     defaultIntervalMin: 20,
-    speedWarnPxH: 10,           // referencia orientativa (grupo Kreutz en C3)
+    speedTypicalPxH: 10,        // velocidad típica de un cometa Kreutz en C3 (guía oficial)
+    speedJumpTolerancePxH: 10,  // tolerancia de variación entre cuadros consecutivos (guía oficial)
   },
 };
 

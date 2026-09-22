@@ -58,17 +58,45 @@ export function trackMetrics(marks, camera) {
     }
   }
 
+  // dirección predominante: ¿entra desde la mitad inferior y se acerca al Sol?
+  // (según la guía oficial, ~84% de los cometas SOHO reales lo hacen así)
+  let directionInfo = null;
+  if (sorted.length >= 2) {
+    const first = sorted[0], last = sorted[sorted.length - 1];
+    const cx = IMAGE_SIZE / 2, cy = IMAGE_SIZE / 2;
+    const distFirst = Math.hypot(first.x - cx, first.y - cy);
+    const distLast = Math.hypot(last.x - cx, last.y - cy);
+    directionInfo = {
+      entersFromLowerHalf: first.y > cy,
+      approachingSun: distLast < distFirst,
+      movesMostlyHorizontal: Math.abs(last.x - first.x) > 3 * Math.abs(last.y - first.y),
+    };
+  }
+
   const info = CAMERA_INFO[camera];
   const flags = [];
   if (sorted.length < 5) flags.push(`Sólo ${sorted.length} cuadro(s) marcado(s) — se recomiendan 5 o más consecutivos.`);
-  if (maxSpeed != null && maxSpeed > info.speedWarnPxH * 2.2) {
-    flags.push(`Velocidad máxima (${maxSpeed.toFixed(1)} px/h) muy por encima de lo típico para ${camera} (~${info.speedWarnPxH} px/h) — revisar si es un cometa.`);
+
+  // Test de consistencia de velocidad tal como lo describe la guía oficial: si la velocidad
+  // varía entre cuadros consecutivos más que la tolerancia de la cámara, no es un cometa.
+  if (speedJumpMax > info.speedJumpTolerancePxH) {
+    flags.push(
+      `La velocidad varía ${speedJumpMax.toFixed(1)} px/h entre cuadros consecutivos, por encima de la tolerancia orientativa de la guía oficial para ${camera} (~${info.speedJumpTolerancePxH} px/h) — un cometa real no acelera/frena así de golpe.`
+    );
+  }
+  if (maxSpeed != null && maxSpeed > info.speedTypicalPxH * 3) {
+    flags.push(
+      `Velocidad máxima (${maxSpeed.toFixed(1)} px/h) muy por encima de la típica de un cometa Kreutz en ${camera} (~${info.speedTypicalPxH} px/h) — revisar si no es una estrella, un planeta o un rayo cósmico.`
+    );
   }
   if (maxResidualPx != null && maxResidualPx > 12) {
     flags.push(`El trazado se aleja hasta ${maxResidualPx.toFixed(1)} px de una línea recta ajustada — verificar que no sea ruido o confusión entre objetos.`);
   }
+  if (directionInfo && directionInfo.movesMostlyHorizontal) {
+    flags.push(`El movimiento es mayormente horizontal — los cometas SOHO casi nunca se mueven así; podría ser una estrella o un planeta en tránsito.`);
+  }
 
-  return { sorted, segments, avgSpeed, maxSpeed, minSpeed, speedJumpMax, maxResidualPx, flags };
+  return { sorted, segments, avgSpeed, maxSpeed, minSpeed, speedJumpMax, maxResidualPx, directionInfo, flags };
 }
 
 function linreg(xs, ys) {

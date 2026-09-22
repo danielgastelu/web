@@ -40,6 +40,7 @@ $$(".tab-btn").forEach((btn) => {
     btn.setAttribute("aria-selected", "true");
     $$(".tab-panel").forEach((p) => p.classList.remove("active"));
     $(`#tab-${btn.dataset.tab}`).classList.add("active");
+    if (btn.dataset.tab !== "explorar") stopPlayback();
     if (btn.dataset.tab === "reportes") renderSessionsList();
   });
 });
@@ -83,6 +84,7 @@ $("#btnExtenderAntes").addEventListener("click", () => extendSet(-1));
 $("#btnExtenderDespues").addEventListener("click", () => extendSet(1));
 
 function generateSet() {
+  stopPlayback();
   const date = $("#fDate").value;
   const camera = $("#fCamera").value;
   const start = $("#fStart").value;
@@ -118,6 +120,7 @@ function generateSet() {
 
 function extendSet(direction) {
   if (!session) return;
+  stopPlayback();
   const step = session.interval * 60 * 1000;
   const n = 6; // cuántos cuadros agregar de una
   const newFrames = [];
@@ -150,12 +153,44 @@ function loadFrame(idx) {
   $("#frameLabel").textContent = `Cuadro ${idx + 1} / ${session.frames.length} — ${fmtUTShort(f.tISO)} · ${fmtLocal(f.tISO)}`;
   $$("#filmstrip .thumb").forEach((t, i) => t.classList.toggle("active", i === idx));
   const activeThumb = $(`#filmstrip .thumb[data-idx="${idx}"]`);
-  if (activeThumb) activeThumb.scrollIntoView({ inline: "nearest", behavior: "smooth" });
+  // "block: nearest" es clave: sin especificarlo, el navegador puede scrollear
+  // verticalmente toda la página al cambiar de cuadro, corriendo el visor bajo el cursor.
+  if (activeThumb) activeThumb.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
   renderOverlay();
 }
 
-$("#btnPrevFrame").addEventListener("click", () => loadFrame(Math.max(0, frameIndex - 1)));
-$("#btnNextFrame").addEventListener("click", () => loadFrame(Math.min(session.frames.length - 1, frameIndex + 1)));
+$("#btnPrevFrame").addEventListener("click", () => { stopPlayback(); loadFrame(Math.max(0, frameIndex - 1)); });
+$("#btnNextFrame").addEventListener("click", () => { stopPlayback(); loadFrame(Math.min(session.frames.length - 1, frameIndex + 1)); });
+
+// ---------- reproducción automática (flipbook / blink) ----------
+// Técnica clásica de caza de cometas: reproducir la secuencia en bucle (o alternar
+// rápidamente entre dos cuadros, con velocidad "Blink") para que el ojo detecte lo que
+// se mueve de forma consistente frente al fondo de estrellas fijas.
+let playTimer = null;
+const btnPlay = $("#btnPlay");
+
+function isPlaying() { return playTimer !== null; }
+
+function stopPlayback() {
+  if (playTimer) { clearInterval(playTimer); playTimer = null; }
+  btnPlay.classList.remove("playing");
+  btnPlay.innerHTML = "&#9654; Reproducir";
+}
+
+function startPlayback() {
+  if (!session || session.frames.length < 2) return;
+  const speed = Number($("#fPlaySpeed").value) || 350;
+  playTimer = setInterval(() => {
+    loadFrame((frameIndex + 1) % session.frames.length);
+  }, speed);
+  btnPlay.classList.add("playing");
+  btnPlay.innerHTML = "&#10074;&#10074; Pausar";
+}
+
+function togglePlayback() { isPlaying() ? stopPlayback() : startPlayback(); }
+
+btnPlay.addEventListener("click", togglePlayback);
+$("#fPlaySpeed").addEventListener("change", () => { if (isPlaying()) { stopPlayback(); startPlayback(); } });
 
 function renderFilmstrip() {
   const el = $("#filmstrip");
@@ -176,7 +211,7 @@ function renderFilmstrip() {
     dots.className = "thumb-dots";
     dots.id = `dots-${i}`;
     div.append(img, time, dots);
-    div.addEventListener("click", () => loadFrame(i));
+    div.addEventListener("click", () => { stopPlayback(); loadFrame(i); });
     el.appendChild(div);
   });
   renderFilmstripDots();
@@ -247,6 +282,7 @@ function clientToImagePixel(clientX, clientY) {
 }
 
 function handleMarkClick(e) {
+  if (isPlaying()) { stopPlayback(); return; } // un clic durante la reproducción pausa, no marca
   if (!session || !activeCandidateId) {
     if (session && !activeCandidateId) $("#setStatus").textContent = "Creá o elegí un candidato antes de marcar (botón “+ Nuevo candidato”).";
     return;
@@ -374,6 +410,12 @@ function renderCandidateMetrics() {
       `<td>${seg ? seg.dtMin.toFixed(0) : "—"}</td><td>${seg && seg.speedPxH != null ? seg.speedPxH.toFixed(1) : "—"}</td></tr>`;
   });
   html += `</tbody></table>`;
+  if (metrics.directionInfo) {
+    const d = metrics.directionInfo;
+    html += `<p class="hint">Entra desde la mitad inferior: <strong>${d.entersFromLowerHalf ? "sí" : "no"}</strong> · ` +
+      `Se acerca al Sol: <strong>${d.approachingSun ? "sí" : "no"}</strong> ` +
+      `(patrón típico en ~84% de los cometas SOHO reales, según la guía oficial — no es un requisito estricto).</p>`;
+  }
   if (metrics.flags.length) {
     html += metrics.flags.map((f) => `<p class="flag">⚠ ${f}</p>`).join("");
   } else if (metrics.sorted.length >= 5) {
@@ -492,6 +534,7 @@ function renderSessionsList() {
     const openBtn = document.createElement("button");
     openBtn.className = "btn"; openBtn.textContent = "Abrir";
     openBtn.addEventListener("click", () => {
+      stopPlayback();
       session = s; frameIndex = 0; activeCandidateId = s.candidates[0]?.id || null;
       $('.tab-btn[data-tab="explorar"]').click();
       $("#viewerEmpty").hidden = true; $("#zoomLayer").hidden = false;
@@ -515,8 +558,9 @@ function renderSessionsList() {
 window.addEventListener("keydown", (e) => {
   if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
   if (!session) return;
-  if (e.key === "ArrowRight") loadFrame(Math.min(session.frames.length - 1, frameIndex + 1));
-  else if (e.key === "ArrowLeft") loadFrame(Math.max(0, frameIndex - 1));
+  if (e.key === " ") { e.preventDefault(); togglePlayback(); }
+  else if (e.key === "ArrowRight") { stopPlayback(); loadFrame(Math.min(session.frames.length - 1, frameIndex + 1)); }
+  else if (e.key === "ArrowLeft") { stopPlayback(); loadFrame(Math.max(0, frameIndex - 1)); }
   else if (e.key === "+" || e.key === "=") { zoom = Math.min(8, zoom * 1.4); applyTransform(); }
   else if (e.key === "-" || e.key === "_") { zoom = Math.max(1, zoom / 1.4); applyTransform(); }
   else if (e.key === "0") resetZoom();

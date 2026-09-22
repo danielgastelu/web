@@ -47,6 +47,13 @@ export function buildReportText({ profile, session, candidate, group, comments }
   if (metrics.maxResidualPx != null) {
     lines.push(`  - Desvío máx. respecto de una trayectoria rectilínea ajustada: ${metrics.maxResidualPx.toFixed(1)} px`);
   }
+  if (metrics.speedJumpMax != null && metrics.segments.length > 1) {
+    lines.push(`  - Variación máx. de velocidad entre cuadros consecutivos: ${metrics.speedJumpMax.toFixed(1)} px/h (tolerancia orientativa de la guía oficial: ~${info.speedJumpTolerancePxH} px/h en ${session.camera})`);
+  }
+  if (metrics.directionInfo) {
+    const d = metrics.directionInfo;
+    lines.push(`  - Entra desde la mitad inferior: ${d.entersFromLowerHalf ? "sí" : "no"} · Se acerca al Sol: ${d.approachingSun ? "sí" : "no"} (patrón típico en ~84% de los cometas SOHO reales)`);
+  }
   if (first) {
     const last = metrics.sorted[metrics.sorted.length - 1];
     const phys = pixelToPhysical(last.x, last.y, session.camera);
@@ -89,7 +96,9 @@ export function buildReportJson({ profile, session, candidate, group, comments }
       avgSpeedPxH: metrics.avgSpeed,
       minSpeedPxH: metrics.minSpeed,
       maxSpeedPxH: metrics.maxSpeed,
+      speedJumpMaxPxH: metrics.speedJumpMax,
       maxResidualPx: metrics.maxResidualPx,
+      directionInfo: metrics.directionInfo,
       flags: metrics.flags,
     },
   };

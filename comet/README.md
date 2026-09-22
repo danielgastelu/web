@@ -9,15 +9,46 @@ real de un descubrimiento se hace en <https://sungrazer.nrl.navy.mil/report> (fo
 web, no por correo): esta app te ayuda a explorar las imágenes, marcar candidatos con
 precisión y dejar el reporte listo para copiar allí.
 
+### Revisión contra la guía oficial (`soho_guide`)
+
+Después de revisar la [guía oficial de caza de cometas SOHO](https://sungrazer.nrl.navy.mil/soho_guide)
+punto por punto se corrigieron dos cosas:
+
+- **Bug de lógica**: la guía define dos números distintos para C2/C3 que no hay que confundir
+  — la *velocidad típica* de un cometa Kreutz (referencia absoluta) y la *tolerancia de
+  variación* de velocidad entre cuadros consecutivos (el test real que usan para descartar
+  falsos positivos: "si la velocidad varía más de ~10 px/h en C3 o ~60 px/h en C2, no es un
+  cometa"). La primera versión de la app sólo miraba la velocidad absoluta; ahora calcula y
+  muestra también la variación entre cuadros consecutivos, que es el criterio que realmente
+  describe la guía.
+- **Bug de scroll**: al cambiar de cuadro, la miniatura activa del filmstrip podía arrastrar
+  un scroll vertical de toda la página (comportamiento por defecto del navegador), corriendo
+  el visor bajo el cursor. Se corrigió fijando el scroll sólo al eje horizontal del filmstrip.
+
+También se agregó contenido que faltaba: detección automática de si el candidato entra desde
+la mitad inferior de la imagen acercándose al Sol (~84% de los casos reales, según la guía),
+y en la pestaña **Guía rápida** se sumaron los penachos/estructuras coronales, las CME, el
+disco ocultador y el brazo del ocultador como objetos que *no* hay que reportar, el dato de
+que en C3 se ven cientos de estrellas (no sólo 15-40 como en C2), y enlaces directos a la
+lista de tránsitos de planetas y a los reportes confirmados del sitio.
+
+**Lo que la guía menciona y esta app todavía no ofrece**: sets de imágenes de práctica con
+respuestas conocidas para entrenar antes de reportar candidatos reales (la guía los ofrece
+para descarga). Es una buena mejora a futuro si te sirve para uso en clase.
+
 ## Qué hace
 
 1. **Explorar sets de imágenes en vivo**: elegís fecha, cámara (LASCO C2 o C3) y rango
    horario (UT), y la app arma la secuencia de cuadros trayéndolos en vivo desde la
    [API pública de Helioviewer](https://api.helioviewer.org/) (procesada a partir de los
    mismos datos SOHO/LASCO), a 1024×1024 px con el centro solar en el centro de la imagen.
-2. **Marcar candidatos de forma ágil**: creás uno o más "candidatos" (cada uno con su
-   color) y hacés clic sobre el objeto en cada cuadro donde aparece. Zoom con rueda del
-   mouse o botones, desplazamiento arrastrando, navegación con teclado.
+2. **Flipbook / blink automático**: un botón de reproducción (▶, o barra espaciadora) pasa
+   la secuencia sola a la velocidad que elijas, para detectar a simple vista qué se mueve
+   de forma consistente contra el fondo de estrellas — la técnica clásica de caza de cometas.
+3. **Marcar candidatos de forma ágil**: creás uno o más "candidatos" (cada uno con su
+   color) y hacés clic sobre el objeto en cada cuadro donde aparece (un clic durante la
+   reproducción pausa en vez de marcar). Zoom con rueda del mouse o botones, desplazamiento
+   arrastrando, navegación con teclado.
 3. **Métricas automáticas**: por cada candidato, la app calcula solo mediante las marcas
    que hiciste la velocidad entre cuadros (px/h), un chequeo de trayectoria rectilínea, y
    valores auxiliares de elongación (en radios solares) y ángulo de posición — con alertas
@@ -66,17 +97,24 @@ el funcionamiento offline sin necesidad de HTTPS.
 2. Pestaña **Explorar y marcar**: elegí fecha, cámara, rango horario (en UT) e intervalo
    entre cuadros, y tocá **Generar set**. Podés extender el set hacia atrás/adelante sin
    perder lo ya marcado.
-3. Creá uno o más **candidatos** y hacé clic sobre el objeto en cada cuadro donde lo veas
-   (se recomiendan 5 o más cuadros consecutivos). Usá zoom para marcar con precisión.
-4. Mirá las **métricas automáticas** para descartar estrellas, planetas o rayos cósmicos
+3. Usá **Reproducir** (▶, o barra espaciadora) para pasar la secuencia como flipbook/blink
+   automático y detectar a simple vista qué se mueve de forma consistente contra el fondo
+   de estrellas fijas — la técnica clásica de caza de cometas. Elegí la velocidad
+   (Lenta/Media/Rápida/Blink) según lo que te resulte más cómodo.
+4. Creá uno o más **candidatos** y, con la secuencia pausada, hacé clic sobre el objeto en
+   cada cuadro donde lo veas (se recomiendan 5 o más cuadros consecutivos). Usá zoom para
+   marcar con precisión. Si hacés clic mientras se está reproduciendo, sólo pausa en ese
+   cuadro — no marca por accidente.
+5. Mirá las **métricas automáticas** para descartar estrellas, planetas o rayos cósmicos
    (ver criterios resumidos en la pestaña **Guía rápida**).
-5. Generá el **reporte**, copialo o descargalo. Si te convence, llevalo al
+6. Generá el **reporte**, copialo o descargalo. Si te convence, llevalo al
    [formulario oficial](https://sungrazer.nrl.navy.mil/report).
 
 ### Atajos de teclado (para ir rápido)
-- `←` / `→`: cuadro anterior / siguiente
+- `Espacio`: reproducir / pausar la secuencia (flipbook / blink automático)
+- `←` / `→`: cuadro anterior / siguiente (pausa la reproducción si estaba activa)
 - `+` / `-`: acercar / alejar zoom, `0`: restablecer zoom
-- Clic: marcar candidato activo · arrastrar: desplazar la vista
+- Clic: marcar candidato activo (o pausar, si se está reproduciendo) · arrastrar: desplazar la vista
 - `Supr`: borrar la marca del candidato activo en el cuadro actual
 - `N`: nuevo candidato
 - `1`–`9`: elegir candidato activo

@@ -89,8 +89,17 @@
   <div class="card viewer-card">
     <div class="viewer-toolbar">
       <button class="btn icon-btn" id="btnPrevFrame" title="Cuadro anterior (←)">&larr;</button>
-      <span id="frameLabel" class="frame-label">Sin set cargado</span>
+      <button class="btn icon-btn btn-accent" id="btnPlay" title="Reproducir secuencia / blink automático (barra espaciadora)">&#9654; Reproducir</button>
       <button class="btn icon-btn" id="btnNextFrame" title="Cuadro siguiente (→)">&rarr;</button>
+      <label class="speed-select">Velocidad
+        <select id="fPlaySpeed">
+          <option value="700">Lenta</option>
+          <option value="350" selected>Media</option>
+          <option value="150">Rápida</option>
+          <option value="80">Blink</option>
+        </select>
+      </label>
+      <span id="frameLabel" class="frame-label">Sin set cargado</span>
       <span class="spacer"></span>
       <button class="btn icon-btn" id="btnZoomOut" title="Alejar (-)">&minus;</button>
       <span id="zoomLabel" class="zoom-label">100%</span>
@@ -106,7 +115,7 @@
       </div>
     </div>
     <div class="filmstrip" id="filmstrip"></div>
-    <p class="hint">Clic = marcar el candidato activo en este punto. Arrastrar = desplazar la vista. Rueda del mouse = zoom. Atajos: ←/→ cambiar cuadro, +/&minus; zoom, Supr borrar marca, 1-9 elegir candidato, N nuevo candidato.</p>
+    <p class="hint">Clic = marcar el candidato activo en este punto (si la secuencia se está reproduciendo, un clic la pausa en ese cuadro en vez de marcar). Arrastrar = desplazar la vista. Rueda del mouse = zoom. Atajos: <strong>Espacio</strong> reproducir/pausar, ←/→ cambiar cuadro, +/&minus; zoom, Supr borrar marca, 1-9 elegir candidato, N nuevo candidato.</p>
   </div>
 
   <!-- Reporte -->
@@ -156,15 +165,17 @@
   <div class="card">
     <h2>Criterios para identificar un candidato (resumen de la guía oficial)</h2>
     <ul>
-      <li>Visible en <strong>al menos 5 cuadros consecutivos</strong> (idealmente 6-7 u más).</li>
-      <li>Se mueve en <strong>línea aproximadamente recta</strong> y a <strong>velocidad constante</strong> — tamaño, forma y brillo se mantienen similares.</li>
-      <li>La mayoría de los cometas sungrazer reales (~84%) entra desde la <strong>mitad inferior</strong> de la imagen, moviéndose hacia el Sol.</li>
-      <li><strong>No es una estrella</strong>: las estrellas se desplazan horizontalmente de izquierda a derecha, a velocidad constante (15 a 40 visibles en C2).</li>
-      <li><strong>No es un planeta</strong>: son más brillantes y grandes que las estrellas, se mueven aprox. horizontalmente (a veces invierten sentido) y muestran picos de difracción.</li>
-      <li><strong>No es un rayo cósmico</strong>: aparecen como puntos o rayas blancas en un único cuadro, sin relación entre cuadros sucesivos.</li>
-      <li>Los cometas del grupo <strong>Kreutz</strong> (~85% de los hallazgos en SOHO) suelen moverse a menos de ~10&nbsp;px/h en C3 y hasta ~70&nbsp;px/h en C2; variaciones bruscas de velocidad entre cuadros son señal de alerta.</li>
+      <li>Visible en <strong>al menos 5 cuadros consecutivos</strong> (idealmente 6-7 u más); se admiten huecos de datos si el objeto reaparece.</li>
+      <li>Se mueve en <strong>línea aproximadamente recta</strong>, a <strong>velocidad constante</strong> y sin cambios bruscos de tamaño, forma o brillo. Si "se prende y apaga", zigzaguea, o acelera/frena de golpe, <strong>casi seguro no es un cometa</strong>.</li>
+      <li>La mayoría de los cometas sungrazer reales (~84% de las veces) entra desde la <strong>mitad inferior</strong> de la imagen, moviéndose hacia el Sol — la app lo indica automáticamente en las métricas de cada candidato, aunque no es un requisito estricto.</li>
+      <li><strong>No es una estrella</strong>: las estrellas se desplazan horizontalmente de izquierda a derecha, a velocidad constante (15 a 40 visibles a la vez en C2; cientos en C3).</li>
+      <li><strong>No es un planeta</strong>: son más brillantes y grandes que las estrellas, se mueven aprox. horizontalmente (en cualquiera de los dos sentidos) y casi siempre muestran picos de difracción por saturación. Conviene revisar la <a href="https://sungrazer.nrl.navy.mil/transits" target="_blank" rel="noopener">lista de tránsitos de planetas</a> del sitio oficial.</li>
+      <li><strong>No es un rayo cósmico</strong>: aparecen como puntos, manchas o rayas en un único cuadro, en cualquier parte de la imagen, sin relación con cuadros sucesivos — es la causa más común de reportes erróneos.</li>
+      <li><strong>No son cometas</strong> tampoco los <strong>penachos/estructuras coronales</strong> (streamers, brillantes y que pueden durar meses), las <strong>eyecciones de masa coronal (CME)</strong>, el <strong>disco ocultador</strong> central, ni el <strong>brazo/pilar que sostiene el ocultador</strong> (visible en C3).</li>
+      <li>Los cometas del grupo <strong>Kreutz</strong> (~85% de los hallazgos, uno cada ~3 días en promedio) suelen moverse a menos de ~10&nbsp;px/h en C3 y ~70&nbsp;px/h en C2, siguiendo órbitas conocidas y predecibles según la época del año (ver <a href="https://sungrazer.nrl.navy.mil/C2_C3_Comet_Tracks" target="_blank" rel="noopener">comet tracks</a>). Los cometas no-Kreutz son mucho más raros e impredecibles — la guía recomienda a los principiantes concentrarse en Kreutz.</li>
+      <li><strong>Test de consistencia de velocidad</strong> (lo aplica automáticamente esta app): si la velocidad entre cuadros consecutivos varía más de ~10&nbsp;px/h en C3 o ~60&nbsp;px/h en C2, el objeto casi seguro no es un cometa — esto es distinto de la velocidad típica de arriba, que es el valor absoluto esperado, no la variación permitida entre mediciones.</li>
     </ul>
-    <p class="hint">Fuente: <a href="https://sungrazer.nrl.navy.mil/soho_guide" target="_blank" rel="noopener">Guía oficial de caza de cometas SOHO</a> y <a href="https://sungrazer.nrl.navy.mil/comet_faqs" target="_blank" rel="noopener">FAQ</a> del Sungrazer Project. Se recomienda revisar reportes confirmados en el sitio antes de reportar por primera vez.</p>
+    <p class="hint">Fuente: <a href="https://sungrazer.nrl.navy.mil/soho_guide" target="_blank" rel="noopener">Guía oficial de caza de cometas SOHO</a> y <a href="https://sungrazer.nrl.navy.mil/comet_faqs" target="_blank" rel="noopener">FAQ</a> del Sungrazer Project. La guía recomienda pasar una o dos semanas revisando en silencio los <a href="https://sungrazer.nrl.navy.mil/reports" target="_blank" rel="noopener">reportes confirmados en el sitio</a> antes de reportar por primera vez — el éxito de quienes empiezan a reportar sin hacer esto es prácticamente nulo.</p>
 
     <h2>Cómo usar esta app</h2>
     <ol>
@@ -177,6 +188,9 @@
 
     <h2>Precisión de las coordenadas — leer antes de reportar</h2>
     <p>Las imágenes se generan con la API pública de Helioviewer a partir de los mismos datos SOHO/LASCO, reencuadradas a 1024×1024&nbsp;px con el centro solar fijado en el centro de la imagen y la escala nativa de cada cámara (C2: 11.9&nbsp;"/px, C3: 56.0&nbsp;"/px). Esto se aproxima mucho a la grilla de píxeles nativa que usa el formulario oficial, pero puede no coincidir exactamente cuadro a cuadro (reproyección, orientación). Para un reporte que vaya a enviarse de verdad, conviene <strong>verificar las coordenadas</strong> contra las imágenes JPEG originales en <a href="http://sohowww.nascom.nasa.gov/data/realtime-images.html" target="_blank" rel="noopener">sohowww.nascom.nasa.gov</a>. La elongación y el ángulo de posición que calcula la app son auxiliares/aproximados, no un dato exigido por el formulario oficial (que sólo pide hora + x,y por cuadro).</p>
+
+    <h2>Grupos de cometas en el reporte</h2>
+    <p>La guía de identificación sólo distingue entre Kreutz y "no-Kreutz" (raros e impredecibles). El desplegable "Grupo de cometa" del reporte incluye además Kracht, Marsden y Meyer porque son las subfamilias que efectivamente aparecen en los reportes reales del sitio — si no estás segura del grupo, lo más honesto es dejarlo en "Desconocido".</p>
   </div>
 </section>
 
