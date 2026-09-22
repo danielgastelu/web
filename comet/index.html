@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f1f">
+<meta name="description" content="Explorador y marcador de imágenes LASCO/SOHO para cazadores de cometas rasantes (Sungrazer Project). Marca candidatos y genera el reporte listo para el formulario oficial.">
+<title>Sungrazer Hunter</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="icons/icon-192.png" alt="" class="brand-icon">
+    <div>
+      <h1>Sungrazer Hunter</h1>
+      <p class="subtitle">Explorá imágenes LASCO, marcá candidatos y generá el reporte — herramienta no oficial, basada en las pautas del <a href="https://sungrazer.nrl.navy.mil/" target="_blank" rel="noopener">Sungrazer Project (NRL)</a></p>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="explorar" role="tab" aria-selected="true">Explorar y marcar</button>
+    <button class="tab-btn" data-tab="reportes" role="tab" aria-selected="false">Mis reportes</button>
+    <button class="tab-btn" data-tab="ayuda" role="tab" aria-selected="false">Guía rápida</button>
+    <button class="tab-btn" data-tab="perfil" role="tab" aria-selected="false">Perfil</button>
+  </nav>
+  <div id="installArea" class="install-area" hidden>
+    <button id="installBtn" class="btn btn-accent">Instalar app</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ EXPLORAR / MARCAR ============ -->
+<section id="tab-explorar" class="tab-panel active">
+
+  <div class="panel-grid">
+
+    <!-- Controles de set de imágenes -->
+    <div class="card" id="setControls">
+      <h2>1. Set de imágenes</h2>
+      <div class="field-row">
+        <label>Fecha (UT)
+          <input type="date" id="fDate">
+        </label>
+        <label>Cámara
+          <select id="fCamera">
+            <option value="C2">LASCO C2</option>
+            <option value="C3">LASCO C3</option>
+          </select>
+        </label>
+      </div>
+      <div class="field-row">
+        <label>Desde (UT)
+          <input type="time" id="fStart" value="00:00">
+        </label>
+        <label>Hasta (UT)
+          <input type="time" id="fEnd" value="06:00">
+        </label>
+        <label>Intervalo (min)
+          <input type="number" id="fInterval" min="1" step="1" value="12">
+        </label>
+      </div>
+      <p class="hint" id="localTimeHint"></p>
+      <div class="field-row">
+        <button class="btn btn-primary" id="btnGenerar">Generar set</button>
+        <button class="btn" id="btnExtenderAntes" disabled>&larr; Cuadros antes</button>
+        <button class="btn" id="btnExtenderDespues" disabled>Cuadros después &rarr;</button>
+      </div>
+      <p class="hint">Las imágenes se obtienen en vivo desde la API pública de <a href="https://api.helioviewer.org/" target="_blank" rel="noopener">Helioviewer</a> (procesadas a partir de datos SOHO/LASCO), reencuadradas a 1024×1024 px, centro solar en el centro de la imagen. Ver aclaraciones de precisión en <em>Guía rápida</em>.</p>
+      <div id="setStatus" class="hint"></div>
+    </div>
+
+    <!-- Candidatos -->
+    <div class="card" id="candidatesCard">
+      <h2>2. Candidatos en este set</h2>
+      <div id="candidateList" class="candidate-list"></div>
+      <button class="btn" id="btnNuevoCandidato">+ Nuevo candidato</button>
+      <p class="hint">Elegí un candidato activo y hacé clic sobre el objeto en cada cuadro donde lo veas (mín. recomendado: 5 cuadros consecutivos).</p>
+      <div id="candidateMetrics" class="metrics"></div>
+    </div>
+
+  </div>
+
+  <!-- Visor principal -->
+  <div class="card viewer-card">
+    <div class="viewer-toolbar">
+      <button class="btn icon-btn" id="btnPrevFrame" title="Cuadro anterior (←)">&larr;</button>
+      <span id="frameLabel" class="frame-label">Sin set cargado</span>
+      <button class="btn icon-btn" id="btnNextFrame" title="Cuadro siguiente (→)">&rarr;</button>
+      <span class="spacer"></span>
+      <button class="btn icon-btn" id="btnZoomOut" title="Alejar (-)">&minus;</button>
+      <span id="zoomLabel" class="zoom-label">100%</span>
+      <button class="btn icon-btn" id="btnZoomIn" title="Acercar (+)">+</button>
+      <button class="btn icon-btn" id="btnZoomReset" title="Restablecer zoom (0)">1:1</button>
+      <button class="btn icon-btn danger" id="btnBorrarMarca" title="Borrar marca del candidato activo en este cuadro (Supr)">Borrar marca</button>
+    </div>
+    <div class="viewer-stage-wrap" id="stageWrap">
+      <div class="viewer-empty" id="viewerEmpty">Generá un set de imágenes para empezar a explorar.</div>
+      <div class="zoom-layer" id="zoomLayer" hidden>
+        <img id="frameImg" alt="Cuadro LASCO activo" draggable="false">
+        <svg id="markerOverlay" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="filmstrip" id="filmstrip"></div>
+    <p class="hint">Clic = marcar el candidato activo en este punto. Arrastrar = desplazar la vista. Rueda del mouse = zoom. Atajos: ←/→ cambiar cuadro, +/&minus; zoom, Supr borrar marca, 1-9 elegir candidato, N nuevo candidato.</p>
+  </div>
+
+  <!-- Reporte -->
+  <div class="card" id="reportCard">
+    <h2>3. Reporte</h2>
+    <div class="field-row">
+      <label>Candidato para el reporte
+        <select id="reportCandidate"></select>
+      </label>
+      <label>Grupo de cometa (si se conoce)
+        <select id="reportGroup">
+          <option value="">Desconocido / no aplica</option>
+          <option>Kreutz</option>
+          <option>Kracht</option>
+          <option>Marsden</option>
+          <option>Meyer</option>
+          <option>No agrupado (non-group)</option>
+        </select>
+      </label>
+    </div>
+    <label class="block">Comentarios (opcional)
+      <textarea id="reportComments" rows="2" placeholder="Cualquier observación adicional para tu propio registro..."></textarea>
+    </label>
+    <div class="field-row">
+      <button class="btn btn-primary" id="btnGenerarReporte">Generar reporte</button>
+      <button class="btn" id="btnCopiarReporte" disabled>Copiar texto</button>
+      <button class="btn" id="btnDescargarTxt" disabled>Descargar .txt</button>
+      <button class="btn" id="btnDescargarZip" disabled>Descargar paquete .zip (reporte + recortes)</button>
+    </div>
+    <pre id="reportPreview" class="report-preview" hidden></pre>
+    <p class="hint warn">Este reporte se genera y descarga localmente. El Sungrazer Project recibe los reportes a través de su <a href="https://sungrazer.nrl.navy.mil/report" target="_blank" rel="noopener">formulario web oficial</a> (no por correo) — para un descubrimiento real, copiá estos datos allí. El .zip queda listo para adjuntar a un correo si querés compartirlo con colegas o guardarlo.</p>
+  </div>
+
+</section>
+
+<!-- ============ MIS REPORTES ============ -->
+<section id="tab-reportes" class="tab-panel">
+  <div class="card">
+    <h2>Sesiones y reportes guardados</h2>
+    <p class="hint">Se guardan automáticamente en este dispositivo (localStorage), incluidas las marcas de cada candidato.</p>
+    <div id="sessionsList" class="sessions-list"></div>
+  </div>
+</section>
+
+<!-- ============ AYUDA ============ -->
+<section id="tab-ayuda" class="tab-panel">
+  <div class="card">
+    <h2>Criterios para identificar un candidato (resumen de la guía oficial)</h2>
+    <ul>
+      <li>Visible en <strong>al menos 5 cuadros consecutivos</strong> (idealmente 6-7 u más).</li>
+      <li>Se mueve en <strong>línea aproximadamente recta</strong> y a <strong>velocidad constante</strong> — tamaño, forma y brillo se mantienen similares.</li>
+      <li>La mayoría de los cometas sungrazer reales (~84%) entra desde la <strong>mitad inferior</strong> de la imagen, moviéndose hacia el Sol.</li>
+      <li><strong>No es una estrella</strong>: las estrellas se desplazan horizontalmente de izquierda a derecha, a velocidad constante (15 a 40 visibles en C2).</li>
+      <li><strong>No es un planeta</strong>: son más brillantes y grandes que las estrellas, se mueven aprox. horizontalmente (a veces invierten sentido) y muestran picos de difracción.</li>
+      <li><strong>No es un rayo cósmico</strong>: aparecen como puntos o rayas blancas en un único cuadro, sin relación entre cuadros sucesivos.</li>
+      <li>Los cometas del grupo <strong>Kreutz</strong> (~85% de los hallazgos en SOHO) suelen moverse a menos de ~10&nbsp;px/h en C3 y hasta ~70&nbsp;px/h en C2; variaciones bruscas de velocidad entre cuadros son señal de alerta.</li>
+    </ul>
+    <p class="hint">Fuente: <a href="https://sungrazer.nrl.navy.mil/soho_guide" target="_blank" rel="noopener">Guía oficial de caza de cometas SOHO</a> y <a href="https://sungrazer.nrl.navy.mil/comet_faqs" target="_blank" rel="noopener">FAQ</a> del Sungrazer Project. Se recomienda revisar reportes confirmados en el sitio antes de reportar por primera vez.</p>
+
+    <h2>Cómo usar esta app</h2>
+    <ol>
+      <li>Completá tu <strong>Perfil</strong> una vez (nombre de observador).</li>
+      <li>En <strong>Explorar y marcar</strong>, elegí fecha, cámara (C2/C3) y rango horario, y generá el set.</li>
+      <li>Creá uno o más <strong>candidatos</strong> y hacé clic sobre el objeto en cada cuadro donde aparezca. Usá el zoom para precisión.</li>
+      <li>Revisá las métricas automáticas (velocidad, ajuste a línea recta) para descartar falsos positivos.</li>
+      <li>Generá el <strong>reporte</strong>, copialo o descargalo, y si te convence, llevalo al <a href="https://sungrazer.nrl.navy.mil/report" target="_blank" rel="noopener">formulario oficial</a>.</li>
+    </ol>
+
+    <h2>Precisión de las coordenadas — leer antes de reportar</h2>
+    <p>Las imágenes se generan con la API pública de Helioviewer a partir de los mismos datos SOHO/LASCO, reencuadradas a 1024×1024&nbsp;px con el centro solar fijado en el centro de la imagen y la escala nativa de cada cámara (C2: 11.9&nbsp;"/px, C3: 56.0&nbsp;"/px). Esto se aproxima mucho a la grilla de píxeles nativa que usa el formulario oficial, pero puede no coincidir exactamente cuadro a cuadro (reproyección, orientación). Para un reporte que vaya a enviarse de verdad, conviene <strong>verificar las coordenadas</strong> contra las imágenes JPEG originales en <a href="http://sohowww.nascom.nasa.gov/data/realtime-images.html" target="_blank" rel="noopener">sohowww.nascom.nasa.gov</a>. La elongación y el ángulo de posición que calcula la app son auxiliares/aproximados, no un dato exigido por el formulario oficial (que sólo pide hora + x,y por cuadro).</p>
+  </div>
+</section>
+
+<!-- ============ PERFIL ============ -->
+<section id="tab-perfil" class="tab-panel">
+  <div class="card">
+    <h2>Perfil del observador</h2>
+    <p class="hint">Estos datos se usan para completar el reporte y quedan guardados sólo en este dispositivo.</p>
+    <label class="block">Nombre (como figura en el formulario del Sungrazer Project)
+      <input type="text" id="pName" placeholder="Nombre y apellido">
+    </label>
+    <label class="block">Correo (opcional, sólo para tu propio registro — no se envía nada automáticamente)
+      <input type="email" id="pEmail" placeholder="tu@correo.com">
+    </label>
+    <label class="block">Notas / afiliación (opcional)
+      <input type="text" id="pNotes" placeholder="ej: ITS Arias Balparda">
+    </label>
+    <button class="btn btn-primary" id="btnGuardarPerfil">Guardar perfil</button>
+    <span id="perfilStatus" class="hint"></span>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  <p>Herramienta educativa no oficial. No está afiliada al Naval Research Laboratory ni al Sungrazer Project. Datos de imagen vía <a href="https://api.helioviewer.org/" target="_blank" rel="noopener">Helioviewer API</a>.</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
