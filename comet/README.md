@@ -32,6 +32,31 @@ disco ocultador y el brazo del ocultador como objetos que *no* hay que reportar,
 que en C3 se ven cientos de estrellas (no sólo 15-40 como en C2), y enlaces directos a la
 lista de tránsitos de planetas y a los reportes confirmados del sitio.
 
+### Botón de reproducción automática (flipbook / blink)
+
+Se agregó un botón **▶ Reproducir** en el visor (también con la barra espaciadora) que pasa
+la secuencia sola, con velocidad configurable (Lenta/Media/Rápida/Blink) — la técnica clásica
+de caza de cometas para detectar a simple vista qué se mueve contra el fondo de estrellas
+fijas. Un clic sobre la imagen mientras se reproduce pausa en vez de marcar por accidente.
+
+### Bug de actualización del service worker (PWA con caché vieja)
+
+Si ya habías abierto una versión anterior de la app, el service worker podía quedar sirviendo
+`index.html`/`app.js` **viejos desde el caché indefinidamente**, aunque se publicara una
+versión nueva en el servidor — por eso el botón de reproducir no aparecía. Es un problema
+clásico de PWA: el navegador sólo detecta que hay una versión nueva del service worker si el
+archivo `sw.js` cambia de contenido byte a byte. Se corrigió de dos formas:
+- Los recursos propios de la app (HTML/CSS/JS) ahora se sirven con estrategia **red primero,
+  caché como respaldo** (antes era caché primero), así con conexión siempre se ve lo último
+  publicado; el caché sólo entra en juego si no hay red.
+- La app ahora muestra un aviso ("Hay una versión nueva — Recargar") cuando el service worker
+  detecta una actualización, para no depender silenciosamente de que el usuario recargue por
+  su cuenta.
+
+**Importante para quien despliegue actualizaciones futuras**: conviene subir el número de
+`CACHE_VERSION` en `sw.js` en cada cambio real que se publique — es lo que garantiza que el
+navegador note la actualización incluso si alguien tiene una pestaña vieja abierta.
+
 **Lo que la guía menciona y esta app todavía no ofrece**: sets de imágenes de práctica con
 respuestas conocidas para entrenar antes de reportar candidatos reales (la guía los ofrece
 para descarga). Es una buena mejora a futuro si te sirve para uso en clase.

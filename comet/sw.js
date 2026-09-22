@@ -3,7 +3,11 @@
 // reportes ya guardados), y cachea oportunistamente los cuadros de imagen ya vistos
 // para poder revisarlos sin conexión. Las imágenes NUEVAS siguen necesitando red.
 
-const CACHE_VERSION = "sg-hunter-v1";
+// IMPORTANTE: subir este número en cada actualización real de la app. Es lo que hace que
+// el navegador detecte "este sw.js cambió" y reemplace la versión instalada — sin este
+// cambio de contenido, un usuario que ya visitó la app antes puede quedar viendo
+// index.html/app.js viejos indefinidamente por más que se suba una versión nueva al servidor.
+const CACHE_VERSION = "sg-hunter-v2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
@@ -34,13 +38,19 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((k) => k.startsWith("sg-hunter-") && k !== SHELL_CACHE && k !== IMAGE_CACHE)
-          .map((k) => caches.delete(k))
+    caches.keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((k) => k.startsWith("sg-hunter-") && k !== SHELL_CACHE && k !== IMAGE_CACHE)
+            .map((k) => caches.delete(k))
+        )
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim())
+      // Avisa a las pestañas abiertas que este SW nuevo tomó control, para poder ofrecer
+      // recargar y mostrar la versión al día sin que el usuario tenga que enterarse solo.
+      .then(() => self.clients.matchAll({ type: "window" }))
+      .then((clients) => clients.forEach((c) => c.postMessage({ type: "SG_HUNTER_UPDATED" })))
   );
 });
 
@@ -70,10 +80,20 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Recursos propios de la app: cache-first, con red como respaldo.
+  // Recursos propios de la app (HTML/CSS/JS): red primero, con el caché como respaldo
+  // offline. Así, con conexión, siempre se ve la versión publicada más reciente — el
+  // caché sólo entra en juego si no hay red (para poder seguir usando la app offline).
   if (url.origin === self.location.origin) {
     event.respondWith(
-      caches.match(req).then((cached) => cached || fetch(req).catch(() => caches.match("./index.html")))
+      fetch(req)
+        .then((resp) => {
+          if (resp && resp.status === 200) {
+            const copy = resp.clone();
+            caches.open(SHELL_CACHE).then((cache) => cache.put(req, copy));
+          }
+          return resp;
+        })
+        .catch(() => caches.match(req).then((cached) => cached || caches.match("./index.html")))
     );
     return;
   }

@@ -590,7 +590,28 @@ window.addEventListener("appinstalled", () => { $("#installArea").hidden = true;
 
 // ================= SERVICE WORKER =================
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch((err) => console.warn("SW no registrado:", err));
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("sw.js");
+      reg.update().catch(() => {}); // fuerza a chequear si hay una versión más nueva ahora mismo
+    } catch (err) {
+      console.warn("SW no registrado:", err);
+    }
   });
+
+  // Cuando una versión nueva del service worker toma control, avisamos para recargar
+  // (los datos guardados en localStorage no se pierden con la recarga).
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "SG_HUNTER_UPDATED") showUpdateBanner();
+  });
+}
+
+function showUpdateBanner() {
+  if ($("#updateBanner")) return; // ya se está mostrando
+  const bar = document.createElement("div");
+  bar.id = "updateBanner";
+  bar.className = "update-banner";
+  bar.innerHTML = `Hay una versión nueva de la app disponible. <button class="btn btn-accent" id="btnReloadUpdate">Recargar</button>`;
+  document.body.prepend(bar);
+  $("#btnReloadUpdate").addEventListener("click", () => location.reload());
 }
