@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOHO / Sungrazer - Visor de Secuencias & Reportes Rápidos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        astro: {
+                            900: '#070a12',
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            600: '#334155',
+                            accent: '#06b6d4',
+                            danger: '#ef4444',
+                            warning: '#f59e0b',
+                            success: '#10b981',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #070a12;
+            color: #e2e8f0;
+            user-select: none;
+        }
+        /* Custom scrollbar for dark layout */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+        /* Canvas cursor crosshair */
+        .canvas-crosshair {
+            cursor: crosshair;
+        }
+        /* Range slider styling */
+        input[type=range] {
+            accent-color: #06b6d4;
+        }
+        .kbd-badge {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .toast-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden font-sans">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-astro-800 border-b border-astro-700 px-4 py-2 flex items-center justify-between shrink-0 shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-cyan-950 p-2 rounded-lg border border-cyan-500/30 text-cyan-400">
+                <i class="fa-solid fa-meteor text-xl animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                    Sungrazer Rapid Inspector
+                    <span class="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-mono">v2.5 High-Throughput</span>
+                </h1>
+                <p class="text-xs text-slate-400">Exploración de Secuencias LASCO/SOHO & Generador Masivo de Reportes</p>
+            </div>
+        </div>
+
+        <!-- Quick Status & Set Controls -->
+        <div class="flex items-center space-x-3">
+            <div class="bg-astro-900 border border-astro-700 px-3 py-1.5 rounded-lg flex items-center gap-3 font-mono text-xs">
+                <span class="text-slate-400">SET ACTUAL:</span>
+                <span id="currentSetLabel" class="text-amber-400 font-bold">Cargando Set Online...</span>
+                <span id="frameCounter" class="bg-astro-800 px-2 py-0.5 rounded text-cyan-400 border border-slate-700">Frame 1/6</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE NASA/SOHO
+                </span>
+            </div>
+
+            <button id="btnPrevSet" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition" title="Set Anterior">
+                <i class="fa-solid fa-chevron-left"></i> Anterior
+            </button>
+            
+            <button id="btnNextSet" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-cyan-600/20" title="Cargar Siguiente Set">
+                Siguiente Set <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <button onclick="toggleHotkeysModal()" class="bg-astro-700 hover:bg-slate-600 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs transition" title="Atajos de teclado">
+                <i class="fa-solid fa-keyboard text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Body -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- LEFT COLUMN: Canvas Viewer & Image Toolbar -->
+        <div class="flex-1 flex flex-col bg-astro-900 border-r border-astro-700 relative overflow-hidden">
+            
+            <!-- Top Controls Bar -->
+            <div class="bg-astro-800/90 backdrop-blur border-b border-astro-700 p-2 flex flex-wrap items-center justify-between gap-2 z-10">
+                <!-- Playback controls -->
+                <div class="flex items-center space-x-1">
+                    <button id="btnFirstFrame" class="p-2 hover:bg-slate-700 rounded text-slate-300 text-xs transition" title="Primer Frame (Home)"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="btnPrevFrame" class="p-2 hover:bg-slate-700 rounded text-slate-300 text-xs transition" title="Frame Anterior (←)"><i class="fa-solid fa-caret-left text-base"></i></button>
+                    <button id="btnPlayPause" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-semibold text-xs transition flex items-center gap-1.5" title="Reproducir / Pausa (Espacio)">
+                        <i id="playIcon" class="fa-solid fa-play"></i> <span id="playBtnText">Blink</span>
+                    </button>
+                    <button id="btnNextFrame" class="p-2 hover:bg-slate-700 rounded text-slate-300 text-xs transition" title="Siguiente Frame (→)"><i class="fa-solid fa-caret-right text-base"></i></button>
+                    <button id="btnLastFrame" class="p-2 hover:bg-slate-700 rounded text-slate-300 text-xs transition" title="Último Frame (End)"><i class="fa-solid fa-forward-step"></i></button>
+
+                    <div class="h-4 w-px bg-slate-700 mx-1"></div>
+
+                    <!-- Speed Control -->
+                    <div class="flex items-center gap-2 text-xs text-slate-300 font-mono">
+                        <i class="fa-solid fa-gauge-high text-slate-400"></i>
+                        <input type="range" id="speedSlider" min="1" max="15" value="4" class="w-20 h-1 bg-slate-700 rounded cursor-pointer">
+                        <span id="speedValue" class="w-8 text-cyan-400">4 FPS</span>
+                    </div>
+                </div>
+
+                <!-- Image Processing & Stretch Filters -->
+                <div class="flex items-center space-x-2 text-xs">
+                    <!-- Stretch Filter Select -->
+                    <div class="flex items-center gap-1">
+                        <span class="text-slate-400"><i class="fa-solid fa-sliders"></i> Estiramiento:</span>
+                        <select id="selectStretch" class="bg-astro-900 border border-slate-700 rounded px-2 py-1 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+                            <option value="normal">Normal (Linear)</option>
+                            <option value="invert">Invertido (Negative)</option>
+                            <option value="high-contrast">Alto Contraste</option>
+                            <option value="log">Logarítmico (Objetos Débiles)</option>
+                        </select>
+                    </div>
+
+                    <div class="h-4 w-px bg-slate-700 mx-1"></div>
+
+                    <!-- Brightness & Contrast -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400" title="Brillo"><i class="fa-solid fa-sun"></i></span>
+                        <input type="range" id="brightnessSlider" min="50" max="250" value="100" class="w-16 h-1 bg-slate-700 rounded cursor-pointer">
+                        
+                        <span class="text-slate-400" title="Contraste"><i class="fa-solid fa-circle-half-stroke"></i></span>
+                        <input type="range" id="contrastSlider" min="50" max="250" value="100" class="w-16 h-1 bg-slate-700 rounded cursor-pointer">
+                        
+                        <button id="btnResetFilters" class="p-1.5 text-slate-400 hover:text-white rounded hover:bg-slate-700 transition" title="Reiniciar Filtros">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+
+                    <div class="h-4 w-px bg-slate-700 mx-1"></div>
+
+                    <!-- Zoom Controls -->
+                    <div class="flex items-center space-x-1">
+                        <button id="btnZoomOut" class="p-1.5 hover:bg-slate-700 rounded text-slate-300" title="Alejar (-)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                        <span id="zoomLevel" class="font-mono text-cyan-400 w-12 text-center">100%</span>
+                        <button id="btnZoomIn" class="p-1.5 hover:bg-slate-700 rounded text-slate-300" title="Acercar (+)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        <button id="btnResetView" class="p-1.5 hover:bg-slate-700 rounded text-slate-300" title="Ajustar Pantalla (R)"><i class="fa-solid fa-expand"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Workspace Area -->
+            <div id="canvasContainer" class="flex-1 relative overflow-hidden bg-black flex items-center justify-center canvas-crosshair">
+                <canvas id="imageCanvas" class="max-w-full max-h-full shadow-2xl"></canvas>
+                
+                <!-- Loading Overlay Indicator -->
+                <div id="loadingOverlay" class="absolute inset-0 bg-black/85 backdrop-blur-sm z-30 flex flex-col items-center justify-center space-y-3 transition-opacity">
+                    <div class="relative flex items-center justify-center">
+                        <div class="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin"></div>
+                        <i class="fa-solid fa-satellite text-cyan-400 text-lg absolute animate-pulse"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 id="loadingTextTitle" class="text-xs font-bold text-white uppercase tracking-wider">Descargando Imágenes Online de NASA/SOHO...</h3>
+                        <p id="loadingTextSub" class="text-[11px] text-slate-400 font-mono mt-1">Conectando a la API de Helioviewer...</p>
+                    </div>
+                    <div class="w-48 bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-700">
+                        <div id="loadingProgressBar" class="bg-cyan-400 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- On-Screen Telemetry HUD -->
+                <div class="absolute top-3 left-3 bg-astro-900/80 backdrop-blur border border-slate-700/60 rounded px-3 py-1.5 text-xs font-mono pointer-events-none space-y-0.5 shadow-md">
+                    <div class="text-cyan-400 font-bold flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        <span id="hudInstrument">SOHO / LASCO C3</span>
+                    </div>
+                    <div class="text-slate-300" id="hudTimestamp">2026-09-16 02:12:00 UTC</div>
+                    <div class="text-slate-400 text-[11px]" id="hudCoords">X: 000 | Y: 000</div>
+                </div>
+
+                <!-- Crosshair & Selection Helper Indicator -->
+                <div class="absolute bottom-3 left-3 bg-astro-900/80 backdrop-blur border border-slate-700/60 rounded px-3 py-1.5 text-xs text-slate-300 pointer-events-none flex items-center gap-3">
+                    <span class="flex items-center gap-1"><kbd class="kbd-badge">Doble Clic</kbd> o <kbd class="kbd-badge">M</kbd> Marcar Candidato</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="flex items-center gap-1"><kbd class="kbd-badge">Arrastrar</kbd> Desplazar Imagen</span>
+                </div>
+            </div>
+
+            <!-- Frame Timeline Strip -->
+            <div class="bg-astro-800 border-t border-astro-700 p-2 flex items-center justify-between gap-2 z-10 overflow-x-auto">
+                <div id="timelineContainer" class="flex items-center gap-2 flex-1 overflow-x-auto py-1">
+                    <!-- Dynamic frame thumbnails generated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Tools, Detections & Report Generator -->
+        <div class="w-96 bg-astro-800 flex flex-col shrink-0 border-l border-astro-700 shadow-xl">
+            
+            <!-- Sidebar Tab Navigation Header -->
+            <div class="flex border-b border-astro-700 bg-astro-900">
+                <button onclick="switchTab('tab-marks')" id="btnTabMarks" class="flex-1 py-3 px-2 text-xs font-bold border-b-2 border-cyan-500 text-cyan-400 flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-crosshairs"></i> Marcas (<span id="markCountBadge">0</span>)
+                </button>
+                <button onclick="switchTab('tab-report')" id="btnTabReport" class="flex-1 py-3 px-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-file-lines"></i> Reporte
+                </button>
+                <button onclick="switchTab('tab-datasets')" id="btnTabDatasets" class="flex-1 py-3 px-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-images"></i> Datasets
+                </button>
+                <button onclick="switchTab('tab-ai')" id="btnTabAI" class="flex-1 py-3 px-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-robot"></i> AI Check
+                </button>
+            </div>
+
+            <!-- Sidebar Content Container -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+
+                <!-- TAB 1: MARKS & CANDIDATE POSITIONS -->
+                <div id="tab-marks" class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-check text-cyan-400"></i> Detecciones en el Set
+                        </h2>
+                        <button onclick="clearAllMarks()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-trash"></i> Limpiar Todo
+                        </button>
+                    </div>
+
+                    <!-- Marks Table / List -->
+                    <div id="marksList" class="space-y-2">
+                        <div class="bg-astro-900/60 border border-slate-700/50 rounded-lg p-4 text-center text-slate-400 text-xs italic">
+                            No se han marcado candidatos en este set.<br>
+                            Haz doble clic sobre el objeto en la imagen o presiona la tecla <kbd class="kbd-badge">M</kbd> para fijar una coordenada.
+                        </div>
+                    </div>
+
+                    <!-- Quick Candidate Classification Box -->
+                    <div class="bg-astro-900 border border-slate-700/70 rounded-lg p-3 space-y-2">
+                        <label class="text-xs font-semibold text-slate-300 block">Grupo u Origen Probable:</label>
+                        <select id="candidateGroup" class="w-full bg-astro-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white focus:border-cyan-500 focus:outline-none">
+                            <option value="Kreutz">Grupo Kreutz (Rasante al Sol muy común)</option>
+                            <option value="Meyer">Grupo Meyer</option>
+                            <option value="Marsden">Grupo Marsden</option>
+                            <option value="Kracht">Grupo Kracht</option>
+                            <option value="Non-group">No Pertenece a Grupo / Desconocido</option>
+                        </select>
+                        <p class="text-[11px] text-slate-400 leading-tight">
+                            * Los cometas Kreutz suelen aproximarse desde el cuadrante Suroeste en imágenes C3 de SOHO.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TAB 2: OFFICIAL REPORT GENERATOR -->
+                <div id="tab-report" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane text-cyan-400"></i> Generador de Reporte Rápido
+                        </h2>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded">
+                            Estándar Sungrazer
+                        </span>
+                    </div>
+
+                    <!-- Metadata Form -->
+                    <div class="space-y-3 bg-astro-900 border border-slate-700/70 rounded-lg p-3 text-xs">
+                        <div>
+                            <label class="block text-slate-300 font-semibold mb-1">Nombre del Observador:</label>
+                            <input type="text" id="observerName" value="AstronomoAficionado" class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1.5 text-white focus:border-cyan-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-semibold mb-1">Email de Contacto:</label>
+                            <input type="email" id="observerEmail" value="astronomo@ejemplo.com" class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1.5 text-white focus:border-cyan-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-semibold mb-1">Observaciones / Brillo estimado:</label>
+                            <textarea id="reportNotes" rows="2" placeholder="Objeto difuso tenue, movimiento uniforme sudoeste..." class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1.5 text-white focus:border-cyan-500 focus:outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Auto-generated Report Textarea -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-semibold text-slate-300">Texto Formateado para Envío:</label>
+                            <button onclick="copyReportToClipboard()" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                        <textarea id="formattedReportText" readonly class="w-full h-44 bg-slate-950 font-mono text-[11px] text-cyan-300 border border-slate-800 rounded p-2.5 focus:outline-none leading-relaxed leading-3"></textarea>
+                    </div>
+
+                    <!-- High Throughput Action Buttons -->
+                    <div class="pt-2 space-y-2">
+                        <button onclick="submitAndNextSet()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 text-xs flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-check-double text-sm"></i> Guardar Reporte & Cargar Siguiente Set
+                        </button>
+                        <p class="text-[11px] text-slate-400 text-center">
+                            Procesa decenas de sets de imágenes por hora usando este flujo continuo.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TAB 3: DATASETS SELECTOR -->
+                <div id="tab-datasets" class="space-y-4 hidden">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-database text-cyan-400"></i> Datasets Online Disponibles
+                    </h2>
+
+                    <!-- Presets List -->
+                    <div id="datasetsList" class="space-y-2">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- Online Generator Tool -->
+                    <div class="border-t border-astro-700 pt-3 space-y-3">
+                        <h3 class="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-globe"></i> Generar Secuencia Online Personalizada
+                        </h3>
+                        <p class="text-[11px] text-slate-400 leading-tight">
+                            Consulta la API de Helioviewer para traer imágenes reales de cualquier fecha desde 1996 hasta hoy.
+                        </p>
+
+                        <div class="space-y-2 bg-astro-900 p-2.5 rounded-lg border border-slate-700/80 text-xs">
+                            <div>
+                                <label class="block text-slate-300 font-semibold mb-1">Instrumento:</label>
+                                <select id="fetchInstrument" class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                    <option value="5">SOHO / LASCO C3 (Campo Amplio)</option>
+                                    <option value="4">SOHO / LASCO C2 (Campo Cercano)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-semibold mb-1">Fecha Inicial (UTC):</label>
+                                <input type="date" id="fetchDate" value="2024-10-10" class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1 text-white">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1">Fotogramas:</label>
+                                    <select id="fetchFrames" class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                        <option value="4">4 Frames</option>
+                                        <option value="6" selected>6 Frames</option>
+                                        <option value="8">8 Frames</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1">Intervalo:</label>
+                                    <select id="fetchInterval" class="w-full bg-astro-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                        <option value="1">1 Hora</option>
+                                        <option value="2" selected>2 Horas</option>
+                                        <option value="4">4 Horas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="fetchCustomOnlineSequence()" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-xs flex items-center justify-center gap-2 transition">
+                                <i class="fa-solid fa-cloud-arrow-down"></i> Descargar Secuencia de NASA
+                            </button>
+                        </div>
+
+                        <!-- Manual URL Input -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-300">O pegar URLs de imágenes directamente:</label>
+                            <textarea id="customUrlsInput" rows="3" placeholder="https://ejemplo.com/imagen1.jpg&#10;https://ejemplo.com/imagen2.jpg" class="w-full bg-astro-900 border border-slate-700 rounded p-2 text-[11px] text-cyan-300 font-mono focus:outline-none"></textarea>
+                            <button onclick="loadCustomUrlsSequence()" class="w-full py-1.5 bg-astro-900 hover:bg-slate-700 border border-slate-600 rounded text-xs text-slate-200 flex items-center justify-center gap-1.5 transition">
+                                <i class="fa-solid fa-link text-cyan-400"></i> Cargar URLs Pegadas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: GEMINI AI ASSISTANT -->
+                <div id="tab-ai" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-brain text-cyan-400"></i> Asistente de Verificación IA
+                        </h2>
+                        <span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded">
+                            Gemini 3 Flash
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Usa la inteligencia artificial de Gemini para verificar si las coordenadas marcadas coinciden con la dinámica conocida de un cometa rasante o para redactar una descripción técnica detallada del objeto.
+                    </p>
+
+                    <button id="btnAiAnalyze" onclick="runAiAnalysis()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg shadow-lg shadow-purple-600/20 text-xs flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Analizar Candidatos con Gemini AI
+                    </button>
+
+                    <!-- AI Response Area -->
+                    <div id="aiResponseBox" class="bg-astro-900 border border-slate-700/80 rounded-lg p-3 text-xs space-y-2 min-h-[120px] text-slate-300 font-sans">
+                        <span class="text-slate-500 italic">Haz clic en el botón superior para solicitar una evaluación automática del set marcado.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sidebar Footer: Report Count Summary -->
+            <div class="p-3 bg-astro-900 border-t border-astro-700 flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-400">Reportes Generados:</span>
+                <span id="globalReportCounter" class="text-emerald-400 font-bold bg-emerald-950 border border-emerald-800 px-2 py-0.5 rounded">0</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="hotkeysModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-astro-800 border border-astro-700 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-keyboard text-cyan-400"></i> Atajos de Teclado Rápidos
+                </h3>
+                <button onclick="toggleHotkeysModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="flex items-center justify-between bg-astro-900 p-2 rounded border border-slate-700/50">
+                    <span class="text-slate-300">Play / Pausa:</span>
+                    <kbd class="kbd-badge">Espacio</kbd>
+                </div>
+                <div class="flex items-center justify-between bg-astro-900 p-2 rounded border border-slate-700/50">
+                    <span class="text-slate-300">Frame Sig / Ant:</span>
+                    <kbd class="kbd-badge">← / →</kbd>
+                </div>
+                <div class="flex items-center justify-between bg-astro-900 p-2 rounded border border-slate-700/50">
+                    <span class="text-slate-300">Marcar Punto:</span>
+                    <kbd class="kbd-badge">M</kbd>
+                </div>
+                <div class="flex items-center justify-between bg-astro-900 p-2 rounded border border-slate-700/50">
+                    <span class="text-slate-300">Invertir Color:</span>
+                    <kbd class="kbd-badge">I</kbd>
+                </div>
+                <div class="flex items-center justify-between bg-astro-900 p-2 rounded border border-slate-700/50">
+                    <span class="text-slate-300">Reiniciar Vista:</span>
+                    <kbd class="kbd-badge">R</kbd>
+                </div>
+                <div class="flex items-center justify-between bg-astro-900 p-2 rounded border border-slate-700/50">
+                    <span class="text-slate-300">Sig Set Rápido:</span>
+                    <kbd class="kbd-badge">N</kbd>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 leading-tight">
+                Diseñado para maximizar la velocidad de inspección en ráfaga. Puedes navegar y evaluar candidatos usando exclusivamente tu teclado.
+            </p>
+
+            <button onclick="toggleHotkeysModal()" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-xs transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="fixed top-14 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+    <script>
+        
+        // --- Application State ---
+        const state = {
+            currentSetIndex: 0,
+            currentFrameIndex: 0,
+            isPlaying: false,
+            fps: 4,
+            playTimer: null,
+            zoom: 1.0,
+            panX: 0,
+            panY: 0,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            brightness: 100,
+            contrast: 100,
+            stretchMode: 'normal',
+            marks: {},
+            datasets: [],
+            totalReportsCount: 0,
+            cursorX: 0,
+            cursorY: 0,
+            isLoading: false
+        };
+
+        // --- Helioviewer API Online Datasets Generator ---
+        function buildHelioviewerUrl(dateIso, sourceId) {
+            // SourceID 5 = LASCO C3, SourceID 4 = LASCO C2
+            const scale = sourceId === 5 ? '25.0' : '12.0';
+            return `https://api.helioviewer.org/v2/takeScreenshot/?date=${encodeURIComponent(dateIso)}&imageScale=${scale}&layers=%5B${sourceId},1,100%5D&width=600&height=600&x0=0&y0=0&display=true`;
+        }
+
+        // Generate dynamic date timestamps
+        function generateTimeSequence(startDate, frameCount, intervalHours) {
+            const list = [];
+            let current = new Date(startDate);
+            for (let i = 0; i < frameCount; i++) {
+                list.push(current.toISOString());
+                current = new Date(current.getTime() + intervalHours * 3600 * 1000);
+            }
+            return list;
+        }
+
+        function createRealOnlineDatasets() {
+            const datasets = [];
+
+            // Dataset 1: Cometa C/2023 A3 (Tsuchinshan-ATLAS) en SOHO LASCO C3
+            const dateListA3 = generateTimeSequence('2024-10-10T02:00:00Z', 6, 2);
+            datasets.push({
+                id: 'set-online-a3',
+                title: 'Set 1: Cometa C/2023 A3 (LASCO C3)',
+                instrument: 'SOHO / LASCO C3 (Online)',
+                baseTime: '2024-10-10 ',
+                framesCount: 6,
+                description: 'Gran cometa reciente transitando por el campo de visión de LASCO C3. Descargado desde Helioviewer API.',
+                urls: dateListA3.map(d => buildHelioviewerUrl(d, 5)),
+                timestamps: dateListA3
+            });
+
+            // Dataset 2: Transito reciente en LASCO C2
+            const dateListC2 = generateTimeSequence('2024-10-10T04:00:00Z', 6, 2);
+            datasets.push({
+                id: 'set-online-c2',
+                title: 'Set 2: Alta Resolución LASCO C2 (Online)',
+                instrument: 'SOHO / LASCO C2 (Online)',
+                baseTime: '2024-10-10 ',
+                framesCount: 6,
+                description: 'Secuencia de alta resolución de la corona solar interna en LASCO C2.',
+                urls: dateListC2.map(d => buildHelioviewerUrl(d, 4)),
+                timestamps: dateListC2
+            });
+
+            // Dataset 3: Cometa Historico C/2011 W3 (Lovejoy) en LASCO C3
+            const dateListLovejoy = generateTimeSequence('2011-12-15T12:00:00Z', 6, 3);
+            datasets.push({
+                id: 'set-online-lovejoy',
+                title: 'Set 3: Cometa Kreutz C/2011 W3 Lovejoy',
+                instrument: 'SOHO / LASCO C3 (Online)',
+                baseTime: '2011-12-15 ',
+                framesCount: 6,
+                description: 'Famoso cometa rasante del grupo Kreutz sobreviviendo al perihelio cerca del Sol.',
+                urls: dateListLovejoy.map(d => buildHelioviewerUrl(d, 5)),
+                timestamps: dateListLovejoy
+            });
+
+            return datasets;
+        }
+
+        // Asynchronously load images from online URLs into offscreen canvases
+        async function loadOnlineImagesForSet(dataset) {
+            showLoadingOverlay(true, dataset.title, `Cargando 0/${dataset.urls.length} imágenes desde NASA/Helioviewer...`);
+            dataset.frameCanvases = [];
+
+            let loaded = 0;
+            const promises = dataset.urls.map((url, index) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous"; // Request CORS for filter manipulation if permitted
+
+                    img.onload = () => {
+                        const c = document.createElement('canvas');
+                        c.width = img.width || 600;
+                        c.height = img.height || 600;
+                        const cctx = c.getContext('2d');
+                        cctx.drawImage(img, 0, 0);
+                        dataset.frameCanvases[index] = c;
+
+                        loaded++;
+                        updateLoadingProgress(loaded, dataset.urls.length, dataset.title);
+                        resolve(true);
+                    };
+
+                    img.onerror = () => {
+                        console.warn(`Error al cargar imagen online desde: ${url}. Generando vista de respaldo.`);
+                        // Fallback canvas on network timeout/CORS blocking
+                        const c = document.createElement('canvas');
+                        c.width = 600;
+                        c.height = 600;
+                        const cctx = c.getContext('2d');
+                        cctx.fillStyle = '#05070d';
+                        cctx.fillRect(0, 0, 600, 600);
+                        cctx.fillStyle = '#ef4444';
+                        cctx.font = '14px "JetBrains Mono", monospace';
+                        cctx.fillText('Error de Red / Imagen No Disponible', 130, 290);
+                        cctx.fillStyle = '#94a3b8';
+                        cctx.font = '11px "JetBrains Mono", monospace';
+                        cctx.fillText(`URL: ${url.substring(0, 45)}...`, 130, 315);
+                        dataset.frameCanvases[index] = c;
+
+                        loaded++;
+                        updateLoadingProgress(loaded, dataset.urls.length, dataset.title);
+                        resolve(false);
+                    };
+
+                    img.src = url;
+                });
+            });
+
+            await Promise.all(promises);
+            showLoadingOverlay(false);
+        }
+
+        function showLoadingOverlay(show, title = '', subtitle = '') {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                document.getElementById('loadingTextTitle').textContent = title;
+                document.getElementById('loadingTextSub').textContent = subtitle;
+                document.getElementById('loadingProgressBar').style.width = '0%';
+                overlay.classList.remove('hidden');
+                state.isLoading = true;
+            } else {
+                overlay.classList.add('hidden');
+                state.isLoading = false;
+            }
+        }
+
+        function updateLoadingProgress(current, total, title) {
+            const pct = Math.round((current / total) * 100);
+            document.getElementById('loadingProgressBar').style.width = `${pct}%`;
+            document.getElementById('loadingTextSub').textContent = `Descargando imagen ${current} de ${total} de NASA (${pct}%)...`;
+        }
+
+        // Fetch custom user date range online sequence
+        async function fetchCustomOnlineSequence() {
+            const instrument = parseInt(document.getElementById('fetchInstrument').value, 10);
+            const dateVal = document.getElementById('fetchDate').value;
+            const framesCount = parseInt(document.getElementById('fetchFrames').value, 10);
+            const intervalHours = parseInt(document.getElementById('fetchInterval').value, 10);
+
+            if (!dateVal) {
+                showToast('Por favor selecciona una fecha válida', 'warning');
+                return;
+            }
+
+            const startDate = `${dateVal}T12:00:00Z`;
+            const dateList = generateTimeSequence(startDate, framesCount, intervalHours);
+            const instName = instrument === 5 ? 'LASCO C3' : 'LASCO C2';
+
+            const newDs = {
+                id: `custom-online-${Date.now()}`,
+                title: `Personalizado: ${instName} (${dateVal})`,
+                instrument: `SOHO / ${instName} (Helioviewer)`,
+                baseTime: `${dateVal} `,
+                framesCount: framesCount,
+                description: `Secuencia en vivo descargada de Helioviewer API para la fecha ${dateVal}.`,
+                urls: dateList.map(d => buildHelioviewerUrl(d, instrument)),
+                timestamps: dateList
+            };
+
+            state.datasets.push(newDs);
+            updateDatasetsListUI();
+            await loadSet(state.datasets.length - 1);
+            showToast(`¡Secuencia online cargada con éxito para ${dateVal}!`, 'success');
+        }
+
+        // Load custom pasted URLs
+        async function loadCustomUrlsSequence() {
+            const text = document.getElementById('customUrlsInput').value.trim();
+            if (!text) {
+                showToast('Pega al menos una URL de imagen válida', 'warning');
+                return;
+            }
+
+            const urls = text.split('\n').map(u => u.trim()).filter(u => u.length > 5);
+            if (urls.length === 0) {
+                showToast('No se encontraron URLs válidas en el texto', 'warning');
+                return;
+            }
+
+            const newDs = {
+                id: `pasted-urls-${Date.now()}`,
+                title: `Set Personalizado por URLs (${urls.length} imgs)`,
+                instrument: 'Imágenes por URL Externa',
+                baseTime: 'Custom ',
+                framesCount: urls.length,
+                description: 'Secuencia creada ingresando enlaces directos de imágenes online.',
+                urls: urls,
+                timestamps: urls.map((_, i) => `URL #${i + 1}`)
+            };
+
+            state.datasets.push(newDs);
+            updateDatasetsListUI();
+            await loadSet(state.datasets.length - 1);
+            showToast(`Cargado set con ${urls.length} imágenes online`, 'success');
+        }
+
+        // Modified loadSet function with asynchronous image loading
+        async function loadSet(index) {
+            stopPlayback();
+            state.isPlaying = false;
+            state.currentSetIndex = index;
+            state.currentFrameIndex = 0;
+            state.zoom = 1.0;
+            state.panX = 0;
+            state.panY = 0;
+
+            const dataset = state.datasets[index];
+            document.getElementById('currentSetLabel').textContent = dataset.title;
+
+            // Load online images if not pre-rendered
+            if (!dataset.frameCanvases || dataset.frameCanvases.length === 0) {
+                await loadOnlineImagesForSet(dataset);
+            }
+
+            // Generate timeline buttons
+            const timeline = document.getElementById('timelineContainer');
+            let html = '';
+            for (let i = 0; i < dataset.framesCount; i++) {
+                html += `<button onclick="setFrame(${i})">F${i + 1}</button>`;
+            }
+            timeline.innerHTML = html;
+
+            updateFrameUI();
+            updateMarksUI();
+            updateFormattedReport();
+            renderCanvas();
+            updateDatasetsListUI();
+        }
+
+        function loadNextSet() {
+            const nextIdx = (state.currentSetIndex + 1) % state.datasets.length;
+            loadSet(nextIdx);
+        }
+
+        function loadPrevSet() {
+            const prevIdx = (state.currentSetIndex - 1 + state.datasets.length) % state.datasets.length;
+            loadSet(prevIdx);
+        }
+
+        function resetView() {
+            state.zoom = 1.0;
+            state.panX = 0;
+            state.panY = 0;
+            state.brightness = 100;
+            state.contrast = 100;
+            state.stretchMode = 'normal';
+            document.getElementById('brightnessSlider').value = 100;
+            document.getElementById('contrastSlider').value = 100;
+            document.getElementById('selectStretch').value = 'normal';
+            renderCanvas();
+            showToast('Vista y filtros reiniciados', 'info');
+        }
+
+        // Render Datasets Selector Sidebar List
+        function updateDatasetsListUI() {
+            const container = document.getElementById('datasetsList');
+            let html = '';
+            state.datasets.forEach((ds, idx) => {
+                const isActive = idx === state.currentSetIndex;
+                const markCount = (state.marks[idx] || []).length;
+
+                html += `
+                <div onclick="loadSet(${idx})" class="p-3 rounded-lg border cursor-pointer transition ${isActive ? 'bg-cyan-950/40 border-cyan-500/60 text-white' : 'bg-astro-900 border-slate-800 text-slate-300 hover:border-slate-700'}">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold">${ds.title}</span>
+                        ${markCount > 0 ? `<span class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 font-mono">${markCount} marcas</span>` : ''}
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">${ds.description}</p>
+                    <div class="text-[10px] text-cyan-400 font-mono mt-2 flex items-center justify-between">
+                        <span>${ds.instrument}</span>
+                        <span>${ds.framesCount} Frames</span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // Handle Custom Local Files Upload
+        function handleCustomFiles(files) {
+            if (!files || files.length === 0) return;
+
+            const customCanvases = [];
+            let loadedCount = 0;
+
+            Array.from(files).forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const c = document.createElement('canvas');
+                        c.width = img.width;
+                        c.height = img.height;
+                        const cctx = c.getContext('2d');
+                        cctx.drawImage(img, 0, 0);
+                        customCanvases[i] = c;
+                        loadedCount++;
+
+                        if (loadedCount === files.length) {
+                            // Create new custom dataset
+                            const newDs = {
+                                id: `custom-${Date.now()}`,
+                                title: `Set Personalizado (${files.length} imgs)`,
+                                instrument: 'Imágenes Locales Usuario',
+                                baseTime: '2026-09-16 Custom ',
+                                framesCount: files.length,
+                                description: 'Set de imágenes cargado desde el disco local.',
+                                frameCanvases: customCanvases
+                            };
+                            state.datasets.push(newDs);
+                            showToast(`¡Set personalizado cargado con éxito!`, 'success');
+                            loadSet(state.datasets.length - 1);
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Gemini AI API Integration Call
+        async function runAiAnalysis() {
+            const responseBox = document.getElementById('aiResponseBox');
+            const dataset = state.datasets[state.currentSetIndex];
+            const currentSetMarks = state.marks[state.currentSetIndex] || [];
+
+            responseBox.innerHTML = `
+                <div class="flex items-center justify-center gap-2 py-4 text-purple-400">
+                    <i class="fa-solid fa-spinner animate-spin"></i>
+                    <span>Analizando con Gemini 3 Flash AI...</span>
+                </div>`;
+
+            const prompt = `Actúa como un astrofísico experto del Naval Research Laboratory (NRL) especialista en el proyecto Sungrazer de SOHO.
+Evalúa las siguientes coordenadas reportadas por un aficionado en una secuencia de imágenes coronográficas:
+Instrumento: ${dataset.instrument}
+Descripción del set: ${dataset.description}
+Marcas registradas por el usuario: ${JSON.stringify(currentSetMarks)}
+
+Responde de manera concisa en español en 2 párrafos:
+1. Analiza la coherencia del movimiento (dirección, velocidad de fotogramas). ¿Presenta una trayectoria orbital típica de un cometa del grupo Kreutz o no pertenece a grupo?
+2. Da una recomendación de confirmación oficial o posible falsa alarma (rayo cósmico/ruido).`;
+
+            try {
+                const apiKey = ""; // Canvas dynamic key binding
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }]
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    responseBox.innerHTML = `<div class="prose prose-invert text-xs leading-relaxed text-slate-200">${text.replace(/\n/g, '<br>')}</div>`;
+                } else {
+                    responseBox.innerHTML = `<span class="text-rose-400">No se pudo obtener la respuesta del modelo Gemini. Intente de nuevo.</span>`;
+                }
+            } catch (err) {
+                console.error(err);
+                responseBox.innerHTML = `<span class="text-rose-400">Error en la consulta API: ${err.message}</span>`;
+            }
+        }
+
+        // Sidebar Tab Switcher
+        function switchTab(tabId) {
+            ['tab-marks', 'tab-report', 'tab-datasets', 'tab-ai'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+
+            ['btnTabMarks', 'btnTabReport', 'btnTabDatasets', 'btnTabAI'].forEach(id => {
+                const btn = document.getElementById(id);
+                btn.className = 'flex-1 py-3 px-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition';
+            });
+
+            const activeBtnMap = {
+                'tab-marks': 'btnTabMarks',
+                'tab-report': 'btnTabReport',
+                'tab-datasets': 'btnTabDatasets',
+                'tab-ai': 'btnTabAI'
+            };
+
+            const activeBtn = document.getElementById(activeBtnMap[tabId]);
+            activeBtn.className = 'flex-1 py-3 px-2 text-xs font-bold border-b-2 border-cyan-500 text-cyan-400 flex items-center justify-center gap-1.5 transition';
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgMap = {
+                info: 'bg-slate-800 border-cyan-500/50 text-cyan-300',
+                success: 'bg-slate-800 border-emerald-500/50 text-emerald-300',
+                warning: 'bg-slate-800 border-amber-500/50 text-amber-300'
+            };
+
+            toast.className = `toast-enter px-4 py-2.5 rounded-lg border shadow-xl text-xs font-semibold flex items-center gap-2 pointer-events-auto ${bgMap[type] || bgMap.info}`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function toggleHotkeysModal() {
+            document.getElementById('hotkeysModal').classList.toggle('hidden');
+        }
+
+
+        // Initialize application
+        window.onload = function() {
+            // Load Real Online Datasets
+            state.datasets = createRealOnlineDatasets();
+
+            // Wire input slider controls
+            document.getElementById('speedSlider').addEventListener('input', (e) => {
+                state.fps = parseInt(e.target.value, 10);
+                document.getElementById('speedValue').textContent = `${state.fps} FPS`;
+                if (state.isPlaying) startPlayback();
+            });
+
+            document.getElementById('brightnessSlider').addEventListener('input', (e) => {
+                state.brightness = parseInt(e.target.value, 10);
+                renderCanvas();
+            });
+
+            document.getElementById('contrastSlider').addEventListener('input', (e) => {
+                state.contrast = parseInt(e.target.value, 10);
+                renderCanvas();
+            });
+
+            document.getElementById('selectStretch').addEventListener('change', (e) => {
+                state.stretchMode = e.target.value;
+                renderCanvas();
+            });
+
+            document.getElementById('btnResetFilters').addEventListener('click', () => {
+                state.brightness = 100;
+                state.contrast = 100;
+                state.stretchMode = 'normal';
+                document.getElementById('brightnessSlider').value = 100;
+                document.getElementById('contrastSlider').value = 100;
+                document.getElementById('selectStretch').value = 'normal';
+                renderCanvas();
+            });
+
+            // Wire playback control buttons
+            document.getElementById('btnPlayPause').addEventListener('click', togglePlayPause);
+            document.getElementById('btnFirstFrame').addEventListener('click', () => setFrame(0));
+            document.getElementById('btnLastFrame').addEventListener('click', () => {
+                const dataset = state.datasets[state.currentSetIndex];
+                if (dataset) setFrame(dataset.framesCount - 1);
+            });
+            document.getElementById('btnPrevFrame').addEventListener('click', () => stepFrame(-1));
+            document.getElementById('btnNextFrame').addEventListener('click', () => stepFrame(1));
+
+            // Wire Zoom buttons
+            document.getElementById('btnZoomIn').addEventListener('click', () => {
+                state.zoom = Math.min(8.0, state.zoom * 1.25);
+                renderCanvas();
+            });
+            document.getElementById('btnZoomOut').addEventListener('click', () => {
+                state.zoom = Math.max(0.5, state.zoom / 1.25);
+                renderCanvas();
+            });
+            document.getElementById('btnResetView').addEventListener('click', resetView);
+
+            // Wire Set buttons
+            document.getElementById('btnNextSet').addEventListener('click', loadNextSet);
+            document.getElementById('btnPrevSet').addEventListener('click', loadPrevSet);
+
+            // Form dynamic updates
+            ['observerName', 'observerEmail', 'candidateGroup', 'reportNotes'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateFormattedReport);
+            });
+
+            // Setup mouse & keyboard interaction
+            setupInteractionListeners();
+
+            // Initial load first real online set
+            loadSet(0);
+        };
+    </script>
+</body>
+</html>
