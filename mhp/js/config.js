@@ -6,10 +6,12 @@ export const APP = {
 };
 
 // Datos de la sección «Acerca de». Los campos vacíos se muestran como «por completar».
+// Nombres institucionales: no se traducen, se muestran igual en los 6 idiomas.
 export const ABOUT = {
-  siteUrl: '',       // Dirección pública de la app, p. ej. 'https://…'
-  institution: '',   // Institución donde trabajan las personas del equipo
-  contact: ''        // Correo o enlace de contacto (opcional)
+  siteUrl: 'https://edytic.ces.edu.uy/',                    // Dirección pública de la app, p. ej. 'https://…'
+  institution: 'DGES - EDyTIC - Contenidistas de Astronomía 2026',  // Institución donde trabajan las personas del equipo
+  contact: 'recursosastronomia@uruguayeduca.edu.uy',        // Correo o enlace de contacto (opcional)
+  contactSubject: 'App actividad solar'                     // Asunto prellenado del mailto (opcional, solo aplica a un correo)
 };
 
 // Reglas del laboratorio
