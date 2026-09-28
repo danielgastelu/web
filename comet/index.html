@@ -27,8 +27,13 @@
     <button class="tab-btn" data-tab="ayuda" role="tab" aria-selected="false">Guía rápida</button>
     <button class="tab-btn" data-tab="perfil" role="tab" aria-selected="false">Perfil</button>
   </nav>
-  <div id="installArea" class="install-area" hidden>
-    <button id="installBtn" class="btn btn-accent">Instalar app</button>
+  <div class="topbar-actions">
+    <button id="btnDeviceToggle" class="btn btn-device" title="Cambiar modo de interacción (Celular / Laptop)" aria-label="Modo de interacción">
+      <span id="deviceIcon" class="device-icon">📱</span> <span id="deviceText" class="device-text">Celular</span>
+    </button>
+    <div id="installArea" class="install-area" hidden>
+      <button id="installBtn" class="btn btn-accent">Instalar app</button>
+    </div>
   </div>
 </header>
 
@@ -87,10 +92,32 @@
 
   <!-- Visor principal -->
   <div class="card viewer-card">
+
+    <!-- Selector rápido de candidatos para acceso inmediato -->
+    <div class="quick-candidate-section" id="quickCandidateSection">
+      <span class="quick-candidate-label">Candidato:</span>
+      <div class="quick-candidate-list" id="quickCandidateList">
+        <span class="hint" style="font-size:0.8rem;">Sin candidatos</span>
+      </div>
+      <button class="btn btn-sm" id="btnQuickNuevoCandidato" title="Crear un nuevo candidato">+ Nuevo</button>
+    </div>
+
+    <!-- Modos de interacción táctil (para celulares / pantallas táctiles) -->
+    <div class="mobile-modes-bar" id="mobileModesBar">
+      <span class="mode-bar-label">Modo táctil:</span>
+      <div class="mode-buttons" role="group" aria-label="Modo táctil para marcar candidatos">
+        <button class="btn mode-btn active" data-mode="crosshair" id="btnModeCrosshair" title="Arrastrá la imagen hasta centrar el cometa en la cruz y tocalo para marcar">🎯 Mira fija</button>
+        <button class="btn mode-btn" data-mode="touch" id="btnModeTouch" title="Tocá o deslizá el dedo con lupa de precisión">👆 Toque directo</button>
+        <button class="btn mode-btn" data-mode="pan" id="btnModePan" title="Navegá y hacé zoom libremente sin marcar">✋ Navegar</button>
+      </div>
+    </div>
+
     <div class="viewer-toolbar">
-      <button class="btn icon-btn" id="btnPrevFrame" title="Cuadro anterior (←)">&larr;</button>
-      <button class="btn icon-btn btn-accent" id="btnPlay" title="Reproducir secuencia / blink automático (barra espaciadora)">&#9654; Reproducir</button>
-      <button class="btn icon-btn" id="btnNextFrame" title="Cuadro siguiente (→)">&rarr;</button>
+      <div class="toolbar-nav-group">
+        <button class="btn icon-btn" id="btnPrevFrame" title="Cuadro anterior (←)">&larr;</button>
+        <button class="btn icon-btn btn-accent" id="btnPlay" title="Reproducir secuencia / blink automático (barra espaciadora)">&#9654; Reproducir</button>
+        <button class="btn icon-btn" id="btnNextFrame" title="Cuadro siguiente (→)">&rarr;</button>
+      </div>
       <label class="speed-select">Velocidad
         <select id="fPlaySpeed">
           <option value="700">Lenta</option>
@@ -101,21 +128,60 @@
       </label>
       <span id="frameLabel" class="frame-label">Sin set cargado</span>
       <span class="spacer"></span>
-      <button class="btn icon-btn" id="btnZoomOut" title="Alejar (-)">&minus;</button>
-      <span id="zoomLabel" class="zoom-label">100%</span>
-      <button class="btn icon-btn" id="btnZoomIn" title="Acercar (+)">+</button>
-      <button class="btn icon-btn" id="btnZoomReset" title="Restablecer zoom (0)">1:1</button>
+      <div class="toolbar-zoom-group">
+        <button class="btn icon-btn" id="btnZoomOut" title="Alejar (-)">&minus;</button>
+        <span id="zoomLabel" class="zoom-label">100%</span>
+        <button class="btn icon-btn" id="btnZoomIn" title="Acercar (+)">+</button>
+        <button class="btn icon-btn" id="btnZoomReset" title="Restablecer zoom (0)">1:1</button>
+      </div>
       <button class="btn icon-btn danger" id="btnBorrarMarca" title="Borrar marca del candidato activo en este cuadro (Supr)">Borrar marca</button>
     </div>
+
     <div class="viewer-stage-wrap" id="stageWrap">
       <div class="viewer-empty" id="viewerEmpty">Generá un set de imágenes para empezar a explorar.</div>
       <div class="zoom-layer" id="zoomLayer" hidden>
         <img id="frameImg" alt="Cuadro LASCO activo" draggable="false">
         <svg id="markerOverlay" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
       </div>
+
+      <!-- Retícula / Mira central fija para modo móvil 'crosshair' -->
+      <div class="crosshair-overlay" id="crosshairOverlay" hidden aria-hidden="true">
+        <div class="crosshair-ring"></div>
+        <div class="crosshair-line crosshair-h"></div>
+        <div class="crosshair-line crosshair-v"></div>
+        <div class="crosshair-dot"></div>
+      </div>
+
+      <!-- Lupa flotante para modo táctil directo -->
+      <div class="magnifier-loupe" id="magnifierLoupe" hidden aria-hidden="true">
+        <canvas id="loupeCanvas" width="128" height="128"></canvas>
+        <div class="loupe-reticle"></div>
+        <div class="loupe-coords" id="loupeCoords">x: --, y: --</div>
+      </div>
     </div>
+
+    <!-- Barra de acción táctil para marcar en el centro de la mira -->
+    <div class="mobile-action-bar" id="mobileActionBar">
+      <button class="btn btn-primary btn-mark-center" id="btnMarkCenter">🎯 Marcar objeto en la mira</button>
+    </div>
+
+    <!-- Barra de ajuste fino de la marca (píxel a píxel) -->
+    <div class="micro-adjust-bar" id="microAdjustBar" hidden>
+      <div class="micro-info">
+        <span class="micro-title">Ajuste fino (píxel a píxel):</span>
+        <span class="micro-coords" id="microCoords">x: --, y: --</span>
+      </div>
+      <div class="micro-dpad">
+        <button class="btn icon-btn micro-btn" id="btnNudgeLeft" title="Mover 1px a la izquierda" aria-label="Izquierda">◀</button>
+        <button class="btn icon-btn micro-btn" id="btnNudgeUp" title="Mover 1px arriba" aria-label="Arriba">▲</button>
+        <button class="btn icon-btn micro-btn" id="btnNudgeDown" title="Mover 1px abajo" aria-label="Abajo">▼</button>
+        <button class="btn icon-btn micro-btn" id="btnNudgeRight" title="Mover 1px a la derecha" aria-label="Derecha">▶</button>
+        <button class="btn icon-btn danger micro-btn" id="btnMicroDelete" title="Quitar marca de este cuadro" aria-label="Quitar marca">✕ Quitar</button>
+      </div>
+    </div>
+
     <div class="filmstrip" id="filmstrip"></div>
-    <p class="hint">Clic = marcar el candidato activo en este punto (si la secuencia se está reproduciendo, un clic la pausa en ese cuadro en vez de marcar). Arrastrar = desplazar la vista. Rueda del mouse = zoom. Atajos: <strong>Espacio</strong> reproducir/pausar, ←/→ cambiar cuadro, +/&minus; zoom, Supr borrar marca, 1-9 elegir candidato, N nuevo candidato.</p>
+    <p class="hint" id="viewerHint">Clic = marcar candidato activo · Arrastrar = desplazar vista · Rueda = zoom · Atajos: Espacio, ←/→, +/-, Supr, 1-9.</p>
   </div>
 
   <!-- Reporte -->
@@ -177,11 +243,19 @@
     </ul>
     <p class="hint">Fuente: <a href="https://sungrazer.nrl.navy.mil/soho_guide" target="_blank" rel="noopener">Guía oficial de caza de cometas SOHO</a> y <a href="https://sungrazer.nrl.navy.mil/comet_faqs" target="_blank" rel="noopener">FAQ</a> del Sungrazer Project. La guía recomienda pasar una o dos semanas revisando en silencio los <a href="https://sungrazer.nrl.navy.mil/reports" target="_blank" rel="noopener">reportes confirmados en el sitio</a> antes de reportar por primera vez — el éxito de quienes empiezan a reportar sin hacer esto es prácticamente nulo.</p>
 
-    <h2>Cómo usar esta app</h2>
+    <h2>Cómo usar esta app en celulares y laptops</h2>
     <ol>
       <li>Completá tu <strong>Perfil</strong> una vez (nombre de observador).</li>
       <li>En <strong>Explorar y marcar</strong>, elegí fecha, cámara (C2/C3) y rango horario, y generá el set.</li>
-      <li>Creá uno o más <strong>candidatos</strong> y hacé clic sobre el objeto en cada cuadro donde aparezca. Usá el zoom para precisión.</li>
+      <li><strong>En Laptops / Computadoras de escritorio</strong>: hacé clic directo sobre el objeto en cada cuadro para marcarlo, arrastrá para desplazar la vista y usá la rueda del mouse para hacer zoom.</li>
+      <li><strong>En Celulares / Pantallas táctiles</strong> (la app detecta automáticamente tu dispositivo o podés alternar con el botón superior 📱/💻):
+        <ul>
+          <li><strong>Modo Mira fija</strong> (recomendado): Arrastrá la imagen para centrar el cometa exactamente en la cruz central y pulsá el botón <em>"🎯 Marcar objeto en la mira"</em>. Esto evita que tu dedo oculte el cometa.</li>
+          <li><strong>Modo Toque directo</strong>: Deslizá el dedo por la imagen; aparecerá una lupa amplificadora (3x) flotando sobre tu dedo para ver con total precisión el píxel exacto antes de soltar.</li>
+          <li><strong>Modo Navegar</strong>: Permite mover y hacer zoom con gestos de pellizco (pinch-to-zoom) con total seguridad sin dejar marcas accidentales.</li>
+          <li><strong>Ajuste fino (D-Pad)</strong>: Una vez marcado un cuadro, usá los botones de flechas (◀ ▲ ▼ ▶) para mover la marca píxel a píxel con máxima precisión astronómica.</li>
+        </ul>
+      </li>
       <li>Revisá las métricas automáticas (velocidad, ajuste a línea recta) para descartar falsos positivos.</li>
       <li>Generá el <strong>reporte</strong>, copialo o descargalo, y si te convence, llevalo al <a href="https://sungrazer.nrl.navy.mil/report" target="_blank" rel="noopener">formulario oficial</a>.</li>
     </ol>

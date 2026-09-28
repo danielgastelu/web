@@ -277,7 +277,7 @@ function renderFilmstripDots() {
   });
 }
 
-// ---------- zoom / pan ----------
+// ---------- zoom / pan & touch interaction ----------
 function applyTransform() {
   zoomLayer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
   $("#zoomLabel").textContent = `${Math.round(zoom * 100)}%`;
@@ -296,27 +296,93 @@ stageWrap.addEventListener("wheel", (e) => {
   applyTransform();
 }, { passive: false });
 
-// click = marcar, arrastrar = pan
-let dragState = null;
-zoomLayer.addEventListener("mousedown", (e) => {
-  dragState = { startX: e.clientX, startY: e.clientY, panX0: panX, panY0: panY, moved: false };
+// ---------- pointer events (unifying mouse and multi-touch / pinch-zoom / loupe) ----------
+const activePointers = new Map();
+let initialPinchDist = null;
+let initialZoom = 1;
+let isDragging = false;
+let dragStartX = 0, dragStartY = 0;
+let panX0 = 0, panY0 = 0;
+
+stageWrap.addEventListener("pointerdown", (e) => {
+  if (!session) return;
+  stageWrap.setPointerCapture(e.pointerId);
+  activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+  if (activePointers.size === 1) {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    panX0 = panX;
+    panY0 = panY;
+
+    if (activeDevice === "mobile" && mobileTouchMode === "touch") {
+      showLoupe(e.clientX, e.clientY);
+    }
+  } else if (activePointers.size === 2) {
+    hideLoupe();
+    const pts = Array.from(activePointers.values());
+    initialPinchDist = Math.hypot(pts[0].clientX - pts[1].clientX, pts[0].clientY - pts[1].clientY);
+    initialZoom = zoom;
+  }
 });
-window.addEventListener("mousemove", (e) => {
-  if (!dragState) return;
-  const dx = e.clientX - dragState.startX;
-  const dy = e.clientY - dragState.startY;
-  if (Math.hypot(dx, dy) > 4) {
-    dragState.moved = true;
-    panX = dragState.panX0 + dx;
-    panY = dragState.panY0 + dy;
+
+stageWrap.addEventListener("pointermove", (e) => {
+  if (!activePointers.has(e.pointerId)) return;
+  activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+  if (activePointers.size === 2 && initialPinchDist) {
+    const pts = Array.from(activePointers.values());
+    const dist = Math.hypot(pts[0].clientX - pts[1].clientX, pts[0].clientY - pts[1].clientY);
+    const factor = dist / initialPinchDist;
+    zoom = Math.min(8, Math.max(1, initialZoom * factor));
+    if (zoom === 1) { panX = 0; panY = 0; }
+    applyTransform();
+    return;
+  }
+
+  if (!isDragging) return;
+
+  const dx = e.clientX - dragStartX;
+  const dy = e.clientY - dragStartY;
+
+  if (activeDevice === "mobile" && mobileTouchMode === "touch") {
+    showLoupe(e.clientX, e.clientY);
+  } else {
+    // Pan view
+    panX = panX0 + dx;
+    panY = panY0 + dy;
     applyTransform();
   }
 });
-window.addEventListener("mouseup", (e) => {
-  if (!dragState) return;
-  if (!dragState.moved) handleMarkClick(e);
-  dragState = null;
-});
+
+stageWrap.addEventListener("pointerup", (e) => handlePointerRelease(e));
+stageWrap.addEventListener("pointercancel", (e) => handlePointerRelease(e));
+
+function handlePointerRelease(e) {
+  activePointers.delete(e.pointerId);
+  if (activePointers.size < 2) initialPinchDist = null;
+
+  if (activePointers.size === 0) {
+    if (isDragging) {
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      const moved = Math.hypot(dx, dy) > 4;
+
+      if (activeDevice === "desktop") {
+        if (!moved) handleMarkClick(e.clientX, e.clientY);
+      } else if (activeDevice === "mobile") {
+        if (mobileTouchMode === "touch") {
+          const { x, y } = clientToImagePixel(e.clientX, e.clientY);
+          placeMarkAt(x, y);
+          hideLoupe();
+        }
+      }
+    }
+    isDragging = false;
+    hideLoupe();
+  }
+}
 
 function clientToImagePixel(clientX, clientY) {
   const rect = frameImg.getBoundingClientRect();
@@ -325,23 +391,246 @@ function clientToImagePixel(clientX, clientY) {
   return { x, y };
 }
 
-function handleMarkClick(e) {
-  if (isPlaying()) { stopPlayback(); return; } // un clic durante la reproducción pausa, no marca
-  if (!session || !activeCandidateId) {
-    if (session && !activeCandidateId) $("#setStatus").textContent = "Creá o elegí un candidato antes de marcar (botón “+ Nuevo candidato”).";
-    return;
-  }
-  const { x, y } = clientToImagePixel(e.clientX, e.clientY);
+function handleMarkClick(clientX, clientY) {
+  if (isPlaying()) { stopPlayback(); return; }
+  const { x, y } = clientToImagePixel(clientX, clientY);
+  placeMarkAt(x, y);
+}
+
+function placeMarkAt(x, y) {
   if (x < 0 || y < 0 || x > IMAGE_SIZE || y > IMAGE_SIZE) return;
+  if (!session) return;
+  if (!activeCandidateId) {
+    if (session.candidates.length > 0) {
+      activeCandidateId = session.candidates[0].id;
+    } else {
+      addCandidate();
+    }
+  }
   const cand = session.candidates.find((c) => c.id === activeCandidateId);
   if (!cand) return;
   const frameId = session.frames[frameIndex].id;
   cand.marks[frameId] = { x, y };
+  navigator.vibrate?.(30);
   renderOverlay();
   renderCandidates();
+  renderQuickCandidates();
   renderFilmstripDots();
+  updateMicroAdjustBar();
   persistSession();
 }
+
+// Botón "Marcar en la mira" para modo móvil crosshair
+$("#btnMarkCenter").addEventListener("click", () => {
+  if (!session) return;
+  if (isPlaying()) { stopPlayback(); return; }
+  const rect = stageWrap.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const { x, y } = clientToImagePixel(centerX, centerY);
+  placeMarkAt(x, y);
+});
+
+// Lupa flotante para modo táctil directo
+const loupeEl = $("#magnifierLoupe");
+const loupeCanvas = $("#loupeCanvas");
+const loupeCtx = loupeCanvas ? loupeCanvas.getContext("2d") : null;
+const loupeCoords = $("#loupeCoords");
+
+function showLoupe(clientX, clientY) {
+  if (!loupeEl || !frameImg.complete || frameImg.naturalWidth === 0) return;
+  loupeEl.hidden = false;
+  const stageRect = stageWrap.getBoundingClientRect();
+  const left = clientX - stageRect.left;
+  const top = clientY - stageRect.top;
+  loupeEl.style.left = `${left}px`;
+  loupeEl.style.top = `${top}px`;
+
+  const { x, y } = clientToImagePixel(clientX, clientY);
+  if (loupeCoords) loupeCoords.textContent = `x:${Math.round(x)}, y:${Math.round(y)}`;
+
+  if (loupeCtx && loupeCanvas) {
+    loupeCtx.imageSmoothingEnabled = false;
+    loupeCtx.clearRect(0, 0, loupeCanvas.width, loupeCanvas.height);
+    const imgRect = frameImg.getBoundingClientRect();
+    const scale = IMAGE_SIZE / imgRect.width;
+    const sourceX = (clientX - imgRect.left) * scale;
+    const sourceY = (clientY - imgRect.top) * scale;
+    const sampleSize = 90;
+    loupeCtx.drawImage(
+      frameImg,
+      sourceX - sampleSize / 2, sourceY - sampleSize / 2, sampleSize, sampleSize,
+      0, 0, loupeCanvas.width, loupeCanvas.height
+    );
+  }
+}
+
+function hideLoupe() {
+  if (loupeEl) loupeEl.hidden = true;
+}
+
+// Micro-ajuste D-Pad
+function updateMicroAdjustBar() {
+  const bar = $("#microAdjustBar");
+  if (!bar) return;
+  if (activeDevice !== "mobile" || !session || !activeCandidateId) {
+    bar.hidden = true;
+    return;
+  }
+  const cand = session.candidates.find((c) => c.id === activeCandidateId);
+  const frameId = session.frames[frameIndex]?.id;
+  if (!cand || !frameId || !cand.marks[frameId]) {
+    bar.hidden = true;
+    return;
+  }
+  bar.hidden = false;
+  const m = cand.marks[frameId];
+  const coordsEl = $("#microCoords");
+  if (coordsEl) coordsEl.textContent = `x: ${Math.round(m.x)}, y: ${Math.round(m.y)}`;
+}
+
+function nudgeMark(dx, dy) {
+  if (!session || !activeCandidateId) return;
+  const cand = session.candidates.find((c) => c.id === activeCandidateId);
+  const frameId = session.frames[frameIndex]?.id;
+  if (!cand || !frameId || !cand.marks[frameId]) return;
+  const m = cand.marks[frameId];
+  m.x = Math.max(0, Math.min(IMAGE_SIZE, m.x + dx));
+  m.y = Math.max(0, Math.min(IMAGE_SIZE, m.y + dy));
+  navigator.vibrate?.(20);
+  renderOverlay();
+  renderCandidates();
+  renderQuickCandidates();
+  renderFilmstripDots();
+  updateMicroAdjustBar();
+  persistSession();
+}
+
+$("#btnNudgeLeft").addEventListener("click", () => nudgeMark(-1, 0));
+$("#btnNudgeRight").addEventListener("click", () => nudgeMark(1, 0));
+$("#btnNudgeUp").addEventListener("click", () => nudgeMark(0, -1));
+$("#btnNudgeDown").addEventListener("click", () => nudgeMark(0, 1));
+$("#btnMicroDelete").addEventListener("click", () => {
+  $("#btnBorrarMarca").click();
+  updateMicroAdjustBar();
+});
+
+// Selector rápido de candidatos
+function renderQuickCandidates() {
+  const list = $("#quickCandidateList");
+  if (!list) return;
+  if (!session || session.candidates.length === 0) {
+    list.innerHTML = `<span class="hint" style="font-size:0.8rem;">Sin candidatos</span>`;
+    return;
+  }
+  list.innerHTML = "";
+  session.candidates.forEach((c) => {
+    const chip = document.createElement("button");
+    chip.className = "candidate-chip" + (c.id === activeCandidateId ? " active" : "");
+    const swatch = document.createElement("span");
+    swatch.className = "candidate-chip-swatch";
+    swatch.style.background = c.color;
+    const label = document.createElement("span");
+    const count = Object.keys(c.marks).length;
+    label.textContent = `${c.label} (${count})`;
+    chip.append(swatch, label);
+    chip.addEventListener("click", () => {
+      activeCandidateId = c.id;
+      renderCandidates();
+      renderQuickCandidates();
+      renderOverlay();
+      updateMicroAdjustBar();
+    });
+    list.appendChild(chip);
+  });
+}
+
+$("#btnQuickNuevoCandidato").addEventListener("click", () => {
+  addCandidate();
+  renderQuickCandidates();
+});
+
+// Modos táctiles móviles y detección de dispositivo
+let deviceMode = localStorage.getItem("sg_device_override") || "auto";
+let activeDevice = "desktop";
+let mobileTouchMode = "crosshair";
+
+function getEffectiveDevice() {
+  if (deviceMode === "mobile") return "mobile";
+  if (deviceMode === "desktop") return "desktop";
+  const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+  const hasTouch = (navigator.maxTouchPoints > 0) || ("ontouchstart" in window);
+  const isSmallScreen = window.innerWidth <= 860;
+  const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if ((isCoarse && hasTouch) || (hasTouch && isSmallScreen) || isMobileUA) {
+    return "mobile";
+  }
+  return "desktop";
+}
+
+function refreshDeviceUI() {
+  activeDevice = getEffectiveDevice();
+  const isMobile = (activeDevice === "mobile");
+  document.body.classList.toggle("device-mobile", isMobile);
+  document.body.classList.toggle("device-desktop", !isMobile);
+
+  const iconEl = $("#deviceIcon");
+  const textEl = $("#deviceText");
+  if (iconEl && textEl) {
+    if (isMobile) {
+      iconEl.textContent = "📱";
+      textEl.textContent = "Celular";
+    } else {
+      iconEl.textContent = "💻";
+      textEl.textContent = "Laptop";
+    }
+  }
+
+  const crosshairEl = $("#crosshairOverlay");
+  const mobileActionEl = $("#mobileActionBar");
+  const mobileModesEl = $("#mobileModesBar");
+  if (crosshairEl) crosshairEl.hidden = !(isMobile && mobileTouchMode === "crosshair");
+  if (mobileActionEl) mobileActionEl.style.display = (isMobile && mobileTouchMode === "crosshair") ? "block" : "none";
+  if (mobileModesEl) mobileModesEl.style.display = isMobile ? "flex" : "none";
+
+  updateViewerHint();
+  updateMicroAdjustBar();
+}
+
+$("#btnDeviceToggle").addEventListener("click", () => {
+  const current = getEffectiveDevice();
+  deviceMode = (current === "mobile") ? "desktop" : "mobile";
+  localStorage.setItem("sg_device_override", deviceMode);
+  refreshDeviceUI();
+});
+
+$$(".mode-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    $$(".mode-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    mobileTouchMode = btn.dataset.mode;
+    refreshDeviceUI();
+  });
+});
+
+function updateViewerHint() {
+  const hint = $("#viewerHint");
+  if (!hint) return;
+  if (activeDevice === "mobile") {
+    if (mobileTouchMode === "crosshair") {
+      hint.textContent = "Modo Mira fija: Arrastrá la imagen para centrar el objeto en la cruz y tocá 'Marcar objeto en la mira'. Pellizcá para zoom.";
+    } else if (mobileTouchMode === "touch") {
+      hint.textContent = "Modo Toque directo: Deslizá el dedo sobre el cometa; la lupa flotante te mostrará el aumento exacto. Soltá para marcar.";
+    } else {
+      hint.textContent = "Modo Navegar: Desplazá y hacé zoom libremente con tus dedos sin riesgo de marcar.";
+    }
+  } else {
+    hint.textContent = "Clic = marcar candidato activo · Arrastrar = desplazar vista · Rueda = zoom · Atajos: Espacio, ←/→, +/-, Supr, 1-9.";
+  }
+}
+
+refreshDeviceUI();
+window.addEventListener("resize", () => refreshDeviceUI());
 
 $("#btnBorrarMarca").addEventListener("click", () => {
   if (!session || !activeCandidateId) return;
@@ -349,7 +638,7 @@ $("#btnBorrarMarca").addEventListener("click", () => {
   const frameId = session.frames[frameIndex]?.id;
   if (cand && frameId && cand.marks[frameId]) {
     delete cand.marks[frameId];
-    renderOverlay(); renderCandidates(); renderFilmstripDots(); persistSession();
+    renderOverlay(); renderCandidates(); renderQuickCandidates(); renderFilmstripDots(); updateMicroAdjustBar(); persistSession();
   }
 });
 

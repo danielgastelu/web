@@ -272,7 +272,7 @@
 
         <!-- Reloj Central -->
         <div class="timer-box">
-            <div class="timer" id="timer-display">10:00</div>
+            <div class="timer" id="timer-display">6:00</div>
             <div class="match-status" id="match-status-text">LISTO</div>
         </div>
 
@@ -305,7 +305,7 @@
                 <li><span>Tecla A:</span> Incrementa score Izquierda.</li>
                 <li><span>Tecla L:</span> Incrementa score Derecha.</li>
                 <li><span>Espacio:</span> Inicia / Pausa / Reanuda el partido.</li>
-                <li><span>R + S + T (Mantener 5s):</span> Resetea el marcador y el tiempo a 10:00.</li>
+                <li><span>R + S + T (Mantener 5s):</span> Resetea el marcador y el tiempo a 06:00.</li>
                 <li><span>Clic en nombres:</span> Permite editar los contendientes libremente.</li>
             </ul>
             <button class="close-modal" onclick="toggleHelp(false)">Cerrar</button>
@@ -382,7 +382,7 @@
         // --- LÓGICA ORIGINAL DEL MARCADOR[cite: 1] ---
         let scoreLeft = 0;
         let scoreRight = 0;
-        let timeLeft = 600;
+        let timeLeft = 360;
         let timerInterval = null;
         let isRunning = false;
         let isGameOver = false;
@@ -442,7 +442,7 @@
             clearInterval(timerInterval);
             isRunning = false;
             isGameOver = false;
-            timeLeft = 600;
+            timeLeft = 360;
             scoreLeft = 0;
             scoreRight = 0;
             
