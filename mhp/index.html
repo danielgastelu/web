@@ -385,16 +385,23 @@
     <section class="view" data-view="medallas" hidden aria-labelledby="med-h">
       <div class="wrap-narrow">
         <header class="view-head"><h1 id="med-h" data-i18n="med_title"></h1><p data-i18n="med_lead"></p></header>
+        <h2 class="med-group-h" data-i18n="med_activity_t"></h2>
         <div class="med-top">
           <div class="med-summary" id="med-summary"></div>
           <div class="med-next" id="med-next" aria-live="polite"></div>
         </div>
         <ol class="medals" id="medal-list"></ol>
+        <section class="bd-sec" aria-labelledby="bd-h">
+          <h2 id="bd-h"><span data-i18n="bd_section_t"></span> <span class="bd-count" id="bd-count"></span></h2>
+          <p class="muted" data-i18n="bd_section_lead"></p>
+          <ol class="medals" id="bd-list"></ol>
+        </section>
         <section class="med-how">
           <h2 data-i18n="med_how_t"></h2>
           <ul>
             <li data-i18n="med_how_days"></li>
             <li data-i18n="med_how_dates"></li>
+            <li data-i18n="med_how_bd"></li>
             <li data-i18n="med_how_keep"></li>
           </ul>
         </section>
@@ -428,6 +435,11 @@
           </section>
 
           <section class="about-sec"><h2 data-i18n="about_data_t"></h2><p data-i18n="about_data_d"></p></section>
+          <section class="about-sec">
+            <h2 data-i18n="about_portraits_t"></h2>
+            <p data-i18n="about_portraits_d"></p>
+            <ul class="portrait-credits" id="portrait-credits"></ul>
+          </section>
           <section class="about-sec"><h2 data-i18n="about_privacy_t"></h2><p data-i18n="about_privacy_d"></p></section>
           <section class="about-sec">
             <h2 data-i18n="about_install_t"></h2>

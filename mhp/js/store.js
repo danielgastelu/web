@@ -1,5 +1,5 @@
 // Estado de la sesión: observaciones, k, series importadas, medallas. Todo queda en el dispositivo (localStorage).
-import { LAB, MEDALS } from './config.js';
+import { LAB, MEDALS, BIRTHDAYS } from './config.js';
 import { referenceAt } from './silso.js';
 
 const KEY = 'helios.data.v1';
@@ -49,11 +49,16 @@ function logActivity(ms) {
   if (!state.activity.includes(day)) { state.activity.push(day); state.activity.sort(); }
 }
 export const medalMetrics = () => ({ dates: state.obs.length, days: state.activity.length });
-/** Otorga las medallas recién alcanzadas y las devuelve (en orden de dificultad). */
+export const bdKey = id => 'bd_' + id;     // clave de una medalla de cumpleaños en state.medals
+/** Otorga las medallas recién alcanzadas y las devuelve: primero las de constancia, después las de cumpleaños. */
 function awardMedals() {
-  const m = medalMetrics(), won = [];
+  const m = medalMetrics(), won = [], at = Date.now();
   for (const md of MEDALS) {
-    if (!state.medals[md.id] && m[md.metric] >= md.goal) { state.medals[md.id] = { at: Date.now(), seen: false }; won.push(md); }
+    if (!state.medals[md.id] && m[md.metric] >= md.goal) { state.medals[md.id] = { at, seen: false }; won.push(md); }
+  }
+  const monthDays = new Set(state.activity.map(d => d.slice(5)));
+  for (const bd of BIRTHDAYS) {
+    if (!state.medals[bdKey(bd.id)] && monthDays.has(bd.date)) { state.medals[bdKey(bd.id)] = { at, seen: false }; won.push({ ...bd, kind: 'bd' }); }
   }
   return won;
 }

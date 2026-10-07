@@ -1,7 +1,7 @@
 // Service worker de Misión Helios: guarda la app para usarla sin conexión.
 // Las imágenes del Sol (NASA) y cualquier otro origen NO se guardan: siempre van a la red.
 // La lista de archivos y la versión las escribe tools/stamp_sw.js; no las edites a mano.
-const VERSION = /*VERSION*/'helios-2de05efa2b'/*END_VERSION*/;
+const VERSION = /*VERSION*/'helios-12aee124a6'/*END_VERSION*/;
 const SHELL = /*SHELL*/[
   "./",
   "css/app.css",
@@ -15,6 +15,16 @@ const SHELL = /*SHELL*/[
   "icons/icon-512.png",
   "icons/icon-maskable-512.png",
   "icons/icon.svg",
+  "img/copernico.jpg",
+  "img/galileo.jpg",
+  "img/hipatia.jpg",
+  "img/jackson.jpg",
+  "img/johnson.jpg",
+  "img/newton.jpg",
+  "img/roman.jpg",
+  "img/sagan.jpg",
+  "img/vaughan.jpg",
+  "img/wolf.jpg",
   "index.html",
   "js/app.js",
   "js/chart.js",

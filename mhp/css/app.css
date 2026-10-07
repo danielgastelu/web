@@ -281,6 +281,31 @@ main:focus { outline: none; }
 .med-how h2 { font-size: var(--step-1); }
 .med-how li { color: var(--muted); margin-bottom: 0.4rem; }
 
+/* Cumpleaños de la ciencia: retrato dentro del aro */
+.medal-badge.portrait { overflow: hidden; padding: 0; background: #eef0f3; }
+.medal-badge.portrait img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.medal-badge.portrait.is-locked img { filter: grayscale(1) contrast(0.8); opacity: 0.4; }
+.bd-sec { margin-top: 2.5rem; }
+.bd-sec h2, .med-group-h { font-size: var(--step-2); margin-bottom: 0.25rem; }
+.med-group-h { margin-top: 1.5rem; }
+.bd-count { font-family: var(--font-ui); font-size: var(--step--1); font-weight: 700; color: var(--muted); white-space: nowrap; }
+.bd-sec > p { margin: 0; }
+.bd-who { margin: 0 0 0.2rem; font-weight: 700; }
+.bd-years { font-weight: 400; color: var(--muted); }
+.bd-when { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0; }
+.bd-date, .bd-memo { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; }
+.bd-date { background: #fff3d6; color: var(--warn); }
+.bd-date::before { content: "📅 "; }
+.bd-memo { background: #eef0f3; color: var(--muted); font-weight: 400; }
+.bd-link { margin: 0.4rem 0 0; font-size: var(--step--1); }
+.bd-wiki { font-weight: 700; color: var(--link); }
+.bd-wiki-off { color: var(--muted); }
+.bd-wiki-off::before { content: "🔒 "; }
+.medal.bd[data-state="today"] { border-color: var(--flare); box-shadow: 0 0 0 2px var(--flare); }
+.medal.bd[data-state="today"] .medal-status { color: var(--flare); font-weight: 700; }
+.portrait-credits { margin: 0.5rem 0 0; padding-left: 1.2rem; font-size: var(--step--1); color: var(--muted); }
+.portrait-credits a { color: var(--link); }
+
 /* Festejo al ganar una medalla */
 .medal-celebrate { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; padding-block: 0.5rem 0.25rem; text-align: center; }
 .medal-cel { display: grid; justify-items: center; max-width: 16rem; }

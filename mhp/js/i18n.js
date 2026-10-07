@@ -51,6 +51,12 @@ export function fmtDate(iso, style = 'medium') {
   return new Intl.DateTimeFormat(getLangInfo().tag, { dateStyle: style, timeZone: 'UTC' }).format(Date.UTC(y, m - 1, d));
 }
 
+/** 'MM-DD' → «4 de enero», «January 4», etc. */
+export function fmtDayMonth(md) {
+  const [m, d] = md.split('-').map(Number);
+  return new Intl.DateTimeFormat(getLangInfo().tag, { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(Date.UTC(2000, m - 1, d));
+}
+
 export function applyI18n(root = document) {
   root.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   root.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
