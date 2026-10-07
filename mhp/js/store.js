@@ -50,15 +50,26 @@ function logActivity(ms) {
 }
 export const medalMetrics = () => ({ dates: state.obs.length, days: state.activity.length });
 export const bdKey = id => 'bd_' + id;     // clave de una medalla de cumpleaños en state.medals
+export const bdTier = rec => rec ? (rec.tier || 'gold') : null;
 /** Otorga las medallas recién alcanzadas y las devuelve: primero las de constancia, después las de cumpleaños. */
 function awardMedals() {
   const m = medalMetrics(), won = [], at = Date.now();
   for (const md of MEDALS) {
     if (!state.medals[md.id] && m[md.metric] >= md.goal) { state.medals[md.id] = { at, seen: false }; won.push(md); }
   }
-  const monthDays = new Set(state.activity.map(d => d.slice(5)));
+  // Conmemorativas: oro si se guardó una observación el día del cumpleaños; plata si se observó un Sol de esa fecha (cualquier año).
+  // Una de plata pasa a oro más adelante; el oro nunca baja. Las ganadas antes de existir la plata no tienen tier y cuentan como oro.
+  const activeDays = new Set(state.activity.map(d => d.slice(5)));
+  const sunDays = new Set(state.obs.map(o => o.date.slice(5)));
   for (const bd of BIRTHDAYS) {
-    if (!state.medals[bdKey(bd.id)] && monthDays.has(bd.date)) { state.medals[bdKey(bd.id)] = { at, seen: false }; won.push({ ...bd, kind: 'bd' }); }
+    const key = bdKey(bd.id), had = state.medals[key];
+    const tier = activeDays.has(bd.date) ? 'gold' : sunDays.has(bd.date) ? 'silver' : null;
+    if (!tier) continue;
+    if (!had) { state.medals[key] = { at, seen: false, tier }; won.push({ ...bd, kind: 'bd', tier }); }
+    else if (tier === 'gold' && had.tier === 'silver') {
+      state.medals[key] = { ...had, tier: 'gold', goldAt: at, seen: false };
+      won.push({ ...bd, kind: 'bd', tier: 'gold', upgraded: true });
+    }
   }
   return won;
 }

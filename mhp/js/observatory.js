@@ -111,6 +111,21 @@ export function initObservatory() {
     return false;
   }
 
+  /** Un Sol de ese día y mes ('MM-DD') en un año al azar con imagen (lo pide el botón de las medallas conmemorativas). */
+  async function loadMonthDay(md) {
+    const first = Number(LAB.DATE_MIN.slice(0, 4)), last = Number(dateInput.max.slice(0, 4));
+    const years = [];
+    for (let y = first; y <= last; y++) { const iso = `${y}-${md}`; if (iso >= LAB.DATE_MIN && iso <= dateInput.max) years.push(iso); }
+    for (let i = years.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [years[i], years[j]] = [years[j], years[i]]; }
+    for (const iso of years.slice(0, LAB.RANDOM_TRIES + 2)) {
+      dateInput.value = iso;
+      if (await loadDate(iso)) return true;
+      if (stageState === 'offline') return false;
+    }
+    return false;
+  }
+  window.addEventListener('helios:observe-date', e => { triedAuto = true; loadMonthDay(e.detail); });
+
   form.addEventListener('submit', e => { e.preventDefault(); if (dateInput.value) loadDate(dateInput.value); });
   $('#btn-random').addEventListener('click', loadRandom);
 

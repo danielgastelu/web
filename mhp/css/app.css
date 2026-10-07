@@ -303,6 +303,12 @@ main:focus { outline: none; }
 .bd-wiki-off::before { content: "🔒 "; }
 .medal.bd[data-state="today"] { border-color: var(--flare); box-shadow: 0 0 0 2px var(--flare); }
 .medal.bd[data-state="today"] .medal-status { color: var(--flare); font-weight: 700; }
+.medal-tier { display: inline-block; vertical-align: middle; margin-left: 0.35rem; padding: 0.1rem 0.55rem; border-radius: 999px; font-family: var(--font-ui); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
+.medal-tier[data-tier="gold"] { background: linear-gradient(135deg, #ffe27a, #d99a06); color: #3d2a00; }
+.medal-tier[data-tier="silver"] { background: linear-gradient(135deg, #f1f4f8, #a9b4c3); color: #26303d; }
+.bd-hint { margin: 0.4rem 0 0; font-size: var(--step--1); }
+.bd-countdown { color: var(--muted); }
+.bd-act { margin: 0.6rem 0 0; }
 .portrait-credits { margin: 0.5rem 0 0; padding-left: 1.2rem; font-size: var(--step--1); color: var(--muted); }
 .portrait-credits a { color: var(--link); }
 

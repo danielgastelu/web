@@ -1,14 +1,16 @@
 // Vista «Medallas»: logros por constancia, medallas conmemorativas y celebración al ganar una.
 import { MEDALS, BIRTHDAYS, portraitUrl, wikiUrl, commonsUrl } from './config.js';
 import { t, tn, fmtNum, fmtDate, fmtDayMonth, getLang, onLangChange } from './i18n.js';
-import { getState, subscribe, medalMetrics, unseenMedalIds, markMedalsSeen, localDay, bdKey } from './store.js';
+import { getState, subscribe, medalMetrics, unseenMedalIds, markMedalsSeen, localDay, bdKey, bdTier } from './store.js';
 import { $, esc, openDialog } from './dom.js';
 
 const isBd = md => md.kind === 'bd';
 
+// Conmemorativas: aro de plata (Sol de esa fecha) u oro (observación el día del cumpleaños). md.tier = 'gold' | 'silver'.
 const badge = (md, cls = '') => isBd(md)
-  ? `<span class="medal-badge portrait ${cls}" data-tier="3"><img src="${portraitUrl(md.id)}" alt="" width="128" height="128" loading="lazy"></span>`
+  ? `<span class="medal-badge portrait ${cls}" data-tier="${md.tier === 'silver' ? 2 : 3}"><img src="${portraitUrl(md.id)}" alt="" width="128" height="128" loading="lazy"></span>`
   : `<span class="medal-badge ${cls}" data-tier="${md.tier}"><span class="medal-emoji" aria-hidden="true">${md.emoji}</span></span>`;
+const tierChip = tier => `<span class="medal-tier" data-tier="${tier}">${esc(t(tier === 'gold' ? 'bd_gold' : 'bd_silver'))}</span>`;
 
 /** Una medalla ganada se muestra completa aunque después se borren observaciones. */
 function progressOf(md, metrics, medals) {
@@ -80,16 +82,27 @@ export function initMedals() {
 
   function renderBirthdays(st) {
     const lang = getLang();
-    const rows = BIRTHDAYS.map(bd => ({ bd: { ...bd, kind: 'bd' }, won: st.medals[bdKey(bd.id)], days: daysUntil(bd.date) }));
+    const rows = BIRTHDAYS.map(bd => {
+      const won = st.medals[bdKey(bd.id)], tier = bdTier(won);
+      return { bd: { ...bd, kind: 'bd', tier: tier || 'gold' }, won, tier, days: daysUntil(bd.date) };
+    });
     const upcoming = rows.filter(r => !r.won).reduce((a, r) => (!a || r.days < a.days ? r : a), null);
-    bdCount.textContent = t('med_summary', { n: fmtNum(rows.filter(r => r.won).length), total: fmtNum(rows.length) });
+    const golds = rows.filter(r => r.tier === 'gold').length;
+    bdCount.textContent = t('med_summary', { n: fmtNum(rows.filter(r => r.won).length), total: fmtNum(rows.length) })
+      + (golds ? ` · ${t('bd_gold_n', { n: fmtNum(golds) })}` : '');
 
     bdList.innerHTML = rows.map(r => {
-      const { bd, won, days } = r;
-      const name = t(`bd_${bd.id}_n`);
-      const state = won ? 'won' : days === 0 ? 'today' : r === upcoming ? 'next' : 'locked';
-      const status = won ? t('med_earned_on', { date: fmtDate(localDay(won.at)) })
-        : days === 0 ? t('bd_today') : tn('bd_in', days);
+      const { bd, won, tier, days } = r;
+      const name = t(`bd_${bd.id}_n`), date = fmtDayMonth(bd.date);
+      const state = tier === 'gold' ? 'won' : days === 0 ? 'today' : won ? 'won' : r === upcoming ? 'next' : 'locked';
+      const countdown = days === 0 ? t(won ? 'bd_today_gold' : 'bd_today') : tn('bd_in', days);
+      let how;
+      if (tier === 'gold') how = `<p class="medal-status">${esc(t('med_earned_on', { date: fmtDate(localDay(won.goldAt || won.at)) }))}</p>`;
+      else if (tier === 'silver') how = `<p class="medal-status">${esc(t('med_earned_on', { date: fmtDate(localDay(won.at)) }))}</p>
+          <p class="bd-hint">${esc(t('bd_gold_hint', { date }))} <span class="bd-countdown">${esc(countdown)}</span></p>`;
+      else how = `<p class="bd-hint">${esc(t('bd_unlock', { date }))}</p>
+          <p class="medal-status">${esc(countdown)}</p>
+          <p class="bd-act"><button type="button" class="btn btn-secondary btn-small" data-observe="${bd.date}">${esc(t('bd_observe_btn'))}</button></p>`;
       const link = won
         ? `<a class="bd-wiki" href="${esc(wikiUrl(lang, bd.wiki[lang] || bd.wiki.en))}" target="_blank" rel="noopener" aria-label="${esc(t('bd_wiki_aria', { name }))}">${esc(t('bd_wiki'))} <span aria-hidden="true">↗</span></a>`
         : `<span class="bd-wiki-off">${esc(t('bd_wiki_locked'))}</span>`;
@@ -97,11 +110,11 @@ export function initMedals() {
       <li class="medal bd" data-state="${state}">
         ${badge(bd, won ? 'is-won' : 'is-locked')}
         <div class="medal-body">
-          <h3>${esc(title(bd))}${chip(bdKey(bd.id), fresh)}${lockedNote(won)}</h3>
+          <h3>${esc(title(bd))}${tier ? ' ' + tierChip(tier) : ''}${chip(bdKey(bd.id), fresh)}${lockedNote(won)}</h3>
           <p class="bd-who">${esc(name)} <span class="bd-years">(${esc(lifeSpan(bd))})</span></p>
           <p class="medal-goal">${esc(goal(bd))}</p>
-          <p class="bd-when"><span class="bd-date">${esc(won ? fmtDayMonth(bd.date) : t('bd_unlock', { date: fmtDayMonth(bd.date) }))}</span>${bd.memorial ? `<span class="bd-memo">${esc(t('bd_memorial'))}</span>` : ''}</p>
-          <p class="medal-status">${esc(status)}</p>
+          <p class="bd-when"><span class="bd-date">${esc(date)}</span>${bd.memorial ? `<span class="bd-memo">${esc(t('bd_memorial'))}</span>` : ''}</p>
+          ${how}
           <p class="bd-link">${link}</p>
         </div>
       </li>`;
@@ -126,6 +139,13 @@ export function initMedals() {
       markMedalsSeen();            // emite → render(): el punto del menú se apaga y «¡Nueva!» se mantiene
     } else if (fresh.size) { fresh = new Set(); render(); }
   });
+  // «Observar un Sol de esta fecha»: va al observatorio y carga ese día y mes en un año al azar con imagen.
+  bdList.addEventListener('click', e => {
+    const b = e.target.closest('[data-observe]');
+    if (!b) return;
+    window.dispatchEvent(new CustomEvent('helios:observe-date', { detail: b.dataset.observe }));
+    location.hash = '#/observar';
+  });
   subscribe(render);
   onLangChange(render);
   render();
@@ -138,13 +158,15 @@ export function celebrateMedals(won, then) {
       ${won.map(md => `
         <div class="medal-cel">
           ${badge(md, 'is-won big')}
-          <p class="medal-cel-t">${esc(title(md))}</p>
+          <p class="medal-cel-t">${esc(title(md))}${isBd(md) ? ' ' + tierChip(md.tier) : ''}</p>
           ${isBd(md) ? `<p class="medal-cel-g"><strong>${esc(t(`bd_${md.id}_n`))}</strong></p>` : ''}
           <p class="medal-cel-g">${esc(goal(md))}</p>
+          ${isBd(md) && md.tier === 'silver' ? `<p class="medal-cel-g">${esc(t('bd_gold_hint', { date: fmtDayMonth(md.date) }))}</p>` : ''}
         </div>`).join('')}
     </div>`;
+  const allUpgrades = won.every(md => md.upgraded);
   openDialog({
-    title: t(won.length === 1 ? 'med_new_one' : 'med_new_other'),
+    title: allUpgrades ? t('bd_upgraded') : t(won.length === 1 ? 'med_new_one' : 'med_new_other'),
     body,
     actions: [
       { label: t('med_new_see'), kind: 'primary', onClick: () => { location.hash = '#/medallas'; } },
