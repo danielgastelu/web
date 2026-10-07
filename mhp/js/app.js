@@ -6,9 +6,10 @@ import { $, $$, esc, toast, prefersReducedMotion } from './dom.js';
 import { initSun } from './sun.js';
 import { initObservatory } from './observatory.js';
 import { initDataLab } from './datalab.js';
+import { initMedals } from './medals.js';
 
 // ---------- vistas ----------
-const ROUTES = ['mision', 'observar', 'datos', 'acerca'];
+const ROUTES = ['mision', 'observar', 'datos', 'medallas', 'acerca'];
 let firstRoute = true;
 let active = null;
 
@@ -129,6 +130,7 @@ buildLangMenu();
 initSun($('#hero-sun'));
 initObservatory();
 initDataLab();
+initMedals();
 initInstall();
 initOffline();
 onLangChange(() => { refreshLangButton(); refreshAbout(); });

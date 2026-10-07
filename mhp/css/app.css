@@ -116,8 +116,9 @@ main:focus { outline: none; }
   border-top: 1px solid var(--ink-soft);
   padding-bottom: env(safe-area-inset-bottom);
 }
-.tabbar ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabbar ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); }
 .tabbar a {
+  position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;
   min-height: var(--bar-h); padding: 0.4rem 0.25rem;
   color: var(--on-ink-muted); text-decoration: none; font-size: 0.8125rem; font-weight: 700;
@@ -125,6 +126,8 @@ main:focus { outline: none; }
 }
 .tabbar svg { width: 1.5rem; height: 1.5rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tabbar a[aria-current="page"] { color: #fff; border-top-color: var(--amber); }
+/* Punto «hay medallas nuevas» */
+.nav-dot { position: absolute; top: 0.45rem; left: calc(50% + 0.55rem); width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--flare); box-shadow: 0 0 0 2px var(--ink); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
@@ -222,6 +225,73 @@ main:focus { outline: none; }
 
 .credits { display: grid; gap: 0.6rem; margin: 1rem 0 0; padding: 0; list-style: none; }
 .credits a { color: var(--link); }
+.credits .ref { padding-left: 2em; text-indent: -2em; }   /* sangría francesa (APA) */
+.credits .ref a { overflow-wrap: anywhere; }
+
+/* ---------- Medallas ---------- */
+.medal-badge {
+  --ring: #b8692e; --ring-hi: #f2b27a;                       /* bronce */
+  flex: none; display: inline-grid; place-items: center; width: 4.25rem; height: 4.25rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff8e6, #ffe2a3 70%);
+  border: 4px solid var(--ring);
+  box-shadow: inset 0 0 0 2px var(--ring-hi), 0 3px 10px rgba(20, 38, 75, 0.18);
+}
+.medal-badge[data-tier="2"] { --ring: #8c99ab; --ring-hi: #e4e9f0; }   /* plata */
+.medal-badge[data-tier="3"] { --ring: #d99a06; --ring-hi: #ffe27a; }   /* oro */
+.medal-emoji { font-size: 2.1rem; line-height: 1; }
+.medal-badge.is-locked { background: #eef0f3; border-color: #d9dde4; box-shadow: none; }
+.medal-badge.is-locked .medal-emoji { filter: grayscale(1); opacity: 0.35; }
+.medal-badge.small { width: 2.75rem; height: 2.75rem; border-width: 3px; }
+.medal-badge.small .medal-emoji { font-size: 1.35rem; }
+.medal-badge.big { width: 6.5rem; height: 6.5rem; border-width: 5px; }
+.medal-badge.big .medal-emoji { font-size: 3.3rem; }
+
+.med-top { display: grid; gap: 0.75rem; margin-top: 1rem; }
+.med-summary, .med-next { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.9rem 1rem; }
+.med-count { font-family: var(--font-display); font-weight: 650; font-size: var(--step-1); margin: 0 0 0.5rem; }
+.med-strip { list-style: none; margin: 0; padding: 0; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.med-strip .medal-badge { width: 2.4rem; height: 2.4rem; border-width: 3px; }
+.med-strip .medal-emoji { font-size: 1.15rem; }
+.med-today { margin: 0.65rem 0 0; font-size: var(--step--1); color: var(--muted); }
+.med-today[data-done="true"] { color: var(--ok); font-weight: 700; }
+.med-today[data-done="true"]::before { content: "✓ "; }
+.med-next { border-left: 5px solid var(--amber); }
+.med-next[data-done="true"] { border-left-color: var(--ok); }
+.med-next-k { margin: 0 0 0.35rem; font-size: var(--step--1); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--flare); }
+.med-next-t { display: flex; align-items: center; gap: 0.75rem; margin: 0; }
+
+.medals { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: 0.75rem; }
+.medal { display: flex; gap: 1rem; align-items: flex-start; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem; }
+.medal[data-state="locked"] { background: #f7f8fa; }
+.medal[data-state="locked"] h3, .medal[data-state="locked"] .medal-goal { color: var(--muted); }
+.medal[data-state="next"] { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
+.medal[data-state="won"] { border-color: color-mix(in srgb, var(--ok) 35%, var(--rule)); }
+.medal-body { flex: 1; min-width: 0; }
+.medal h3 { font-size: var(--step-1); margin: 0.1rem 0 0.15rem; }
+.medal-goal { margin: 0 0 0.6rem; }
+.medal-chip { display: inline-block; vertical-align: middle; margin-left: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--flare); color: #fff; font-family: var(--font-ui); font-size: 0.75rem; font-weight: 700; }
+.medal-meter { display: flex; align-items: center; gap: 0.6rem; }
+.meter { flex: 1; height: 0.6rem; border-radius: 999px; background: #e3e7ee; overflow: hidden; }
+.meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--amber), var(--flare)); transition: width 0.6s ease-out; }
+.medal[data-state="won"] .meter span { background: var(--ok); }
+.medal-n { font-size: 0.8125rem; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.medal-status { margin: 0.35rem 0 0; font-size: var(--step--1); color: var(--muted); }
+.medal[data-state="won"] .medal-status { color: var(--ok); font-weight: 700; }
+.med-how { margin-top: 2rem; }
+.med-how h2 { font-size: var(--step-1); }
+.med-how li { color: var(--muted); margin-bottom: 0.4rem; }
+
+/* Festejo al ganar una medalla */
+.medal-celebrate { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; padding-block: 0.5rem 0.25rem; text-align: center; }
+.medal-cel { display: grid; justify-items: center; max-width: 16rem; }
+.medal-cel .medal-badge { animation: medal-pop 0.7s cubic-bezier(.2, 1.4, .4, 1) both; }
+.medal-cel-t { font-family: var(--font-display); font-weight: 650; font-size: var(--step-1); margin: 0.75rem 0 0.15rem; }
+.medal-cel-g { margin: 0; color: var(--muted); font-size: var(--step--1); }
+@keyframes medal-pop {
+  0% { transform: scale(0.3) rotate(-25deg); opacity: 0; }
+  60% { transform: scale(1.12) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
 
 /* ---------- Observatorio ---------- */
 .obs-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; padding-block: 0.75rem 2rem; }
@@ -431,6 +501,8 @@ details.how summary { cursor: pointer; font-weight: 700; min-height: 2.5rem; dis
   .tabbar a { flex-direction: row; min-height: var(--appbar-h); padding: 0 1rem; gap: 0.5rem; font-size: var(--step-0); border-top: 0; border-bottom: 3px solid transparent; }
   .tabbar a[aria-current="page"] { border-bottom-color: var(--amber); }
   .tabbar svg { width: 1.25rem; height: 1.25rem; }
+  .nav-dot { top: 0.7rem; left: 1.9rem; }
+  .med-top { grid-template-columns: 1fr 1fr; }
   .toasts { bottom: 1.25rem; }
   .hero { padding-block: 3rem 4rem; }
   .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 3rem; }

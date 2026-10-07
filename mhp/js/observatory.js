@@ -5,6 +5,7 @@ import { t, tn, fmtNum, fmtK, onLangChange } from './i18n.js';
 import { getState, subscribe, saveObservation, wolf, kPending, getPref, setPref } from './store.js';
 import { $, $$, toast, isCoarsePointer } from './dom.js';
 import { openKDialog } from './kdialog.js';
+import { celebrateMedals } from './medals.js';
 import { bindKInput, syncKInput } from './kinput.js';
 
 const round = (x, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
@@ -278,7 +279,9 @@ export function initObservatory() {
     const { s, g } = counts();
     const res = saveObservation({ date: cur.date, g, s, time: cur.time });
     toast(t(res.replaced ? 'toast_replaced' : 'toast_saved', { r: fmtNum(res.r) }), { kind: 'ok' });
-    if (res.kDue) setTimeout(openKDialog, 800);
+    // Primero se festeja la medalla; la evaluación de k, si corresponde, llega al cerrar ese diálogo.
+    if (res.newMedals.length) setTimeout(() => celebrateMedals(res.newMedals, res.kDue ? () => setTimeout(openKDialog, 300) : null), 600);
+    else if (res.kDue) setTimeout(openKDialog, 800);
   });
 
   bindKInput(kInput);

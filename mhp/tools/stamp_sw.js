@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Escribe en sw.js la lista de archivos de la app y una versión que cambia con cualquier modificación.
 // Uso (desde la carpeta del proyecto):  node tools/stamp_sw.js
-// Ejecutalo cada vez que cambies un archivo, antes de publicar: así las personas reciben el aviso «Actualizar».
+// Ejecutarlo cada vez que cambie un archivo, antes de publicar: así las personas reciben el aviso «Actualizar».
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');

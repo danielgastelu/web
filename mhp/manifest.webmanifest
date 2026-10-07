@@ -1,7 +1,7 @@
 {
   "name": "Misión Helios",
   "short_name": "Helios",
-  "description": "Observá manchas solares en imágenes reales de la NASA y calculá el número de Wolf.",
+  "description": "Observar manchas solares en imágenes reales de la NASA y calcular el número de Wolf.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

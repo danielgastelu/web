@@ -1,5 +1,5 @@
-// Estado de la sesión: observaciones, k, series importadas. Todo queda en el dispositivo (localStorage).
-import { LAB } from './config.js';
+// Estado de la sesión: observaciones, k, series importadas, medallas. Todo queda en el dispositivo (localStorage).
+import { LAB, MEDALS } from './config.js';
 import { referenceAt } from './silso.js';
 
 const KEY = 'helios.data.v1';
@@ -10,7 +10,9 @@ const fresh = () => ({
   obs: [],                       // { id, date:'AAAA-MM-DD', g, s, q, time, savedAt }
   series: [],                    // { id, name, sim, rows:[{ date, g, s, r }] }
   kState: { nextAt: LAB.K_FIRST, pending: false },
-  profile: { school: '', name: '' }
+  profile: { school: '', name: '' },
+  activity: [],                  // días del calendario (local, 'AAAA-MM-DD') en que se guardó al menos una observación
+  medals: {}                     // { [id]: { at: ms, seen: bool } } — una medalla ganada no se pierde
 });
 
 let state = fresh();
@@ -25,6 +27,9 @@ function load() {
     if (!d || d.v !== 1) return;
     state = { ...fresh(), ...d.state, kState: { ...fresh().kState, ...(d.state && d.state.kState) }, profile: { ...fresh().profile, ...(d.state && d.state.profile) } };
   } catch (e) { memoryOnly = true; }
+  // Datos anteriores a las medallas: se reconstruye la actividad con lo que hay y se otorgan en silencio.
+  if (!state.activity.length) state.obs.forEach(o => { if (o.savedAt) logActivity(o.savedAt); });
+  if (awardMedals().length) persist();
 }
 
 function persist() {
@@ -33,6 +38,32 @@ function persist() {
 }
 
 function emit(reason) { persist(); listeners.forEach(fn => fn(reason)); }
+
+// ---------- actividad y medallas ----------
+export const localDay = (ms = Date.now()) => {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+function logActivity(ms) {
+  const day = localDay(ms);
+  if (!state.activity.includes(day)) { state.activity.push(day); state.activity.sort(); }
+}
+export const medalMetrics = () => ({ dates: state.obs.length, days: state.activity.length });
+/** Otorga las medallas recién alcanzadas y las devuelve (en orden de dificultad). */
+function awardMedals() {
+  const m = medalMetrics(), won = [];
+  for (const md of MEDALS) {
+    if (!state.medals[md.id] && m[md.metric] >= md.goal) { state.medals[md.id] = { at: Date.now(), seen: false }; won.push(md); }
+  }
+  return won;
+}
+export const unseenMedalIds = () => Object.keys(state.medals).filter(id => !state.medals[id].seen);
+export function markMedalsSeen() {
+  const ids = unseenMedalIds();
+  if (!ids.length) return;
+  ids.forEach(id => { state.medals[id].seen = true; });
+  emit('medals');
+}
 
 load();
 
@@ -66,8 +97,10 @@ export function saveObservation({ date, g, s, time }) {
   if (existing >= 0) state.obs[existing] = rec; else state.obs.push(rec);
   state.obs.sort((a, b) => a.date.localeCompare(b.date));
   if (!state.kState.pending && qualifyingCount() >= state.kState.nextAt) state.kState.pending = true;
+  logActivity(rec.savedAt);
+  const newMedals = awardMedals();
   emit('obs');
-  return { replaced: existing >= 0, rec, r: wolf(state.k, g, s), kDue: state.kState.pending };
+  return { replaced: existing >= 0, rec, r: wolf(state.k, g, s), kDue: state.kState.pending, newMedals };
 }
 
 export function deleteObservation(id) {
@@ -125,7 +158,7 @@ export function setProfile(p) {
 }
 
 export function clearAll() {
-  state = fresh();
+  state = { ...fresh(), activity: state.activity, medals: state.medals };   // los logros se conservan
   emit('all');
 }
 

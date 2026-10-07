@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Misión Helios</title>
-  <meta name="description" content="Misión Helios: observá manchas solares en imágenes reales de la NASA y calculá el número de Wolf.">
+  <meta name="description" content="Misión Helios: observar manchas solares en imágenes reales de la NASA y calcular el número de Wolf.">
   <meta name="theme-color" content="#14264b">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,6 +41,7 @@
           <li><a href="#/" data-route="mision"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg><span data-i18n="nav_mission"></span></a></li>
           <li><a href="#/observar" data-route="observar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v4.5M12 16v4.5M3.5 12H8M16 12h4.5"/></svg><span data-i18n="nav_observe"></span></a></li>
           <li><a href="#/datos" data-route="datos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 3.5v17h17"/><circle cx="8" cy="15" r="1.3"/><circle cx="12" cy="9.5" r="1.3"/><circle cx="15.5" cy="13" r="1.3"/><circle cx="19" cy="6.5" r="1.3"/></svg><span data-i18n="nav_data"></span></a></li>
+          <li><a href="#/medallas" data-route="medallas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 10.6 5.6 2.8h4.2l2.2 5.4 2.2-5.4h4.2l-2.7 7.8"/><circle cx="12" cy="15.2" r="6"/><circle cx="12" cy="15.2" r="2.4"/></svg><span data-i18n="nav_medals"></span><span class="nav-dot" id="nav-medals-dot" hidden><span class="visually-hidden" data-i18n="med_new_dot"></span></span></a></li>
           <li><a href="#/acerca" data-route="acerca"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.2"/></svg><span data-i18n="nav_about"></span></a></li>
         </ul>
       </nav>
@@ -219,6 +220,9 @@
         <div class="wrap">
           <h2 id="cred-h" style="font-size:var(--step-2)" data-i18n="credits_title"></h2>
           <ul class="credits">
+            <!-- Referencias en formato APA 7; títulos en su idioma original (no se traducen) -->
+            <li class="ref">Salvo, R. <span lang="es">[Prof., Observatorio del Liceo N.º 58 «Mario Benedetti»]</span>. (2012). <span lang="es">Observando el ciclo de manchas solares con la computadora</span>. <span data-i18n="ref_in"></span> <i lang="es">Anuario digital de Astronomía 2012</i>. <span lang="es">Ministerio de Educación y Cultura</span>. <a href="https://www.gub.uy/ministerio-educacion-cultura/sites/ministerio-educacion-cultura/files/documentos/publicaciones/anuario_digital2012.pdf" target="_blank" rel="noopener">https://www.gub.uy/ministerio-educacion-cultura/sites/ministerio-educacion-cultura/files/documentos/publicaciones/anuario_digital2012.pdf</a></li>
+            <li class="ref">Salvo, R. <span lang="es">[Prof., Observatorio del Liceo N.º 58 «Mario Benedetti»; Observatorio Astronómico Los Molinos]</span>. (2013). <span lang="es">Observando el ciclo de manchas solares a través de la web: Período 2012</span>. <span data-i18n="ref_in"></span> <i lang="es">Anuario de Astronomía 2013</i>. <a href="http://aulas.ces.edu.uy/pluginfile.php/216861/mod_folder/content/0/Anuario_Astronom%C3%ADa_2013.pdf?forcedownload=1" target="_blank" rel="noopener">http://aulas.ces.edu.uy/pluginfile.php/216861/mod_folder/content/0/Anuario_Astronom%C3%ADa_2013.pdf</a></li>
             <li><a href="https://www.sidc.be/SILSO/" target="_blank" rel="noopener" data-i18n="credit_silso"></a></li>
             <li><a href="https://soho.nascom.nasa.gov/" target="_blank" rel="noopener" data-i18n="credit_soho"></a></li>
             <li><a href="https://sdo.gsfc.nasa.gov/" target="_blank" rel="noopener" data-i18n="credit_sdo"></a></li>
@@ -374,6 +378,27 @@
             </div>
           </div>
         </details>
+      </div>
+    </section>
+
+    <!-- ===================== MEDALLAS ===================== -->
+    <section class="view" data-view="medallas" hidden aria-labelledby="med-h">
+      <div class="wrap-narrow">
+        <header class="view-head"><h1 id="med-h" data-i18n="med_title"></h1><p data-i18n="med_lead"></p></header>
+        <div class="med-top">
+          <div class="med-summary" id="med-summary"></div>
+          <div class="med-next" id="med-next" aria-live="polite"></div>
+        </div>
+        <ol class="medals" id="medal-list"></ol>
+        <section class="med-how">
+          <h2 data-i18n="med_how_t"></h2>
+          <ul>
+            <li data-i18n="med_how_days"></li>
+            <li data-i18n="med_how_dates"></li>
+            <li data-i18n="med_how_keep"></li>
+          </ul>
+        </section>
+        <div class="cta-row"><a class="btn btn-primary" href="#/observar" data-i18n="how_cta"></a></div>
       </div>
     </section>
 

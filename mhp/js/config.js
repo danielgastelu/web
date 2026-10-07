@@ -32,6 +32,17 @@ export const LAB = {
   DATE_MIN: '2010-05-01'    // Desde que hay imágenes de HMI
 };
 
+// Medallas, en orden de dificultad. Textos: claves med_<id>_t (título) y med_<id>_g (meta) en strings.js.
+// metric: 'dates' = fechas del Sol distintas registradas; 'days' = días del calendario con al menos un registro.
+// tier: color del aro (1 bronce, 2 plata, 3 oro).
+export const MEDALS = [
+  { id: 'novel',    emoji: '🔭', metric: 'dates', goal: 1,   tier: 1 },
+  { id: 'aventura', emoji: '🌅', metric: 'days',  goal: 5,   tier: 1 },
+  { id: 'centinela',emoji: '🛡️', metric: 'days',  goal: 30,  tier: 2 },
+  { id: 'cronista', emoji: '📜', metric: 'dates', goal: 50,  tier: 2 },
+  { id: 'maestria', emoji: '🏆', metric: 'dates', goal: 100, tier: 3 }
+];
+
 // Enlaces de los créditos
 export const LINKS = {
   silso: 'https://www.sidc.be/SILSO/',
