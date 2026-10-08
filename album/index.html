@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Álbum Virtual: Feria de Ciencias</title>
+    <meta name="description" content="Colecciona los cromos de grandes personalidades de la ciencia en la feria científica.">
+    <meta name="theme-color" content="#7B2FF7">
+
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Álbum Ciencia">
+
+    <link rel="preload" href="fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Íconos (trazo estilo Lucide) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-atom" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><path d="M20.2 20.2c2-2-.6-7.9-5.7-13S3.8 1.8 1.8 3.8c-2 2 .6 7.9 5.7 13s11.2 7.7 12.7 3.4z"/><path d="M15.7 15.7c-5.1 5.1-11 7.7-13 5.7S1.8 13.6 7 8.5s11.2-7.7 13.2-5.7 .6 7.8-4.5 12.9z"/></symbol>
+        <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19A1.5 1.5 0 0 0 5.8 21h12.4a1.5 1.5 0 0 0 1.3-2L14 9.5V3"/><path d="M7 15h10"/></symbol>
+        <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10z"/><path d="M2 21c0-3 1.9-5.4 5.2-6.1 2.5-.5 5-2 6.8-3.9"/></symbol>
+        <symbol id="i-planet" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M4.1 15.6C1.9 17.5 1 19.2 1.7 20.1c1.1 1.5 6.5-.7 12-5s8.9-9.1 7.8-10.6c-.6-.9-2.4-.6-4.8.6"/></symbol>
+        <symbol id="i-chip" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+        <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.9-1"/></symbol>
+        <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.8 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.2.6 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12A9 9 0 0 1 18.5 5.8L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-install" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+        <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5.1A15 15 0 0 1 22 8.8M5 12.9a10 10 0 0 1 5.2-2.8M16.9 10.6A10 10 0 0 1 19 12.9M12 20h.01"/></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></symbol>
+        <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L19.6 11l-5.7 2.2L12 19l-1.9-5.8L4.4 11l5.7-2.2z"/><path d="M19 3v4M21 5h-4"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    </svg>
+
+    <header class="header">
+        <div class="header__inner">
+            <div class="brand">
+                <img src="icons/icon-192.png" alt="" width="44" height="44">
+                <div>
+                    <h1>Feria de Ciencias</h1>
+                    <p>Álbum de cromos</p>
+                </div>
+            </div>
+
+            <div class="header__actions">
+                <button id="install-btn" class="chip-btn" type="button" hidden>
+                    <svg class="icon"><use href="#i-install"/></svg> Instalar
+                </button>
+            </div>
+
+            <div class="progress" role="group" aria-label="Progreso del álbum">
+                <div class="progress__track" role="progressbar" aria-valuemin="0" id="progress-track">
+                    <div id="progress-bar" class="progress__bar"></div>
+                </div>
+                <span class="progress__label"><svg class="icon"><use href="#i-star"/></svg><span id="progress-text">0/0</span></span>
+            </div>
+
+            <form id="code-form" class="code-form" autocomplete="off" novalidate>
+                <label>
+                    <span class="sr-only">Código secreto de 4 letras</span>
+                    <input id="code-input" class="code-input" type="text" inputmode="text" maxlength="4"
+                        placeholder="ABCD" autocapitalize="characters" autocorrect="off" spellcheck="false"
+                        enterkeyhint="go" aria-describedby="code-help">
+                </label>
+                <button class="btn btn--primary" type="submit">
+                    <svg class="icon"><use href="#i-unlock"/></svg><span>Abrir</span>
+                </button>
+            </form>
+        </div>
+        <p id="code-help" class="sr-only">Busca los códigos en los stands de la feria y escríbelos aquí para desbloquear cromos.</p>
+    </header>
+
+    <p class="offline-pill"><svg class="icon"><use href="#i-wifi-off"/></svg> Sin conexión: el álbum funciona igual</p>
+
+    <main class="main">
+        <nav class="filters" id="filters" aria-label="Filtrar por categoría"></nav>
+        <div id="grid" class="grid" aria-live="polite"></div>
+    </main>
+
+    <footer class="footer">
+        <button class="link-btn" type="button" id="credits-btn">Créditos de las imágenes</button>
+        <span id="version-label"></span>
+        <button class="link-btn link-btn--danger" type="button" id="reset-btn" hidden>Reiniciar álbum (prueba)</button>
+    </footer>
+
+    <div class="toast-region" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Detalle de un cromo -->
+    <dialog id="detail-dialog" aria-labelledby="detail-name">
+        <div class="sheet detail" id="detail-sheet">
+            <button class="sheet__close" type="button" data-close aria-label="Cerrar"><svg class="icon"><use href="#i-close"/></svg></button>
+            <div id="detail-content"></div>
+        </div>
+    </dialog>
+
+    <!-- Nuevo cromo desbloqueado -->
+    <dialog id="reveal-dialog" aria-labelledby="reveal-title">
+        <div class="sheet">
+            <div class="sheet__body reveal" style="text-align:center">
+                <h2 class="reveal__title" id="reveal-title">¡Nuevo cromo desbloqueado!</h2>
+                <p class="reveal__sub" id="reveal-sub"></p>
+                <div id="reveal-card"></div>
+                <button class="btn btn--primary" type="button" data-close>¡Genial, a pegarlo en el álbum!</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Álbum completo -->
+    <dialog id="complete-dialog" aria-labelledby="complete-title">
+        <div class="sheet">
+            <div class="sheet__body complete">
+                <div class="trophy"><svg class="icon"><use href="#i-trophy"/></svg></div>
+                <h2 id="complete-title" style="margin:0 0 6px">¡Álbum completo!</h2>
+                <p style="margin:0 0 18px;color:var(--ink-soft)">Encontraste a todas las personalidades de la feria. ¡Eres una mente brillante!</p>
+                <button class="btn btn--primary" type="button" data-close style="width:100%">Ver mi álbum</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Créditos -->
+    <dialog id="credits-dialog" aria-labelledby="credits-title">
+        <div class="sheet">
+            <button class="sheet__close" type="button" data-close aria-label="Cerrar"><svg class="icon"><use href="#i-close"/></svg></button>
+            <div class="sheet__body">
+                <h2 id="credits-title" style="margin:0 0 4px">Créditos</h2>
+                <p style="margin:0 0 12px;font-size:.9rem;color:var(--ink-soft)">Retratos tomados de Wikipedia / Wikimedia Commons. Los cromos bloqueados se revelan cuando los desbloqueas.</p>
+                <ol class="credits-list" id="credits-list"></ol>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="js/version.js"></script>
+    <script src="js/cromos.js"></script>
+    <script src="js/confetti.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

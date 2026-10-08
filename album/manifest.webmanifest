@@ -1,0 +1,21 @@
+{
+    "name": "Álbum de la Feria de Ciencias",
+    "short_name": "Álbum Ciencia",
+    "description": "Colecciona los cromos de grandes personalidades de la ciencia en la feria científica.",
+    "lang": "es",
+    "dir": "ltr",
+    "id": "./",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#F7F2FF",
+    "theme_color": "#7B2FF7",
+    "categories": ["education", "games"],
+    "icons": [
+        { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+        { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ]
+}
