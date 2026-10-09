@@ -202,10 +202,15 @@
 
     // ---------- Instalación ----------
     let deferredInstall = null;
+    const isStandalone = () =>
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.matchMedia('(display-mode: fullscreen)').matches ||
+        window.matchMedia('(display-mode: minimal-ui)').matches ||
+        navigator.standalone === true;
     window.addEventListener('beforeinstallprompt', e => {
         e.preventDefault();
         deferredInstall = e;
-        $('#install-btn').hidden = false;
+        $('#install-btn').hidden = isStandalone();
     });
     $('#install-btn').addEventListener('click', async () => {
         if (!deferredInstall) return;
