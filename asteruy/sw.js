@@ -26,6 +26,7 @@ const ASSETS = [
     'icons/maskable-512.png',
     'icons/apple-touch-icon.png',
     'icons/favicon-48.png',
+    'img/inst/anep-dges-blanco.svg',
     ...CROMOS.map(f => `img/p${f.id}.webp`)
 ];
 
