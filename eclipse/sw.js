@@ -1,6 +1,6 @@
 /* Service worker — Sonificación Eclipse 2027
    Cambiar CACHE_VERSION cada vez que se publiquen cambios en los archivos. */
-const CACHE_VERSION = 'eclipse2027-v3';
+const CACHE_VERSION = 'eclipse2027-v7';
 const SHELL = [
   './',
   './index.html',

@@ -3,6 +3,11 @@
 @font-face { font-family: 'Source Sans 3'; font-style: italic; font-weight: 400; font-display: swap; src: url('../fonts/source-sans-3-latin-400-italic.woff2') format('woff2'); }
 @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/source-sans-3-latin-600-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/source-sans-3-latin-700-normal.woff2') format('woff2'); }
+/* Fuente de respaldo con el mismo ancho que Source Sans 3 (medido): mientras la fuente
+   carga, el texto ocupa el mismo lugar y la página no «salta» (mejor CLS en Lighthouse). */
+@font-face { font-family: 'Source Sans 3 Fallback'; font-weight: 400; src: local('Arial'), local('Helvetica'), local('Liberation Sans'); size-adjust: 93%; }
+@font-face { font-family: 'Source Sans 3 Fallback'; font-weight: 600; src: local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Liberation Sans Bold'); size-adjust: 92%; }
+@font-face { font-family: 'Source Sans 3 Fallback'; font-weight: 700; src: local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Liberation Sans Bold'); size-adjust: 91%; }
 
 :root {
     /* Tema estándar (optimizado para legibilidad) */
@@ -16,6 +21,9 @@
     --success-color: #1b6e30;   /* contraste ≥ 4.5:1 sobre blanco */
     --danger-color: #c42333;
     --nav-bg: #e0e0e0;
+    --disabled-bg: #e6e8ec;
+    --disabled-text: #4a4f58;
+    --disabled-stripe: rgba(0,0,0,0.05);
     --font-size-base: 17px;
     --nav-h: 64px;
 }
@@ -32,6 +40,9 @@ body.high-contrast {
     --success-color: #00ff00;
     --danger-color: #ff0000;
     --nav-bg: #111111;
+    --disabled-bg: #000000;
+    --disabled-text: #ffff00;
+    --disabled-stripe: transparent;
     --font-size-base: 18px;
 }
 
@@ -40,7 +51,7 @@ body.high-contrast {
 html, body { height: 100%; }
 
 body {
-    font-family: 'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;
+    font-family: 'Source Sans 3', 'Source Sans 3 Fallback', Arial, Helvetica, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
@@ -102,6 +113,7 @@ body.high-contrast .contrast-btn { background-color: var(--accent-color); color:
     flex-wrap: wrap;
     gap: 5px;
     margin-top: 8px;
+    min-height: 32px; /* reserva el lugar de los botones (los crea el script): evita saltos */
 }
 .lang-bar::-webkit-scrollbar { display: none; }
 
@@ -143,7 +155,17 @@ body.high-contrast .contrast-btn { background-color: var(--accent-color); color:
     background: var(--accent-color);
     color: var(--accent-contrast);
     font-size: 0.95rem;
+    /* Flota sobre la barra de pestañas: al aparecer no desplaza el contenido (CLS = 0) */
+    position: fixed;
+    left: 8px; right: 8px;
+    bottom: calc(var(--nav-h) + 8px + env(safe-area-inset-bottom));
+    z-index: 90;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
 }
+body.high-contrast .install-bar { border: 3px solid var(--border-color); box-shadow: none; }
+/* Mientras el aviso está visible, más espacio al final para que no tape contenido */
+body:has(#install-bar:not(.hidden)) main { padding-bottom: calc(var(--nav-h) + 110px + env(safe-area-inset-bottom)); }
 .install-bar .install-text { flex: 1; }
 .install-bar button {
     border: 2px solid var(--accent-contrast);
@@ -208,6 +230,28 @@ body.high-contrast .big-button { color: #000; border: 3px solid var(--border-col
 .big-button.is-active { background-color: var(--success-color); color: #fff; }
 body.high-contrast .big-button.is-active { color: #000; }
 
+/* Botón secundario (vista previa «Escuchar el eclipse en 1 minuto») */
+.secondary-button {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 15px;
+    background-color: var(--panel-bg);
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.secondary-button:hover { background-color: var(--bg-color); }
+.secondary-button.is-running { background-color: var(--accent-color); color: var(--accent-contrast); }
+body.high-contrast .secondary-button { border-width: 3px; }
+body.high-contrast .secondary-button.is-running { color: #000; }
+.preview-card .hint { margin-top: 8px; }
+.how-button { margin-top: 14px; }
+.segmented-control + .hint { margin: -8px 0 14px; }
+
 .segmented-control {
     display: flex;
     border: 2px solid var(--border-color);
@@ -215,13 +259,19 @@ body.high-contrast .big-button.is-active { color: #000; }
     overflow: hidden;
     margin-bottom: 15px;
 }
+/* Cada opción es <label class="seg"><input type="radio"><span class="seg-face">…</span></label>.
+   El radio va DENTRO de la etiqueta: así el lector de pantalla lee cada opción una
+   sola vez (con etiqueta separada, en modo lectura el texto se leía dos veces). */
+.segmented-control .seg { flex: 1; display: flex; position: relative; margin: 0; }
 .segmented-control input[type="radio"] {
-    position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;
+    position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none;
 }
-.segmented-control label {
+.seg-face {
     flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
     text-align: center;
     padding: 10px;
+    min-height: 48px;           /* área táctil cómoda */
     cursor: pointer;
     font-weight: bold;
     background-color: var(--panel-bg);
@@ -229,11 +279,27 @@ body.high-contrast .big-button.is-active { color: #000; }
     transition: background-color 0.2s;
     font-size: 0.95rem;
 }
-.segmented-control input[type="radio"]:checked + label {
+.segmented-control input[type="radio"]:checked + .seg-face {
     background-color: var(--accent-color);
     color: var(--accent-contrast);
 }
-.segmented-control input[type="radio"]:focus-visible + label { outline: 3px solid var(--text-color); outline-offset: -4px; }
+.segmented-control input[type="radio"]:focus-visible + .seg-face { outline: 3px solid var(--text-color); outline-offset: -4px; }
+
+/* Opción no disponible (p. ej. sensor de luz en PC/laptop): gris, pero legible.
+   Texto #4a4f58 sobre #e6e8ec ≈ 7:1 de contraste (WCAG AAA), para baja visión. */
+.seg-sub[hidden] { display: none; }
+.seg-sub { display: block; font-size: 0.8rem; font-weight: 600; line-height: 1.25; }
+.segmented-control input[type="radio"]:disabled + .seg-face {
+    cursor: not-allowed;
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    background-image: repeating-linear-gradient(135deg, transparent 0 8px, var(--disabled-stripe) 8px 10px);
+}
+body.high-contrast .segmented-control input[type="radio"]:disabled + .seg-face {
+    background-image: none;
+    outline: 2px dashed var(--border-color);
+    outline-offset: -6px;
+}
 
 .field-label { display: block; margin-bottom: 10px; font-weight: bold; }
 

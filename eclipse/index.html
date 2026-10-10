@@ -17,7 +17,24 @@
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
     <link rel="preload" href="fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/source-sans-3-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Si el idioma guardado o el del navegador no es español, se oculta la página por un
+         instante hasta que el script cambia los textos: así no «salta» al traducirse.
+         Límite de seguridad: se muestra igual a los 3 segundos. -->
+    <style>.i18n-wait body > header, .i18n-wait body > main, .i18n-wait body > nav { visibility: hidden; }</style>
+    <script>
+        (function () {
+            var l = null;
+            try { l = localStorage.getItem('eclipse.lang'); } catch (e) {}
+            if (!l) l = ((navigator.languages && navigator.languages[0]) || navigator.language || 'es').slice(0, 2).toLowerCase();
+            if (l !== 'es' && /^(pt|en|fr|it|de)$/.test(l)) {
+                var h = document.documentElement;
+                h.classList.add('i18n-wait');
+                setTimeout(function () { h.classList.remove('i18n-wait'); }, 3000);
+            }
+        })();
+    </script>
 </head>
 <body>
     <a class="skip-link" href="#main" data-i18n="a11y.skip">Saltar al contenido principal</a>
@@ -48,27 +65,29 @@
 
             <button type="button" id="btn-start" class="big-button" data-i18n="son.start" data-i18n-aria="son.start.aria">▶ INICIAR EXPERIENCIA</button>
 
-            <div id="status-orientation" class="status-indicator status-bad" role="status" data-i18n="son.tilted">
-                Teléfono inclinado: sonido pausado
+            <div id="status-orientation" class="status-indicator status-bad" role="status" data-i18n="son.tilted">Teléfono inclinado: sonido pausado</div>
+
+            <!-- Vista previa: todo el eclipse comprimido en un minuto -->
+            <div class="card preview-card">
+                <button type="button" id="btn-preview" class="secondary-button" aria-describedby="preview-hint" data-i18n="prev.btn">🎧 Escuchar el eclipse en 1 minuto</button>
+                <p id="preview-hint" class="note hint" data-i18n="prev.hint">Todo el eclipse comprimido en un minuto, para reconocer los sonidos antes del día real. No hace falta apoyar el teléfono.</p>
             </div>
 
             <div class="card">
                 <span class="field-label" id="lbl-source" data-i18n="son.source">Fuente de datos:</span>
-                <div class="segmented-control" role="radiogroup" aria-labelledby="lbl-source">
-                    <input type="radio" id="src-algo" name="data-source" value="algo" checked>
-                    <label for="src-algo" data-i18n="son.src.algo">Algoritmo (reloj)</label>
-                    <input type="radio" id="src-sensor" name="data-source" value="sensor">
-                    <label for="src-sensor" data-i18n="son.src.sensor">Sensor de luz</label>
+                <div class="segmented-control" id="src-group" role="radiogroup" aria-labelledby="lbl-source">
+                    <label class="seg"><input type="radio" id="src-algo" name="data-source" value="algo" checked aria-labelledby="src-algo-txt"><span class="seg-face" id="src-algo-txt" aria-hidden="true" data-i18n="son.src.algo">Algoritmo (reloj)</span></label>
+                    <!-- Si el equipo no tiene sensor de luz, la opción se desactiva y el motivo
+                         se muestra dentro del botón (forma parte de su nombre accesible). -->
+                    <label class="seg"><input type="radio" id="src-sensor" name="data-source" value="sensor" aria-labelledby="src-sensor-txt"><span class="seg-face" id="src-sensor-txt" aria-hidden="true"><span id="src-sensor-name" data-i18n="son.src.sensor">Sensor de luz</span> <span class="seg-sub" id="src-sensor-na" hidden></span></span></label>
                 </div>
 
                 <div id="sensor-msg" class="sensor-msg hidden" role="status"></div>
 
                 <div id="algo-controls">
                     <div class="segmented-control" style="margin-bottom:0;" role="radiogroup" data-i18n-aria="son.modeLabel" aria-label="Modo del reloj">
-                        <input type="radio" id="mode-real" name="algo-mode" value="real" checked>
-                        <label for="mode-real" data-i18n="son.mode.real">Tiempo real</label>
-                        <input type="radio" id="mode-sim" name="algo-mode" value="sim">
-                        <label for="mode-sim" data-i18n="son.mode.sim">Simulador</label>
+                        <label class="seg"><input type="radio" id="mode-real" name="algo-mode" value="real" checked aria-labelledby="mode-real-txt"><span class="seg-face" id="mode-real-txt" aria-hidden="true" data-i18n="son.mode.real">Tiempo real</span></label>
+                        <label class="seg"><input type="radio" id="mode-sim" name="algo-mode" value="sim" aria-labelledby="mode-sim-txt"><span class="seg-face" id="mode-sim-txt" aria-hidden="true" data-i18n="son.mode.sim">Simulador</span></label>
                     </div>
                     <div id="sim-container" class="hidden">
                         <input type="range" id="time-slider" min="0" max="1000" value="0" data-i18n-aria="son.slider.aria" aria-label="Deslizador de tiempo simulado">
@@ -77,11 +96,17 @@
             </div>
 
             <div class="card">
+                <span class="field-label" id="lbl-soundmode" data-i18n="son.soundMode">Tipo de sonido:</span>
+                <div class="segmented-control" role="radiogroup" aria-labelledby="lbl-soundmode" aria-describedby="soundmode-hint">
+                    <label class="seg"><input type="radio" id="snd-notes" name="sound-mode" value="notes" checked aria-labelledby="snd-notes-txt"><span class="seg-face" id="snd-notes-txt" aria-hidden="true" data-i18n="son.snd.notes">Notas melódicas</span></label>
+                    <label class="seg"><input type="radio" id="snd-tone" name="sound-mode" value="tone" aria-labelledby="snd-tone-txt"><span class="seg-face" id="snd-tone-txt" aria-hidden="true" data-i18n="son.snd.tone">Tono continuo</span></label>
+                </div>
+                <p id="soundmode-hint" class="note hint" data-i18n="son.snd.hint">Las notas melódicas son más musicales; el tono continuo permite seguir mejor los cambios suaves.</p>
                 <label class="checkbox-label">
-                    <input type="checkbox" id="voice-toggle" checked aria-describedby="voice-hint">
-                    <span data-i18n="son.voice">Relato por voz (avance e hitos)</span>
+                    <input type="checkbox" id="voice-toggle" checked aria-labelledby="voice-txt" aria-describedby="voice-hint">
+                    <span id="voice-txt" aria-hidden="true" data-i18n="son.voice">Relato por voz (avance e hitos)</span>
                 </label>
-                <p id="voice-hint" class="note hint" data-i18n="son.voice.hint"></p>
+                <p id="voice-hint" class="note hint" data-i18n="son.voice.hint">Si usas un lector de pantalla, puedes desactivar el relato por voz: los cambios de fase y de cobertura los anunciará tu lector.</p>
             </div>
 
             <div class="card dashboard">
@@ -93,12 +118,13 @@
 
                 <div class="dashboard-label" id="lbl-phase" data-i18n="son.lbl.phase">Fase actual</div>
                 <div id="display-phase" class="dashboard-phase" data-i18n="son.waiting">Esperando inicio…</div>
+                <button type="button" id="btn-how" class="secondary-button how-button" data-i18n="how.btn">🗣️ ¿Cómo va el eclipse?</button>
             </div>
 
             <!-- Aparece cuando el eclipse ya terminó -->
             <div id="gallery-card" class="card gallery-card hidden">
                 <h3 data-i18n="gal.title">Fotos del eclipse</h3>
-                <p data-i18n="gal.text_html"></p>
+                <p data-i18n="gal.text_html">El eclipse ya terminó. Accede a la galería de fotos del evento en <a href="https://spaceweathergallery.com/index.php" target="_blank" rel="noopener">Spaceweather Gallery</a>.</p>
             </div>
         </section>
 
@@ -106,11 +132,11 @@
         <section id="tab-simulacion" class="tab-content" aria-labelledby="h-simulacion">
             <div class="card">
                 <h2 id="h-simulacion" tabindex="-1" data-i18n="sim.title">Simulación del eclipse</h2>
-                <p data-i18n="sim.intro">Observa cómo la sombra de la Luna recorre la Tierra.</p>
+                <p data-i18n="sim.intro">Observa cómo la sombra de la Luna recorre la Tierra. Usa los controles para descubrir a qué hora entra y sale cada zona del círculo mayor.</p>
 
                 <div class="sim-layout" id="sim-player">
                     <div class="sim-stage" id="sim-stage">
-                        <video id="sim-video" muted playsinline preload="none" poster="assets/poster.jpg"
+                        <video id="sim-video" muted playsinline preload="none" data-poster="assets/poster.jpg"
                                disablepictureinpicture disableremoteplayback
                                data-i18n-aria="sim.video.label" aria-label="Animación global del eclipse, sin sonido"
                                aria-describedby="sim-desc">
@@ -153,14 +179,14 @@
                         <p class="sim-credit" data-i18n="sim.credit">Animación: Fred Espenak y Michael Zeiler. Licencia CC BY-ND 4.0 (ver Créditos).</p>
                     </div>
                 </div>
-                <p id="sim-keys" class="note keys-note" data-i18n="sim.keys"></p>
+                <p id="sim-keys" class="note keys-note" data-i18n="sim.keys">Atajos de teclado (con el foco en los controles de la animación): barra espaciadora para reproducir o pausar; flechas izquierda y derecha para moverse de a un minuto; con Mayúsculas, de a 10 minutos.</p>
             </div>
 
             <div class="card">
                 <h3 data-i18n="tl.h">Así se ve desde la Tierra</h3>
-                <p id="tl-desc" data-i18n="tl.p"></p>
+                <p id="tl-desc" data-i18n="tl.p">Time-lapse con fotos reales tomadas cada 5 minutos durante el eclipse anular del 26 de diciembre de 2019 en Kinnigoli (India), entre las 08:00 y las 11:05: el Sol se va cubriendo, forma el anillo y vuelve a descubrirse.</p>
                 <div class="timelapse">
-                    <video id="tl-video" controls loop muted playsinline preload="none" poster="img/fotos/timelapse-poster.jpg"
+                    <video id="tl-video" controls loop muted playsinline preload="none" data-poster="img/fotos/timelapse-poster.jpg"
                            width="540" height="540" data-i18n-aria="tl.label" aria-label="Time-lapse con fotos reales de un eclipse anular"
                            aria-describedby="tl-desc">
                         <source src="assets/timelapse-anular-2019.mp4" type='video/mp4; codecs="avc1.640028"'>
@@ -172,14 +198,14 @@
 
             <div class="card">
                 <h3 data-i18n="sim.moments.h">Momentos clave</h3>
-                <p class="note" data-i18n="sim.moments.hint"></p>
+                <p class="note" data-i18n="sim.moments.hint">Elige un momento para llevar la animación a esa hora.</p>
                 <ul class="moments" id="sim-moments"></ul>
             </div>
 
             <div class="card">
                 <h3 data-i18n="sim.desc.h">Qué muestra la animación</h3>
-                <p id="sim-desc" data-i18n="sim.desc"></p>
-                <p id="sim-howto" data-i18n="sim.howto_html"></p>
+                <p id="sim-desc" data-i18n="sim.desc">El globo terrestre visto desde el espacio, con América del Sur a la izquierda y África a la derecha. Una franja amarilla marca el camino del anillo de fuego: empieza en el océano Pacífico, al sudoeste de Chile, cruza Chile, Argentina y Uruguay, atraviesa el océano Atlántico y termina, al atardecer, en la costa de África occidental. Un gran círculo sombreado, la penumbra, avanza de oeste a este; en su centro, un punto negro, la antumbra, recorre la franja amarilla. Cada cuadro equivale a un minuto.</p>
+                <p id="sim-howto" data-i18n="sim.howto_html"><strong>Cómo leerla:</strong> el <strong>círculo mayor</strong> es la penumbra; quien esté dentro de él verá un eclipse parcial. La <strong>mancha pequeña</strong> en su interior es la antumbra: allí se verá el anillo de fuego.</p>
                 <p class="note" id="sim-ref"></p>
             </div>
         </section>
@@ -189,21 +215,27 @@
             <div class="card">
                 <h2 id="h-tecnica" tabindex="-1" data-i18n="tech.title">¿Cómo funciona?</h2>
                 <figure class="photo photo-ring">
-                    <img src="img/fotos/anillo-hinode-2011.jpg" width="800" height="800" loading="lazy"
+                    <img src="img/fotos/anillo-hinode-2011.jpg" width="800" height="800" loading="lazy" decoding="async"
                          data-i18n-alt="fig.ring.alt" alt="Anillo de fuego: un aro de luz anaranjada rodea por completo el disco negro de la Luna.">
-                    <figcaption data-i18n="fig.ring.cap"></figcaption>
+                    <figcaption data-i18n="fig.ring.cap">Eclipse anular del 4 de enero de 2011 visto desde el espacio por la nave Hinode (JAXA/NASA).</figcaption>
                 </figure>
                 <h3 data-i18n="tech.what.h">¿Qué es un eclipse anular?</h3>
-                <p data-i18n="tech.what.p"></p>
-                <p data-i18n="tech.intro"></p>
-                <h3 data-i18n="tech.h.motion"></h3>
-                <p data-i18n="tech.p.motion_html"></p>
-                <h3 data-i18n="tech.h.sound"></h3>
-                <p data-i18n="tech.p.sound"></p>
+                <p data-i18n="tech.what.p">Ocurre cuando la Luna pasa justo por delante del Sol, pero está un poco más lejos de la Tierra que de costumbre: se ve más pequeña y no alcanza a cubrirlo entero. En el momento máximo queda un anillo de luz alrededor de la Luna: el «anillo de fuego».</p>
+                <p data-i18n="tech.intro">Esta experiencia traduce datos en sonido para que puedas «escuchar» el avance del eclipse.</p>
+                <h3 data-i18n="tech.son.h">¿Qué es la sonificación?</h3>
+                <p data-i18n="tech.son.p">Sonificar es convertir datos en sonido. Así como un gráfico o un mapa nos permite «ver» la información, la sonificación nos permite «escucharla»: en lugar de mirar una línea que sube o baja, oímos un sonido que cambia. En esta experiencia, la luz del ambiente que mide el sensor del celular se transforma en un tono que varía: con más luz el sonido es más agudo y con menos luz, más grave.</p>
+                <h3 data-i18n="tech.ls.h">Un antecedente: LightSound</h3>
+                <p data-i18n="tech.ls.p">Esta idea ya tiene un antecedente: LightSound, un proyecto de código abierto creado en 2017 en la Universidad de Harvard. Sus instrucciones públicas permiten construir un pequeño aparato que sigue el eclipse a través del sonido, pensado para que las personas ciegas o con baja visión puedan vivirlo: un sensor mide la luz del Sol y la convierte en notas que cambian a medida que la Luna lo cubre. Esta app toma el mismo principio, pero prescinde del aparato físico (el hardware): no hay que comprar piezas ni armar nada, porque usa el celular, un dispositivo que ya está en manos de gran parte de la población (ver Créditos).</p>
+                <h3 data-i18n="tech.h.motion">El movimiento del teléfono</h3>
+                <p data-i18n="tech.p.motion_html">Tu celular detecta la gravedad. La aplicación requiere que coloques el teléfono completamente <strong>horizontal (apoyado sobre una mesa o en la palma de la mano)</strong>. Si levantas el teléfono, el sonido se pausa. Así controlas cuándo escuchar la experiencia.</p>
+                <h3 data-i18n="tech.h.sound">El sonido y la luz</h3>
+                <p data-i18n="tech.p.sound">El sonido cambia según la cantidad de luz solar (calculada por el reloj o medida por el sensor de tu celular):</p>
                 <ul>
-                    <li data-i18n="tech.li1_html"></li>
-                    <li data-i18n="tech.li2_html"></li>
-                    <li data-i18n="tech.li3_html"></li>
+                    <li data-i18n="tech.li1_html"><strong>Antes y después del eclipse:</strong> hay mucha luz. Escucharás tonos altos (agudos).</li>
+                    <li data-i18n="tech.li2_html"><strong>Durante el avance:</strong> a medida que la Luna cubre el Sol, el tono desciende gradualmente.</li>
+                    <li data-i18n="tech.li3_html"><strong>En el momento máximo:</strong> al llegar a la máxima cobertura, el tono será profundo y grave. Luego, a medida que el Sol vuelve a asomarse, el tono subirá hasta ser cada vez más agudo.</li>
+                    <li data-i18n="tech.li4_html"><strong>Durante el anillo de fuego:</strong> además del tono grave suenan campanitas suaves, para que el momento culminante sea inconfundible.</li>
+                    <li data-i18n="tech.li5_html"><strong>Señales al tacto y al oído:</strong> en los teléfonos que lo permiten, el celular vibra en cada cambio de fase (con un patrón más largo en el anillo de fuego). Al apoyar el teléfono suenan dos notas que suben y, al levantarlo, dos que bajan.</li>
                 </ul>
             </div>
         </section>
@@ -212,23 +244,23 @@
         <section id="tab-observacion" class="tab-content" aria-labelledby="h-observacion">
             <div class="card">
                 <h2 id="h-observacion" tabindex="-1" data-i18n="safe.title">Observación segura</h2>
-                <div class="alert-box" role="note" data-i18n="safe.alert_html"></div>
-                <h3 data-i18n="safe.h.no"></h3>
+                <div class="alert-box" role="note" data-i18n="safe.alert_html">🚨 ¡ATENCIÓN! LA SEGURIDAD ES LO PRIMERO 🚨<br>NUNCA mires directamente al Sol sin la protección adecuada. Hacerlo puede causar daños graves y permanentes en la vista.</div>
+                <h3 data-i18n="safe.h.no">Lo que NO debes usar (peligroso) ❌</h3>
                 <ul>
-                    <li data-i18n="safe.no1"></li>
-                    <li data-i18n="safe.no2"></li>
-                    <li data-i18n="safe.no3"></li>
-                    <li data-i18n="safe.no4"></li>
+                    <li data-i18n="safe.no1">Radiografías.</li>
+                    <li data-i18n="safe.no2">Vidrios ahumados.</li>
+                    <li data-i18n="safe.no3">CD o DVD.</li>
+                    <li data-i18n="safe.no4">Lentes de sol comunes (por más oscuros que sean, no sirven).</li>
                 </ul>
-                <h3 data-i18n="safe.h.direct"></h3>
-                <p data-i18n="safe.p.direct_html"></p>
+                <h3 data-i18n="safe.h.direct">Observación directa segura ✅</h3>
+                <p data-i18n="safe.p.direct_html">Usa solo anteojos especiales para eclipses <strong>homologados y certificados (ISO 12312-2)</strong>. Si usas telescopios o cámaras, deben tener filtros solares profesionales.</p>
                 <figure class="photo photo-people">
-                    <img src="img/fotos/observadores-lentes-2023.jpg" width="1200" height="900" loading="lazy"
+                    <img src="img/fotos/observadores-lentes-2023.jpg" width="1200" height="900" loading="lazy" decoding="async"
                          data-i18n-alt="fig.people.alt" alt="Un grupo de personas al aire libre mira hacia el Sol con anteojos especiales para eclipses.">
-                    <figcaption data-i18n="fig.people.cap"></figcaption>
+                    <figcaption data-i18n="fig.people.cap">Observación del eclipse anular del 14 de octubre de 2023 en Kerrville (Texas, EE. UU.) con anteojos para eclipses. Foto: NASA.</figcaption>
                 </figure>
-                <h3 data-i18n="safe.h.indirect"></h3>
-                <p data-i18n="safe.p.indirect"></p>
+                <h3 data-i18n="safe.h.indirect">Observación indirecta (fácil y segura) ✅</h3>
+                <p data-i18n="safe.p.indirect">Es la forma más segura de disfrutarlo sin equipo. Haz un agujero pequeño en un cartón y proyecta la luz del Sol sobre el piso o una pared. Verás cómo la proyección cambia de un círculo a una «medialuna» a medida que avanza el eclipse.</p>
             </div>
         </section>
 
@@ -239,27 +271,27 @@
                 <h2 id="h-creditos" tabindex="-1" data-i18n="cred.title">Eclipse solar anular</h2>
                 <p class="credits-date"><strong data-i18n="cred.date">6 de febrero de 2027</strong></p>
                 <p data-i18n="cred.place">Datos calculados para: Punta del Este, Uruguay.</p>
-                <p class="region-note" data-i18n="cred.region"></p>
+                <p class="region-note" data-i18n="cred.region">Los horarios son válidos para toda la región, con pequeñas diferencias según la localidad. Explora la sección Simulación para ver a qué hora entra y sale una localidad del círculo mayor del eclipse, que se desplazará sobre América del Sur y el océano Atlántico.</p>
             </div>
 
             <!-- Institución -->
             <div class="card institution">
                 <h3 class="visually-hidden" data-i18n="cred.h.inst">Institución</h3>
                 <div class="inst-band">
-                    <img class="inst-lockup" src="img/logos/anep-dges-edytic.png" width="342" height="62"
+                    <img class="inst-lockup" src="img/logos/anep-dges-edytic.png" loading="lazy" decoding="async" width="342" height="62"
                          data-i18n-alt="cred.inst.alt1" alt="ANEP, Educación Secundaria, Espacio de Educación y TIC">
                 </div>
                 <div class="inst-body">
-                    <img class="logo-edytic logo-on-light" src="img/logos/edytic-claro.png" width="900" height="252"
+                    <img class="logo-edytic logo-on-light" src="img/logos/edytic-claro.png" loading="lazy" decoding="async" width="900" height="252"
                          data-i18n-alt="cred.inst.alt2" alt="Educación y TIC. Espacio de Educación y TIC, DGES">
-                    <img class="logo-edytic logo-on-dark" src="img/logos/edytic-oscuro.png" width="900" height="252"
+                    <img class="logo-edytic logo-on-dark" src="img/logos/edytic-oscuro.png" loading="lazy" decoding="async" width="900" height="252"
                          data-i18n-alt="cred.inst.alt2" alt="Educación y TIC. Espacio de Educación y TIC, DGES">
                     <p class="credits-org">
                         ANEP - DGES (Uruguay)<br>
                         Inspección de Astronomía<br>
                         EDyTIC (2026)
                     </p>
-                    <p class="note" data-i18n="cred.dev"></p>
+                    <p class="note" data-i18n="cred.dev">Aplicación de accesibilidad sensorial desarrollada para promover la astronomía inclusiva.</p>
                 </div>
             </div>
 
@@ -268,53 +300,53 @@
                 <h3 data-i18n="cred.h.about">Acerca de esta app</h3>
                 <div class="about-grid">
                     <section class="about-item" aria-labelledby="h-install">
-                        <h4 id="h-install"><span aria-hidden="true" class="about-ico">📲</span> <span data-i18n="cred.install.h">Instalar la app</span></h4>
-                        <p data-i18n="cred.install"></p>
+                        <h4 id="h-install"><span aria-hidden="true" class="about-ico">📲</span> <span data-i18n="cred.install.h">Instalar la app para usarla sin conexión</span></h4>
+                        <p data-i18n="cred.install">Una vez instalada, la app funciona completa sin conexión a internet, incluida la simulación: ideal para el día del eclipse, al aire libre. En Android o en una computadora, usa el botón «Instalar la app» o el menú del navegador. En iPhone o iPad, abre el menú Compartir y elige «Agregar a pantalla de inicio». Conviene abrirla una vez con conexión y entrar a la sección Simulación para que la animación quede guardada.</p>
                     </section>
                     <section class="about-item" aria-labelledby="h-privacy">
                         <h4 id="h-privacy"><span aria-hidden="true" class="about-ico">🔒</span> <span data-i18n="cred.privacy.h">Privacidad</span></h4>
-                        <p data-i18n="cred.privacy"></p>
+                        <p data-i18n="cred.privacy">La app no pide ningún dato a quien la usa y no tiene cuentas ni formularios. Para saber cuántas personas la usan, cuenta las visitas de forma anónima con GoatCounter, un servicio sin cookies que no guarda datos personales ni sigue a nadie entre sitios. Los cálculos del eclipse vienen incluidos y se hacen en el propio dispositivo. Los sensores de movimiento y de luz solo se usan mientras la experiencia está activa, y sus lecturas no salen del dispositivo. En el navegador se guardan únicamente el idioma, el modo de contraste y el tipo de sonido elegidos. Los sitios externos solo se abren si se toca un enlace.</p>
                     </section>
                 </div>
                 <section class="about-item ai-note" aria-labelledby="h-ai">
                     <h4 id="h-ai"><span aria-hidden="true" class="about-ico">🤖</span> <span data-i18n="ai.h">Nota ética sobre el uso de inteligencia artificial</span></h4>
-                    <p data-i18n="ai.lead"></p>
+                    <p data-i18n="ai.lead">Este proyecto se hizo con la asistencia de herramientas de inteligencia artificial (IA), que participaron como coautoras y como soporte técnico. Queremos decirlo de forma clara.</p>
                     <div class="ai-cols">
                         <div>
                             <h5 id="h-ai-did" data-i18n="ai.did.h">Qué hizo la IA</h5>
                             <ul aria-labelledby="h-ai-did">
-                                <li data-i18n="ai.did1"></li>
-                                <li data-i18n="ai.did2"></li>
-                                <li data-i18n="ai.did3"></li>
+                                <li data-i18n="ai.did1">Ayudó a redactar textos y a traducirlos a seis idiomas.</li>
+                                <li data-i18n="ai.did2">Ayudó a escribir y probar el código, y a convertir la animación a un formato liviano sin alterarla.</li>
+                                <li data-i18n="ai.did3">Propuso opciones de diseño, de accesibilidad y de organización de la interfaz.</li>
                             </ul>
                         </div>
                         <div>
                             <h5 id="h-ai-hum" data-i18n="ai.hum.h">Qué hicieron las personas</h5>
                             <ul aria-labelledby="h-ai-hum">
-                                <li data-i18n="ai.hum1"></li>
-                                <li data-i18n="ai.hum2"></li>
-                                <li data-i18n="ai.hum3"></li>
+                                <li data-i18n="ai.hum1">Definieron la idea, el objetivo y el enfoque didáctico.</li>
+                                <li data-i18n="ai.hum2">Revisaron y aprobaron todos los textos y el comportamiento de la aplicación.</li>
+                                <li data-i18n="ai.hum3">Deciden qué se publica y asumen la responsabilidad de lo publicado.</li>
                             </ul>
                         </div>
                     </div>
-                    <p data-i18n="ai.close"></p>
+                    <p data-i18n="ai.close">La IA no tomó decisiones por su cuenta. Ante cualquier error o algo que no se entienda, la responsabilidad es del equipo humano y agradecemos que se nos avise.</p>
                 </section>
             </div>
 
             <!-- Fuentes -->
             <div class="card">
                 <h3 data-i18n="cred.h.ack">Agradecimientos y fuentes</h3>
-                <p data-i18n="cred.ack1_html"></p>
-                <p data-i18n="cred.ack2_html"></p>
-                <p data-i18n="cred.ack3"></p>
+                <p data-i18n="cred.ack1_html">Gran parte de los datos de esta aplicación provienen de EclipseWise.com, cuyos contenidos se basan en las publicaciones <a href="https://eclipsewise.com/pubs/TYCSE.html" target="_blank" rel="noopener"><cite>Thousand Year Canon of Solar Eclipses 1501 to 2500</cite></a> y <a href="https://eclipsewise.com/pubs/TYCLE.html" target="_blank" rel="noopener"><cite>Thousand Year Canon of Lunar Eclipses 1501 to 2500</cite></a>. Todos los cálculos de eclipses son de Fred Espenak, quien asume plena responsabilidad por su exactitud.</p>
+                <p data-i18n="cred.ack2_html">Se permite reproducir estos datos acompañados de un enlace y del siguiente reconocimiento: “Eclipse Predictions by Fred Espenak, <a href="https://www.EclipseWise.com" target="_blank" rel="noopener">www.EclipseWise.com</a>”</p>
+                <p data-i18n="cred.ack3">Los diagramas y mapas pueden usarse siempre que NO se alteren (salvo cambios de tamaño) y que la línea de crédito incluida NO se elimine ni se cubra.</p>
             </div>
 
             <div class="card">
                 <h3 data-i18n="cred.h.anim">Animación global del eclipse</h3>
-                <p data-i18n="cred.anim1"></p>
+                <p data-i18n="cred.anim1">Estas animaciones pueden usarse y compartirse libremente bajo una licencia Creative Commons, siempre que no se modifiquen y se incluya la atribución.</p>
                 <div class="license-row">
                     <a href="http://creativecommons.org/licenses/by-nd/4.0/" target="_blank" rel="noopener license">
-                        <img src="img/cc-by-nd.svg" alt="Creative Commons BY-ND 4.0" width="88" height="31">
+                        <img src="img/cc-by-nd.svg" loading="lazy" decoding="async" alt="Creative Commons BY-ND 4.0" width="88" height="31">
                     </a>
                     <p id="license-line"></p>
                 </div>
@@ -324,22 +356,24 @@
 
             <div class="card">
                 <h3 data-i18n="cred.h.img">Imágenes</h3>
-                <p data-i18n="cred.img.intro"></p>
+                <p data-i18n="cred.img.intro">Las fotografías y el time-lapse provienen de Wikimedia Commons:</p>
                 <ul class="img-credits">
-                    <li data-i18n="cred.img1_html"></li>
-                    <li data-i18n="cred.img2_html"></li>
-                    <li data-i18n="cred.img3_html"></li>
+                    <li data-i18n="cred.img1_html">«Anillo de fuego» del 4 de enero de 2011, nave Hinode (JAXA/NASA), publicado por NASA’s Scientific Visualization Studio. Dominio público. <a href="https://commons.wikimedia.org/wiki/File:What_Is_an_Annular_Eclipse%3F_(SVS14325_-_14325_AnnularEclipsePhoto_003).jpg" target="_blank" rel="noopener">Ver en Wikimedia Commons</a>.</li>
+                    <li data-i18n="cred.img2_html">Time-lapse del eclipse anular del 26 de diciembre de 2019 en Kinnigoli (India), de Siddharth Mallya, con licencia <a href="https://creativecommons.org/licenses/by-sa/4.0/deed" target="_blank" rel="noopener">CC BY-SA 4.0</a>. En esta app se usa recortado y convertido a otro formato, con la misma licencia. <a href="https://commons.wikimedia.org/wiki/File:Annular_Solar_Eclipse_-_26th_December_2019_-_Kinnigoli,_India_-_Timelapse_Video.webm" target="_blank" rel="noopener">Ver en Wikimedia Commons</a>.</li>
+                    <li data-i18n="cred.img3_html">Personas observando el eclipse anular del 14 de octubre de 2023 en Kerrville (Texas), NASA’s Scientific Visualization Studio. Dominio público. <a href="https://commons.wikimedia.org/wiki/File:Eclipse_Safety_Imagery_2023_(SVS14447_-_14447_013_IMG_8047).jpg" target="_blank" rel="noopener">Ver en Wikimedia Commons</a>.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h3 data-i18n="cred.h.more">Para saber más</h3>
-                <p data-i18n="cred.more_html"></p>
+                <p data-i18n="cred.more_html">Datos técnicos completos del eclipse (circunstancias, mapas y tablas): <a href="https://eclipsewise.com/solar/SEprime/2001-2100/SE2027Feb06Aprime.html" target="_blank" rel="noopener">EclipseWise — Annular Solar Eclipse of 2027 Feb 06</a>.</p>
+                <p data-i18n="cred.more.son_html"><strong>Sonificación:</strong> para profundizar en esta técnica, que transforma datos en sonido del mismo modo que un gráfico los transforma en imagen, ver <a href="https://sonification.de/handbook/" target="_blank" rel="noopener"><cite>The Sonification Handbook</cite></a> (T. Hermann, A. Hunt y J. G. Neuhoff, eds., Logos, Berlín, 2011), libro de acceso abierto.</p>
+                <p data-i18n="cred.more.ls_html"><strong>LightSound (Universidad de Harvard):</strong> proyecto de código abierto, iniciado en 2017, que permite construir un dispositivo que convierte la luz del Sol en sonido para que las personas ciegas o con baja visión puedan seguir un eclipse solar. En su sitio se publican las instrucciones de armado, los diagramas y el código. <a href="https://astrolab.fas.harvard.edu/LightSound.html" target="_blank" rel="noopener">LightSound — astrolab.fas.harvard.edu</a>.</p>
             </div>
 
             <div class="card tribute">
                 <h3 data-i18n="cred.h.tribute">En memoria de Fred Espenak (1953–2025)</h3>
-                <p data-i18n="cred.tribute_html"></p>
+                <p data-i18n="cred.tribute_html">Agradecemos y reconocemos el aporte infatigable de <a href="https://es.wikipedia.org/wiki/Fred_Espenak" target="_blank" rel="noopener">Fred Espenak</a>, quien durante décadas puso a disposición de observadores de eclipses de todas las épocas y lugares sus cálculos de las circunstancias de estos fenómenos. Esta aplicación existe, en buena medida, gracias a su trabajo.</p>
             </div>
 
             <p class="app-version" id="app-version"></p>
@@ -357,5 +391,8 @@
 
     <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
+    <!-- Estadísticas de uso anónimas (GoatCounter: sin cookies ni datos personales).
+         Se carga de forma asíncrona, sin frenar la app; sin conexión simplemente no cuenta. -->
+    <script data-goatcounter="https://danielgastelu.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
