@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Eclipse solar del 6 de febrero de 2027 — Una experiencia de sonificación</title>
+    <meta name="description" content="Sonificación accesible del eclipse solar anular del 6 de febrero de 2027 en Uruguay, con simulación global del eclipse.">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0056b3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Eclipse 2027">
+    <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <link rel="preload" href="fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a class="skip-link" href="#main" data-i18n="a11y.skip">Saltar al contenido principal</a>
+
+    <header>
+        <div class="header-row">
+            <h1 data-i18n="app.title">Sonificación Eclipse 2027</h1>
+            <button type="button" id="btn-contrast" class="contrast-btn">Alto contraste</button>
+        </div>
+        <div id="lang-bar" class="lang-bar" role="group" data-i18n-aria="lang.label" aria-label="Idioma"></div>
+    </header>
+
+    <!-- Aviso de instalación (celulares) -->
+    <div id="install-bar" class="install-bar hidden" role="region" data-i18n-aria="install.region" aria-label="Instalación de la app">
+        <span id="install-text" class="install-text"></span>
+        <button type="button" id="btn-install" class="hidden" data-i18n="install.btn">📲 Instalar la app</button>
+        <button type="button" id="btn-install-close" class="install-close" data-i18n-aria="install.close" aria-label="Cerrar"><span aria-hidden="true">✕</span></button>
+    </div>
+
+    <!-- Avisos para lectores de pantalla -->
+    <div id="sr-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+    <span id="sr-newtab" hidden data-i18n="a11y.newtab">(se abre en una pestaña nueva)</span>
+
+    <main id="main" tabindex="0">
+        <!-- PESTAÑA 1: SONIFICACIÓN (principal) -->
+        <section id="tab-sonificacion" class="tab-content active" aria-labelledby="h-sonificacion">
+            <h2 id="h-sonificacion" class="visually-hidden" tabindex="-1" data-i18n="son.h">Sonificación del eclipse</h2>
+
+            <button type="button" id="btn-start" class="big-button" data-i18n="son.start" data-i18n-aria="son.start.aria">▶ INICIAR EXPERIENCIA</button>
+
+            <div id="status-orientation" class="status-indicator status-bad" role="status" data-i18n="son.tilted">
+                Teléfono inclinado: sonido pausado
+            </div>
+
+            <div class="card">
+                <span class="field-label" id="lbl-source" data-i18n="son.source">Fuente de datos:</span>
+                <div class="segmented-control" role="radiogroup" aria-labelledby="lbl-source">
+                    <input type="radio" id="src-algo" name="data-source" value="algo" checked>
+                    <label for="src-algo" data-i18n="son.src.algo">Algoritmo (reloj)</label>
+                    <input type="radio" id="src-sensor" name="data-source" value="sensor">
+                    <label for="src-sensor" data-i18n="son.src.sensor">Sensor de luz</label>
+                </div>
+
+                <div id="sensor-msg" class="sensor-msg hidden" role="status"></div>
+
+                <div id="algo-controls">
+                    <div class="segmented-control" style="margin-bottom:0;" role="radiogroup" data-i18n-aria="son.modeLabel" aria-label="Modo del reloj">
+                        <input type="radio" id="mode-real" name="algo-mode" value="real" checked>
+                        <label for="mode-real" data-i18n="son.mode.real">Tiempo real</label>
+                        <input type="radio" id="mode-sim" name="algo-mode" value="sim">
+                        <label for="mode-sim" data-i18n="son.mode.sim">Simulador</label>
+                    </div>
+                    <div id="sim-container" class="hidden">
+                        <input type="range" id="time-slider" min="0" max="1000" value="0" data-i18n-aria="son.slider.aria" aria-label="Deslizador de tiempo simulado">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="voice-toggle" checked aria-describedby="voice-hint">
+                    <span data-i18n="son.voice">Relato por voz (avance e hitos)</span>
+                </label>
+                <p id="voice-hint" class="note hint" data-i18n="son.voice.hint"></p>
+            </div>
+
+            <div class="card dashboard">
+                <div class="dashboard-label" id="lbl-time" data-i18n="son.lbl.time">Hora (real o simulada)</div>
+                <div id="display-time" class="dashboard-val">--:--:--</div>
+
+                <div class="dashboard-label" id="lbl-cov" data-i18n="son.lbl.coverage">Cobertura del Sol</div>
+                <div id="display-coverage" class="dashboard-val">0%</div>
+
+                <div class="dashboard-label" id="lbl-phase" data-i18n="son.lbl.phase">Fase actual</div>
+                <div id="display-phase" class="dashboard-phase" data-i18n="son.waiting">Esperando inicio…</div>
+            </div>
+
+            <!-- Aparece cuando el eclipse ya terminó -->
+            <div id="gallery-card" class="card gallery-card hidden">
+                <h3 data-i18n="gal.title">Fotos del eclipse</h3>
+                <p data-i18n="gal.text_html"></p>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 2: SIMULACIÓN -->
+        <section id="tab-simulacion" class="tab-content" aria-labelledby="h-simulacion">
+            <div class="card">
+                <h2 id="h-simulacion" tabindex="-1" data-i18n="sim.title">Simulación del eclipse</h2>
+                <p data-i18n="sim.intro">Observa cómo la sombra de la Luna recorre la Tierra.</p>
+
+                <div class="sim-layout" id="sim-player">
+                    <div class="sim-stage" id="sim-stage">
+                        <video id="sim-video" muted playsinline preload="none" poster="assets/poster.jpg"
+                               disablepictureinpicture disableremoteplayback
+                               data-i18n-aria="sim.video.label" aria-label="Animación global del eclipse, sin sonido"
+                               aria-describedby="sim-desc">
+                            <source src="assets/eclipse-2027-02-06.mp4" type='video/mp4; codecs="avc1.640028"'>
+                            <source src="assets/eclipse-2027-02-06.webm" type='video/webm; codecs="vp9"'>
+                        </video>
+                        <div id="sim-loading" class="sim-loading hidden"></div>
+                    </div>
+
+                    <div class="sim-panel">
+                        <div class="sim-clock" id="sim-clock">
+                            <div class="sim-date" id="sim-date">Sábado, 6 de febrero de 2027</div>
+                            <div class="sim-time" id="sim-time">09:58</div>
+                            <div class="sim-tz" data-i18n="sim.tz">Hora de Uruguay (GMT−3)</div>
+                            <div class="sim-ut" id="sim-ut"></div>
+                        </div>
+
+                        <div class="sim-timeline">
+                            <input type="range" id="sim-range" min="0" max="363" step="1" value="0" data-i18n-aria="sim.timeline" aria-label="Línea de tiempo de la animación">
+                            <div class="sim-ticks" aria-hidden="true"><span id="sim-tick-start"></span><span id="sim-tick-end"></span></div>
+                        </div>
+
+                        <div class="sim-controls" role="group" data-i18n-aria="sim.title" aria-label="Simulación del eclipse" aria-describedby="sim-keys">
+                            <button type="button" class="sim-btn" id="sim-first" data-i18n-aria="sim.first" data-i18n-title="sim.first" aria-label="Ir al inicio"><span aria-hidden="true">⏮</span></button>
+                            <button type="button" class="sim-btn" id="sim-prev"  data-i18n-aria="sim.prev"  data-i18n-title="sim.prev"  aria-label="Cuadro anterior"><span aria-hidden="true">◀</span></button>
+                            <button type="button" class="sim-btn primary" id="sim-play" aria-label="Reproducir"><span aria-hidden="true">▶</span></button>
+                            <button type="button" class="sim-btn" id="sim-next"  data-i18n-aria="sim.next"  data-i18n-title="sim.next"  aria-label="Cuadro siguiente"><span aria-hidden="true">▶︎|</span></button>
+                            <button type="button" class="sim-btn" id="sim-last"  data-i18n-aria="sim.last"  data-i18n-title="sim.last"  aria-label="Ir al final"><span aria-hidden="true">⏭</span></button>
+                            <label class="sim-speed">
+                                <span data-i18n="sim.speed">Velocidad</span>
+                                <select id="sim-speed">
+                                    <option value="0.25">×0,25</option>
+                                    <option value="0.5" selected>×0,5</option>
+                                    <option value="1">×1</option>
+                                    <option value="2">×2</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <p class="sim-credit" data-i18n="sim.credit">Animación: Fred Espenak y Michael Zeiler. Licencia CC BY-ND 4.0 (ver Créditos).</p>
+                    </div>
+                </div>
+                <p id="sim-keys" class="note keys-note" data-i18n="sim.keys"></p>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="tl.h">Así se ve desde la Tierra</h3>
+                <p id="tl-desc" data-i18n="tl.p"></p>
+                <div class="timelapse">
+                    <video id="tl-video" controls loop muted playsinline preload="none" poster="img/fotos/timelapse-poster.jpg"
+                           width="540" height="540" data-i18n-aria="tl.label" aria-label="Time-lapse con fotos reales de un eclipse anular"
+                           aria-describedby="tl-desc">
+                        <source src="assets/timelapse-anular-2019.mp4" type='video/mp4; codecs="avc1.640028"'>
+                        <source src="assets/timelapse-anular-2019.webm" type='video/webm; codecs="vp9"'>
+                    </video>
+                </div>
+                <p class="sim-credit">Siddharth Mallya · CC BY-SA 4.0 · Wikimedia Commons</p>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="sim.moments.h">Momentos clave</h3>
+                <p class="note" data-i18n="sim.moments.hint"></p>
+                <ul class="moments" id="sim-moments"></ul>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="sim.desc.h">Qué muestra la animación</h3>
+                <p id="sim-desc" data-i18n="sim.desc"></p>
+                <p id="sim-howto" data-i18n="sim.howto_html"></p>
+                <p class="note" id="sim-ref"></p>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 3: FUNCIONAMIENTO TÉCNICO -->
+        <section id="tab-tecnica" class="tab-content" aria-labelledby="h-tecnica">
+            <div class="card">
+                <h2 id="h-tecnica" tabindex="-1" data-i18n="tech.title">¿Cómo funciona?</h2>
+                <figure class="photo photo-ring">
+                    <img src="img/fotos/anillo-hinode-2011.jpg" width="800" height="800" loading="lazy"
+                         data-i18n-alt="fig.ring.alt" alt="Anillo de fuego: un aro de luz anaranjada rodea por completo el disco negro de la Luna.">
+                    <figcaption data-i18n="fig.ring.cap"></figcaption>
+                </figure>
+                <h3 data-i18n="tech.what.h">¿Qué es un eclipse anular?</h3>
+                <p data-i18n="tech.what.p"></p>
+                <p data-i18n="tech.intro"></p>
+                <h3 data-i18n="tech.h.motion"></h3>
+                <p data-i18n="tech.p.motion_html"></p>
+                <h3 data-i18n="tech.h.sound"></h3>
+                <p data-i18n="tech.p.sound"></p>
+                <ul>
+                    <li data-i18n="tech.li1_html"></li>
+                    <li data-i18n="tech.li2_html"></li>
+                    <li data-i18n="tech.li3_html"></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 4: OBSERVACIÓN SEGURA -->
+        <section id="tab-observacion" class="tab-content" aria-labelledby="h-observacion">
+            <div class="card">
+                <h2 id="h-observacion" tabindex="-1" data-i18n="safe.title">Observación segura</h2>
+                <div class="alert-box" role="note" data-i18n="safe.alert_html"></div>
+                <h3 data-i18n="safe.h.no"></h3>
+                <ul>
+                    <li data-i18n="safe.no1"></li>
+                    <li data-i18n="safe.no2"></li>
+                    <li data-i18n="safe.no3"></li>
+                    <li data-i18n="safe.no4"></li>
+                </ul>
+                <h3 data-i18n="safe.h.direct"></h3>
+                <p data-i18n="safe.p.direct_html"></p>
+                <figure class="photo photo-people">
+                    <img src="img/fotos/observadores-lentes-2023.jpg" width="1200" height="900" loading="lazy"
+                         data-i18n-alt="fig.people.alt" alt="Un grupo de personas al aire libre mira hacia el Sol con anteojos especiales para eclipses.">
+                    <figcaption data-i18n="fig.people.cap"></figcaption>
+                </figure>
+                <h3 data-i18n="safe.h.indirect"></h3>
+                <p data-i18n="safe.p.indirect"></p>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 5: CRÉDITOS -->
+        <section id="tab-creditos" class="tab-content credits" aria-labelledby="h-creditos">
+            <!-- Evento -->
+            <div class="card credits-head">
+                <h2 id="h-creditos" tabindex="-1" data-i18n="cred.title">Eclipse solar anular</h2>
+                <p class="credits-date"><strong data-i18n="cred.date">6 de febrero de 2027</strong></p>
+                <p data-i18n="cred.place">Datos calculados para: Punta del Este, Uruguay.</p>
+                <p class="region-note" data-i18n="cred.region"></p>
+            </div>
+
+            <!-- Institución -->
+            <div class="card institution">
+                <h3 class="visually-hidden" data-i18n="cred.h.inst">Institución</h3>
+                <div class="inst-band">
+                    <img class="inst-lockup" src="img/logos/anep-dges-edytic.png" width="342" height="62"
+                         data-i18n-alt="cred.inst.alt1" alt="ANEP, Educación Secundaria, Espacio de Educación y TIC">
+                </div>
+                <div class="inst-body">
+                    <img class="logo-edytic logo-on-light" src="img/logos/edytic-claro.png" width="900" height="252"
+                         data-i18n-alt="cred.inst.alt2" alt="Educación y TIC. Espacio de Educación y TIC, DGES">
+                    <img class="logo-edytic logo-on-dark" src="img/logos/edytic-oscuro.png" width="900" height="252"
+                         data-i18n-alt="cred.inst.alt2" alt="Educación y TIC. Espacio de Educación y TIC, DGES">
+                    <p class="credits-org">
+                        ANEP - DGES (Uruguay)<br>
+                        Inspección de Astronomía<br>
+                        EDyTIC (2026)
+                    </p>
+                    <p class="note" data-i18n="cred.dev"></p>
+                </div>
+            </div>
+
+            <!-- Acerca de esta app -->
+            <div class="card about">
+                <h3 data-i18n="cred.h.about">Acerca de esta app</h3>
+                <div class="about-grid">
+                    <section class="about-item" aria-labelledby="h-install">
+                        <h4 id="h-install"><span aria-hidden="true" class="about-ico">📲</span> <span data-i18n="cred.install.h">Instalar la app</span></h4>
+                        <p data-i18n="cred.install"></p>
+                    </section>
+                    <section class="about-item" aria-labelledby="h-privacy">
+                        <h4 id="h-privacy"><span aria-hidden="true" class="about-ico">🔒</span> <span data-i18n="cred.privacy.h">Privacidad</span></h4>
+                        <p data-i18n="cred.privacy"></p>
+                    </section>
+                </div>
+                <section class="about-item ai-note" aria-labelledby="h-ai">
+                    <h4 id="h-ai"><span aria-hidden="true" class="about-ico">🤖</span> <span data-i18n="ai.h">Nota ética sobre el uso de inteligencia artificial</span></h4>
+                    <p data-i18n="ai.lead"></p>
+                    <div class="ai-cols">
+                        <div>
+                            <h5 id="h-ai-did" data-i18n="ai.did.h">Qué hizo la IA</h5>
+                            <ul aria-labelledby="h-ai-did">
+                                <li data-i18n="ai.did1"></li>
+                                <li data-i18n="ai.did2"></li>
+                                <li data-i18n="ai.did3"></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 id="h-ai-hum" data-i18n="ai.hum.h">Qué hicieron las personas</h5>
+                            <ul aria-labelledby="h-ai-hum">
+                                <li data-i18n="ai.hum1"></li>
+                                <li data-i18n="ai.hum2"></li>
+                                <li data-i18n="ai.hum3"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p data-i18n="ai.close"></p>
+                </section>
+            </div>
+
+            <!-- Fuentes -->
+            <div class="card">
+                <h3 data-i18n="cred.h.ack">Agradecimientos y fuentes</h3>
+                <p data-i18n="cred.ack1_html"></p>
+                <p data-i18n="cred.ack2_html"></p>
+                <p data-i18n="cred.ack3"></p>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="cred.h.anim">Animación global del eclipse</h3>
+                <p data-i18n="cred.anim1"></p>
+                <div class="license-row">
+                    <a href="http://creativecommons.org/licenses/by-nd/4.0/" target="_blank" rel="noopener license">
+                        <img src="img/cc-by-nd.svg" alt="Creative Commons BY-ND 4.0" width="88" height="31">
+                    </a>
+                    <p id="license-line"></p>
+                </div>
+                <p style="margin-bottom:0"><strong data-i18n="cred.attrLabel">Atribución:</strong></p>
+                <blockquote class="attribution" id="attr-animation"></blockquote>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="cred.h.img">Imágenes</h3>
+                <p data-i18n="cred.img.intro"></p>
+                <ul class="img-credits">
+                    <li data-i18n="cred.img1_html"></li>
+                    <li data-i18n="cred.img2_html"></li>
+                    <li data-i18n="cred.img3_html"></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="cred.h.more">Para saber más</h3>
+                <p data-i18n="cred.more_html"></p>
+            </div>
+
+            <div class="card tribute">
+                <h3 data-i18n="cred.h.tribute">En memoria de Fred Espenak (1953–2025)</h3>
+                <p data-i18n="cred.tribute_html"></p>
+            </div>
+
+            <p class="app-version" id="app-version"></p>
+        </section>
+    </main>
+
+    <!-- Barra de navegación -->
+    <nav class="tabbar" data-i18n-aria="a11y.sections" aria-label="Secciones de la app">
+        <button type="button" id="nav-sonificacion" class="active" data-target="tab-sonificacion" aria-controls="tab-sonificacion" aria-current="page"><span class="nav-ico" aria-hidden="true">🔊</span><span class="nav-txt" data-i18n="nav.sound">Sonido</span></button>
+        <button type="button" id="nav-simulacion" data-target="tab-simulacion" aria-controls="tab-simulacion"><span class="nav-ico" aria-hidden="true">🌎</span><span class="nav-txt" data-i18n="nav.sim">Simulación</span></button>
+        <button type="button" id="nav-tecnica" data-target="tab-tecnica" aria-controls="tab-tecnica"><span class="nav-ico" aria-hidden="true">⚙️</span><span class="nav-txt" data-i18n="nav.tech">Técnica</span></button>
+        <button type="button" id="nav-observacion" data-target="tab-observacion" aria-controls="tab-observacion"><span class="nav-ico" aria-hidden="true">🕶️</span><span class="nav-txt" data-i18n="nav.safety">Seguridad</span></button>
+        <button type="button" id="nav-creditos" data-target="tab-creditos" aria-controls="tab-creditos"><span class="nav-ico" aria-hidden="true">ℹ️</span><span class="nav-txt" data-i18n="nav.credits">Créditos</span></button>
+    </nav>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

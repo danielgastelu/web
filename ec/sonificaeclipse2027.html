@@ -42,7 +42,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden; /* Prevent body scroll, scroll inside main */
+            overflow: hidden; /* Evita scroll en el body, se hace dentro del main */
         }
 
         /* Encabezado */
@@ -57,7 +57,7 @@
         }
 
         header h1 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin: 0;
             color: var(--accent-color);
             flex-grow: 1;
@@ -84,7 +84,7 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 15px;
-            padding-bottom: 80px; /* Space for bottom nav */
+            padding-bottom: 80px; /* Espacio para el nav inferior */
         }
 
         .tab-content {
@@ -101,7 +101,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Controles de Sonificación (Pestaña 1) */
+        /* Tarjetas de contenido */
         .card {
             background-color: var(--panel-bg);
             border: 2px solid var(--border-color);
@@ -110,10 +110,11 @@
             margin-bottom: 15px;
         }
 
-        .card.high-contrast {
-            border-width: 4px;
+        body.high-contrast .card {
+            border-width: 3px;
         }
 
+        /* Botón Principal */
         .big-button {
             width: 100%;
             background-color: var(--accent-color);
@@ -130,10 +131,10 @@
 
         body.high-contrast .big-button {
             color: #000;
-            border: 4px solid var(--border-color);
+            border: 3px solid var(--border-color);
         }
 
-        /* Selector Segmentado (Radio Buttons estilo botones) */
+        /* Selectores tipo Pestaña Interna */
         .segmented-control {
             display: flex;
             border: 2px solid var(--border-color);
@@ -155,6 +156,7 @@
             background-color: var(--panel-bg);
             color: var(--text-color);
             transition: background-color 0.2s;
+            font-size: 0.95rem;
         }
 
         .segmented-control input[type="radio"]:checked + label {
@@ -166,13 +168,13 @@
             color: #000;
         }
 
-        /* Dashboard Visual */
+        /* Tablero de Datos / Dashboard */
         .dashboard-val {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
             text-align: center;
             color: var(--accent-color);
-            margin: 10px 0;
+            margin: 5px 0;
             line-height: 1.1;
         }
         
@@ -181,7 +183,15 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .dashboard-label:first-child {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
         }
 
         .status-indicator {
@@ -197,14 +207,14 @@
         .status-good { border-color: var(--success-color); color: var(--success-color); background-color: rgba(40, 167, 69, 0.1); }
         body.high-contrast .status-good { background-color: var(--success-color); color: #000; }
 
-        /* Controles genéricos */
+        /* Controles y Formularios */
         label.checkbox-label {
             display: flex;
             align-items: center;
             font-weight: bold;
             font-size: 1.1rem;
             cursor: pointer;
-            padding: 10px 0;
+            padding: 5px 0;
         }
         
         input[type="checkbox"] {
@@ -233,7 +243,7 @@
             flex: 1;
             background: none;
             border: none;
-            padding: 12px 5px;
+            padding: 12px 2px;
             font-size: 0.85rem;
             color: var(--text-color);
             cursor: pointer;
@@ -251,9 +261,9 @@
         }
         body.high-contrast nav button.active { color: #000; }
 
-        /* Estilos Texto (Pestañas de Información) */
-        h2 { color: var(--accent-color); margin-top: 0; }
-        h3 { color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
+        /* Tipografía Interior */
+        h2 { color: var(--accent-color); margin-top: 0; font-size: 1.3rem; }
+        h3 { color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 5px; font-size: 1.1rem; }
         ul { padding-left: 20px; }
         li { margin-bottom: 10px; }
         .alert-box {
@@ -263,12 +273,19 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
+        .countdown-text {
+            font-size: 1rem;
+            font-weight: normal;
+            display: block;
+            margin-top: 8px;
+            color: var(--text-color);
+        }
     </style>
 </head>
 <body>
 
     <header role="banner">
-        <h1>Eclipse Sonificación</h1>
+        <h1>Sonificación Eclipse 2027</h1>
         <button id="btn-contrast" class="contrast-btn" aria-label="Cambiar a modo de alto contraste">Alto Contraste</button>
     </header>
 
@@ -282,7 +299,7 @@
             </div>
 
             <div class="card">
-                <label style="display:block; margin-bottom: 10px; font-weight:bold;">Fuente de Datos para Sonido:</label>
+                <label style="display:block; margin-bottom: 10px; font-weight:bold;">Fuente de Datos:</label>
                 <div class="segmented-control">
                     <input type="radio" id="src-algo" name="data-source" value="algo" checked>
                     <label for="src-algo">Algoritmo (Reloj)</label>
@@ -318,10 +335,11 @@
                 <div class="dashboard-label">Hora (Real o Simulada)</div>
                 <div id="display-time" class="dashboard-val">--:--:--</div>
                 
-                <div class="dashboard-label" style="margin-top:20px;">Cobertura del Sol</div>
+                <div class="dashboard-label">Cobertura del Sol</div>
                 <div id="display-coverage" class="dashboard-val">0%</div>
                 
-                <div id="display-phase" style="text-align:center; font-weight:bold; margin-top:15px; color:var(--accent-color);">
+                <div class="dashboard-label">Fase Actual</div>
+                <div id="display-phase" style="text-align:center; font-weight:bold; margin-top:5px; font-size: 1.2rem; color:var(--accent-color);">
                     Esperando inicio...
                 </div>
             </div>
@@ -333,16 +351,15 @@
                 <h2>¿Cómo funciona?</h2>
                 <p>Esta experiencia traduce datos en sonido para que puedas "escuchar" el avance del eclipse.</p>
                 
-                <h3>El Acelerómetro</h3>
-                <p>Tu celular tiene un sensor que detecta la gravedad. La aplicación requiere que coloques el teléfono completamente <strong>horizontal (apoyado sobre una mesa con la pantalla hacia arriba)</strong>. Si levantas el teléfono, el sonido se pausa. Esto te permite tener control físico sobre la experiencia.</p>
+                <h3>El Movimiento del Teléfono</h3>
+                <p>Tu celular detecta la gravedad. La aplicación requiere que coloques el teléfono completamente <strong>horizontal (apoyado sobre una mesa o en la palma de la mano)</strong>. Si levantas el teléfono, el sonido se pausa. Esto te permite tener control sobre cuándo escuchar la experiencia.</p>
                 
                 <h3>El Sonido y la Luz</h3>
-                <p>El sonido cambia según la cantidad de luz solar (ya sea calculada por el reloj o medida por el sensor de tu celular):</p>
+                <p>El sonido cambia según la cantidad de luz solar (calculada por el reloj o medida por el sensor de tu celular):</p>
                 <ul>
                     <li><strong>Antes y después del eclipse:</strong> Hay mucha luz. Escucharás tonos altos (agudos).</li>
                     <li><strong>Durante el avance:</strong> A medida que la Luna cubre el Sol, el tono va descendiendo gradualmente.</li>
-                    <li><strong>Al llegar al máximo de cobertura (Anillo de fuego):</strong> El tono será profundo y grave.</li>
-                    <li><strong>Al seguir avanzando el desarrollo:</strong> A medida que el Sol vuelve a asomarse, se irá incrementando el tono para ser cada vez más agudo.</li>
+                    <li><strong>En el momento máximo:</strong> Al llegar al máximo de cobertura el tono será profundo y grave. Al seguir avanzando el desarrollo a medida que el Sol vuelve a asomarse, se irá incrementando el tono para ser cada vez más agudo.</li>
                 </ul>
             </div>
         </section>
@@ -362,14 +379,14 @@
                     <li>Radiografías.</li>
                     <li>Vidrios ahumados.</li>
                     <li>CDs o DVDs.</li>
-                    <li>Lentes de sol comunes (por más oscuros que sean, no filtran la radiación dañina).</li>
+                    <li>Lentes de sol comunes (por más oscuros que sean, no sirven).</li>
                 </ul>
 
                 <h3>Observación Directa Segura ✅</h3>
-                <p>Solo utiliza anteojos especiales para eclipses que estén <strong>homologados y certificados (ISO 12312-2)</strong>. Si usas telescopios, binoculares o cámaras, deben tener filtros solares profesionales colocados en la parte frontal del lente.</p>
+                <p>Solo utiliza anteojos especiales para eclipses que estén <strong>homologados y certificados (ISO 12312-2)</strong>. Si usas telescopios o cámaras, deben tener filtros solares profesionales.</p>
 
                 <h3>Observación Indirecta (Fácil y segura) ✅</h3>
-                <p>Es la forma más segura de disfrutarlo sin equipo especial. Haz un pequeño agujero en un cartón y proyecta la luz del Sol sobre una pared, el piso o una hoja de papel blanco. Verás cómo la proyección cambia de un círculo a una forma de medialuna a medida que avanza el eclipse.</p>
+                <p>Es la forma más segura de disfrutarlo sin equipo. Haz un agujero pequeño en un cartón y proyecta la luz del Sol sobre el piso o una pared. Verás cómo la proyección cambia de un círculo a una "medialuna" a medida que avanza el eclipse.</p>
             </div>
         </section>
 
@@ -378,14 +395,14 @@
             <div class="card" style="text-align: center; padding: 30px 15px;">
                 <h2>Eclipse Solar Anular</h2>
                 <p><strong>06 de febrero de 2027</strong></p>
-                <p>Datos calculados para: Punta del Este, Uruguay.</p>
+                <p>Datos de referencia para: Punta del Este, Uruguay.</p>
                 <hr style="border:1px solid var(--border-color); margin: 20px 0;">
-                <p style="font-weight: bold; font-size: 1.1rem;">
+                <p style="font-weight: bold; font-size: 1.1rem; line-height: 1.6;">
                     ANEP - DGES (Uruguay)<br>
                     Inspección de Astronomía<br>
                     EDyTIC (2026)
                 </p>
-                <p style="font-size: 0.9rem; margin-top:20px;">
+                <p style="font-size: 0.95rem; margin-top:20px; color: var(--text-color);">
                     Aplicación de accesibilidad sensorial desarrollada para promover la astronomía inclusiva.
                 </p>
             </div>
@@ -446,6 +463,7 @@
         const displayPhase = document.getElementById('display-phase');
 
         // --- 2. DATOS ASTRONÓMICOS (Punta del Este, Uruguay - 06/Feb/2027 UYT UTC-3) ---
+        // Se utilizan timestamps fijos del momento del eclipse para evitar problemas de husos horarios.
         const baseDate = "2027-02-06T";
         const tC1 = new Date(`${baseDate}10:52:56-03:00`).getTime(); // Inicio parcial
         const tC2 = new Date(`${baseDate}12:36:05-03:00`).getTime(); // Inicio anular
@@ -503,11 +521,12 @@
             osc.stop(audioCtx.currentTime + 0.5);
         }
 
-        // Acelerómetro
+        // Acelerómetro / Giroscopio
         function handleOrientation(event) {
             const beta = event.beta;
             const gamma = event.gamma;
             if (beta !== null && gamma !== null) {
+                // ±15 grados de tolerancia para estar "horizontal"
                 if (Math.abs(beta) < 15 && Math.abs(gamma) < 15) {
                     isDeviceFlat = true;
                     statusOrientation.innerText = "Teléfono Apoyado: Reproduciendo";
@@ -522,6 +541,28 @@
 
         // --- 5. BUCLE PRINCIPAL DE ACTUALIZACIÓN ---
         
+        function getCountdownText(nowMs, targetMs) {
+            let diff = targetMs - nowMs;
+            if (diff <= 0) return "¡Iniciando!";
+            
+            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let textParts = [];
+            // Aproximación de meses a 30 días para lectura fácil
+            if (days >= 30) {
+                let months = Math.floor(days / 30);
+                days = days % 30;
+                textParts.push(`${months} mes${months > 1 ? 'es' : ''}`);
+            }
+            if (days > 0) textParts.push(`${days} día${days > 1 ? 's' : ''}`);
+            if (hours > 0) textParts.push(`${hours} h`);
+            if (minutes > 0) textParts.push(`${minutes} min`);
+            
+            return `Faltan: ${textParts.join(', ')}`;
+        }
+
         function calculateAstronomicalData(timeMs) {
             let coverage = 0;
             let phaseName = "";
@@ -560,19 +601,31 @@
                 evalTime = startTime + (endTime - startTime) * pct;
             }
 
-            // 2. Calcular datos astronómicos (SIEMPRE se muestran en pantalla)
+            // 2. Calcular datos astronómicos
             const dateObj = new Date(evalTime);
-            displayTime.innerText = dateObj.toLocaleTimeString('es-UY');
+            // Mostrar hora considerando zona horaria local del usuario para no confundir su reloj
+            displayTime.innerText = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             
             const astroData = calculateAstronomicalData(evalTime);
             const covRound = Math.round(astroData.coverage);
             
             displayCoverage.innerText = `${covRound}%`;
-            displayPhase.innerText = astroData.phaseName;
+            
+            // Mostrar cuenta regresiva si estamos en modo real y antes del eclipse
+            if (currentAlgoMode === 'real' && evalTime < tC1) {
+                displayPhase.innerHTML = `Antes del eclipse<span class="countdown-text">${getCountdownText(evalTime, tC1)}</span>`;
+            } else {
+                displayPhase.innerText = astroData.phaseName;
+            }
 
             // 3. Relato por voz (Avance e hitos)
             if (astroData.phaseName !== lastAnnouncedPhase) {
-                speak(`Atención. Inicia fase: ${astroData.phaseName}`);
+                // Evitamos anunciar repetidamente la cuenta regresiva, solo el nombre de la fase
+                if (astroData.phaseName === "Antes del eclipse") {
+                    speak("Esperando el inicio del eclipse solar.");
+                } else {
+                    speak(`Atención. Inicia fase: ${astroData.phaseName}`);
+                }
                 lastAnnouncedPhase = astroData.phaseName;
             }
 
@@ -580,7 +633,7 @@
                 speak(`Cobertura del ${covRound} por ciento`);
                 lastAnnouncedPercent = covRound;
             } else if (covRound % 5 !== 0 && Math.abs(covRound - lastAnnouncedPercent) > 2) {
-                lastAnnouncedPercent = -1; // Resetear para permitir anuncios de bajada
+                lastAnnouncedPercent = -1; // Resetear para permitir anuncios tanto de subida como de bajada
             }
 
             // 4. Calcular frecuencia base para el sonido
@@ -624,9 +677,9 @@
                btnStart.style.color = "#fff";
             }
             
-            speak("Sonificación iniciada. Apoye el teléfono en la mesa.");
+            speak("Sonificación iniciada. Apoye el teléfono plano hacia arriba para escuchar.");
 
-            // Permisos Acelerómetro
+            // Permisos Acelerómetro (iOS y navegadores modernos)
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                 try {
                     const perm = await DeviceOrientationEvent.requestPermission();
@@ -681,9 +734,10 @@
                 currentAlgoMode = e.target.value;
                 if (currentAlgoMode === 'sim') {
                     simContainer.classList.remove('hidden');
-                    speak("Modo simulador activado. Deslice el control para avanzar el tiempo.");
+                    speak("Modo simulador activado. Use el deslizador.");
                 } else {
                     simContainer.classList.add('hidden');
+                    speak("Modo tiempo real activado.");
                 }
             });
         });
