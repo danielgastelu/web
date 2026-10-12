@@ -33,7 +33,7 @@
                 ${interactive ? `type="button" data-id="${f.id}" aria-label="${esc(f.name)}, ${esc(f.category)}. Ver detalle"` : ''}>
                 <div class="card__band">
                     <span>${icon(cat.icon)} ${esc(f.category)}</span>
-                    <span class="card__num">#${pad(f.id)}</span>
+                    <span class="card__num">#${pad(f.num)}</span>
                 </div>
                 <div class="portrait"><img src="img/p${f.id}.webp" alt="Retrato de ${esc(f.name)}" width="160" height="160" loading="lazy" decoding="async"></div>
                 <h3 class="card__name">${esc(f.name)}</h3>
@@ -46,7 +46,7 @@
         return `
             <div class="card card--locked" aria-label="Cromo ${f.id}, bloqueado">
                 <div class="portrait" aria-hidden="true">?</div>
-                <h3 class="card__name">Cromo #${pad(f.id)}</h3>
+                <h3 class="card__name">Cromo #${pad(f.num)}</h3>
                 <span class="hint">${icon('lock')} Misterio</span>
             </div>`;
     }
@@ -132,7 +132,7 @@
         $('#detail-sheet').style.setProperty('--cat', cat.color);
         $('#detail-content').innerHTML = `
             <div class="detail__hero">
-                <div class="card__band"><span>${icon(cat.icon)} ${esc(f.category)}</span><span class="card__num">#${pad(f.id)}</span></div>
+                <div class="card__band"><span>${icon(cat.icon)} ${esc(f.category)}</span><span class="card__num">#${pad(f.num)}</span></div>
             </div>
             <div class="sheet__body" style="padding-top:0">
                 <div class="portrait"><img src="img/p${f.id}.webp" alt="Retrato de ${esc(f.name)}" width="160" height="160"></div>
@@ -150,7 +150,7 @@
     function showCredits() {
         $('#credits-list').innerHTML = CROMOS.map(f => unlocked.has(f.id)
             ? `<li><strong>${esc(f.name)}</strong>: ${photoCredit(f, 'ver archivo', false)}</li>`
-            : `<li>Cromo #${pad(f.id)}: ¡desbloquéalo para descubrirlo!</li>`).join('');
+            : `<li>Cromo #${pad(f.num)}: ¡desbloquéalo para descubrirlo!</li>`).join('');
         openDialog('credits-dialog');
     }
 
@@ -180,6 +180,16 @@
         celebrate(f);
     }
 
+    // Cromo de bienvenida: se regala la primera vez que se abre el álbum
+    function giveGift() {
+        const gift = CROMOS.find(f => f.gift);
+        if (!gift || unlocked.has(gift.id)) return;
+        unlocked.add(gift.id);
+        saveUnlocked();
+        renderAll(gift.id);
+        setTimeout(() => celebrate(gift), 400);
+    }
+
     function fail(message) {
         const input = $('#code-input');
         input.classList.remove('is-error');
@@ -193,9 +203,12 @@
     function celebrate(f) {
         navigator.vibrate?.([40, 60, 40]);
         const left = CROMOS.length - unlocked.size;
-        $('#reveal-sub').textContent = left
-            ? `Te faltan ${left} para completar el álbum.`
-            : '¡Era el último que te faltaba!';
+        $('#reveal-title').textContent = f.gift ? '¡Tu primer cromo es un regalo!' : '¡Nuevo cromo desbloqueado!';
+        $('#reveal-sub').textContent = f.gift
+            ? `Busca los códigos de 4 letras para conseguir los ${left} que faltan.`
+            : left
+                ? `Te faltan ${left} para completar el álbum.`
+                : '¡Era el último que te faltaba!';
         $('#reveal-card').innerHTML = cardHTML(f, { interactive: false });
         const dlg = openDialog('reveal-dialog');
         Confetti.fire();   // después de abrir el diálogo para quedar por encima
@@ -343,6 +356,7 @@
         activeFilter = 'Todos';
         renderAll();
         toast('Álbum reiniciado para pruebas.');
+        giveGift();
     });
 
     // ---------- Inicio ----------
@@ -350,5 +364,6 @@
     renderAll();
     syncOnline();
     announceWhatsNew();
+    giveGift();
     registerServiceWorker();
 })();

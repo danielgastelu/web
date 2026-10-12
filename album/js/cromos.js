@@ -1,6 +1,8 @@
 /*
  * Catálogo de cromos. Para agregar uno nuevo:
  *   1. Suma un objeto con un id nuevo (no reutilices ids: el progreso se guarda por id).
+ *      El número que se ve en el cromo (#01, #02...) sale del orden en esta lista, no del id.
+ *      Un cromo con gift: true se regala automáticamente la primera vez que se abre el álbum.
  *   2. Guarda su retrato cuadrado en img/p<id>.webp (el service worker lo descarga solo).
  *      Campos opcionales: metaIcon / originIcon cambian los íconos de las píldoras del detalle;
  *      photo.url puede omitirse si la imagen no proviene de Wikimedia Commons.
@@ -12,12 +14,18 @@ const CATEGORIES = {
     'Biología':    { color: '#16A34A', soft: '#E3F8EA', icon: 'leaf' },
     'Astronomía':  { color: '#7B2FF7', soft: '#EFE6FF', icon: 'planet' },
     'Computación': { color: '#F2671F', soft: '#FFEDE2', icon: 'chip' },
+    'Bienvenida':  { color: '#0B8F8A', soft: '#E0F5F4', icon: 'gift' },
     'Homenaje':    { color: '#D9346B', soft: '#FDE7EF', icon: 'pencil' }
 };
 
 const commons = file => 'https://commons.wikimedia.org/wiki/File:' + file;
 
 const CROMOS = [
+    // Bienvenida (de regalo: no necesita código)
+    { id: 18, code: null, gift: true, name: '¡Te damos la bienvenida!', category: 'Bienvenida', dates: 'Cromo de regalo', nationality: 'Códigos de 4 letras',
+      metaIcon: 'gift', originIcon: 'unlock',
+      desc: 'Este es tu álbum de cromos virtuales. ¡Y este primer cromo es un regalo para ti! Durante la actividad vas a encontrar códigos secretos de 4 letras. Escribe cada código en la casilla de arriba y toca «Abrir». ¡Así aparece un cromo nuevo! Cada uno te presenta a una persona que dejó su huella. ¿Podrás completar el álbum? ¡A buscar!',
+      photo: { author: 'Ilustración original del álbum' } },
     // Física
     { id: 1, code: 'XQZT', name: 'Albert Einstein', category: 'Física', dates: '1879-1955', nationality: 'Alemana/Estadounidense', desc: 'Formuló la teoría de la relatividad, transformando nuestra comprensión del espacio, el tiempo y la gravedad con un enfoque matemático.',
       photo: { author: 'Oren Jack Turner', license: 'Dominio público', url: commons('Albert_Einstein_Head_cleaned.jpg') } },
@@ -61,3 +69,6 @@ const CROMOS = [
       desc: 'Fue profesora de Biología y la primera directora del liceo. Le dio su sello: compromiso, esfuerzo diario y amor por enseñar. Era cercana y sincera con familias, estudiantes, docentes y vecinos. Resolvió con energía los desafíos de los comienzos, desde el edificio hasta el día a día. ¡Gracias Melva!',
       photo: { author: 'Imagen provista por la institución' } }
 ];
+
+// Número visible de cada cromo según su lugar en el álbum
+CROMOS.forEach((f, i) => { f.num = i + 1; });

@@ -10,7 +10,7 @@ que encuentran en los stands para desbloquear cromos.
 - `js/version.js` — versión y novedades (única fuente de verdad)
 - `js/app.js` — lógica · `js/confetti.js` — papel picado
 - `sw.js` — service worker (caché offline + detección de versiones)
-- `img/p<id>.webp` — retratos 320×320 de Wikimedia Commons
+- `img/p<id>.webp` — retratos 320×320 (Wikimedia Commons, imagen institucional e ilustración propia del cromo de bienvenida)
 - `icons/`, `fonts/`, `manifest.webmanifest`
 
 ## Publicar una versión nueva (p. ej. más cromos)
@@ -18,6 +18,11 @@ que encuentran en los stands para desbloquear cromos.
 2. Sube `APP_VERSION` en `js/version.js` y describe el cambio en `APP_NOTES`.
 3. Publica. Quienes tengan el álbum abierto verán “¡Nueva versión!” con un botón **Actualizar**;
    su progreso se conserva.
+
+## Cromo de bienvenida
+- Es el primero del álbum (#01) y tiene `gift: true`: se regala solo la primera vez que alguien abre el álbum
+  (también a quienes ya lo tenían, al actualizar). No tiene código.
+- El número visible de cada cromo sale de su lugar en la lista de `js/cromos.js`; el `id` no cambia nunca.
 
 ## Pruebas
 - Debe servirse por `https://` o `http://localhost` (el service worker no funciona con `file://`).
