@@ -58,6 +58,6 @@ const CROMOS = [
     // Homenaje
     { id: 17, code: 'MELV', name: 'Prof. Melva Cor', category: 'Homenaje', dates: '1953-2013', nationality: 'Liceo N.º 2 de Barros Blancos',
       originIcon: 'pin',
-      desc: 'Profesora de Biología y primera directora del liceo, le dio su sello: compromiso, esfuerzo de todos los días y amor por enseñar. Cercana y sincera con familias, estudiantes, docentes y vecinos, enfrentó con energía cada desafío de los comienzos, desde el edificio hasta el día a día. ¡Gracias Melva!',
+      desc: 'Fue profesora de Biología y la primera directora del liceo. Le dio su sello: compromiso, esfuerzo diario y amor por enseñar. Era cercana y sincera con familias, estudiantes, docentes y vecinos. Resolvió con energía los desafíos de los comienzos, desde el edificio hasta el día a día. ¡Gracias Melva!',
       photo: { author: 'Imagen provista por la institución' } }
 ];
