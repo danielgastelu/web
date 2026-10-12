@@ -2,6 +2,8 @@
  * Catálogo de cromos. Para agregar uno nuevo:
  *   1. Suma un objeto con un id nuevo (no reutilices ids: el progreso se guarda por id).
  *   2. Guarda su retrato cuadrado en img/p<id>.webp (el service worker lo descarga solo).
+ *      Campos opcionales: metaIcon / originIcon cambian los íconos de las píldoras del detalle;
+ *      photo.url puede omitirse si la imagen no proviene de Wikimedia Commons.
  *   3. Sube APP_VERSION en js/version.js y cuenta la novedad en APP_NOTES.
  */
 const CATEGORIES = {
@@ -9,7 +11,8 @@ const CATEGORIES = {
     'Química':     { color: '#D63AF9', soft: '#FBE8FF', icon: 'flask' },
     'Biología':    { color: '#16A34A', soft: '#E3F8EA', icon: 'leaf' },
     'Astronomía':  { color: '#7B2FF7', soft: '#EFE6FF', icon: 'planet' },
-    'Computación': { color: '#F2671F', soft: '#FFEDE2', icon: 'chip' }
+    'Computación': { color: '#F2671F', soft: '#FFEDE2', icon: 'chip' },
+    'Homenaje':    { color: '#D9346B', soft: '#FDE7EF', icon: 'pencil' }
 };
 
 const commons = file => 'https://commons.wikimedia.org/wiki/File:' + file;
@@ -51,5 +54,10 @@ const CROMOS = [
     { id: 15, code: 'FKVD', name: 'Ada Lovelace', category: 'Computación', dates: '1815-1852', nationality: 'Inglesa', desc: 'Escribió el primer algoritmo diseñado para ser procesado por una máquina, estableciendo los fundamentos de la programación informática.',
       photo: { author: 'Antoine Claudet', license: 'Dominio público', url: commons('Ada_Lovelace_daguerreotype_by_Antoine_Claudet_1843_-_cropped.png') } },
     { id: 16, code: 'BNQH', name: 'Alan Turing', category: 'Computación', dates: '1912-1954', nationality: 'Británica', desc: 'Formalizó los conceptos de algoritmo con su máquina teórica, sentando las bases de la informática moderna y el procesamiento de datos.',
-      photo: { author: 'Elliott & Fry', license: 'Dominio público', url: commons('Alan_turing_header.jpg') } }
+      photo: { author: 'Elliott & Fry', license: 'Dominio público', url: commons('Alan_turing_header.jpg') } },
+    // Homenaje
+    { id: 17, code: 'MELV', name: 'Prof. Melva Cor', category: 'Homenaje', dates: '1953-2013', nationality: 'Liceo N.º 2 de Barros Blancos',
+      originIcon: 'pin',
+      desc: 'Profesora de Biología y primera directora del liceo, le dio su sello: compromiso, esfuerzo de todos los días y amor por enseñar. Cercana y sincera con familias, estudiantes, docentes y vecinos, enfrentó con energía cada desafío de los comienzos, desde el edificio hasta el día a día. ¡Gracias Melva!',
+      photo: { author: 'Imagen provista por la institución' } }
 ];

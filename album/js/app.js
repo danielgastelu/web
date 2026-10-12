@@ -118,6 +118,15 @@
         });
     });
 
+    // Crédito de la foto: autor · licencia · enlace (licencia y enlace son opcionales)
+    function photoCredit(f, linkText, prefix = true) {
+        const { author, license, url } = f.photo;
+        const parts = [esc(author)];
+        if (license) parts.push(esc(license));
+        if (url) parts.push(`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(linkText)}</a>`);
+        return (prefix && url ? 'Foto: ' : '') + parts.join(' · ');
+    }
+
     function showDetail(f) {
         const cat = catOf(f);
         $('#detail-sheet').style.setProperty('--cat', cat.color);
@@ -129,19 +138,18 @@
                 <div class="portrait"><img src="img/p${f.id}.webp" alt="Retrato de ${esc(f.name)}" width="160" height="160"></div>
                 <h2 id="detail-name">${esc(f.name)}</h2>
                 <div class="detail__meta">
-                    <span class="pill">${icon('calendar')} ${esc(f.dates)}</span>
-                    <span class="pill">${icon('globe')} ${esc(f.nationality)}</span>
+                    <span class="pill">${icon(f.metaIcon || 'calendar')} ${esc(f.dates)}</span>
+                    <span class="pill">${icon(f.originIcon || 'globe')} ${esc(f.nationality)}</span>
                 </div>
-                <p class="detail__desc">${esc(f.desc)}</p>
-                <p class="credit">Foto: ${esc(f.photo.author)} · ${esc(f.photo.license)} ·
-                    <a href="${esc(f.photo.url)}" target="_blank" rel="noopener">Wikimedia Commons</a></p>
+                <p class="detail__desc${f.desc.length > 200 ? ' detail__desc--long' : ''}">${esc(f.desc)}</p>
+                <p class="credit">${photoCredit(f, 'Wikimedia Commons')}</p>
             </div>`;
         openDialog('detail-dialog');
     }
 
     function showCredits() {
         $('#credits-list').innerHTML = CROMOS.map(f => unlocked.has(f.id)
-            ? `<li><strong>${esc(f.name)}</strong>: ${esc(f.photo.author)} · ${esc(f.photo.license)} · <a href="${esc(f.photo.url)}" target="_blank" rel="noopener">ver archivo</a></li>`
+            ? `<li><strong>${esc(f.name)}</strong>: ${photoCredit(f, 'ver archivo', false)}</li>`
             : `<li>Cromo #${pad(f.id)}: ¡desbloquéalo para descubrirlo!</li>`).join('');
         openDialog('credits-dialog');
     }
