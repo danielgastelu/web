@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonificación del Eclipse Solar Anular 2027</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #f0f0f0;
+            --accent-color: #ff9800;
+            --border-color: #333;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 { color: var(--accent-color); }
+        .panel {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        select, input[type="range"], button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        select { background-color: #333; color: white; }
+        button {
+            background-color: var(--accent-color);
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:focus { outline: 3px solid white; }
+        .hidden { display: none; }
+        .status-box {
+            font-size: 1.2em;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 10px;
+            margin: 15px 0;
+        }
+        /* Estilos de accesibilidad para alto contraste */
+        @media (prefers-contrast: high) {
+            :root { --bg-color: #000; --text-color: #fff; --accent-color: #ff0; --border-color: #fff; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Sonificación del Eclipse Solar Anular</h1>
+        <p>06 de Febrero de 2027 - Punta del Este, Uruguay</p>
+    </header>
+
+    <main>
+        <div class="panel">
+            <h2>Panel de Control</h2>
+            <button id="btn-start" aria-label="Iniciar experiencia y solicitar permisos de sensores">1. Iniciar Experiencia y Sensores</button>
+            
+            <label for="instrument">Instrumento Sintetizado (Forma de onda):</label>
+            <select id="instrument" aria-label="Seleccionar el tipo de instrumento MIDI sintetizado">
+                <option value="triangle">Campanas (Onda Triangular)</option>
+                <option value="sine">Flauta Suave (Onda Senoidal)</option>
+                <option value="square">Clarinete Electrónico (Onda Cuadrada)</option>
+                <option value="sawtooth">Cuerdas (Onda Diente de Sierra)</option>
+            </select>
+
+            <fieldset style="border:1px solid #333; margin-top:15px; padding:10px; border-radius:5px;">
+                <legend style="font-weight:bold;">Modo de Ejecución</legend>
+                <label><input type="radio" name="mode" value="real" checked> Tiempo Real (Usa reloj y sensor de luz del móvil)</label>
+                <label><input type="radio" name="mode" value="sim"> Simulador (Control manual de tiempo)</label>
+            </fieldset>
+
+            <div id="sim-controls" class="hidden" style="margin-top: 15px;">
+                <label for="time-slider">Avance del Tiempo (Simulador):</label>
+                <input type="range" id="time-slider" min="0" max="100" value="0" aria-label="Deslizador para avanzar en el tiempo del eclipse">
+                <p id="sim-time-display" aria-live="polite">Hora simulada: 10:00:00</p>
+            </div>
+        </div>
+
+        <div class="panel" role="region" aria-labelledby="status-title">
+            <h2 id="status-title">Estado del Sistema</h2>
+            <div class="status-box" id="sensor-status" aria-live="polite">
+                Esperando inicio...
+            </div>
+            <div class="status-box" id="eclipse-status" aria-live="assertive">
+                Fase actual: Esperando datos.
+            </div>
+            <div class="status-box" id="explanation-status" aria-live="polite">
+                La explicación astronómica aparecerá aquí.
+            </div>
+            <p><strong>Frecuencia Base Calculada:</strong> <span id="freq-display">0</span> Hz</p>
+            <p><strong>Posición del Móvil:</strong> <span id="orientation-display">Desconocida</span></p>
+        </div>
+
+        <section class="panel">
+            <h2>¿Cómo funciona esto? (Caja Blanca)</h2>
+            <p><strong>El Acelerómetro:</strong> Mide la aceleración gravitacional en 3 ejes (X, Y, Z). Cuando tu celular está apoyado sobre una mesa con la pantalla hacia arriba, los grados de inclinación (Beta y Gamma) son cercanos a 0. El algoritmo lee estos datos y usa un bloque condicional (<code>if</code>) para habilitar el sonido solo si el móvil está horizontal.</p>
+            <p><strong>El Sensor de Luz Ambiental:</strong> Es un fotodiodo que genera una pequeña corriente eléctrica al recibir fotones. En el modo "Tiempo Real", usamos la <em>AmbientLightSensor API</em> para medir los Lux. Si el navegador restringe este sensor por privacidad, el sistema utiliza un modelo matemático que calcula la luz teórica según la hora del eclipse.</p>
+            <p><strong>El Sonido y las Matemáticas:</strong> No usamos archivos MP3. Usamos la <em>Web Audio API</em> para generar ondas matemáticas. La cantidad de luz se multiplica por una frecuencia base. A mayor luz (fuera del eclipse), mayor frecuencia (sonidos agudos). Durante el máximo del eclipse, la luz cae, reduciendo la frecuencia (sonidos graves). Para que suene agradable, el algoritmo selecciona aleatoriamente notas de una <em>escala pentatónica</em>, garantizando armonía matemática.</p>
+        </section>
+    </main>
+
+    <script>
+        // Hitos del Eclipse (Febrero 06, 2027 - Punta del Este, Uruguay - Horario UYT UTC-3)
+        // Convertimos a timestamps para facilitar la interpolación matemática
+        const baseDate = "2027-02-06T";
+        const eclipsePhases = [
+            { id: "pre", time: new Date(`${baseDate}10:00:00-03:00`).getTime(), light: 1.0, 
+              name: "Antes del eclipse", 
+              desc: "El Sol emite su luz por completo. Los sensores registran máxima intensidad y las frecuencias sonoras son altas (agudas)." },
+            { id: "t1", time: new Date(`${baseDate}10:52:56-03:00`).getTime(), light: 1.0, 
+              name: "Primer Contacto (Fase Parcial)", 
+              desc: "La silueta de la Luna toca el borde del Sol. Comienza el tránsito, la luz empezará a disminuir gradualmente." },
+            { id: "t2", time: new Date(`${baseDate}12:36:05-03:00`).getTime(), light: 0.1, 
+              name: "Segundo Contacto (Inicio Anularidad)", 
+              desc: "La Luna está casi en el centro. Como está en su apogeo (más lejos de la Tierra), se ve más pequeña y no cubre todo el Sol. Se forma el anillo de fuego." },
+            { id: "tmax", time: new Date(`${baseDate}12:38:49-03:00`).getTime(), light: 0.07, 
+              name: "Máximo del Eclipse", 
+              desc: "Alineación central perfecta. La iluminación ambiental llega a su punto más bajo. El tono del sonido desciende a sus frecuencias más graves." },
+            { id: "t3", time: new Date(`${baseDate}12:41:34-03:00`).getTime(), light: 0.1, 
+              name: "Tercer Contacto (Fin Anularidad)", 
+              desc: "El anillo de fuego se rompe. La Luna comienza a retirarse y la luz ambiental volverá a subir lentamente." },
+            { id: "t4", time: new Date(`${baseDate}14:21:14-03:00`).getTime(), light: 1.0, 
+              name: "Cuarto Contacto (Fin)", 
+              desc: "La Luna abandona por completo el disco solar. El eclipse ha terminado y las frecuencias vuelven a su máximo." },
+            { id: "post", time: new Date(`${baseDate}15:00:00-03:00`).getTime(), light: 1.0, 
+              name: "Después del eclipse", 
+              desc: "El Sol vuelve a la normalidad." }
+        ];
+
+        // Variables del Sistema
+        let audioCtx;
+        let isPlaying = false;
+        let isDeviceFlat = false;
+        let currentMode = "real";
+        let baseFrequency = 440; // Frecuencia por defecto
+        let realLux = null;
+        let currentPhaseDesc = "";
+
+        // Referencias del DOM
+        const btnStart = document.getElementById('btn-start');
+        const modeRadios = document.getElementsByName('mode');
+        const simControls = document.getElementById('sim-controls');
+        const timeSlider = document.getElementById('time-slider');
+        const simTimeDisplay = document.getElementById('sim-time-display');
+        const sensorStatus = document.getElementById('sensor-status');
+        const eclipseStatus = document.getElementById('eclipse-status');
+        const explanationStatus = document.getElementById('explanation-status');
+        const freqDisplay = document.getElementById('freq-display');
+        const orientationDisplay = document.getElementById('orientation-display');
+        const instrumentSelect = document.getElementById('instrument');
+
+        // Inicializar Audio
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Motor de Síntesis de Audio (Caja Blanca)
+        // Genera notas armónicas de una escala pentatónica basadas en la frecuencia fundamental
+        function playRandomNote() {
+            if (!isPlaying || !isDeviceFlat || !audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = instrumentSelect.value;
+
+            // Escala Pentatónica Mayor (Ratios matemáticos precisos)
+            const pentatonicRatios = [1, 1.122, 1.25, 1.5, 1.681, 2.0];
+            const randomRatio = pentatonicRatios[Math.floor(Math.random() * pentatonicRatios.length)];
+            const targetFreq = baseFrequency * randomRatio;
+
+            osc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
+
+            // Envolvente Acústica (Attack, Decay) para evitar ruidos de "click"
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1); // Attack
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); // Decay
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // Bucle rítmico: Ejecuta una nota cada 400ms
+        setInterval(playRandomNote, 400);
+
+        // Algoritmo para interpolar la luz según el tiempo actual
+        function calculateTheoreticalLight(currentTime) {
+            let phaseA = eclipsePhases[0];
+            let phaseB = eclipsePhases[eclipsePhases.length - 1];
+
+            // Determinar en qué segmento de tiempo estamos
+            for (let i = 0; i < eclipsePhases.length - 1; i++) {
+                if (currentTime >= eclipsePhases[i].time && currentTime <= eclipsePhases[i+1].time) {
+                    phaseA = eclipsePhases[i];
+                    phaseB = eclipsePhases[i+1];
+                    break;
+                }
+            }
+
+            // Actualizar interfaz con la fase actual
+            if (currentPhaseDesc !== phaseA.name) {
+                currentPhaseDesc = phaseA.name;
+                eclipseStatus.innerText = `Fase actual: ${phaseA.name}`;
+                explanationStatus.innerText = phaseA.desc;
+            }
+
+            // Evitar división por cero si estamos fuera del rango
+            if (phaseB.time === phaseA.time) return phaseA.light;
+
+            // Interpolación lineal matemática de la luz
+            const progress = (currentTime - phaseA.time) / (phaseB.time - phaseA.time);
+            return phaseA.light + (phaseB.light - phaseA.light) * progress;
+        }
+
+        // Bucle Principal Lógico
+        function updateLogic() {
+            let evalTime;
+            let currentLightFactor;
+
+            if (currentMode === "sim") {
+                // Mapear el valor del deslizador al rango de tiempo del eclipse
+                const startTime = eclipsePhases[0].time;
+                const endTime = eclipsePhases[eclipsePhases.length - 1].time;
+                const percentage = parseInt(timeSlider.value) / 100;
+                evalTime = startTime + (endTime - startTime) * percentage;
+                
+                const dateObj = new Date(evalTime);
+                simTimeDisplay.innerText = `Hora simulada: ${dateObj.toLocaleTimeString('es-UY')}`;
+                
+                currentLightFactor = calculateTheoreticalLight(evalTime);
+            } else {
+                // Modo tiempo real
+                evalTime = Date.now();
+                
+                if (realLux !== null) {
+                    // Si el sensor físico de luz está disponible, mapeamos (ej: max 1000 lux = 1.0)
+                    currentLightFactor = Math.min(realLux / 1000, 1.0);
+                    // Actualizar texto explicativo basado en la hora para contexto
+                    calculateTheoreticalLight(evalTime); 
+                } else {
+                    currentLightFactor = calculateTheoreticalLight(evalTime);
+                }
+            }
+
+            // Mapeo del factor de luz a la Frecuencia Base (Hz)
+            // 0.07 luz (eclipse max) -> 110 Hz (grave). 1.0 luz -> 880 Hz (agudo).
+            baseFrequency = 110 + (currentLightFactor * 770);
+            freqDisplay.innerText = Math.round(baseFrequency);
+
+            requestAnimationFrame(updateLogic);
+        }
+
+        // Gestión del Acelerómetro/Giroscopio (Device Orientation)
+        function handleOrientation(event) {
+            // Beta: balanceo adelante/atrás. Gamma: balanceo izquierda/derecha.
+            const beta = event.beta;
+            const gamma = event.gamma;
+            
+            if (beta !== null && gamma !== null) {
+                // Consideramos "horizontal pantalla arriba" a un margen de ±15 grados
+                if (Math.abs(beta) < 15 && Math.abs(gamma) < 15) {
+                    isDeviceFlat = true;
+                    orientationDisplay.innerText = "Horizontal (Reproduciendo melodía)";
+                    orientationDisplay.style.color = "var(--accent-color)";
+                } else {
+                    isDeviceFlat = false;
+                    orientationDisplay.innerText = "Inclinado (Sonido en pausa)";
+                    orientationDisplay.style.color = "var(--text-color)";
+                }
+            }
+        }
+
+        // Solicitar Sensores y arrancar
+        btnStart.addEventListener('click', async () => {
+            initAudio();
+            isPlaying = true;
+            btnStart.innerText = "Experiencia Activa";
+            btnStart.style.backgroundColor = "lightgreen";
+
+            // Solicitar permisos de giroscopio para iOS 13+
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    const permissionState = await DeviceOrientationEvent.requestPermission();
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    } else {
+                        sensorStatus.innerText = "Permiso de acelerómetro denegado.";
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                // Dispositivos Android y navegadores estándar
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+
+            // Intentar iniciar el API Experimental de Luz Ambiental
+            if ('AmbientLightSensor' in window) {
+                try {
+                    const sensor = new AmbientLightSensor();
+                    sensor.onreading = () => {
+                        realLux = sensor.illuminance;
+                        sensorStatus.innerText = `Sensor de Luz Activo: ${realLux} Lux`;
+                    };
+                    sensor.onerror = (event) => {
+                        sensorStatus.innerText = "Sensor de luz bloqueado/no compatible. Usando algoritmo astronómico.";
+                        console.log(event.error.name, event.error.message);
+                    };
+                    sensor.start();
+                } catch (err) {
+                    sensorStatus.innerText = "La API de Luz Ambiental no está habilitada. Usando algoritmo astronómico.";
+                }
+            } else {
+                sensorStatus.innerText = "Sensor de Luz no compatible en este navegador. Usando algoritmo astronómico.";
+            }
+
+            requestAnimationFrame(updateLogic);
+        });
+
+        // Cambiar entre Tiempo Real y Simulador
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                currentMode = e.target.value;
+                if (currentMode === "sim") {
+                    simControls.classList.remove('hidden');
+                } else {
+                    simControls.classList.add('hidden');
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

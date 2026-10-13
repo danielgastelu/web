@@ -6,9 +6,10 @@ import { $, $$, esc, toast, prefersReducedMotion } from './dom.js';
 import { initSun } from './sun.js';
 import { initObservatory } from './observatory.js';
 import { initDataLab } from './datalab.js';
+import { initMedals } from './medals.js';
 
 // ---------- vistas ----------
-const ROUTES = ['mision', 'observar', 'datos', 'acerca'];
+const ROUTES = ['mision', 'observar', 'datos', 'medallas', 'acerca'];
 let firstRoute = true;
 let active = null;
 
@@ -70,7 +71,9 @@ function refreshAbout() {
   $('#about-web').innerHTML = fill(ABOUT.siteUrl) || `<a href="${esc(ABOUT.siteUrl)}" target="_blank" rel="noopener">${esc(ABOUT.siteUrl)}</a>`;
   $('#about-inst').innerHTML = fill(ABOUT.institution) || esc(ABOUT.institution);
   const c = ABOUT.contact;
-  $('#about-contact').innerHTML = fill(c) || (/^[^\s@]+@[^\s@]+$/.test(c) ? `<a href="mailto:${esc(c)}">${esc(c)}</a>` : /^https?:/.test(c) ? `<a href="${esc(c)}" target="_blank" rel="noopener">${esc(c)}</a>` : esc(c));
+  const isEmail = /^[^\s@]+@[^\s@]+$/.test(c);
+  const mailHref = isEmail && ABOUT.contactSubject ? `mailto:${c}?subject=${encodeURIComponent(ABOUT.contactSubject)}` : `mailto:${c}`;
+  $('#about-contact').innerHTML = fill(c) || (isEmail ? `<a href="${esc(mailHref)}">${esc(c)}</a>` : /^https?:/.test(c) ? `<a href="${esc(c)}" target="_blank" rel="noopener">${esc(c)}</a>` : esc(c));
   $('#about-version').textContent = t('about_version', { v: APP.version }) + ` (${APP.year})`;
 }
 
@@ -127,6 +130,7 @@ buildLangMenu();
 initSun($('#hero-sun'));
 initObservatory();
 initDataLab();
+initMedals();
 initInstall();
 initOffline();
 onLangChange(() => { refreshLangButton(); refreshAbout(); });

@@ -3,7 +3,7 @@
 // Valores mensuales transcriptos sin modificaciones de la tabla «Smoothed Sunspot Number» del Bureau of Meteorology de Australia
 // (Australian Space Weather Forecasting Centre, https://www.sws.bom.gov.au/Solar/1/6), que la arma a partir de SILSO.
 // Edición del 1 de septiembre de 2026. Cubre de enero de 2008 a febrero de 2026 (valores observados, sin estimaciones).
-// Para actualizarlo con el archivo oficial usá tools/silso_to_js.js.
+// Para actualizarlo con el archivo oficial usar tools/silso_to_js.js.
 export const SILSO = {
   startYear: 2008,
   startMonth: 1,

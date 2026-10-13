@@ -5,6 +5,7 @@ import { t, tn, fmtNum, fmtK, onLangChange } from './i18n.js';
 import { getState, subscribe, saveObservation, wolf, kPending, getPref, setPref } from './store.js';
 import { $, $$, toast, isCoarsePointer } from './dom.js';
 import { openKDialog } from './kdialog.js';
+import { celebrateMedals } from './medals.js';
 import { bindKInput, syncKInput } from './kinput.js';
 
 const round = (x, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
@@ -109,6 +110,21 @@ export function initObservatory() {
     }
     return false;
   }
+
+  /** Un Sol de ese día y mes ('MM-DD') en un año al azar con imagen (lo pide el botón de las medallas conmemorativas). */
+  async function loadMonthDay(md) {
+    const first = Number(LAB.DATE_MIN.slice(0, 4)), last = Number(dateInput.max.slice(0, 4));
+    const years = [];
+    for (let y = first; y <= last; y++) { const iso = `${y}-${md}`; if (iso >= LAB.DATE_MIN && iso <= dateInput.max) years.push(iso); }
+    for (let i = years.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [years[i], years[j]] = [years[j], years[i]]; }
+    for (const iso of years.slice(0, LAB.RANDOM_TRIES + 2)) {
+      dateInput.value = iso;
+      if (await loadDate(iso)) return true;
+      if (stageState === 'offline') return false;
+    }
+    return false;
+  }
+  window.addEventListener('helios:observe-date', e => { triedAuto = true; loadMonthDay(e.detail); });
 
   form.addEventListener('submit', e => { e.preventDefault(); if (dateInput.value) loadDate(dateInput.value); });
   $('#btn-random').addEventListener('click', loadRandom);
@@ -278,7 +294,9 @@ export function initObservatory() {
     const { s, g } = counts();
     const res = saveObservation({ date: cur.date, g, s, time: cur.time });
     toast(t(res.replaced ? 'toast_replaced' : 'toast_saved', { r: fmtNum(res.r) }), { kind: 'ok' });
-    if (res.kDue) setTimeout(openKDialog, 800);
+    // Primero se festeja la medalla; la evaluación de k, si corresponde, llega al cerrar ese diálogo.
+    if (res.newMedals.length) setTimeout(() => celebrateMedals(res.newMedals, res.kDue ? () => setTimeout(openKDialog, 300) : null), 600);
+    else if (res.kDue) setTimeout(openKDialog, 800);
   });
 
   bindKInput(kInput);
