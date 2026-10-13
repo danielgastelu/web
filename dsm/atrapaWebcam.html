@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atrapa Burbujas Webcam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a202c; /* bg-gray-900 */
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Tamaño máximo para escritorio */
+            aspect-ratio: 4/3; /* Relación de aspecto común para webcams */
+            background-color: #000;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Efecto espejo muy importante para webcams */
+            opacity: 0.7; /* Ligeramente transparente para ver mejor el juego */
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none; /* Permite clics a través de la capa UI si fuera necesario */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .hud-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #score-display {
+            color: #4ade80; /* text-green-400 */
+        }
+
+        #time-display {
+            color: #f87171; /* text-red-400 */
+        }
+
+        #start-screen, #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto; /* Permite clics en esta capa */
+            border-radius: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        button {
+            padding: 0.75rem 2rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.4);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mb-4 text-center">
+        <h1 class="text-3xl font-bold text-blue-400">Atrapa Burbujas</h1>
+        <p class="text-gray-400 text-sm mt-1">Usa tu cámara web y mueve las manos para explotarlas</p>
+    </div>
+
+    <div id="game-container">
+        <!-- El elemento de video capturará la cámara web -->
+        <video id="webcam" autoplay playsinline></video>
+        
+        <!-- El canvas es donde dibujaremos las burbujas y detectaremos el movimiento -->
+        <canvas id="game-canvas"></canvas>
+        <canvas id="motion-canvas" class="hidden"></canvas> <!-- Canvas oculto para procesar movimiento -->
+
+        <!-- Interfaz de Usuario -->
+        <div id="ui-layer">
+            <div class="flex justify-between w-full">
+                <div class="hud-text">Puntos: <span id="score-display">0</span></div>
+                <div class="hud-text">Tiempo: <span id="time-display">30</span>s</div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen">
+            <h2 class="text-4xl font-bold mb-4 text-white">¡Prepárate!</h2>
+            <p class="mb-6 text-center max-w-md text-gray-300">Permite el acceso a tu cámara. Muévete frente a ella para "tocar" y explotar las burbujas antes de que acabe el tiempo.</p>
+            
+            <div class="mb-6 w-full max-w-xs flex flex-col items-center">
+                <label for="camera-select" class="block text-sm font-medium text-gray-400 mb-2">Selecciona tu cámara:</label>
+                <select id="camera-select" class="w-full bg-gray-800 text-white rounded-full px-4 py-3 border border-gray-600 focus:outline-none focus:border-blue-500 text-center shadow-inner cursor-pointer appearance-none">
+                    <option value="">Buscando cámaras...</option>
+                </select>
+            </div>
+
+            <button id="start-btn">Iniciar Juego</button>
+            <p id="camera-status" class="mt-4 text-yellow-400 text-sm"></p>
+        </div>
+
+        <!-- Pantalla de Fin de Juego -->
+        <div id="game-over-screen" class="hidden">
+            <h2 class="text-5xl font-bold mb-2 text-red-500">¡Tiempo Terminado!</h2>
+            <p class="text-2xl mb-6">Puntuación Final: <span id="final-score" class="font-bold text-green-400">0</span></p>
+            <button id="restart-btn">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <div class="mt-4 text-gray-500 text-xs text-center max-w-lg">
+        Nota: Asegúrate de estar en un lugar bien iluminado. El juego detecta los cambios de luz (movimiento) frente a la cámara.
+    </div>
+
+    <script>
+        // --- Variables Globales ---
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const motionCanvas = document.getElementById('motion-canvas');
+        const motionCtx = motionCanvas.getContext('2d', { willReadFrequently: true });
+        
+        const scoreDisplay = document.getElementById('score-display');
+        const timeDisplay = document.getElementById('time-display');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const cameraStatus = document.getElementById('camera-status');
+        const cameraSelect = document.getElementById('camera-select');
+
+        let width, height;
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let isPlaying = false;
+        let bubbles = [];
+        let previousImageData = null;
+        let currentStream = null;
+
+        // Configuración del juego
+        const BUBBLE_SPEED = 2;
+        const BUBBLE_SPAWN_RATE = 1000; // ms
+        const SENSITIVITY = 40; // Sensibilidad al movimiento (menor = más sensible)
+        
+        // --- Inicialización y Cámara ---
+
+        // Ajustar el tamaño del canvas al contenedor
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            width = container.clientWidth;
+            height = container.clientHeight;
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Usamos un canvas de movimiento más pequeño para mejorar el rendimiento
+            motionCanvas.width = width / 4; 
+            motionCanvas.height = height / 4;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        async function getCameras() {
+            try {
+                // Pedimos permiso inicial para poder leer los nombres reales de las cámaras
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                cameraSelect.innerHTML = '';
+                
+                if (videoDevices.length === 0) {
+                    cameraSelect.innerHTML = '<option value="">No se encontraron cámaras</option>';
+                    return;
+                }
+                
+                // Llenamos el selector con las cámaras encontradas
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `Cámara ${index + 1}`;
+                    cameraSelect.appendChild(option);
+                });
+
+                // Cambiar cámara al seleccionar otra opción del menú
+                cameraSelect.addEventListener('change', () => {
+                    setupCamera(cameraSelect.value);
+                });
+                
+            } catch (error) {
+                console.error("Error al buscar cámaras:", error);
+                cameraSelect.innerHTML = '<option value="">Error al acceder a cámaras</option>';
+            }
+        }
+
+        async function setupCamera(deviceId = null) {
+            cameraStatus.innerText = "Solicitando acceso a la cámara...";
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Detener el stream de video anterior si existe (importante al cambiar de cámara)
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+
+            const constraints = {
+                video: { 
+                    width: { ideal: 640 },
+                    height: { ideal: 480 }
+                },
+                audio: false
+            };
+
+            // Usar la cámara seleccionada si se proporciona un ID
+            if (deviceId) {
+                constraints.video.deviceId = { exact: deviceId };
+            } else {
+                constraints.video.facingMode = "user";
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                currentStream = stream;
+                video.srcObject = stream;
+                
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        cameraStatus.innerText = "Cámara lista.";
+                        startBtn.disabled = false;
+                        startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        resolve(video);
+                    };
+                });
+            } catch (error) {
+                console.error("Error al acceder a la cámara: ", error);
+                cameraStatus.innerText = "Error: No se pudo acceder a la cámara. Verifica los permisos o si otra app la está usando.";
+            }
+        }
+
+        // --- Lógica de Burbujas ---
+
+        class Bubble {
+            constructor() {
+                this.radius = Math.random() * 20 + 20; // Radio entre 20 y 40
+                this.x = Math.random() * (width - this.radius * 2) + this.radius;
+                this.y = height + this.radius; // Comienza desde abajo
+                this.speedY = Math.random() * BUBBLE_SPEED + 1; // Velocidad aleatoria hacia arriba
+                this.speedX = (Math.random() - 0.5) * 1; // Ligero movimiento lateral
+                
+                // Colores vibrantes y aleatorios
+                const colors = ['#f43f5e', '#a855f7', '#3b82f6', '#10b981', '#f59e0b'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                this.popped = false;
+                this.popAnimation = 0; // Para la animación de explosión
+            }
+
+            update() {
+                if (!this.popped) {
+                    this.y -= this.speedY;
+                    this.x += this.speedX;
+                    
+                    // Rebotar en los bordes laterales
+                    if (this.x < this.radius || this.x > width - this.radius) {
+                        this.speedX *= -1;
+                    }
+                } else {
+                    this.popAnimation += 0.1;
+                }
+            }
+
+            draw(ctx) {
+                if (!this.popped) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color + 'aa'; // Transparencia
+                    ctx.fill();
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Reflejo de luz en la burbuja
+                    ctx.beginPath();
+                    ctx.arc(this.x - this.radius/3, this.y - this.radius/3, this.radius/4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.fill();
+                } else if (this.popAnimation < 1) {
+                    // Animación de explosión (partículas/líneas)
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2 * (1 - this.popAnimation);
+                    const numLines = 6;
+                    for (let i = 0; i < numLines; i++) {
+                        const angle = (Math.PI * 2 / numLines) * i;
+                        const distStart = this.radius + (this.popAnimation * 10);
+                        const distEnd = distStart + 10;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(this.x + Math.cos(angle) * distStart, this.y + Math.sin(angle) * distStart);
+                        ctx.lineTo(this.x + Math.cos(angle) * distEnd, this.y + Math.sin(angle) * distEnd);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // --- Detección de Movimiento ---
+
+        function detectMotion() {
+            if (!isPlaying) return;
+
+            const mWidth = motionCanvas.width;
+            const mHeight = motionCanvas.height;
+
+            // Dibujar el frame actual del video en el canvas pequeño (espejado)
+            motionCtx.save();
+            motionCtx.scale(-1, 1);
+            motionCtx.translate(-mWidth, 0);
+            motionCtx.drawImage(video, 0, 0, mWidth, mHeight);
+            motionCtx.restore();
+
+            const currentImageData = motionCtx.getImageData(0, 0, mWidth, mHeight);
+            
+            if (previousImageData) {
+                // Comparamos el frame actual con el anterior para detectar movimiento
+                for (let i = 0; i < bubbles.length; i++) {
+                    let b = bubbles[i];
+                    if (b.popped) continue;
+
+                    // Mapear la posición de la burbuja (canvas grande) al canvas de movimiento (pequeño)
+                    const mX = Math.floor((b.x / width) * mWidth);
+                    const mY = Math.floor((b.y / height) * mHeight);
+                    const mRadius = Math.floor((b.radius / width) * mWidth);
+
+                    let motionDetectedInBubble = false;
+
+                    // Revisar un área cuadrada alrededor del centro de la burbuja en el canvas pequeño
+                    const checkArea = mRadius;
+                    
+                    // Asegurar no salir de los límites
+                    const startX = Math.max(0, mX - checkArea);
+                    const endX = Math.min(mWidth, mX + checkArea);
+                    const startY = Math.max(0, mY - checkArea);
+                    const endY = Math.min(mHeight, mY + checkArea);
+
+                    // Analizar pixeles en la zona de la burbuja
+                    for (let y = startY; y < endY; y += 2) { // Salto de 2 para optimizar
+                        for (let x = startX; x < endX; x += 2) {
+                            const index = (y * mWidth + x) * 4; // RGBA
+
+                            const rDiff = Math.abs(currentImageData.data[index] - previousImageData.data[index]);
+                            const gDiff = Math.abs(currentImageData.data[index + 1] - previousImageData.data[index + 1]);
+                            const bDiff = Math.abs(currentImageData.data[index + 2] - previousImageData.data[index + 2]);
+
+                            // Si la diferencia de color es mayor a la sensibilidad, hay movimiento
+                            if (rDiff + gDiff + bDiff > SENSITIVITY * 3) {
+                                motionDetectedInBubble = true;
+                                break;
+                            }
+                        }
+                        if (motionDetectedInBubble) break;
+                    }
+
+                    if (motionDetectedInBubble) {
+                        b.popped = true;
+                        score += 10;
+                        scoreDisplay.innerText = score;
+                    }
+                }
+            }
+
+            // Guardar el frame actual para la próxima comparación
+            previousImageData = currentImageData;
+        }
+
+        // --- Bucle del Juego ---
+
+        function gameLoop() {
+            if (!isPlaying) return;
+
+            // Limpiar canvas principal
+            ctx.clearRect(0, 0, width, height);
+
+            // Detectar interacciones de la cámara
+            detectMotion();
+
+            // Spawn de burbujas (manejado por el intervalo en startGame)
+            
+            // Actualizar y dibujar burbujas
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                let b = bubbles[i];
+                b.update();
+                b.draw(ctx);
+
+                // Eliminar burbujas que salieron por arriba o que terminaron de explotar
+                if (b.y + b.radius < 0 || b.popAnimation >= 1) {
+                    bubbles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- Control de Estados del Juego ---
+
+        function startGame() {
+            isPlaying = true;
+            score = 0;
+            timeLeft = 30;
+            bubbles = [];
+            previousImageData = null;
+            
+            scoreDisplay.innerText = score;
+            timeDisplay.innerText = timeLeft;
+            
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            // Intervalo para generar burbujas
+            gameInterval = setInterval(() => {
+                if(isPlaying) bubbles.push(new Bubble());
+            }, BUBBLE_SPAWN_RATE);
+
+            // Intervalo para el temporizador
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                timeDisplay.innerText = timeLeft;
+                
+                // Efecto de urgencia
+                if(timeLeft <= 10) timeDisplay.classList.add('animate-pulse');
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    clearInterval(gameInterval);
+                    endGame();
+                }
+            }, 1000);
+
+            // Iniciar el bucle de dibujo
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            timeDisplay.classList.remove('animate-pulse');
+            finalScoreDisplay.innerText = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // --- Eventos ---
+
+        startBtn.addEventListener('click', () => {
+            if (video.srcObject) {
+                startGame();
+            } else {
+                alert("La cámara aún no está lista o no se dio permiso.");
+            }
+        });
+
+        restartBtn.addEventListener('click', startGame);
+
+        // Iniciar la configuración de la cámara al cargar la página
+        window.onload = async () => {
+            await getCameras();
+            if (cameraSelect.options.length > 0 && cameraSelect.value !== "") {
+                await setupCamera(cameraSelect.value);
+            } else {
+                await setupCamera(); // Respaldo si no hay valor
+            }
+        };
+
+    </script>
+</body>
+</html>
