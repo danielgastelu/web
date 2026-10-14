@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Binary - Simulador y Juego</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ea;
+            --neon-yellow: #ffe600;
+            --dark-bg: #090b14;
+            --panel-bg: #111526;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 0, 234, 0.05), transparent 25%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .title-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Efectos Neon */
+        .text-neon-blue {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        
+        .text-neon-pink {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink), 0 0 10px rgba(255, 0, 234, 0.5);
+        }
+
+        .border-neon-blue {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Lámparas */
+        .lamp {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #1a2035;
+            border: 3px solid #2a3558;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 640px) {
+            .lamp { width: 50px; height: 50px; }
+        }
+
+        .lamp.on {
+            background-color: var(--neon-blue);
+            border-color: #fff;
+            box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue), inset 0 0 15px #fff;
+            transform: scale(1.05);
+        }
+
+        .lamp.on i {
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255,255,255,0.8);
+        }
+
+        /* Indicador de foco para teclado */
+        .lamp.focused {
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 15px rgba(255, 230, 0, 0.4);
+            transform: scale(1.1);
+        }
+        
+        .lamp.focused.on {
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 20px var(--neon-yellow);
+        }
+
+        .lamp i {
+            color: #3f4e7a;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .bit-label {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #6b7280;
+            transition: color 0.3s;
+        }
+
+        .bit-label.active {
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        /* Estrellas */
+        .star-container {
+            min-height: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 1rem;
+            background: rgba(17, 21, 38, 0.8);
+            border: 1px solid rgba(255, 230, 0, 0.2);
+        }
+
+        .star {
+            color: #3f4e7a;
+            font-size: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .star.earned {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px var(--neon-yellow);
+            transform: scale(1.2) rotate(360deg);
+        }
+
+        /* Animación de pulso para el objetivo */
+        @keyframes pulse-target {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); text-shadow: 0 0 20px var(--neon-pink); }
+            100% { transform: scale(1); }
+        }
+        .animate-target {
+            animation: pulse-target 1s infinite;
+        }
+
+        .btn-neon {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+        
+        .btn-neon:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .btn-neon-pink {
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .btn-neon-pink:hover {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        /* Ecuación de asistencia */
+        .math-term { transition: all 0.3s; }
+        .math-term.active { color: var(--neon-blue); font-weight: bold; transform: scale(1.1); display: inline-block; }
+        .math-term.inactive { color: #4b5563; }
+        
+        /* Modal Custom */
+        #modal-overlay {
+            backdrop-filter: blur(5px);
+            background: rgba(9, 11, 20, 0.85);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-8 px-4 relative">
+
+    <!-- Encabezado -->
+    <header class="w-full max-w-4xl text-center mb-6">
+        <h1 class="text-4xl md:text-5xl title-font font-black mb-2 text-neon-blue tracking-wider">NEON BINARY</h1>
+        <p class="text-gray-400 text-sm md:text-base">Aprende código binario encendiendo lámparas.</p>
+    </header>
+
+    <!-- Zona de Estrellas -->
+    <div class="w-full max-w-4xl mb-8">
+        <div class="star-container" id="stars-container">
+            <!-- Las estrellas se inyectan por JS -->
+        </div>
+    </div>
+
+    <!-- Contenedor Principal de Modos y Juego -->
+    <main class="w-full max-w-5xl bg-[#111526] rounded-2xl border border-[#2a3558] p-6 shadow-2xl relative">
+        
+        <!-- Controles de Modo -->
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+            <button id="btn-practice" class="btn-neon px-6 py-3 rounded font-bold title-font bg-[#00f3ff] !text-[#090b14] shadow-[0_0_15px_#00f3ff]">
+                <i class="fas fa-graduation-cap mr-2"></i> Modo Práctica
+            </button>
+            <button id="btn-game" class="btn-neon-pink px-6 py-3 rounded font-bold title-font">
+                <i class="fas fa-stopwatch mr-2"></i> Carrera contra el Tiempo
+            </button>
+        </div>
+
+        <!-- Dashboard del Juego (Oculto en Práctica) -->
+        <div id="game-dashboard" class="hidden flex-col items-center mb-8 border-b border-[#2a3558] pb-8">
+            <div class="flex justify-between w-full max-w-md mb-4 text-xl title-font">
+                <div class="flex items-center text-neon-yellow">
+                    <i class="fas fa-star mr-2"></i> <span id="score-display">0</span>
+                </div>
+                <div class="flex items-center text-neon-pink">
+                    <i class="fas fa-clock mr-2"></i> 00:<span id="time-display">60</span>
+                </div>
+            </div>
+            
+            <div id="start-screen" class="text-center">
+                <p class="mb-4 text-gray-300">Forma los números indicados antes de que acabe el tiempo.</p>
+                <button id="btn-start-game" class="btn-neon-pink px-8 py-4 rounded-full text-xl font-bold title-font animate-pulse">
+                    ¡COMENZAR!
+                </button>
+            </div>
+
+            <div id="target-screen" class="hidden text-center">
+                <p class="text-gray-400 mb-1 uppercase tracking-widest text-sm">Objetivo Actual</p>
+                <div id="target-number" class="text-6xl title-font font-black text-neon-pink animate-target">
+                    142
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Lámparas (8 bits) -->
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-4 md:gap-2 mb-8" id="lamps-container">
+            <!-- Lámparas generadas por JS -->
+        </div>
+
+        <!-- Valor Decimal Actual -->
+        <div class="text-center mb-8">
+            <p class="text-gray-400 mb-2 uppercase tracking-widest text-sm">Suma Total</p>
+            <div id="current-sum-display" class="text-5xl title-font font-bold text-white">
+                0
+            </div>
+        </div>
+
+        <!-- Asistencia Matemática -->
+        <div class="bg-[#0a0d18] border border-[#2a3558] rounded-xl p-4 md:p-6 text-center shadow-inner">
+            <p class="text-gray-400 mb-3 text-xs md:text-sm uppercase tracking-wider"><i class="fas fa-calculator mr-2"></i>Asistencia de Suma en Tiempo Real</p>
+            <div id="math-assistance" class="text-sm md:text-2xl font-mono flex flex-wrap justify-center items-center gap-1 md:gap-2">
+                <!-- Ecuación inyectada por JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal (Mensaje de Fin de Juego) -->
+    <div id="modal-overlay" class="fixed inset-0 z-50 hidden flex justify-center items-center">
+        <div class="bg-[#111526] border-2 border-neon-pink rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_0_30px_rgba(255,0,234,0.3)] transform transition-transform scale-95" id="modal-content">
+            <i class="fas fa-flag-checkered text-5xl text-neon-pink mb-4"></i>
+            <h2 class="text-3xl title-font text-white mb-2">¡TIEMPO!</h2>
+            <p class="text-gray-300 mb-6">Has conseguido <span id="final-score" class="text-neon-yellow font-bold text-2xl">0</span> estrellas.</p>
+            
+            <div class="flex flex-col gap-3">
+                <button id="btn-play-again" class="btn-neon-pink px-4 py-2 rounded font-bold w-full">
+                    Jugar de Nuevo
+                </button>
+                <button id="btn-back-practice" class="bg-transparent border border-gray-600 text-gray-400 hover:text-white hover:border-white px-4 py-2 rounded transition-colors w-full">
+                    Volver a Práctica
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración y Estado
+        const bitValues = [128, 64, 32, 16, 8, 4, 2, 1];
+        let lampStates = [false, false, false, false, false, false, false, false];
+        let currentMode = 'practice'; // 'practice' o 'game'
+        let currentSum = 0;
+        let currentLampFocus = -1; // Índice para navegación por teclado
+        
+        // Estado del Juego
+        let isGameRunning = false;
+        let isChecking = false;
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
+        let targetNumber = 0;
+        const MAX_STARS_DISPLAY = 20;
+
+        // Elementos del DOM
+        const lampsContainer = document.getElementById('lamps-container');
+        const mathAssistance = document.getElementById('math-assistance');
+        const currentSumDisplay = document.getElementById('current-sum-display');
+        const starsContainer = document.getElementById('stars-container');
+        
+        // Elementos de Modos y Juego
+        const btnPractice = document.getElementById('btn-practice');
+        const btnGame = document.getElementById('btn-game');
+        const gameDashboard = document.getElementById('game-dashboard');
+        const startScreen = document.getElementById('start-screen');
+        const targetScreen = document.getElementById('target-screen');
+        const btnStartGame = document.getElementById('btn-start-game');
+        const targetNumberDisplay = document.getElementById('target-number');
+        const timeDisplay = document.getElementById('time-display');
+        const scoreDisplay = document.getElementById('score-display');
+        
+        // Modal
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContent = document.getElementById('modal-content');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const btnPlayAgain = document.getElementById('btn-play-again');
+        const btnBackPractice = document.getElementById('btn-back-practice');
+
+        function initUI() {
+            // Generar Lámparas
+            lampsContainer.innerHTML = '';
+            bitValues.forEach((val, index) => {
+                const col = document.createElement('div');
+                col.className = 'flex flex-col items-center';
+                
+                const lamp = document.createElement('div');
+                lamp.className = 'lamp';
+                lamp.id = `lamp-${index}`;
+                lamp.innerHTML = '<i class="fas fa-lightbulb"></i>';
+                lamp.onclick = () => toggleLamp(index);
+                
+                const binaryLabel = document.createElement('div');
+                binaryLabel.className = 'text-xs text-gray-500 mt-2 font-mono';
+                binaryLabel.innerText = '2^' + (7 - index);
+
+                const valueLabel = document.createElement('div');
+                valueLabel.className = 'bit-label mt-1';
+                valueLabel.id = `label-${index}`;
+                valueLabel.innerText = val;
+
+                col.appendChild(lamp);
+                col.appendChild(binaryLabel);
+                col.appendChild(valueLabel);
+                lampsContainer.appendChild(col);
+            });
+
+            // Generar Estrellas Vacías
+            renderStars();
+            updateMathAssistance();
+        }
+
+        function renderStars() {
+            starsContainer.innerHTML = '';
+            // Mostramos siempre el grid de 20 estrellas
+            for (let i = 0; i < MAX_STARS_DISPLAY; i++) {
+                const star = document.createElement('i');
+                star.className = `fas fa-star star ${i < score ? 'earned' : ''}`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function toggleLamp(index) {
+            if (isChecking) return;
+            
+            // Actualizar foco visual para el usuario de teclado/mouse
+            currentLampFocus = index;
+            updateLampFocus();
+            
+            lampStates[index] = !lampStates[index];
+            const lamp = document.getElementById(`lamp-${index}`);
+            const label = document.getElementById(`label-${index}`);
+            
+            if (lampStates[index]) {
+                lamp.classList.add('on');
+                label.classList.add('active');
+            } else {
+                lamp.classList.remove('on');
+                label.classList.remove('active');
+            }
+            
+            calculateSum();
+        }
+
+        function setAllLamps(state) {
+            for (let i = 0; i < 8; i++) {
+                lampStates[i] = state;
+                const lamp = document.getElementById(`lamp-${i}`);
+                const label = document.getElementById(`label-${i}`);
+                if (state) {
+                    lamp.classList.add('on');
+                    label.classList.add('active');
+                } else {
+                    lamp.classList.remove('on');
+                    label.classList.remove('active');
+                }
+            }
+            calculateSum();
+        }
+
+        function calculateSum() {
+            currentSum = 0;
+            lampStates.forEach((state, index) => {
+                if (state) currentSum += bitValues[index];
+            });
+            
+            currentSumDisplay.innerText = currentSum;
+            updateMathAssistance();
+            
+            // Efecto visual en el display total
+            currentSumDisplay.classList.remove('text-white');
+            currentSumDisplay.classList.add('text-neon-blue');
+            setTimeout(() => {
+                currentSumDisplay.classList.remove('text-neon-blue');
+                currentSumDisplay.classList.add('text-white');
+            }, 200);
+
+            if (isGameRunning) {
+                checkWinCondition();
+            }
+        }
+
+        function updateMathAssistance() {
+            mathAssistance.innerHTML = '';
+            
+            lampStates.forEach((state, index) => {
+                const termSpan = document.createElement('span');
+                
+                if (state) {
+                    termSpan.innerText = bitValues[index];
+                    termSpan.className = 'math-term active';
+                } else {
+                    termSpan.innerText = '0';
+                    termSpan.className = 'math-term inactive';
+                }
+                mathAssistance.appendChild(termSpan);
+                
+                if (index < 7) {
+                    const plusSpan = document.createElement('span');
+                    plusSpan.innerText = ' + ';
+                    plusSpan.className = 'text-gray-600 mx-1';
+                    mathAssistance.appendChild(plusSpan);
+                }
+            });
+
+            const equalsSpan = document.createElement('span');
+            equalsSpan.innerHTML = ` <span class="text-gray-400 mx-2">=</span> <span class="${currentSum > 0 ? 'text-neon-blue font-bold' : 'text-gray-400'}">${currentSum}</span>`;
+            mathAssistance.appendChild(equalsSpan);
+        }
+
+        function switchMode(mode) {
+            if (isGameRunning) return; // Prevenir cambio durante juego activo
+            
+            currentMode = mode;
+            setAllLamps(false);
+            
+            if (mode === 'practice') {
+                btnPractice.classList.add('bg-[#00f3ff]', '!text-[#090b14]', 'shadow-[0_0_15px_#00f3ff]');
+                btnPractice.classList.remove('bg-transparent');
+                
+                btnGame.classList.remove('bg-[#ff00ea]', '!text-[#090b14]', 'shadow-[0_0_15px_#ff00ea]');
+                btnGame.classList.add('bg-transparent');
+                
+                gameDashboard.classList.add('hidden');
+                gameDashboard.classList.remove('flex');
+            } else {
+                btnGame.classList.add('bg-[#ff00ea]', '!text-[#090b14]', 'shadow-[0_0_15px_#ff00ea]');
+                btnGame.classList.remove('bg-transparent');
+                
+                btnPractice.classList.remove('bg-[#00f3ff]', '!text-[#090b14]', 'shadow-[0_0_15px_#00f3ff]');
+                btnPractice.classList.add('bg-transparent');
+                
+                gameDashboard.classList.remove('hidden');
+                gameDashboard.classList.add('flex');
+                
+                startScreen.classList.remove('hidden');
+                targetScreen.classList.add('hidden');
+                scoreDisplay.innerText = '0';
+                timeDisplay.innerText = '60';
+                score = 0;
+                renderStars();
+            }
+        }
+
+        function startGame() {
+            isGameRunning = true;
+            score = 0;
+            timeLeft = 60;
+            targetNumber = -1; // Evita un falso positivo al resetear a 0
+            scoreDisplay.innerText = score;
+            timeDisplay.innerText = timeLeft;
+            
+            setAllLamps(false);
+            renderStars();
+            
+            startScreen.classList.add('hidden');
+            targetScreen.classList.remove('hidden');
+            
+            generateNewTarget();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timeDisplay.innerText = timeLeft.toString().padStart(2, '0');
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function generateNewTarget() {
+            // Genera un número aleatorio entre 1 y 255 diferente al actual
+            let newTarget;
+            do {
+                newTarget = Math.floor(Math.random() * 255) + 1;
+            } while (newTarget === currentSum || newTarget === targetNumber);
+            
+            targetNumber = newTarget;
+            targetNumberDisplay.innerText = targetNumber;
+            targetNumberDisplay.classList.remove('animate-target');
+            // Trigger reflow para reiniciar animación
+            void targetNumberDisplay.offsetWidth;
+            targetNumberDisplay.classList.add('animate-target');
+        }
+
+        function checkWinCondition() {
+            if (currentSum === targetNumber && !isChecking) {
+                // Éxito
+                isChecking = true;
+                score++;
+                scoreDisplay.innerText = score;
+                renderStars();
+                
+                // Efecto de acierto Confetti
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.6 },
+                        colors: ['#ffe600', '#00f3ff', '#ff00ea']
+                    });
+                }
+
+                // Flash verde en el objetivo para feedback positivo
+                targetNumberDisplay.classList.remove('text-neon-pink', 'animate-target');
+                targetNumberDisplay.classList.add('text-green-400', 'shadow-[0_0_20px_#4ade80]');
+                
+                // Pausar un momento para que el usuario vea su éxito antes de resetear
+                setTimeout(() => {
+                    targetNumberDisplay.classList.add('text-neon-pink', 'animate-target');
+                    targetNumberDisplay.classList.remove('text-green-400', 'shadow-[0_0_20px_#4ade80]');
+                    setAllLamps(false);
+                    generateNewTarget();
+                    isChecking = false;
+                }, 400);
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            isGameRunning = false;
+            
+            finalScoreDisplay.innerText = score;
+            modalOverlay.classList.remove('hidden');
+            
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            startScreen.classList.remove('hidden');
+            targetScreen.classList.add('hidden');
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modalOverlay.classList.add('hidden');
+            }, 300);
+        }
+
+        btnPractice.addEventListener('click', () => switchMode('practice'));
+        btnGame.addEventListener('click', () => switchMode('game'));
+        btnStartGame.addEventListener('click', startGame);
+        
+        btnPlayAgain.addEventListener('click', () => {
+            closeModal();
+            startGame();
+        });
+        
+        btnBackPractice.addEventListener('click', () => {
+            closeModal();
+            switchMode('practice');
+        });
+
+        // --- FUNCIONES DE NAVEGACIÓN POR TECLADO ---
+        
+        function updateLampFocus() {
+            for (let i = 0; i < 8; i++) {
+                const lamp = document.getElementById(`lamp-${i}`);
+                if (lamp) {
+                    if (i === currentLampFocus) {
+                        lamp.classList.add('focused');
+                    } else {
+                        lamp.classList.remove('focused');
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            // Ignorar teclas si el modal de victoria está abierto o validando puntos
+            if (!modalOverlay.classList.contains('hidden') || isChecking) return;
+
+            if (e.key === 'ArrowRight') {
+                e.preventDefault(); // Evitar scroll
+                currentLampFocus = currentLampFocus === -1 ? 0 : (currentLampFocus + 1) % 8;
+                updateLampFocus();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault(); // Evitar scroll
+                currentLampFocus = currentLampFocus === -1 ? 7 : (currentLampFocus - 1 + 8) % 8;
+                updateLampFocus();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                if (currentLampFocus !== -1) {
+                    e.preventDefault(); // Evitar scroll con espacio
+                    toggleLamp(currentLampFocus);
+                }
+            }
+        });
+
+        // Limpiar el foco si se hace clic fuera de una lámpara para no confundir
+        document.addEventListener('mousedown', (e) => {
+            if (!e.target.closest('.lamp')) {
+                currentLampFocus = -1;
+                updateLampFocus();
+            }
+        });
+
+        // Inicializar aplicación
+        window.onload = () => {
+            initUI();
+            switchMode('practice');
+        };
+
+    </script>
+</body>
+</html>
