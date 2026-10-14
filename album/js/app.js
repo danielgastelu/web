@@ -19,6 +19,28 @@
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...unlocked])); } catch { /* modo privado */ }
     }
 
+    // ---------- Estadísticas (GoatCounter) ----------
+    // Visitas, instalaciones y cromos desbloqueados. Sin internet el conteo se pierde, pero el álbum sigue igual.
+    // No cuenta en localhost ni con ?test en la URL (pruebas del equipo).
+    const STATS_PREFIX = '/album-feria/';
+    const statsOff = new URLSearchParams(location.search).has('test');
+    const statsQueue = [];
+
+    function track(path, title, event = true) {
+        if (statsOff) return;
+        statsQueue.push({ path: STATS_PREFIX + path, title, event });
+        flushStats();
+    }
+
+    function flushStats() {
+        const gc = window.goatcounter;
+        if (!gc || typeof gc.count !== 'function') return;   // el script todavía no cargó
+        while (statsQueue.length) {
+            try { gc.count(statsQueue.shift()); } catch { /* sin conexión o bloqueado */ }
+        }
+    }
+    document.getElementById('goatcounter-script')?.addEventListener('load', flushStats);
+
     // ---------- Utilidades de render ----------
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const icon = (name, extra = '') => `<svg class="icon" ${extra} aria-hidden="true"><use href="#i-${name}"/></svg>`;
@@ -175,9 +197,15 @@
 
         unlocked.add(f.id);
         saveUnlocked();
+        trackUnlock(f);
         if (activeFilter !== 'Todos' && activeFilter !== f.category) activeFilter = 'Todos';
         renderAll(f.id);
         celebrate(f);
+    }
+
+    function trackUnlock(f) {
+        track(`cromo-${pad(f.num)}`, `Cromo #${pad(f.num)} desbloqueado: ${f.name}`);
+        if (unlocked.size === CROMOS.length) track('album-completo', 'Álbum completo');
     }
 
     // Cromo de bienvenida: se regala la primera vez que se abre el álbum
@@ -186,6 +214,7 @@
         if (!gift || unlocked.has(gift.id)) return;
         unlocked.add(gift.id);
         saveUnlocked();
+        trackUnlock(gift);
         renderAll(gift.id);
         setTimeout(() => celebrate(gift), 400);
     }
@@ -241,6 +270,7 @@
         $('#install-btn').hidden = true;
     });
     window.addEventListener('appinstalled', () => {
+        track('instalacion', 'App instalada');
         $('#install-btn').hidden = true;
         toast('¡Álbum instalado! Ya puedes abrirlo desde tu pantalla de inicio.', { type: 'success', iconName: 'install' });
     });
@@ -363,6 +393,8 @@
     $('#version-label').textContent = `Versión ${self.APP_VERSION}`;
     renderAll();
     syncOnline();
+    track(isStandalone() ? 'abierto-app' : 'abierto-navegador',
+        isStandalone() ? 'Álbum abierto desde la app instalada' : 'Álbum abierto en el navegador', false);
     announceWhatsNew();
     giveGift();
     registerServiceWorker();

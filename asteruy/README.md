@@ -18,6 +18,7 @@ homenajea a una persona, un lugar o un proyecto vinculado al Uruguay. Los visita
 - `js/space.js`: cielo estrellado aleatorio, asteroides dibujados y esquema de órbitas
 - `js/version.js`: versión y novedades (única fuente de verdad)
 - `js/app.js`: lógica · `js/confetti.js`: lluvia de estrellas
+- `js/stats.js`: estadísticas anónimas con GoatCounter
 - `sw.js`: service worker (caché offline + detección de versiones)
 - `img/p<id>.webp`: imagen 256×256 de cada cromo (fotos de Wikimedia Commons o avatar neutro)
 - `icons/`, `fonts/`, `manifest.webmanifest`
@@ -57,6 +58,26 @@ homenajea a una persona, un lugar o un proyecto vinculado al Uruguay. Los visita
 - Debe servirse por `https://` o `http://localhost` (el service worker no funciona con `file://`).
   Ejemplo: `python -m http.server 8765`
 - Agrega `?test` a la URL para ver los botones «Simular instalación» y «Reiniciar álbum».
+
+## Estadísticas (GoatCounter)
+Panel: https://danielgastelu.goatcounter.com/ — sin cookies ni datos personales.
+
+| Evento | Qué cuenta |
+|---|---|
+| `/` y `/app` | Visitas en el navegador y desde la app instalada |
+| `primer-uso` | Dispositivos nuevos (una vez por dispositivo) |
+| `instalacion` | Instalaciones (evento del navegador al instalar) |
+| `abierto-instalado` | Primera vez que se abre desde el ícono instalado |
+| `instalar-aceptado` / `instalar-rechazado` | Respuesta al botón «Instalar» |
+| `cromo-NN-nombre` | Cada cromo descubierto (una vez por dispositivo) |
+| `hito-10-cromos`, `hito-20-cromos`, `hito-30-cromos` | Avance |
+| `album-completo` | Álbumes completados (una vez por dispositivo) |
+| `codigo-incorrecto` | Intentos con códigos que no existen (no se guardan las letras) |
+| `idioma-inicial-xx`, `idioma-xx` | Idioma con el que empieza y cambios de idioma |
+
+- Sin conexión, los eventos se guardan en el dispositivo y se envían al volver internet.
+- No se cuenta nada en `localhost` ni con `?test`, para que las pruebas no alteren los números.
+- Los bloqueadores de anuncios pueden impedir el conteo: los números son una estimación por debajo.
 
 ## Fuentes
 Datos de descubrimiento, órbitas y homenajes: NASA/JPL Small-Body Database (citas oficiales del

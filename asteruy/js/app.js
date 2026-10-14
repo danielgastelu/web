@@ -89,6 +89,7 @@
         document.querySelectorAll('dialog[open]').forEach(d => d.close());
         applyStatic();
         renderAll();
+        Stats.event(`idioma-${code}`, `Idioma elegido: ${I18N[code].label}`);
     }
 
     // ---------- Utilidades de render ----------
@@ -286,9 +287,20 @@
     }
 
     // ---------- Desbloqueo ----------
+    // Nombre corto y sin tildes para las estadísticas, p. ej. "cromo-22-zitarrosa"
+    const slug = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    function track(f) {
+        Stats.once(`cromo-${pad(f.id)}-${slug(f.name)}`, `Cromo ${pad(f.id)}: ${f.install ? f.name : `(${f.num}) ${f.name}`}`);
+        const n = unlocked.size;
+        if ([10, 20, 30].includes(n)) Stats.once(`hito-${n}-cromos`, `Llegó a ${n} cromos`);
+        if (n === CROMOS.length) Stats.once('album-completo', 'Álbum completo');
+    }
+
     function unlock(f, subtitle) {
         unlocked.add(f.id);
         saveUnlocked();
+        track(f);
         if (activeFilter !== 'Todos' && activeFilter !== f.category) activeFilter = 'Todos';
         renderAll(f.id);
         celebrate(f, subtitle);
@@ -302,7 +314,10 @@
         if (code.length !== 4) return fail(t('codeLen'));
 
         const f = CROMOS.find(x => x.code && x.code === code);
-        if (!f) return fail(t('codeBad'));
+        if (!f) {
+            Stats.event('codigo-incorrecto', 'Código incorrecto');
+            return fail(t('codeBad'));
+        }
 
         input.value = '';
         input.blur();
@@ -361,6 +376,8 @@
         if (!deferredInstall) return false;
         deferredInstall.prompt();
         const { outcome } = await deferredInstall.userChoice;
+        Stats.event(outcome === 'accepted' ? 'instalar-aceptado' : 'instalar-rechazado',
+            outcome === 'accepted' ? 'Aceptó instalar' : 'Rechazó instalar');
         deferredInstall = null;
         $('#install-btn').hidden = true;
         if (outcome === 'accepted') grantInstallCard();
@@ -391,6 +408,7 @@
     });
     $('#install-btn').addEventListener('click', promptInstall);
     window.addEventListener('appinstalled', () => {
+        Stats.once('instalacion', 'Álbum instalado');
         $('#install-btn').hidden = true;
         grantInstallCard();
     });
@@ -440,9 +458,11 @@
     function registerServiceWorker() {
         if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
 
+        // En la primera visita el service worker toma el control sin que haga falta recargar
+        const hadController = !!navigator.serviceWorker.controller;
         let reloading = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (reloading) return;
+            if (reloading || !hadController) return;
             reloading = true;
             location.reload();
         });
@@ -521,6 +541,14 @@
     syncOnline();
     announceWhatsNew();
     registerServiceWorker();
+
+    // Estadísticas anónimas: visita (navegador o app instalada) y datos de primera vez por dispositivo
+    const standalone = isStandalone();
+    Stats.pageview(standalone ? '/app' : '/', standalone ? 'Álbum abierto desde la app instalada' : 'Álbum abierto en el navegador');
+    Stats.once('primer-uso', 'Dispositivo nuevo');
+    Stats.once(`idioma-inicial-${lang}`, `Idioma inicial: ${I18N[lang].label}`);
+    if (standalone) Stats.once('abierto-instalado', 'Primera apertura desde la app instalada');
+
     // Abierto desde la pantalla de inicio: el álbum está instalado, ¡cromo de regalo!
-    if (isStandalone()) setTimeout(grantInstallCard, 500);
+    if (standalone) setTimeout(grantInstallCard, 500);
 })();

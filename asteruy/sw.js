@@ -16,6 +16,7 @@ const ASSETS = [
     'js/version.js',
     'js/cromos.js',
     'js/i18n.js',
+    'js/stats.js',
     'js/space.js',
     'js/confetti.js',
     'js/app.js',

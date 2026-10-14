@@ -24,6 +24,13 @@ que encuentran en los stands para desbloquear cromos.
   (también a quienes ya lo tenían, al actualizar). No tiene código.
 - El número visible de cada cromo sale de su lugar en la lista de `js/cromos.js`; el `id` no cambia nunca.
 
+## Estadísticas (GoatCounter)
+Panel: https://danielgastelu.goatcounter.com/ — sin cookies. Se registra, con el prefijo `/album-feria/`:
+- `abierto-app` / `abierto-navegador` — visitas (desde la app instalada o desde el navegador)
+- `instalacion` — evento al instalar (Android y Chrome/Edge de escritorio; iPhone no avisa)
+- `cromo-01` … `cromo-18` — evento al desbloquear cada cromo · `album-completo`
+No cuenta en `localhost` ni con `?test`. Sin internet, ese conteo se pierde.
+
 ## Pruebas
 - Debe servirse por `https://` o `http://localhost` (el service worker no funciona con `file://`).
   Ejemplo: `python -m http.server 8765`
