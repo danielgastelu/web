@@ -5,6 +5,8 @@
  * Para agregar uno nuevo:
  *   1. Agrega un objeto con un id nuevo (no reutilices ids: el progreso se guarda por id).
  *   2. Guarda su imagen cuadrada (256×256) en img/p<id>.webp.
+ *      photo: { author, license, url } para Wikimedia Commons, o
+ *      photo: { site, url } para citar otra fuente (se muestra el nombre del sitio con su enlace).
  *   3. Sube APP_VERSION en js/version.js, cuenta la novedad en APP_NOTES y agrega
  *      las traducciones del cromo en js/i18n.js.
  *
@@ -169,13 +171,13 @@ const CROMOS = [
       desc: 'Astrónomo del Departamento de Astronomía de la Facultad de Ciencias. Estudia la dinámica de cuerpos menores, objetos transneptunianos y planetas extrasolares, en especial las resonancias orbitales.',
       disc: { date: '1999-03-19', by: ['LONEOS'], site: 'Anderson Mesa', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.40, e: 0.128, i: 1.51, per: 1350, D: 2.9 },
-      photo: null },
+      photo: { site: 'CVUy (ANII)', url: 'https://exportcvuy.anii.org.uy/' } },
     { id: 24, code: 'GHLN', num: '17919', name: 'Licandro', desig: '1999 GC8', category: 'Astronomía',
       honoree: 'Javier Licandro', dates: 'n. 1966',
       desc: 'Astrónomo uruguayo que estudia las propiedades físicas de asteroides, cometas y objetos transneptunianos. Trabaja en el Instituto de Astrofísica de Canarias (España).',
       disc: { date: '1999-04-09', by: ['LONEOS'], site: 'Anderson Mesa', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.24, e: 0.255, i: 4.93, per: 1220, D: 3.0 },
-      photo: null },
+      photo: { site: 'NEOMAPP', url: 'https://neomapp.eu/people/javier-licandro/' } },
     { id: 25, code: 'RNYD', num: '20025', name: 'Petronaviera', desig: '1992 DU7', category: 'Cultura',
       honoree: 'Petrona Viera', dates: '1895–1960',
       desc: 'Pintora sorda, reconocida como la primera pintora profesional del Uruguay y figura del planismo. Su mundo, en silencio, se expresó en obras que hoy son patrimonio del país. El nombre lo impulsaron la inspección de Astronomía de Secundaria y el Centro de Recursos para Sordos.',
@@ -211,7 +213,7 @@ const CROMOS = [
       desc: 'Astrónomo que investiga cuerpos menores: las comas de los cometas, las órbitas de los asteroides y cómo evolucionan los planetesimales cuando se forman los planetas. Se doctoró en la TU Braunschweig (Alemania) y trabaja en la Facultad de Ciencias y en educación astronómica.',
       disc: { date: '1999-07-12', by: ['LINEAR'], site: 'Socorro', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.66, e: 0.140, i: 12.1, per: 1590, D: 6.7 }, cite: 'WGSBN Bull. 6, #11',
-      photo: null },
+      photo: { site: 'CVUy (ANII)', url: 'https://exportcvuy.anii.org.uy/' } },
     { id: 31, code: 'UQGS', num: '28051', name: 'Bruzzone', desig: '1998 HS153', category: 'Astronomía',
       honoree: 'Juan Sebastián Bruzzone', dates: 'n. 1981',
       desc: 'Estudia meteoros, meteoroides, discos de escombros y sistemas planetarios con radar y observaciones ópticas y polarimétricas. Fue investigador posdoctoral en el Centro Goddard de la NASA y hoy trabaja en la Facultad de Ciencias.',

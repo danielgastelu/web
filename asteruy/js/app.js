@@ -226,8 +226,13 @@
     function creditHTML(f) {
         if (!f.photo) return `<p class="credit">${esc(t('image'))}: ${esc(t('avatarCredit'))}.</p>`;
         const note = tc(f, 'note');
-        return `<p class="credit">${esc(t('image'))}${note ? ' (' + esc(note) + ')' : ''}: ${esc(f.photo.author)} · ${esc(f.photo.license)} ·
-            <a href="${esc(f.photo.url)}" target="_blank" rel="noopener">Wikimedia Commons</a></p>`;
+        return `<p class="credit">${esc(t('image'))}${note ? ' (' + esc(note) + ')' : ''}: ${photoMeta(f)}
+            <a href="${esc(f.photo.url)}" target="_blank" rel="noopener">${esc(f.photo.site || 'Wikimedia Commons')}</a></p>`;
+    }
+
+    // Autor y licencia (solo las fotos de Wikimedia Commons los tienen), seguidos de " · "
+    function photoMeta(f) {
+        return [f.photo.author, f.photo.license].filter(Boolean).map(x => esc(x) + ' · ').join('');
     }
 
     function showDetail(f) {
@@ -281,7 +286,7 @@
         $('#credits-list').innerHTML = CROMOS.filter(f => !f.install).map(f => {
             if (!unlocked.has(f.id)) return `<li>${esc(t('creditLocked', pad(f.id)))}</li>`;
             if (!f.photo) return `<li><strong>${esc(f.name)}</strong>: ${esc(t('creditAvatar'))}.</li>`;
-            return `<li><strong>${esc(f.name)}</strong>: ${esc(f.photo.author)} · ${esc(f.photo.license)} · <a href="${esc(f.photo.url)}" target="_blank" rel="noopener">${esc(t('viewFile'))}</a></li>`;
+            return `<li><strong>${esc(f.name)}</strong>: ${photoMeta(f)}<a href="${esc(f.photo.url)}" target="_blank" rel="noopener">${esc(f.photo.site || t('viewFile'))}</a></li>`;
         }).join('');
         openDialog('credits-dialog');
     }

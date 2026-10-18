@@ -20,7 +20,7 @@ homenajea a una persona, un lugar o un proyecto vinculado al Uruguay. Los visita
 - `js/app.js`: lógica · `js/confetti.js`: lluvia de estrellas
 - `js/stats.js`: estadísticas anónimas con GoatCounter
 - `sw.js`: service worker (caché offline + detección de versiones)
-- `img/p<id>.webp`: imagen 256×256 de cada cromo (fotos de Wikimedia Commons o avatar neutro)
+- `img/p<id>.webp`: imagen 256×256 de cada cromo (fotos de Wikimedia Commons u otra fuente citada, o avatar neutro)
 - `icons/`, `fonts/`, `manifest.webmanifest`
 
 ## Códigos misterio (para imprimir en la feria)
@@ -81,5 +81,7 @@ Panel: https://danielgastelu.goatcounter.com/ — sin cookies ni datos personale
 
 ## Fuentes
 Datos de descubrimiento, órbitas y homenajes: NASA/JPL Small-Body Database (citas oficiales del
-MPC / boletines WGSBN de la IAU). Imágenes: Wikimedia Commons (autor y licencia en cada cromo).
+MPC / boletines WGSBN de la IAU). Imágenes: Wikimedia Commons (autor y licencia en cada cromo); las fotos de Licandro
+([NEOMAPP](https://neomapp.eu/people/javier-licandro/)) y de Gallardo y Lemos
+([CVUy, ANII](https://exportcvuy.anii.org.uy/)) se citan con su sitio de origen.
 La lista completa está en el botón «Fuentes y créditos» de la app.
