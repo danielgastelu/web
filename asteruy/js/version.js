@@ -3,8 +3,9 @@
  * Cada vez que cambies CUALQUIER archivo de la app (cromos, imágenes, estilos...)
  * sube APP_VERSION y agrega una nota: así los visitantes ven el aviso "Nueva versión".
  */
-self.APP_VERSION = '1.2.1';
+self.APP_VERSION = '1.3.0';
 self.APP_NOTES = [
+    'La órbita ahora es un modelo 3D: gíralo con un dedo y mira su inclinación.',
     'Fotos nuevas de Javier Licandro, Tabaré Gallardo y Pablo Lemos.',
     '¡40 cromos: 39 asteroides con nombres uruguayos y un cromo de regalo!',
     'El cromo N.º 01 se gana al instalar el álbum.',

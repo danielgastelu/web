@@ -269,7 +269,13 @@
 
                 <h3 class="detail__h">${icon('orbit')} ${esc(t('orbitH'))}</h3>
                 <p class="detail__disc">${esc(t('orbitWhere', L().orbit[f.orbit.cls] || I18N.es.orbit[f.orbit.cls]))}</p>
-                ${Space.orbit(f.orbit, f.num, cat.color, { earth: t('earth'), mars: t('mars'), jupiter: t('jupiter'), aria: esc(t('orbitAria')) })}
+                ${Space.orbit(f.orbit, f.num, cat.color, { earth: t('earth'), mars: t('mars'), jupiter: t('jupiter'), aria: esc(t('orbitAria')), reset: esc(t('orbitReset')) })}
+                <p class="orbit__hint">${esc(t('orbitDrag'))}</p>
+                <p class="orbit__legend">
+                    <span><i class="sw sw--above"></i>${esc(t('orbitAbove'))}</span>
+                    <span><i class="sw sw--below"></i>${esc(t('orbitBelow'))}</span>
+                    <span>${esc(t('orbitIncl'))}: ${esc(num(f.orbit.i, 1))}°</span>
+                </p>
                 <p class="orbit__note">${esc(t('orbitNote'))}</p>
                 ${dataGrid(f)}
 
@@ -277,6 +283,7 @@
                 <p class="credit">${esc(t('data'))}: NASA/JPL Small-Body Database${f.cite ? ' · ' + esc(f.cite) : ''} ·
                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=${encodeURIComponent(f.num)}" target="_blank" rel="noopener">${esc(t('viewRecord'))}</a></p>
             </div>`;
+        Space.mountOrbits($('#detail-content'));
         openDialog('detail-dialog');
     }
 
