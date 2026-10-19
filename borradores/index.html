@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recorridos de Astronomía · Astronomía para jóvenes</title>
+<meta name="description" content="Índice de los 13 recorridos interactivos de Astronomía adaptados de los módulos del prof. Héctor Roldós para estudiantes de 14 a 16 años.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>if(window.tailwind)tailwind.config={darkMode:'class',theme:{extend:{colors:{lightbg:'#e5e7eb',darkbg:'#030712'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Lexend',system-ui,sans-serif;transition:background-color .4s,color .4s}
+.space-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 20%,#0b1528 0%,#030712 75%);transition:opacity .5s}
+.space-bg::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 120px 80px,#c4b5fd,transparent),radial-gradient(1.5px 1.5px at 200px 160px,#fff,transparent),radial-gradient(1px 1px at 300px 40px,#e0f2fe,transparent);background-size:340px 220px;opacity:.55}
+.tarjeta{transition:transform .2s,border-color .2s,box-shadow .2s}
+.tarjeta:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 10px 30px -10px rgba(var(--crgb),.5)}
+.tarjeta:focus{--tw-ring-color:rgba(var(--crgb),.5)}
+.tarjeta .ico{background:rgba(var(--crgb),.15);border:1px solid rgba(var(--crgb),.4)}
+.tarjeta .chip{background:rgba(var(--crgb),.12);color:var(--c3)} .light .tarjeta .chip{color:var(--c2)}
+.tarjeta .ver{color:var(--c3)} .light .tarjeta .ver{color:var(--c2)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+:root{--footer-bg:#090d16;--footer-text-color:#94a3b8;--footer-text-hover:#f1f5f9;--footer-border:#1e293b}
+.main-footer{width:100%;background-color:var(--footer-bg);border-top:1px solid var(--footer-border);padding:2rem 1rem;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;box-sizing:border-box}
+.main-footer.container{max-width:none;margin:0 auto;display:flex;justify-content:center}
+.footer-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-decoration:none;color:var(--footer-text-color);transition:transform .25s ease,color .25s ease;text-align:center;width:100%;max-width:850px}
+@media (min-width:768px){.footer-card{flex-direction:row;text-align:left;gap:2rem}}
+.footer-card:hover{color:var(--footer-text-hover);transform:translateY(-2px)}
+.footer-logo{height:60px;width:auto;max-width:180px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(255,255,255,.1))}
+.footer-text{margin:0;font-size:.875rem;line-height:1.6;font-weight:400}
+</style>
+</head>
+<body class="dark bg-darkbg text-slate-100 min-h-screen flex flex-col" id="app-body">
+<a href="#contenido-principal" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:p-4 focus:bg-violet-600 focus:text-white focus:z-50 rounded-lg">Saltar al contenido principal</a>
+<div class="space-bg" id="space-starfield" aria-hidden="true"></div>
+<header class="sticky top-0 z-40 backdrop-blur-md dark:bg-darkbg/85 bg-lightbg/90 border-b dark:border-slate-800 border-slate-300">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener" class="shrink-0 rounded focus:outline-none focus:ring-2 focus:ring-violet-400" title="Espacio de Educación y TIC (se abre en otra pestaña)">
+      <img src="img/edytic-oscuro.png" alt="Educación y TIC — Espacio de Educación y TIC, DGES" class="logo-oscuro h-9 sm:h-11 w-auto">
+      <img src="img/edytic-claro.png" alt="Educación y TIC — Espacio de Educación y TIC, DGES" class="logo-claro h-9 sm:h-11 w-auto hidden">
+    </a>
+    <nav class="flex items-center gap-2" aria-label="Navegación general">
+      <a href="https://danielgastelu.github.io/web/portada.html" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-bold text-sm dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 11.5 12 4l9 7.5M5 10v10h5v-6h4v6h5V10"/></svg><span>Inicio</span></a>
+      <button id="theme-toggle" type="button" role="switch" aria-checked="true" aria-label="Modo oscuro" class="relative inline-flex h-9 w-16 shrink-0 cursor-pointer rounded-full border-2 border-transparent dark:bg-slate-800 bg-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400">
+        <span class="absolute left-1.5 top-1.5 text-xs" aria-hidden="true">☀️</span><span class="absolute right-1.5 top-1.5 text-xs" aria-hidden="true">🌙</span>
+        <span id="theme-slider" class="pointer-events-none inline-block h-8 w-8 -mt-px rounded-full bg-white shadow transition translate-x-7"></span></button>
+    </nav>
+  </div>
+</header>
+
+<main id="contenido-principal" class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 py-10">
+  <div class="text-center max-w-3xl mx-auto">
+    <span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-violet-500/10 dark:text-violet-300 text-violet-700 border border-violet-500/30">Astronomía para jóvenes</span>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mt-4 mb-4 dark:text-white text-slate-900 leading-tight">Recorridos de Astronomía</h1>
+    <p class="text-lg sm:text-xl dark:text-slate-300 text-slate-700 font-light leading-relaxed">13 recorridos interactivos para explorar el universo paso a paso: del tamaño de la Tierra hasta las galaxias más lejanas. Cada uno termina con un desafío y una evidencia para el docente.</p>
+  </div>
+  <div class="mt-8 max-w-3xl mx-auto p-4 rounded-2xl border border-violet-500/40 bg-violet-500/10 text-sm sm:text-base dark:text-slate-200 text-slate-800">
+    📚 <strong>Reconocimiento.</strong> Estos recorridos se basan en los <a href="https://aulas.uruguayeduca.edu.uy/course/view.php?id=107" target="_blank" rel="noopener" class="underline dark:text-violet-300 text-violet-700">módulos de aprendizaje de Astronomía de 1.º de Bachillerato<span class="sr-only"> (se abre en otra pestaña)</span></a> de Uruguay Educa, elaborados por el <strong>prof. Héctor Roldós</strong> junto a Daniel Gastelú, y los adaptan para estudiantes de 14 a 16 años.
+  </div>
+  <section class="mt-12" aria-labelledby="g-La Tie"><h2 id="g-La Tie" class="text-2xl font-extrabold dark:text-white text-slate-900 mb-4"><span aria-hidden="true">🌍</span> La Tierra, la Luna y el Sol</h2>
+<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"><li><a href="eratostenes/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#10b981;--c2:#059669;--c3:#6ee7b7;--crgb:16,185,129">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">📏</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Eratóstenes: forma y tamaño de la Tierra</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Medir el planeta con un palo y una sombra</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">8 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 25 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="la-superficie-de-la-luna/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#6366f1;--c2:#4f46e5;--c3:#a5b4fc;--crgb:99,102,241">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🌕</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">La superficie de la Luna</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Cráteres, mares y volcanes de nuestro satélite</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">10 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="eclipses/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#fb923c;--c2:#ea580c;--c3:#fdba74;--crgb:251,146,60">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🌘</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Eclipses</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Cuando el Sol, la Tierra y la Luna se alinean</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">11 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="el-sol/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#f59e0b;--c2:#d97706;--c3:#fcd34d;--crgb:245,158,11">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">☀️</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">El Sol</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Nuestra estrella, de cerca</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">10 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 25 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li></ul></section><section class="mt-12" aria-labelledby="g-El Sis"><h2 id="g-El Sis" class="text-2xl font-extrabold dark:text-white text-slate-900 mb-4"><span aria-hidden="true">🪐</span> El Sistema Solar</h2>
+<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"><li><a href="planetas/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#06b6d4;--c2:#0891b2;--c3:#67e8f9;--crgb:6,182,212">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🪐</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Planetas</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Ocho mundos alrededor del Sol</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">8 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="asteroides-y-cometas/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#14b8a6;--c2:#0d9488;--c3:#5eead4;--crgb:20,184,166">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">☄️</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Asteroides y cometas</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Restos de la formación del Sistema Solar</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">10 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="meteoroides/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#f43f5e;--c2:#e11d48;--c3:#fda4af;--crgb:244,63,94">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🌠</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Meteoroides</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Estrellas fugaces, bólidos y meteoritos</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">9 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 20 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li></ul></section><section class="mt-12" aria-labelledby="g-Las es"><h2 id="g-Las es" class="text-2xl font-extrabold dark:text-white text-slate-900 mb-4"><span aria-hidden="true">⭐</span> Las estrellas</h2>
+<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"><li><a href="estrellas-y-analisis-espectral/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#d946ef;--c2:#c026d3;--c3:#f0abfc;--crgb:217,70,239">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🌈</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Estrellas y análisis espectral</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">La luz, mensajera de las estrellas</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">9 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 35 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="clasificacion-estelar/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#38bdf8;--c2:#0284c7;--c3:#7dd3fc;--crgb:56,189,248">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🔭</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Clasificación estelar</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Ordenar las estrellas por su luz</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">10 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="las-estrellas-y-su-evolucion/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#f43f5e;--c2:#e11d48;--c3:#fda4af;--crgb:244,63,94">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">💥</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Las estrellas y su evolución</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Nacer, vivir y morir a escala cósmica</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">9 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 35 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li></ul></section><section class="mt-12" aria-labelledby="g-Galaxi"><h2 id="g-Galaxi" class="text-2xl font-extrabold dark:text-white text-slate-900 mb-4"><span aria-hidden="true">🌌</span> Galaxias y universo</h2>
+<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"><li><a href="distancias-en-el-universo/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#6366f1;--c2:#4f46e5;--c3:#a5b4fc;--crgb:99,102,241">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">📐</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Distancias en el universo</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">¿Qué tan lejos es lejos?</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">10 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="la-via-lactea/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#a855f7;--c2:#7c3aed;--c3:#c084fc;--crgb:168,85,247">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🌌</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">La Vía Láctea</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">La galaxia en la que vivimos</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">9 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li><li><a href="clasificacion-de-galaxias/index.html" class="tarjeta group block h-full p-5 rounded-2xl border dark:bg-slate-900/70 bg-white dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4" style="--c:#d946ef;--c2:#c026d3;--c3:#f0abfc;--crgb:217,70,239">
+<span class="flex items-start gap-4"><span class="ico shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-3xl" aria-hidden="true">🌀</span>
+<span class="min-w-0"><span class="block text-lg font-bold dark:text-white text-slate-900 leading-snug">Clasificación de galaxias</span>
+<span class="block text-sm mt-1 dark:text-slate-300 text-slate-700">Islas de estrellas en el universo</span>
+<span class="flex flex-wrap gap-2 mt-3 text-xs font-semibold"><span class="chip px-2 py-1 rounded-full">9 pasos</span><span class="chip px-2 py-1 rounded-full">⏱️ unos 30 minutos</span></span></span></span>
+<span class="ver block mt-4 text-sm font-bold">Comenzar el recorrido <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span></span></a></li></ul></section>
+  <section class="mt-14" aria-labelledby="g-portal">
+    <h2 id="g-portal" class="text-xl font-bold dark:text-white text-slate-900 mb-2">🛰️ Más temas en el portal</h2>
+    <p class="text-sm dark:text-slate-400 text-slate-600 mb-4">Estos temas del curso ya tienen su propio recurso interactivo en el portal.</p>
+    <ul class="flex flex-wrap gap-2"><li><a href="https://danielgastelu.github.io/web/ec/contlumv1.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border dark:border-slate-700 border-slate-300 dark:bg-slate-900/60 bg-white font-semibold text-sm hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400">Contaminación lumínica <span aria-hidden="true">↗</span></a></li><li><a href="https://danielgastelu.github.io/web/ec/constelacionesV3.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border dark:border-slate-700 border-slate-300 dark:bg-slate-900/60 bg-white font-semibold text-sm hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400">Constelaciones <span aria-hidden="true">↗</span></a></li><li><a href="https://danielgastelu.github.io/web/ec/movimientogeneraldiario.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border dark:border-slate-700 border-slate-300 dark:bg-slate-900/60 bg-white font-semibold text-sm hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400">Movimiento general diario <span aria-hidden="true">↗</span></a></li><li><a href="https://danielgastelu.github.io/web/ec/luna001.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border dark:border-slate-700 border-slate-300 dark:bg-slate-900/60 bg-white font-semibold text-sm hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400">Fases de la Luna <span aria-hidden="true">↗</span></a></li><li><a href="https://danielgastelu.github.io/web/ec/exoplanetas.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border dark:border-slate-700 border-slate-300 dark:bg-slate-900/60 bg-white font-semibold text-sm hover:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400">Exoplanetas <span aria-hidden="true">↗</span></a></li></ul>
+  </section>
+</main>
+
+<div class="w-full dark:bg-[#070b14] bg-slate-200 border-t dark:border-slate-800 border-slate-300">
+  <p class="max-w-4xl mx-auto px-4 sm:px-6 py-4 text-center text-sm dark:text-slate-400 text-slate-700">Contenido adaptado de los módulos de aprendizaje de Astronomía de 1.º de Bachillerato de Uruguay Educa, elaborados por el <strong>prof. Héctor Roldós</strong> y Daniel Gastelú. Licencia <a class="underline" href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-SA 4.0<span class="sr-only"> (se abre en otra pestaña)</span></a>.</p>
+</div>
+<footer class="main-footer container">
+  <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener noreferrer" class="footer-card">
+    <img src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" alt="Logo Uruguay Educa" class="footer-logo" onerror="this.onerror=null; this.style.display='none';"/>
+    <p class="footer-text">Portal Uruguay Educa (ANEP-DGES-EDyTIC) — Contenidistas de Astronomía 2026. Herramienta educativa interactiva de uso libre desarrollada con asistencia de IA.</p>
+  </a>
+</footer>
+<script data-goatcounter="https://danielgastelu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){const body=document.getElementById('app-body'),tg=document.getElementById('theme-toggle'),sl=document.getElementById('theme-slider'),sb=document.getElementById('space-starfield');
+function tema(o){body.classList.toggle('dark',o);body.classList.toggle('light',!o);body.classList.toggle('bg-darkbg',o);body.classList.toggle('text-slate-100',o);body.classList.toggle('bg-lightbg',!o);body.classList.toggle('text-slate-900',!o);
+sb.style.opacity=o?'1':'0';sl.classList.toggle('translate-x-7',o);sl.classList.toggle('translate-x-0',!o);tg.setAttribute('aria-checked',String(o));
+document.querySelectorAll('.logo-oscuro').forEach(i=>i.classList.toggle('hidden',!o));document.querySelectorAll('.logo-claro').forEach(i=>i.classList.toggle('hidden',o));
+try{localStorage.setItem('astro-tema',o?'oscuro':'claro')}catch(e){}}
+tg.addEventListener('click',()=>tema(!body.classList.contains('dark')));try{if(localStorage.getItem('astro-tema')==='claro')tema(false)}catch(e){}})();
+</script>
+</body>
+</html>

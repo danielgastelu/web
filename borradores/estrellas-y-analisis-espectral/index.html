@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estrellas y análisis espectral · Astronomía para jóvenes</title>
+<meta name="description" content="Recorrido interactivo sobre los espectros: qué son, sus tres tipos, cómo revelan la composición química de las estrellas y su movimiento, con un laboratorio para identificar elementos. Adaptado de los módulos del prof. Héctor Roldós.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>if(window.tailwind)tailwind.config={darkMode:'class',theme:{extend:{colors:{lightbg:'#e5e7eb',darkbg:'#030712'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Lexend: tipografía elegida para facilitar la lectura (pautas DUA) -->
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#d946ef;--acc-strong:#c026d3;--acc-light:#f0abfc;--acc-rgb:217,70,239}
+body{font-family:'Lexend',system-ui,sans-serif;transition:background-color .4s,color .4s}
+.space-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 30%,#0b1528 0%,#030712 75%);transition:opacity .5s}
+.space-bg::before,.space-bg::after{content:"";position:absolute;inset:0;background-repeat:repeat}
+.space-bg::before{background-image:radial-gradient(1px 1px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 120px 80px,#c4b5fd,transparent),radial-gradient(1.5px 1.5px at 200px 160px,#fff,transparent),radial-gradient(1px 1px at 300px 40px,#e0f2fe,transparent);background-size:340px 220px;opacity:.55}
+.space-bg::after{background-image:radial-gradient(1px 1px at 60px 120px,#fff,transparent),radial-gradient(1.2px 1.2px at 250px 200px,#a5b4fc,transparent);background-size:280px 260px;opacity:.35;animation:titilar 6s ease-in-out infinite alternate}
+@keyframes titilar{from{opacity:.2}to{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.space-bg::after{animation:none}*{scroll-behavior:auto!important;transition:none!important}}
+.acc-text{color:var(--acc-light)} .light .acc-text{color:var(--acc-strong)}
+.acc-bg{background:var(--acc-strong)} .acc-ring{--tw-ring-color:rgba(var(--acc-rgb),.45)}
+.acc-soft{background:rgba(var(--acc-rgb),.15)}
+.acc-border{border-color:rgba(var(--acc-rgb),.45)}
+.hover-acc:hover{border-color:var(--acc)} .hover-soft:hover{background:rgba(var(--acc-rgb),.15)}
+.acc-link{color:var(--acc-light)} .light .acc-link{color:var(--acc-strong)}
+.acc-pill{background:rgba(var(--acc-rgb),.12);border:1px solid rgba(var(--acc-rgb),.35);color:var(--acc-light)}
+.light .acc-pill{color:var(--acc-strong)}
+.paso{display:none} .paso.activo{display:block;animation:entrar .35s ease}
+@keyframes entrar{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.prosa p{margin:.9rem 0;line-height:1.75} .prosa strong{font-weight:700}
+.light .prosa strong{color:#0f172a} .dark .prosa strong{color:#fff}
+.img-rota img{display:none} .img-rota figcaption::before{content:"(La imagen no está disponible en este momento.) ";font-style:italic}
+.star-earned{animation:pulso 1.5s infinite ease-in-out;color:#eab308!important;filter:none!important}
+@keyframes pulso{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.opcion[aria-pressed="true"]{border-color:var(--acc);background:rgba(var(--acc-rgb),.18)}
+.opcion.correcta{border-color:#22c55e!important;background:rgba(34,197,94,.18)!important}
+.opcion.incorrecta{border-color:#ef4444!important;background:rgba(239,68,68,.15)!important}
+/* Footer Uruguay Educa */
+:root{--footer-bg:#090d16;--footer-text-color:#94a3b8;--footer-text-hover:#f1f5f9;--footer-border:#1e293b}
+.main-footer{width:100%;background-color:var(--footer-bg);border-top:1px solid var(--footer-border);padding:2rem 1rem;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;box-sizing:border-box}
+.main-footer.container{max-width:none;margin:0 auto;display:flex;justify-content:center}
+.footer-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-decoration:none;color:var(--footer-text-color);transition:transform .25s ease,color .25s ease;text-align:center;width:100%;max-width:850px}
+@media (min-width:768px){.footer-card{flex-direction:row;text-align:left;gap:2rem}}
+.footer-card:hover{color:var(--footer-text-hover);transform:translateY(-2px)}
+.footer-logo{height:60px;width:auto;max-width:180px;object-fit:contain;transition:filter .25s ease;filter:drop-shadow(0 0 4px rgba(255,255,255,.1))}
+.footer-card:hover .footer-logo{filter:drop-shadow(0 0 8px rgba(255,255,255,.3))}
+.footer-text{margin:0;font-size:.875rem;line-height:1.6;font-weight:400}
+@media print{header,nav,#barra-nav,.no-print,.space-bg{display:none!important}.paso:not(.activo){display:none!important}#indice,.main-footer{display:none!important}body{background:#fff!important;color:#000!important}}
+</style>
+</head>
+<body class="dark bg-darkbg text-slate-100 min-h-screen flex flex-col selection:bg-violet-500 selection:text-white" id="app-body">
+<a href="#contenido-principal" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:p-4 focus:bg-violet-600 focus:text-white focus:z-50 rounded-lg">Saltar al contenido principal</a>
+<div class="space-bg" id="space-starfield" aria-hidden="true"></div>
+
+<!-- CABECERA: logotipo EDyTIC + Inicio -->
+<header class="sticky top-0 z-40 backdrop-blur-md dark:bg-darkbg/85 bg-lightbg/90 border-b dark:border-slate-800 border-slate-300">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener" class="shrink-0 rounded focus:outline-none focus:ring-2 acc-ring" title="Espacio de Educación y TIC (se abre en otra pestaña)">
+        <img src="img/edytic-oscuro.png" alt="Educación y TIC — Espacio de Educación y TIC, DGES" class="logo-oscuro h-9 sm:h-11 w-auto">
+        <img src="img/edytic-claro.png" alt="Educación y TIC — Espacio de Educación y TIC, DGES" class="logo-claro h-9 sm:h-11 w-auto hidden">
+      </a>
+      <div class="hidden md:block border-l dark:border-slate-700 border-slate-300 pl-3 min-w-0">
+        <span class="text-[11px] font-bold uppercase tracking-widest acc-text block">Astronomía para jóvenes</span>
+        <span class="text-sm font-extrabold dark:text-white text-slate-900 truncate block">Estrellas y análisis espectral</span>
+      </div>
+    </div>
+    <nav class="flex items-center gap-2" aria-label="Navegación general">
+      <a href="https://danielgastelu.github.io/web/portada.html" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-bold text-sm dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-300 hover-acc focus:outline-none focus:ring-2 acc-ring">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 11.5 12 4l9 7.5M5 10v10h5v-6h4v6h5V10"/></svg>
+        <span>Inicio</span>
+      </a>
+      <button id="theme-toggle" type="button" role="switch" aria-checked="true" aria-label="Modo oscuro" class="relative inline-flex h-9 w-16 shrink-0 cursor-pointer rounded-full border-2 border-transparent dark:bg-slate-800 bg-slate-300 focus:outline-none focus:ring-2 acc-ring">
+        <span class="absolute left-1.5 top-1.5 text-xs" aria-hidden="true">☀️</span><span class="absolute right-1.5 top-1.5 text-xs" aria-hidden="true">🌙</span>
+        <span id="theme-slider" class="pointer-events-none inline-block h-8 w-8 -mt-px rounded-full bg-white shadow transition translate-x-7"></span>
+      </button>
+    </nav>
+  </div>
+  <!-- Progreso -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-3">
+    <div class="flex items-center justify-between gap-3 text-xs sm:text-sm">
+      <details id="indice" class="relative">
+        <summary class="cursor-pointer select-none font-semibold dark:text-slate-300 text-slate-700 list-none inline-flex items-center gap-1 whitespace-nowrap px-2 py-1 rounded-lg hover-soft focus:outline-none focus:ring-2 acc-ring">📑 Índice <span aria-hidden="true">▾</span></summary>
+        <ol id="lista-indice" class="absolute left-0 mt-2 w-[min(90vw,24rem)] max-h-[60vh] overflow-auto p-2 rounded-xl shadow-2xl border dark:border-slate-700 border-slate-300 dark:bg-slate-900 bg-white z-50"></ol>
+      </details>
+      <p id="progreso-texto" class="font-semibold dark:text-slate-300 text-slate-700" aria-live="polite"></p>
+    </div>
+    <div class="mt-2 h-2 rounded-full dark:bg-slate-800 bg-slate-300 overflow-hidden" role="progressbar" aria-label="Avance en el recorrido" aria-valuemin="0" aria-valuemax="100" id="barra-progreso"><div id="barra-relleno" class="h-full acc-bg transition-all duration-500" style="width:0%"></div></div>
+  </div>
+</header>
+
+<main id="contenido-principal" class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 py-8" tabindex="-1">
+<section class="paso prosa" id="seccion-1" data-titulo="¡Bienvenida!" aria-labelledby="h-paso-1"><div class="text-center max-w-3xl mx-auto"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Leer la luz</span><h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mt-4 mb-2 dark:text-white text-slate-900 leading-tight">Estrellas y análisis espectral</h1><h2 id="h-paso-1" class="text-lg sm:text-xl font-semibold acc-text mb-6 focus:outline-none">La luz, mensajera de las estrellas</h2></div><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p class="text-lg sm:text-xl leading-relaxed">En 1835, el filósofo Auguste Comte escribió que jamás sabríamos de qué están hechas las estrellas: estaban demasiado lejos. Pocos años después, los científicos lo estaban averiguando. <strong>No necesitaron viajar: la respuesta venía escondida en la luz.</strong></p><div class="my-6 p-5 rounded-2xl border border-yellow-500/40 bg-yellow-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">💡</span> Idea clave</h3><div class="space-y-3 leading-relaxed"><p>Cuando la luz atraviesa un prisma, se separa en sus colores: es el <strong>espectro</strong>. Cada elemento químico deja en el espectro un conjunto de líneas propio, como una <strong>huella digital</strong> o un código de barras. Analizando el espectro de una estrella, sabemos de qué está hecha, qué temperatura tiene y si se acerca o se aleja.</p></div></div><div class="my-6 p-5 rounded-2xl dark:bg-slate-800/60 bg-white border dark:border-slate-700 border-slate-300"><h3 class="text-lg font-bold mb-3 dark:text-white text-slate-900">🎯 En este recorrido vas a…</h3><ul class="space-y-2"><li class="flex gap-3"><span class="acc-text font-bold" aria-hidden="true">✦</span><span>Explicar qué es un espectro y cómo se forma el arcoíris.</span></li><li class="flex gap-3"><span class="acc-text font-bold" aria-hidden="true">✦</span><span>Distinguir los espectros continuo, de absorción y de emisión.</span></li><li class="flex gap-3"><span class="acc-text font-bold" aria-hidden="true">✦</span><span>Conocer la historia del análisis espectral y el descubrimiento del helio.</span></li><li class="flex gap-3"><span class="acc-text font-bold" aria-hidden="true">✦</span><span>Identificar elementos químicos comparando espectros.</span></li><li class="flex gap-3"><span class="acc-text font-bold" aria-hidden="true">✦</span><span>Entender cómo la luz revela el movimiento de estrellas y galaxias.</span></li></ul><p class="mt-4 text-sm dark:text-slate-400 text-slate-600">⏱️ Tiempo estimado: unos 35 minutos · Avanza con el botón <strong>Siguiente</strong> o con las flechas del teclado.</p></div><div class="my-6 p-4 rounded-2xl border acc-border acc-soft text-sm sm:text-base"><p class="m-0">📚 <strong>Reconocimiento.</strong> Este recorrido se basa en el módulo «Estrellas y análisis espectral» de los módulos de aprendizaje de Astronomía de Uruguay Educa, elaborados por el <strong>prof. Héctor Roldós</strong> junto a Daniel Gastelú. Aquí lo adaptamos para estudiantes de 14 a 16 años.</p></div></div></section>
+<section class="paso prosa" id="seccion-2" data-titulo="¿Qué es un espectro?" aria-labelledby="h-paso-2"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Concepto</span><h2 id="h-paso-2" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">¿Qué es un espectro?</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>¿De qué color es la luz que refleja una hoja blanca? «Blanca», dirías. Pero si esa luz atraviesa un <strong>prisma</strong>, aparece toda una gama de colores: rojo, naranja, amarillo, verde, azul y violeta. La luz blanca es, en realidad, una mezcla de colores.</p><figure class="my-6 max-w-2xl mx-auto"><img src="https://aulas.uruguayeduca.edu.uy/pluginfile.php/21089/mod_page/content/3/modARCOIRIS.jpg" alt="Arcoíris sobre un paisaje." loading="lazy" decoding="async" class="w-full h-auto rounded-xl border dark:border-slate-700 border-slate-300 bg-black/20" onerror="this.closest('figure').classList.add('img-rota')"><figcaption class="mt-2 text-sm dark:text-slate-400 text-slate-600">En el arcoíris, millones de gotitas de agua actúan como pequeños prismas. <span class="block text-xs opacity-80">Imagen: módulo original.</span></figcaption></figure><p>En el arcoíris, cada gota desvía (<strong>refracta</strong>) la luz del Sol. Cada color se desvía un ángulo distinto según su <strong>longitud de onda</strong>, y por eso los colores se separan. El <strong>violeta</strong> tiene la longitud de onda más corta y el <strong>rojo</strong>, la más larga.</p><div class="my-6 p-5 rounded-2xl border border-orange-500/40 bg-orange-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">🧪</span> Fabrica un espectro</h3><div class="space-y-3 leading-relaxed"><p>Pon un CD o un DVD bajo una lámpara o la luz del Sol (¡sin mirar el Sol!) e inclínalo hasta ver los colores. Compara la luz de una lámpara incandescente, una LED y un tubo fluorescente: ¿los espectros son iguales? Las finas pistas del disco separan los colores como un prisma.</p></div></div></div></section>
+<section class="paso prosa" id="seccion-3" data-titulo="Tres tipos de espectros" aria-labelledby="h-paso-3"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Concepto</span><h2 id="h-paso-3" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">Tres tipos de espectros</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><figure class="my-6 max-w-2xl mx-auto"><img src="https://astro.unl.edu/naap/ebs/graphics/spectratypes.jpg" alt="Tres espectros: uno continuo con todos los colores, uno de absorción con líneas oscuras y uno de emisión con líneas brillantes sobre fondo negro." loading="lazy" decoding="async" class="w-full h-auto rounded-xl border dark:border-slate-700 border-slate-300 bg-black/20" onerror="this.closest('figure').classList.add('img-rota')"><figcaption class="mt-2 text-sm dark:text-slate-400 text-slate-600">Los tres tipos de espectros: continuo, de absorción y de emisión. <span class="block text-xs opacity-80">Imagen: NAAP, Universidad de Nebraska-Lincoln.</span></figcaption></figure><div class="my-6 overflow-x-auto rounded-xl border dark:border-slate-700 border-slate-300"><table class="w-full text-sm sm:text-base"><thead class="acc-soft"><th scope="col" class="p-3 text-left font-bold">Tipo</th><th scope="col" class="p-3 text-left font-bold">Cómo se ve</th><th scope="col" class="p-3 text-left font-bold">Quién lo produce</th></thead><tbody><tr class='border-t dark:border-slate-700 border-slate-300'><th scope="row" class="p-3 text-left font-semibold">Continuo</th><td class="p-3">Todos los colores, sin cortes.</td><td class="p-3">Un objeto sólido caliente (el filamento de una lamparita) o un gas muy denso y caliente.</td></tr><tr class='border-t dark:border-slate-700 border-slate-300'><th scope="row" class="p-3 text-left font-semibold">De absorción</th><td class="p-3">Todos los colores, con algunas <strong>líneas oscuras</strong>.</td><td class="p-3">Luz de un espectro continuo que atraviesa un gas más frío: el gas «se queda» con algunos colores.</td></tr><tr class='border-t dark:border-slate-700 border-slate-300'><th scope="row" class="p-3 text-left font-semibold">De emisión</th><td class="p-3">Solo algunas <strong>líneas brillantes</strong> sobre fondo oscuro.</td><td class="p-3">Un gas caliente y poco denso: tubos fluorescentes, carteles de neón, algunas lámparas de calle.</td></tr></tbody></table></div><div class="my-6 p-5 rounded-2xl border border-yellow-500/40 bg-yellow-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">💡</span> Las mismas líneas</h3><div class="space-y-3 leading-relaxed"><p>Un mismo gas produce líneas de emisión y de absorción exactamente en las <strong>mismas longitudes de onda</strong>. Si el gas brilla solo, emite esos colores; si una luz más brillante lo atraviesa, absorbe esos mismos colores. Se debe a la estructura de los átomos: cada átomo solo puede absorber o emitir ciertas energías.</p></div></div><p>Para profundizar en cómo los átomos absorben y emiten luz, lee la sección «La luz y los átomos» del documento <a href="http://www.uruguayeduca.edu.uy/Userfiles/P0001/File/Qu%C3%ADmica_de_las_estrellas.pdf" target="_blank" rel="noopener" class="acc-link underline underline-offset-2">«Química de las estrellas»<span class="sr-only"> (se abre en otra pestaña)</span></a> de Uruguay Educa (enlace del módulo original; si no abre, pídeselo a tu docente) y dibuja un esquema que lo resuma.</p></div></section>
+<section class="paso prosa" id="seccion-4" data-titulo="La luz, mensajera de las estrellas" aria-labelledby="h-paso-4"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Historia</span><h2 id="h-paso-4" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">La luz, mensajera de las estrellas</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>En la primera mitad del siglo XIX, científicos como John Herschel, Fox Talbot y William Swan estudiaron los espectros de llamas de distintas sustancias. Poco a poco quedó claro que <strong>cada elemento químico produce su propio conjunto de líneas</strong>.</p><figure class="my-6 max-w-2xl mx-auto"><img src="https://aulas.uruguayeduca.edu.uy/pluginfile.php/20605/mod_page/content/10/ESPECTROSHUELLAS.jpg" alt="Espectros de trece estrellas, cada uno con un patrón distinto de líneas oscuras." loading="lazy" decoding="async" class="w-full h-auto rounded-xl border dark:border-slate-700 border-slate-300 bg-black/20" onerror="this.closest('figure').classList.add('img-rota')"><figcaption class="mt-2 text-sm dark:text-slate-400 text-slate-600">Espectros de trece estrellas diferentes: las líneas oscuras son longitudes de onda que faltan. <span class="block text-xs opacity-80">Imagen: módulo original.</span></figcaption></figure><p>El <strong>sodio</strong>, por ejemplo, tiene dos líneas amarillas muy marcadas, en 589,0 y 589,6 nanómetros. Cualquier muestra con sodio, como la sal de mesa, se reconoce por ese par de líneas.</p><p><strong>Joseph Fraunhofer</strong> descubrió cientos de líneas oscuras en el espectro del Sol, pero nadie sabía qué eran. En 1859, <strong>Gustav Kirchhoff</strong> explicó que una misma sustancia produce líneas brillantes cuando el gas emite su propia luz, y líneas oscuras cuando una luz más brillante lo atraviesa. ¡Ahora se podía saber de qué estaban hechas las estrellas!</p><div class="my-6 max-w-2xl mx-auto"><button type="button" class="yt-lite group relative block w-full aspect-video overflow-hidden rounded-xl border dark:border-slate-700 border-slate-300 bg-black" data-vid="doW5LmlmhVA" data-titulo="Espectroscopía: herramienta para el análisis químico de los astros" aria-label="Reproducir video: Espectroscopía: herramienta para el análisis químico de los astros"><img src="https://i.ytimg.com/vi/doW5LmlmhVA/hqdefault.jpg" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition"><span class="absolute inset-0 flex items-center justify-center" aria-hidden="true"><span class="flex items-center justify-center w-16 h-16 rounded-full bg-red-600 shadow-lg group-hover:scale-110 transition"><svg viewBox="0 0 24 24" class="w-8 h-8 fill-white ml-1"><path d="M8 5v14l11-7z"/></svg></span></span><span class="absolute bottom-0 left-0 right-0 p-3 text-left text-sm font-semibold text-white bg-gradient-to-t from-black/90 to-transparent">▶ Espectroscopía: herramienta para el análisis químico de los astros</span></button><p class="mt-2 text-sm dark:text-slate-400 text-slate-600">Carl Sagan explica cómo se usó esta técnica para estudiar el planeta Venus (serie «Cosmos»).</p><p class="mt-1 text-xs dark:text-slate-500 text-slate-500">¿No se ve? <a class="underline" href="https://www.youtube.com/watch?v=doW5LmlmhVA" target="_blank" rel="noopener">Abrir el video en YouTube</a> (se abre en otra pestaña).</p></div><div class="my-6 p-5 rounded-2xl border border-fuchsia-500/40 bg-fuchsia-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">🚀</span> Un elemento descubierto en el Sol</h3><div class="space-y-3 leading-relaxed"><p>Durante el eclipse total de Sol del 18 de agosto de 1868 se observó en la corona una línea amarilla en <strong>587,6 nm</strong> que no coincidía con ningún elemento conocido. Ese mismo año, Norman Lockyer la midió con precisión y concluyó que era un elemento nuevo. Lo llamó <strong>helio</strong>, por <em>Helios</em>, el Sol en griego.</p><p>Recién en 1895 se encontró helio en la Tierra. Hoy sabemos que es el segundo elemento más abundante del universo… y es el que usamos para inflar globos.</p></div></div><figure class="my-6 max-w-sm mx-auto"><img src="https://aulas.uruguayeduca.edu.uy/pluginfile.php/20605/mod_page/content/10/modGLOBOS_HELIO.jpeg" alt="Globos de colores inflados con helio." loading="lazy" decoding="async" class="w-full h-auto rounded-xl border dark:border-slate-700 border-slate-300 bg-black/20" onerror="this.closest('figure').classList.add('img-rota')"><figcaption class="mt-2 text-sm dark:text-slate-400 text-slate-600">El helio se descubrió en el Sol antes que en la Tierra. <span class="block text-xs opacity-80">Imagen: módulo original.</span></figcaption></figure></div></section>
+<section class="paso prosa" id="seccion-5" data-titulo="Laboratorio: identifica elementos" aria-labelledby="h-paso-5"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Actividad</span><h2 id="h-paso-5" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">Laboratorio: identifica elementos</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>En el módulo original esta práctica se hacía con un programa en Flash que ya no funciona en los navegadores actuales. Aquí tienes una versión nueva con la misma idea: cada muestra es un espectro «incógnita» que puede tener líneas de uno o más elementos.</p>
+<div id="lab-espectros" class="my-6 p-5 rounded-2xl dark:bg-slate-800/60 bg-white border dark:border-slate-700 border-slate-300">
+<h3 class="text-lg font-bold mb-1 dark:text-white text-slate-900">🔬 Laboratorio: identifica los elementos</h3>
+<p class="text-sm mb-4">Compara las líneas del espectro incógnita con las «huellas» de cada elemento. Marca los elementos que encuentres y comprueba.</p>
+<div class="flex flex-wrap gap-2 mb-4" role="group" aria-label="Elegir muestra">
+<button type="button" data-m="0" class="lab-m px-4 py-2 rounded-xl font-bold border-2 dark:border-slate-600 border-slate-300 acc-border acc-soft">Muestra 1</button>
+<button type="button" data-m="1" class="lab-m px-4 py-2 rounded-xl font-bold border-2 dark:border-slate-600 border-slate-300">Muestra 2</button>
+<button type="button" data-m="2" class="lab-m px-4 py-2 rounded-xl font-bold border-2 dark:border-slate-600 border-slate-300">Muestra 3</button>
+<button type="button" data-m="3" class="lab-m px-4 py-2 rounded-xl font-bold border-2 dark:border-slate-600 border-slate-300">Muestra 4</button>
+</div>
+<p class="text-sm font-bold acc-text">Espectro incógnita <span id="lab-tipo" class="font-normal"></span></p>
+<div id="lab-incog" class="my-2"></div>
+<p class="text-sm font-bold mt-4 mb-1">Espectros de emisión de referencia</p>
+<div id="lab-ref" class="space-y-2"></div>
+<div class="mt-4 flex flex-wrap items-center gap-3">
+<span class="text-sm font-semibold">Tipo de espectro:</span>
+<label class="inline-flex items-center gap-1"><input type="radio" name="lab-t" value="emision"> Emisión</label>
+<label class="inline-flex items-center gap-1"><input type="radio" name="lab-t" value="absorcion"> Absorción</label>
+<button id="lab-ok" type="button" class="ml-auto px-5 py-2 rounded-xl font-bold acc-bg text-white">Comprobar</button>
+</div>
+<p id="lab-fb" class="mt-3 font-semibold" aria-live="polite"></p>
+</div>
+<script>
+(function(){
+const EL={'Hidrógeno':[410.2,434.0,486.1,656.3],'Helio':[447.1,471.3,492.2,501.6,587.6,667.8],'Sodio':[589.0,589.6],'Mercurio':[404.7,435.8,546.1,577.0,579.1],'Calcio':[393.4,396.8,422.7]};
+const M=[{e:['Hidrógeno'],t:'emision'},{e:['Sodio','Mercurio'],t:'emision'},{e:['Hidrógeno','Helio'],t:'absorcion'},{e:['Hidrógeno','Calcio','Sodio'],t:'absorcion'}];
+function col(w){let r=0,g=0,b=0;if(w<440){r=-(w-440)/60;b=1}else if(w<490){g=(w-440)/50;b=1}else if(w<510){g=1;b=-(w-510)/20}else if(w<580){r=(w-510)/70;g=1}else if(w<645){r=1;g=-(w-645)/65}else{r=1}
+let f=w<420?0.3+0.7*(w-380)/40:(w>680?0.3+0.7*(700-w)/20:1);return 'rgb('+[r,g,b].map(x=>Math.round(255*Math.max(0,x)*f)).join(',')+')';}
+function x(w){return (w-380)/320*600;}
+function franja(lineas,abs,etq){let s='<svg viewBox="0 0 600 40" class="w-full h-8 rounded" role="img" aria-label="'+etq+'" preserveAspectRatio="none">';
+if(abs){s+='<defs><linearGradient id="g'+etq.replace(/\W/g,'')+'">';for(let w=380;w<=700;w+=10)s+='<stop offset="'+((w-380)/320)+'" stop-color="'+col(w)+'"/>';s+='</linearGradient></defs><rect width="600" height="40" fill="url(#g'+etq.replace(/\W/g,'')+')"/>';lineas.forEach(w=>s+='<rect x="'+(x(w)-1.5)+'" width="3" height="40" fill="#000"/>');}
+else{s+='<rect width="600" height="40" fill="#000"/>';lineas.forEach(w=>s+='<rect x="'+(x(w)-1.5)+'" width="3" height="40" fill="'+col(w)+'"/>');}
+return s+'</svg>';}
+const ref=document.getElementById('lab-ref');
+ref.innerHTML=Object.keys(EL).map(k=>'<label class="grid grid-cols-[7.5rem_1fr] items-center gap-2"><span class="inline-flex items-center gap-2 text-sm"><input type="checkbox" value="'+k+'"> '+k+'</span>'+franja(EL[k],false,k)+'</label>').join('')
++'<div class="grid grid-cols-[7.5rem_1fr] gap-2 text-xs dark:text-slate-400 text-slate-600"><span></span><span class="flex justify-between"><span>380 nm (violeta)</span><span>540 nm</span><span>700 nm (rojo)</span></span></div>';
+let m=0;
+function pintar(){const s=M[m];let L=[];s.e.forEach(k=>L=L.concat(EL[k]));document.getElementById('lab-incog').innerHTML=franja(L,s.t==='absorcion','Espectro incógnita');
+document.getElementById('lab-fb').textContent='';ref.querySelectorAll('input').forEach(i=>i.checked=false);document.querySelectorAll('input[name=lab-t]').forEach(i=>i.checked=false);
+document.querySelectorAll('.lab-m').forEach((b,i)=>{b.classList.toggle('acc-soft',i===m);b.classList.toggle('acc-border',i===m);b.setAttribute('aria-pressed',String(i===m));});}
+document.querySelectorAll('.lab-m').forEach(b=>b.addEventListener('click',()=>{m=+b.dataset.m;pintar();}));
+document.getElementById('lab-ok').addEventListener('click',()=>{const s=M[m];const sel=[...ref.querySelectorAll('input:checked')].map(i=>i.value).sort();const t=(document.querySelector('input[name=lab-t]:checked')||{}).value;
+const okE=JSON.stringify(sel)===JSON.stringify([...s.e].sort()),okT=t===s.t;const fb=document.getElementById('lab-fb');
+fb.textContent=okE&&okT?'¡Excelente! Identificaste todos los elementos y el tipo de espectro.':(!okE?'Revisa los elementos: busca cada línea de la incógnita en las referencias. ':'')+(!okT?'Revisa el tipo: ¿las líneas son brillantes sobre negro o oscuras sobre los colores?':'');
+fb.className='mt-3 font-semibold '+(okE&&okT?'text-green-500':'text-amber-500');});
+pintar();})();
+</script><div class="my-6 p-5 rounded-2xl border border-violet-500/40 bg-violet-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">🤔</span> Para tu cuaderno</h3><div class="space-y-3 leading-relaxed"><p>Anota para cada muestra los elementos que encontraste y si es un espectro de emisión o de absorción. ¿Qué muestras podrían corresponder a la luz de una estrella? ¿Cuáles a una lámpara?</p></div></div></div></section>
+<section class="paso prosa" id="seccion-6" data-titulo="La luz revela movimientos" aria-labelledby="h-paso-6"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Ciencia</span><h2 id="h-paso-6" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">La luz revela movimientos</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>¿Notaste que la sirena de una ambulancia suena más aguda cuando se acerca y más grave cuando se aleja? Es el <strong>efecto Doppler</strong>. Con la luz pasa algo parecido.</p><div class="my-6 overflow-x-auto rounded-xl border dark:border-slate-700 border-slate-300"><table class="w-full text-sm sm:text-base"><thead class="acc-soft"><th scope="col" class="p-3 text-left font-bold">Si la estrella…</th><th scope="col" class="p-3 text-left font-bold">Sus líneas se corren hacia…</th><th scope="col" class="p-3 text-left font-bold">Se llama…</th></thead><tbody><tr class='border-t dark:border-slate-700 border-slate-300'><th scope="row" class="p-3 text-left font-semibold">se acerca a nosotros</th><td class="p-3">el azul (longitudes de onda más cortas)</td><td class="p-3">corrimiento al azul</td></tr><tr class='border-t dark:border-slate-700 border-slate-300'><th scope="row" class="p-3 text-left font-semibold">se aleja de nosotros</th><td class="p-3">el rojo (longitudes de onda más largas)</td><td class="p-3">corrimiento al rojo</td></tr></tbody></table></div><p>Las líneas de cada elemento están en lugares conocidos. Si en una estrella aparecen un poco corridas, podemos calcular <strong>a qué velocidad</strong> se acerca o se aleja. Cuanto mayor es el corrimiento, mayor es la velocidad.</p><div class="my-6 p-5 rounded-2xl border border-emerald-500/40 bg-emerald-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">🔭</span> Tres descubrimientos gracias al Doppler</h3><div class="space-y-3 leading-relaxed"><ul class="list-disc pl-6 space-y-2 my-4"><li><strong>Estrellas dobles:</strong> en algunas estrellas las líneas van y vienen periódicamente: son dos estrellas girando una alrededor de la otra.</li><li><strong>Exoplanetas:</strong> un planeta hace «tambalear» a su estrella. En 1995 se descubrió así el primer planeta alrededor de una estrella como el Sol, 51 Pegasi b.</li><li><strong>El universo se expande:</strong> en la década de 1920, Edwin Hubble vio que casi todas las galaxias tienen corrimiento al rojo, y más cuanto más lejos están. Las galaxias se alejan unas de otras: el universo está en expansión.</li></ul></div></div><div class="my-6 p-5 rounded-2xl border border-fuchsia-500/40 bg-fuchsia-500/10"><h3 class="text-lg font-bold mb-2 dark:text-white text-slate-900"><span aria-hidden="true">🚀</span> Un dato sorprendente</h3><div class="space-y-3 leading-relaxed"><p>La galaxia de Andrómeda es una de las pocas con corrimiento al azul: se acerca a nosotros a unos 110 km por segundo. Dentro de unos 4500 millones de años chocará con la Vía Láctea.</p></div></div></div></section>
+<section class="paso prosa" id="seccion-7" data-titulo="Para pensar en clase" aria-labelledby="h-paso-7"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Reflexión</span><h2 id="h-paso-7" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">Para pensar en clase</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>Antes del desafío final, discute estas preguntas con tu grupo. Escribe tu respuesta en el cuaderno y después despliega la respuesta sugerida para comparar.</p><details class="group my-3 rounded-xl border dark:border-slate-700 border-slate-300 dark:bg-slate-800/50 bg-white"><summary class="cursor-pointer p-4 font-semibold dark:text-white text-slate-900 list-none flex justify-between gap-3 focus:outline-none focus:ring-2 acc-ring rounded-xl"><span><span aria-hidden="true">🤔</span> 1. ¿Por qué el espectro del Sol es de absorción y no continuo?</span><span class="group-open:rotate-180 transition" aria-hidden="true">▾</span></summary><div class="px-4 pb-4 dark:text-slate-300 text-slate-700"><p class="text-sm font-bold acc-text mb-1">Respuesta sugerida</p><p>Porque la luz que sale del interior caliente y denso del Sol (con espectro continuo) atraviesa las capas exteriores, más frías y transparentes. Los átomos de esas capas absorben ciertas longitudes de onda y aparecen las líneas oscuras.</p></div></details><details class="group my-3 rounded-xl border dark:border-slate-700 border-slate-300 dark:bg-slate-800/50 bg-white"><summary class="cursor-pointer p-4 font-semibold dark:text-white text-slate-900 list-none flex justify-between gap-3 focus:outline-none focus:ring-2 acc-ring rounded-xl"><span><span aria-hidden="true">🤔</span> 2. ¿Cómo podemos saber que hay sodio en una estrella a cientos de años luz?</span><span class="group-open:rotate-180 transition" aria-hidden="true">▾</span></summary><div class="px-4 pb-4 dark:text-slate-300 text-slate-700"><p class="text-sm font-bold acc-text mb-1">Respuesta sugerida</p><p>Porque en su espectro aparecen las dos líneas características del sodio en 589,0 y 589,6 nm. Las líneas de cada elemento son siempre las mismas, en la Tierra o en una estrella lejana.</p></div></details><details class="group my-3 rounded-xl border dark:border-slate-700 border-slate-300 dark:bg-slate-800/50 bg-white"><summary class="cursor-pointer p-4 font-semibold dark:text-white text-slate-900 list-none flex justify-between gap-3 focus:outline-none focus:ring-2 acc-ring rounded-xl"><span><span aria-hidden="true">🤔</span> 3. Si las líneas de una galaxia están muy corridas al rojo, ¿qué podemos decir de ella?</span><span class="group-open:rotate-180 transition" aria-hidden="true">▾</span></summary><div class="px-4 pb-4 dark:text-slate-300 text-slate-700"><p class="text-sm font-bold acc-text mb-1">Respuesta sugerida</p><p>Que se aleja de nosotros a gran velocidad y, según la ley de Hubble, que probablemente está muy lejos.</p></div></details></div></section>
+<section class="paso prosa" id="seccion-8" data-titulo="Desafío final" aria-labelledby="h-paso-8"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Autoevaluación</span><h2 id="h-paso-8" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">Desafío final</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>Responde las 5 preguntas. Por cada respuesta correcta ganas una estrella ⭐. Al final obtienes una <strong>evidencia para el docente</strong>.</p><div class="my-4 flex gap-1 flex-wrap" id="q-estrellas"></div><div id="quiz-box" class="my-4 p-5 sm:p-6 rounded-2xl dark:bg-slate-800/60 bg-white border dark:border-slate-700 border-slate-300"><p id="q-num" class="text-sm font-bold uppercase tracking-wider acc-text"></p><h3 id="q-texto" tabindex="-1" class="text-xl font-bold my-3 dark:text-white text-slate-900 focus:outline-none"></h3><div id="q-opciones" class="space-y-3"></div><div id="q-feedback" class="hidden"></div><button id="q-comprobar" type="button" class="mt-5 px-5 py-3 rounded-xl font-bold acc-bg text-white disabled:opacity-40 focus:outline-none focus:ring-4 acc-ring">Comprobar respuesta</button></div><div id="certificado" tabindex="-1" class="hidden my-4 p-6 rounded-2xl border-2 border-yellow-500/60 bg-yellow-500/10 text-center focus:outline-none"><p class="text-5xl" aria-hidden="true">🏆</p><h3 class="text-2xl font-extrabold mt-2 dark:text-white text-slate-900">¡Misión completada!</h3><p id="c-mensaje" class="mt-2"></p><div class="mt-5 p-5 rounded-xl dark:bg-slate-900/70 bg-white border dark:border-slate-700 border-slate-300 text-left max-w-md mx-auto"><p class="text-xs font-bold uppercase tracking-wider acc-text">Evidencia para el docente</p><p class="font-bold text-lg mt-1 dark:text-white text-slate-900">Estrellas y análisis espectral</p><p class="mt-1">Título obtenido: <strong id="c-titulo"></strong></p><label class="block mt-3 text-sm no-print" for="c-nombre-input">Escribe tu nombre:</label><input id="c-nombre-input" type="text" autocomplete="name" class="no-print mt-1 w-full p-2 rounded-lg border dark:border-slate-600 border-slate-300 dark:bg-slate-800 bg-white"><p class="mt-2">Estudiante: <strong id="c-nombre">—</strong></p><p>Puntaje: <strong id="c-puntos"></strong></p><p>Fecha: <strong id="c-fecha"></strong></p></div><div class="mt-5 flex flex-wrap gap-3 justify-center no-print"><button id="q-imprimir" type="button" class="px-5 py-3 rounded-xl font-bold acc-bg text-white focus:outline-none focus:ring-4 acc-ring">🖨️ Imprimir o guardar en PDF</button><button id="q-reiniciar" type="button" class="px-5 py-3 rounded-xl font-bold dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4 acc-ring">🔄 Reiniciar el desafío</button></div></div></div></section>
+<section class="paso prosa" id="seccion-9" data-titulo="Para saber más y créditos" aria-labelledby="h-paso-9"><span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full acc-pill">Recursos</span><h2 id="h-paso-9" class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-4 dark:text-white text-slate-900 leading-tight focus:outline-none">Para saber más y créditos</h2><div class="text-base sm:text-lg dark:text-slate-300 text-slate-800 font-light"><p>Si quieres profundizar, estos recursos están pensados para estudiantes como tú.</p><ul class="space-y-3 my-4"><li class="p-4 rounded-xl dark:bg-slate-800/50 bg-white border dark:border-slate-700 border-slate-300"><a href="https://phet.colorado.edu/es/simulations/hydrogen-atom" target="_blank" rel="noopener" class="font-bold acc-link underline">🌐 PhET: Modelos del átomo de hidrógeno<span class="sr-only"> (se abre en otra pestaña)</span></a><p class="text-sm mt-1 dark:text-slate-400 text-slate-600">Simulador para ver cómo los átomos emiten luz de ciertos colores.</p></li><li class="p-4 rounded-xl dark:bg-slate-800/50 bg-white border dark:border-slate-700 border-slate-300"><a href="https://phet.colorado.edu/es/simulations/blackbody-spectrum" target="_blank" rel="noopener" class="font-bold acc-link underline">🌐 PhET: Espectro de cuerpo negro<span class="sr-only"> (se abre en otra pestaña)</span></a><p class="text-sm mt-1 dark:text-slate-400 text-slate-600">Relación entre la temperatura de un objeto y el color de su luz.</p></li><li class="p-4 rounded-xl dark:bg-slate-800/50 bg-white border dark:border-slate-700 border-slate-300"><a href="https://astro.unl.edu/naap/" target="_blank" rel="noopener" class="font-bold acc-link underline">🌐 Laboratorios NAAP (Universidad de Nebraska)<span class="sr-only"> (se abre en otra pestaña)</span></a><p class="text-sm mt-1 dark:text-slate-400 text-slate-600">Laboratorios virtuales, entre ellos uno sobre el átomo de hidrógeno y sus líneas espectrales (en inglés).</p></li></ul><h3 class="text-xl font-bold mt-8 mb-3 dark:text-white text-slate-900">🛰️ Sigue explorando en este portal</h3><ul class="grid sm:grid-cols-2 gap-3"><li class="p-4 rounded-xl acc-soft border acc-border"><a href="../clasificacion-estelar/index.html" class="font-bold acc-link underline">Clasificación estelar</a><p class="text-sm mt-1 dark:text-slate-300 text-slate-700">Cómo se ordenan las estrellas según su espectro.</p></li><li class="p-4 rounded-xl acc-soft border acc-border"><a href="https://danielgastelu.github.io/web/ec/exoplanetas.html" class="font-bold acc-link underline">Exoplanetas (portal)</a><p class="text-sm mt-1 dark:text-slate-300 text-slate-700">Otros métodos para descubrir planetas en otras estrellas.</p></li><li class="p-4 rounded-xl acc-soft border acc-border"><a href="../el-sol/index.html" class="font-bold acc-link underline">El Sol</a><p class="text-sm mt-1 dark:text-slate-300 text-slate-700">La estrella cuyo espectro estudió Fraunhofer.</p></li></ul><h3 class="text-xl font-bold mt-10 mb-3 dark:text-white text-slate-900">📚 Créditos y reconocimiento</h3><div class="p-5 rounded-2xl border acc-border acc-soft"><p class="m-0">Este recorrido es una adaptación del módulo <strong>«Estrellas y análisis espectral»</strong> de los <a href="https://aulas.uruguayeduca.edu.uy/course/view.php?id=107" target="_blank" rel="noopener" class="acc-link underline">módulos de aprendizaje de Astronomía para 1.º de Bachillerato<span class="sr-only"> (se abre en otra pestaña)</span></a> del portal Uruguay Educa. Reconocemos especialmente al <strong>prof. Héctor Roldós</strong>, autor junto a Daniel Gastelú de los textos, imágenes propias y actividades en los que se basa este nuevo contenido.</p><p>Licencia: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener" class="acc-link underline">Creative Commons Atribución-CompartirIgual 4.0 (CC BY-SA 4.0)<span class="sr-only"> (se abre en otra pestaña)</span></a>, la misma del módulo original.</p></div><details class="mt-4 rounded-xl border dark:border-slate-700 border-slate-300 dark:bg-slate-800/40 bg-white"><summary class="cursor-pointer p-4 font-semibold focus:outline-none focus:ring-2 acc-ring rounded-xl">🔗 Recorrido original en Uruguay Educa (5 enlaces)</summary><div class="px-4 pb-4"><p class="text-sm">Tema: <a href="https://aulas.uruguayeduca.edu.uy/course/view.php?id=107&amp;section=15" target="_blank" rel="noopener" class="acc-link underline">Estrellas y análisis espectral<span class="sr-only"> (se abre en otra pestaña)</span></a></p><ol class="list-decimal pl-6 space-y-1 text-sm mt-2"><li><a href="https://aulas.uruguayeduca.edu.uy/mod/page/view.php?id=11615" target="_blank" rel="noopener" class="acc-link underline break-words">¿Qué es un espectro?<span class="sr-only"> (se abre en otra pestaña)</span></a></li><li><a href="https://aulas.uruguayeduca.edu.uy/mod/page/view.php?id=11329" target="_blank" rel="noopener" class="acc-link underline break-words">La luz; mensajera de las estrellas<span class="sr-only"> (se abre en otra pestaña)</span></a></li><li><a href="https://aulas.uruguayeduca.edu.uy/mod/resource/view.php?id=11346" target="_blank" rel="noopener" class="acc-link underline break-words">Identificando elementos.<span class="sr-only"> (se abre en otra pestaña)</span></a></li><li><a href="https://aulas.uruguayeduca.edu.uy/mod/page/view.php?id=11521" target="_blank" rel="noopener" class="acc-link underline break-words">La luz revela movimientos de estrellas y galaxias.<span class="sr-only"> (se abre en otra pestaña)</span></a></li><li><a href="https://aulas.uruguayeduca.edu.uy/mod/page/view.php?id=38077" target="_blank" rel="noopener" class="acc-link underline break-words">Créditos<span class="sr-only"> (se abre en otra pestaña)</span></a></li></ol></div></details><details class="mt-3 rounded-xl border dark:border-slate-700 border-slate-300 dark:bg-slate-800/40 bg-white"><summary class="cursor-pointer p-4 font-semibold focus:outline-none focus:ring-2 acc-ring rounded-xl">🖼️ Fuentes de imágenes, videos y datos</summary><ul class="list-disc pl-10 pr-4 pb-4 space-y-1 text-sm"><li>Texto base: módulo «Estrellas y análisis espectral», Daniel Gastelú y Héctor Roldós, Uruguay Educa (CC BY-SA 4.0).</li><li>Adaptado en el módulo original de NAAP (astro.unl.edu/naap/ebs) y de NASA Imagine the Universe (imagine.gsfc.nasa.gov).</li><li>Imágenes: arcoíris, espectros estelares y globos, módulo original; tipos de espectros, NAAP, Universidad de Nebraska-Lincoln.</li><li>Video de YouTube: «Espectroscopía: herramienta para el análisis químico de cuerpos celestes» (Carl Sagan, Cosmos).</li><li>Documento «Química de las estrellas», portal Uruguay Educa.</li><li>Laboratorio de identificación de elementos: elaborado para este recorrido (reemplaza la actividad en Flash del módulo original). Longitudes de onda: NIST Atomic Spectra Database.</li><li>El módulo original dejó en construcción la página «La luz revela movimientos de estrellas y galaxias»; su contenido aquí es nuevo.</li></ul></details><p class="mt-8 flex flex-wrap gap-3 justify-center"><a href="../index.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold acc-bg text-white focus:outline-none focus:ring-4 acc-ring">🧭 Ver todos los recorridos</a><a href="https://danielgastelu.github.io/web/portada.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-300 focus:outline-none focus:ring-4 acc-ring">🏠 Volver al inicio del portal</a></p></div></section>
+</main>
+
+<!-- Navegación secuencial -->
+<nav id="barra-nav" class="sticky bottom-0 z-30 backdrop-blur-md dark:bg-darkbg/85 bg-lightbg/90 border-t dark:border-slate-800 border-slate-300" aria-label="Navegación entre pasos">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <button id="btn-anterior" type="button" class="inline-flex items-center gap-2 px-4 sm:px-5 py-3 rounded-xl font-bold dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-4 acc-ring"><span aria-hidden="true">←</span> Anterior</button>
+    <span class="hidden sm:block text-xs dark:text-slate-500 text-slate-500">También puedes usar las flechas ← → del teclado</span>
+    <button id="btn-siguiente" type="button" class="inline-flex items-center gap-2 px-4 sm:px-5 py-3 rounded-xl font-bold acc-bg text-white shadow disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-4 acc-ring">Siguiente <span aria-hidden="true">→</span></button>
+  </div>
+</nav>
+
+<!-- Reconocimiento -->
+<div class="w-full dark:bg-[#070b14] bg-slate-200 border-t dark:border-slate-800 border-slate-300">
+  <p class="max-w-4xl mx-auto px-4 sm:px-6 py-4 text-center text-sm dark:text-slate-400 text-slate-700">
+    Contenido adaptado de los <a class="acc-link underline" href="https://aulas.uruguayeduca.edu.uy/course/view.php?id=107" target="_blank" rel="noopener">módulos de aprendizaje de Astronomía de 1.º de Bachillerato<span class="sr-only"> (se abre en otra pestaña)</span></a> de Uruguay Educa, elaborados por el <strong>prof. Héctor Roldós</strong> y Daniel Gastelú. Licencia <a class="acc-link underline" href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-SA 4.0<span class="sr-only"> (se abre en otra pestaña)</span></a>.
+  </p>
+</div>
+
+<!-- Footer Uruguay Educa -->
+<footer class="main-footer container">
+  <a href="https://edytic.ces.edu.uy/" target="_blank" rel="noopener noreferrer" class="footer-card">
+    <img src="https://danielgastelu.github.io/web/logos/logoueblanco-removebg.png" alt="Logo Uruguay Educa" class="footer-logo" onerror="this.onerror=null; this.style.display='none';"/>
+    <p class="footer-text">Portal Uruguay Educa (ANEP-DGES-EDyTIC) — Contenidistas de Astronomía 2026. Herramienta educativa interactiva de uso libre desarrollada con asistencia de IA.</p>
+  </a>
+</footer>
+<script data-goatcounter="https://danielgastelu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+<script>
+const QUIZ = [{"q": "¿Qué es un espectro?", "o": ["Un fantasma.", "La luz separada en sus distintos colores o longitudes de onda.", "Un tipo de telescopio.", "La sombra de una estrella."], "c": 1, "e": "Un prisma, las gotas de lluvia o un CD separan la luz en sus colores.", "bien": "¡Correcto!"}, {"q": "¿Qué tipo de espectro produce un gas caliente y poco denso, como un tubo de neón?", "o": ["Continuo.", "De absorción.", "De emisión: líneas brillantes sobre fondo oscuro.", "Ninguno."], "c": 2, "e": "Cada gas emite solo ciertos colores, que forman su huella característica.", "bien": "¡Excelente!"}, {"q": "¿Por qué decimos que las líneas espectrales son como una huella digital?", "o": ["Porque todas las estrellas tienen las mismas líneas.", "Porque cada elemento químico tiene su propio conjunto de líneas.", "Porque solo se ven con el dedo.", "Porque cambian todos los días."], "c": 1, "e": "Comparando las líneas con las de elementos conocidos, identificamos la composición de una estrella.", "bien": "¡Muy bien!"}, {"q": "¿Dónde se descubrió el helio por primera vez?", "o": ["En una mina de Uruguay.", "En el espectro del Sol, durante un eclipse en 1868.", "En la Luna.", "En el océano."], "c": 1, "e": "Por eso se llama helio, de Helios, el Sol. En la Tierra se encontró recién en 1895.", "bien": "¡Exacto!"}, {"q": "Si las líneas de una estrella aparecen corridas hacia el rojo, la estrella…", "o": ["se acerca a nosotros.", "se aleja de nosotros.", "está quieta.", "se está apagando."], "c": 1, "e": "Es el efecto Doppler: al alejarse, las longitudes de onda se estiran hacia el rojo.", "bien": "¡Impecable!"}];
+const TITULO_CERT = "Detective de la luz";
+(function(){
+  const pasos=[...document.querySelectorAll('.paso')];
+  const total=pasos.length;
+  const btnA=document.getElementById('btn-anterior'), btnS=document.getElementById('btn-siguiente');
+  const txt=document.getElementById('progreso-texto'), relleno=document.getElementById('barra-relleno'), barra=document.getElementById('barra-progreso');
+  const listaIdx=document.getElementById('lista-indice'), indice=document.getElementById('indice');
+  const CLAVE='astro-'+location.pathname;
+  let actual=0;
+  pasos.forEach((p,i)=>{
+    const li=document.createElement('li');
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='w-full text-left px-3 py-2 rounded-lg text-sm hover-soft focus:outline-none focus:ring-2 acc-ring';
+    b.innerHTML='<span class="font-bold acc-text mr-2">'+(i+1)+'.</span>'+p.dataset.titulo;
+    b.addEventListener('click',()=>{indice.open=false;ir(i,true);});
+    li.appendChild(b);listaIdx.appendChild(li);
+  });
+  function ir(i,foco){
+    actual=Math.max(0,Math.min(total-1,i));
+    pasos.forEach((p,k)=>p.classList.toggle('activo',k===actual));
+    btnA.disabled=actual===0;
+    btnS.disabled=actual===total-1;
+    btnS.innerHTML=actual===total-2?'Último paso <span aria-hidden="true">→</span>':'Siguiente <span aria-hidden="true">→</span>';
+    txt.textContent='Paso '+(actual+1)+' de '+total+' · '+pasos[actual].dataset.titulo;
+    const pct=Math.round((actual+1)/total*100);relleno.style.width=pct+'%';barra.setAttribute('aria-valuenow',pct);
+    [...listaIdx.querySelectorAll('button')].forEach((b,k)=>{b.setAttribute('aria-current',k===actual?'step':'false');b.classList.toggle('acc-soft',k===actual);});
+    history.replaceState(null,'','#paso-'+(actual+1));
+    try{localStorage.setItem(CLAVE,String(actual));}catch(e){}
+    if(foco){window.scrollTo({top:0,behavior:'smooth'});const h=pasos[actual].querySelector('h2');if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}}
+  }
+  btnA.addEventListener('click',()=>ir(actual-1,true));
+  btnS.addEventListener('click',()=>ir(actual+1,true));
+  document.addEventListener('keydown',e=>{
+    const t=e.target.tagName; if(['INPUT','TEXTAREA','SELECT'].includes(t)||e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.key==='ArrowRight'&&actual<total-1){ir(actual+1,true);} if(e.key==='ArrowLeft'&&actual>0){ir(actual-1,true);}
+  });
+  document.querySelectorAll('[data-ir]').forEach(b=>b.addEventListener('click',()=>ir(parseInt(b.dataset.ir,10),true)));
+  let inicio=0; const m=location.hash.match(/paso-(\d+)/);
+  if(m) inicio=parseInt(m[1],10)-1; else {try{const g=localStorage.getItem(CLAVE); if(g) inicio=parseInt(g,10)||0;}catch(e){}}
+  ir(inicio,false);
+
+  /* Tema claro / oscuro */
+  const body=document.getElementById('app-body'), tg=document.getElementById('theme-toggle'), sl=document.getElementById('theme-slider'), sb=document.getElementById('space-starfield');
+  function tema(oscuro){
+    body.classList.toggle('dark',oscuro); body.classList.toggle('light',!oscuro);
+    body.classList.toggle('bg-darkbg',oscuro); body.classList.toggle('text-slate-100',oscuro);
+    body.classList.toggle('bg-lightbg',!oscuro); body.classList.toggle('text-slate-900',!oscuro);
+    sb.style.opacity=oscuro?'1':'0'; sl.classList.toggle('translate-x-7',oscuro); sl.classList.toggle('translate-x-0',!oscuro);
+    tg.setAttribute('aria-checked',String(oscuro));
+    document.querySelectorAll('.logo-oscuro').forEach(i=>i.classList.toggle('hidden',!oscuro));
+    document.querySelectorAll('.logo-claro').forEach(i=>i.classList.toggle('hidden',oscuro));
+    try{localStorage.setItem('astro-tema',oscuro?'oscuro':'claro');}catch(e){}
+  }
+  tg.addEventListener('click',()=>tema(!body.classList.contains('dark')));
+  try{ if(localStorage.getItem('astro-tema')==='claro') tema(false); }catch(e){}
+
+  /* Videos: se cargan al pulsar */
+  document.querySelectorAll('.yt-lite').forEach(b=>b.addEventListener('click',()=>{
+    const f=document.createElement('iframe');
+    f.src='https://www.youtube-nocookie.com/embed/'+b.dataset.vid+'?autoplay=1&rel=0';
+    f.title=b.dataset.titulo; f.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'; f.allowFullscreen=true;
+    f.className='w-full aspect-video rounded-xl border-0';
+    b.replaceWith(f); f.focus();
+  }));
+
+  /* Desafío final */
+  const qBox=document.getElementById('quiz-box'); if(!qBox) return;
+  let qi=0, puntos=0, elegida=null, respondida=false, orden=[];
+  const qTexto=document.getElementById('q-texto'), qOps=document.getElementById('q-opciones'), qNum=document.getElementById('q-num'),
+        qFb=document.getElementById('q-feedback'), qBtn=document.getElementById('q-comprobar'), estrellas=document.getElementById('q-estrellas'), cert=document.getElementById('certificado');
+  estrellas.innerHTML=QUIZ.map((_,i)=>'<span id="estrella-'+i+'" class="text-2xl grayscale opacity-40" aria-hidden="true">⭐</span>').join('');
+  function pintar(){
+    const q=QUIZ[qi]; elegida=null; respondida=false;
+    qNum.textContent='Pregunta '+(qi+1)+' de '+QUIZ.length;
+    qTexto.textContent=q.q; qFb.innerHTML=''; qFb.className='hidden';
+    qBtn.textContent='Comprobar respuesta'; qBtn.disabled=true;
+    qOps.innerHTML='';
+    orden=q.o.map((_,k)=>k); for(let i=orden.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[orden[i],orden[j]]=[orden[j],orden[i]];}
+    orden.forEach((k)=>{const op=q.o[k];
+      const b=document.createElement('button'); b.type='button';
+      b.className='opcion w-full text-left p-4 rounded-xl border-2 dark:border-slate-700 border-slate-300 dark:bg-slate-800/60 bg-white hover-acc focus:outline-none focus:ring-4 acc-ring transition';
+      b.setAttribute('aria-pressed','false'); b.textContent=op;
+      b.dataset.k=k;
+      b.addEventListener('click',()=>{ if(respondida) return; elegida=k; [...qOps.children].forEach(c=>c.setAttribute('aria-pressed',String(+c.dataset.k===k))); qBtn.disabled=false; });
+      qOps.appendChild(b);
+    });
+  }
+  qBtn.addEventListener('click',()=>{
+    const q=QUIZ[qi];
+    if(!respondida){
+      respondida=true; const ok=elegida===q.c; const b=[...qOps.children]; const porK=k=>b.find(x=>+x.dataset.k===k);
+      porK(q.c).classList.add('correcta'); if(!ok) porK(elegida).classList.add('incorrecta');
+      b.forEach(x=>x.disabled=true);
+      if(ok){puntos++; document.getElementById('estrella-'+qi).classList.add('star-earned'); document.getElementById('estrella-'+qi).classList.remove('grayscale','opacity-40');}
+      qFb.className='mt-4 p-4 rounded-xl border '+(ok?'border-green-500/50 bg-green-500/10':'border-red-500/50 bg-red-500/10');
+      qFb.innerHTML='<p class="font-bold mb-1">'+(ok?q.bien:'Casi. La respuesta correcta es la marcada en verde.')+'</p><p>'+q.e+'</p>';
+      qFb.setAttribute('role','status');
+      qBtn.textContent=qi<QUIZ.length-1?'Siguiente pregunta →':'Ver mi resultado 🏆';
+    } else {
+      qi++; if(qi<QUIZ.length){pintar(); qTexto.focus();} else fin();
+    }
+  });
+  function fin(){
+    qBox.classList.add('hidden'); cert.classList.remove('hidden');
+    document.getElementById('c-puntos').textContent=puntos+'/'+QUIZ.length+' estrellas';
+    document.getElementById('c-fecha').textContent=new Date().toLocaleDateString('es-UY',{day:'numeric',month:'long',year:'numeric'});
+    const msj=puntos===QUIZ.length?'¡Recorrido perfecto! Dominas el tema.':puntos>=3?'¡Buen trabajo! Repasa los pasos donde dudaste.':'¡Sigue intentándolo! Vuelve a los pasos del recorrido y prueba otra vez.';
+    document.getElementById('c-mensaje').textContent=msj;
+    document.getElementById('c-titulo').textContent=TITULO_CERT;
+    cert.focus();
+  }
+  const nombre=document.getElementById('c-nombre-input'), nombreOut=document.getElementById('c-nombre');
+  if(nombre){nombre.addEventListener('input',()=>{nombreOut.textContent=nombre.value.trim()||'—';});}
+  document.getElementById('q-reiniciar').addEventListener('click',()=>{qi=0;puntos=0;cert.classList.add('hidden');qBox.classList.remove('hidden');estrellas.querySelectorAll('span').forEach(s=>{s.classList.remove('star-earned');s.classList.add('grayscale','opacity-40');});pintar();});
+  document.getElementById('q-imprimir').addEventListener('click',()=>window.print());
+  pintar();
+})();
+</script>
+</body>
+</html>
