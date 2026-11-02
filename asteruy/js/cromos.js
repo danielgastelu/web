@@ -6,7 +6,8 @@
  *   1. Agrega un objeto con un id nuevo (no reutilices ids: el progreso se guarda por id).
  *   2. Guarda su imagen cuadrada (256×256) en img/p<id>.webp.
  *      photo: { author, license, url } para Wikimedia Commons, o
- *      photo: { site, url } para citar otra fuente (se muestra el nombre del sitio con su enlace).
+ *      photo: { site, url } para citar otra fuente (se muestra el nombre del sitio con su enlace), o
+ *      photo: { credit: 'personal' } («Archivo personal») / { credit: 'courtesy', by } («Cortesía de …»), sin enlace.
  *   3. Sube APP_VERSION en js/version.js, cuenta la novedad en APP_NOTES y agrega
  *      las traducciones del cromo en js/i18n.js.
  *
@@ -81,7 +82,7 @@ const CROMOS = [
       desc: 'Físico y astrofísico montevideano que trabajó en Princeton, Harvard y Buenos Aires. En 1955 fundó la primera institución universitaria del Uruguay dedicada a investigar física y astronomía, e impulsó el Planetario de Montevideo.',
       disc: { date: '1992-11-21', by: ['E. F. Helin'], site: 'Palomar', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.56, e: 0.169, i: 14.4, per: 1490, D: 8.6 }, cite: 'WGSBN Bull. 1, #1',
-      photo: null },
+      photo: { site: 'Academia Nacional de Ciencias (Argentina)', url: 'https://www.anc-argentina.org.ar/institucional/academicos/todos-nuestros-academicos/felix-cernuschi/' } },
     { id: 9, code: 'QMLG', num: '9478', name: 'Caldeyro', desig: '2148 P-L', category: 'Ciencia',
       honoree: 'Roberto Caldeyro Barcia', dates: '1921–1996',
       desc: 'Fisiólogo pionero de la perinatología. Con Hermógenes Álvarez creó las «Unidades Montevideo», que miden la intensidad de las contracciones del parto y se usan en todo el mundo. Presidió el PEDECIBA y ayudó a reconstruir la ciencia uruguaya tras la dictadura.',
@@ -111,13 +112,13 @@ const CROMOS = [
       desc: 'Astrónomo aficionado y comunicador. Construía sus propios telescopios y observaba estrellas variables, ocultaciones, novas y cometas.',
       disc: { date: '1989-10-02', by: ['S. J. Bus'], site: 'Cerro Tololo', cc: 'CL' },
       orbit: { cls: 'MBA', a: 2.42, e: 0.160, i: 3.61, per: 1370, D: 10.0 },
-      photo: null },
+      photo: { credit: 'courtesy', by: 'A. Galli' } },
     { id: 14, code: 'ANPS', num: '10677', name: 'Colucci', desig: '1979 MN3', category: 'Astronomía',
       honoree: 'Adrián Rodríguez Colucci', dates: 'n. 1978',
       desc: 'Astrónomo uruguayo del Observatorio del Valongo, en Río de Janeiro (Brasil). Estudia cómo las mareas cambian las órbitas de planetas y cuerpos menores.',
       disc: { date: '1979-06-25', by: ['E. F. Helin', 'S. J. Bus'], site: 'Siding Spring', cc: 'AU' },
       orbit: { cls: 'MBA', a: 2.27, e: 0.069, i: 1.98, per: 1250, D: 3.6 },
-      photo: null },
+      photo: { site: 'IAFE (UBA-CONICET), Reunión AAA 2022', url: 'https://www.iafe.uba.ar/raaa2022/charla-Colu.html' } },
     { id: 15, code: 'XSGA', num: '10690', name: 'Massera', desig: '1981 DO3', category: 'Ciencia',
       honoree: 'José Luis Massera', dates: '1915–2002',
       desc: 'Matemático que estudió la estabilidad de las ecuaciones diferenciales. El «lema de Massera» permite saber cuándo un equilibrio es estable usando las funciones de Lyapunov.',
@@ -135,7 +136,7 @@ const CROMOS = [
       desc: 'Astrónomo aficionado, profesor de astronomía en secundaria y comunicador. Fue cofundador y presidente honorario de la Asociación de Aficionados a la Astronomía.',
       disc: { date: '1981-03-02', by: ['S. J. Bus'], site: 'Siding Spring', cc: 'AU' },
       orbit: { cls: 'MBA', a: 2.66, e: 0.200, i: 5.19, per: 1590, D: 3.3 },
-      photo: null },
+      photo: { credit: 'courtesy', by: 'A. Galli' } },
     { id: 18, code: 'ZXFL', num: '12648', name: 'Ibarbourou', desig: '1135 T-3', category: 'Cultura',
       honoree: 'Juana de Ibarbourou', dates: '1892–1979',
       desc: '«Juana de América», una de las poetas más populares de Sudamérica. En sus versos los sentimientos se funden con la naturaleza.',
@@ -189,7 +190,7 @@ const CROMOS = [
       desc: 'Cantante afrouruguaya de candombe y tango que llevó la cultura afrouruguaya a muchos países. Fue la primera presidenta de Mundo Afro y «Mujer del Año» de Montevideo (2002). La propuesta surgió de estudiantes de secundaria.',
       disc: { date: '1993-03-19', by: ['UESAC'], site: 'La Silla', cc: 'CL' },
       orbit: { cls: 'MBA', a: 2.68, e: 0.081, i: 2.83, per: 1610, D: 4.3 }, cite: 'WGSBN Bull. 4, #14',
-      photo: { author: 'Mike Peel', license: 'CC BY-SA 4.0', url: commons('At_Montevideo_2023_484.jpg'), note: 'Su sol en el Paseo de los Soles' } },
+      photo: { site: 'Portal Uruguay Educa', url: 'https://uruguayeduca.anep.edu.uy/sites/default/files/exelearning/06-2026/14645/las_llamadas.html' } },
     { id: 27, code: 'URFZ', num: '20055', name: 'Mariaespinola', desig: '1993 FB47', category: 'Educación',
       honoree: 'María Espínola', dates: '1878–1963',
       desc: 'Maestra e inspectora que fundó la primera escuela técnica de San José de Mayo. En 1921 integró el Consejo de Enseñanza Primaria y Normal, el cargo más alto ocupado por una mujer en el Uruguay hasta entonces. Escribió «La escuela y el progreso» (1922).',
@@ -201,7 +202,7 @@ const CROMOS = [
       desc: 'Artista plástica y maestra que trabajó en escuelas y centros de secundaria, rurales y urbanos. Hizo aportes importantes a las artes y la cultura, y recibió el Premio Morosoli de Plata en 2010.',
       disc: { date: '1993-10-09', by: ['E. W. Elst'], site: 'La Silla', cc: 'CL' },
       orbit: { cls: 'OMB', a: 3.21, e: 0.123, i: 1.8, per: 2100, D: 11.0 }, cite: 'WGSBN Bull. 5, #4',
-      photo: null },
+      photo: { site: 'San Carlos y su Gente', url: 'https://sancarlosysugente.weebly.com/marta-nieves-art-plaacutestica.html', note: 'Junto a una de sus obras' } },
     { id: 29, code: 'BEWU', num: '20176', name: 'Aliciagoyena', desig: '1996 XK29', category: 'Educación',
       honoree: 'Alicia Goyena', dates: '1897–1977',
       desc: 'Profesora de historia y directora de la Sección Femenina del Instituto Batlle y Ordóñez. Promovió una educación humanista y el acceso de las mujeres a la enseñanza secundaria.',
@@ -219,7 +220,7 @@ const CROMOS = [
       desc: 'Estudia meteoros, meteoroides, discos de escombros y sistemas planetarios con radar y observaciones ópticas y polarimétricas. Fue investigador posdoctoral en el Centro Goddard de la NASA y hoy trabaja en la Facultad de Ciencias.',
       disc: { date: '1998-04-25', by: ['LONEOS'], site: 'Anderson Mesa', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.90, e: 0.028, i: 0.97, per: 1800 }, cite: 'WGSBN Bull. 1, #2',
-      photo: null },
+      photo: { author: 'Imagen personal', site: 'X (@jsbruzzone)', url: 'https://x.com/jsbruzzone' } },
     { id: 32, code: 'DASV', num: '30449', name: 'Caldas', desig: '2000 NH13', category: 'Astronomía',
       honoree: 'Manuel Caldas', dates: 'n. 1981',
       desc: 'Ingeniero espacial e investigador del Departamento de Astronomía de la Facultad de Ciencias. Trabaja en radioastronomía e instrumentación y participa en BOCOSUR, la red uruguaya de cámaras que detecta bólidos.',
@@ -231,13 +232,13 @@ const CROMOS = [
       desc: 'Profesora del Centro Universitario Regional del Este (Udelar), donde dirige el observatorio astronómico. Estudia la dinámica y las propiedades físicas de los cuerpos menores del Sistema Solar.',
       disc: { date: '1999-01-14', by: ['LONEOS'], site: 'Anderson Mesa', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.24, e: 0.089, i: 4.12, per: 1230, D: 2.3 }, cite: 'WGSBN Bull. 1, #2',
-      photo: null },
+      photo: { credit: 'personal' } },
     { id: 34, code: 'YHRN', g: 'f', num: '34409', name: 'Venturini', desig: '2000 RB95', category: 'Astronomía',
       honoree: 'Julia Venturini', dates: 'n. 1988',
       desc: 'Astrofísica de la Universidad de Ginebra (Suiza). Crea modelos por computadora de cómo se forman los planetas, incluyendo su estructura interna y cómo migran dentro de su sistema.',
       disc: { date: '2000-09-04', by: ['LONEOS'], site: 'Anderson Mesa', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.97, e: 0.061, i: 9.65, per: 1870, D: 5.2 }, cite: 'WGSBN Bull. 3, #9',
-      photo: null },
+      photo: { site: '500 Women Scientists Fribourg-Bern', url: 'https://www.500womenscientistsfribourgbern.ch/team-member/dr.-julia-venturini' } },
     { id: 35, code: 'QVRA', num: '34808', name: 'Bocosur', desig: '2001 SY73', category: 'Divulgación',
       honoree: 'Red BOCOSUR (Bólidos del Cono Sur)', dates: 'red de cámaras',
       desc: 'La red uruguaya de cámaras de cielo completo que detecta bólidos. Tiene más de 20 estaciones en azoteas de centros de enseñanza secundaria de todo el país, y docentes y estudiantes ayudan a mantenerla y a analizar los datos.',
@@ -273,7 +274,7 @@ const CROMOS = [
       desc: 'Astrónomo aficionado que estudia cuerpos menores, lluvias de meteoros y estrellas variables, muy conocido por divulgar la astronomía en Uruguay, Brasil y Argentina. ¡Uno de los descubridores de su asteroide es Javier Licandro, que también está en este álbum!',
       disc: { date: '2009-01-20', by: ['R. Gil-Hutton', 'J. Licandro'], site: 'Kitt Peak', cc: 'US' },
       orbit: { cls: 'MBA', a: 2.70, e: 0.067, i: 6.4, per: 1620 }, cite: 'WGSBN Bull. 5, #10',
-      photo: null }
+      photo: { credit: 'personal' } }
 ];
 
 /* Fuentes consultadas (se muestran en "Fuentes y créditos"). */
