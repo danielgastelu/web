@@ -5,7 +5,7 @@ import { T } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
-const S = { lang: 'en', showRF: true, showReg: true, showComm: false, comm: null, layer: 'month', mode: 'sun', hour: 0, month: 0, mSun: 0, mRadio: 0, view: '2d', exag: 4 /* exageración vertical de la vista 3D, solo visual */, skyWide: true,
+const S = { lang: 'en', showRF: true, showReg: true, showComm: false, comm: null, layer: 'month', mode: 'sun', hour: 0, month: 0, mSun: 0, mRadio: 0, view: '2d', exag: 1 /* exageración vertical de la vista 3D, solo visual */, skyWide: true,
             level: null, sel: null, pins: [], sugg: null, suggList: [] };
 let META, EPH, NH, M, L = {}, FINE, RF = null;      // datos
 const hzCache = new Map(), serCache = new Map();
