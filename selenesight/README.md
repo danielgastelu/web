@@ -8,7 +8,8 @@
 
 | ES | EN |
 |---|---|
-| Mapa estereográfico polar (80°S–polo) y vista 3D con relieve exagerado ×4 | Polar stereographic map (80°S–pole) and 3D view with 4× vertical exaggeration |
+| Mapa estereográfico polar (80°S–polo) y vista 3D con relieve exagerado (selector 1× · 2× · 4×, por defecto 4×; solo visual) | Polar stereographic map (80°S–pole) and 3D view with vertical exaggeration (1× · 2× · 4× selector, 4× by default; visual only) |
+| Botones + / − / restablecer vista (sin depender de rueda ni pellizco), capa «Solo relieve» sin colores, paneles de capas y leyenda plegables en pantallas chicas | + / − / reset-view buttons (no need for wheel or pinch), "Relief only" layer without colours, collapsible layers and legend panels on small screens |
 | Hexágonos semitransparentes de 10 y 5 km (hasta 80°S) y 2 km (hasta 85°S) según el zoom, en 5 clases del % del mes sinódico: 0–20 % rojo, 21–40 % naranja, 41–60 % amarillo, 61–80 % verde pálido y 81–100 % verde pleno (referencia en la leyenda del mapa) | Semi-transparent 10 and 5 km (to 80°S) and 2 km (to 85°S) hexagons depending on zoom, in 5 classes of the synodic month %: 0–20% red, 21–40% orange, 41–60% yellow, 61–80% pale green and 81–100% full green (key in the map legend) |
 | Interruptor Sol / Tierra | Sun / Earth switch |
 | Horizonte y cielo de 0 a 30° (escala ampliada en 0–10°) con las trayectorias del mes | Horizon & sky 0–30° (expanded 0–10° scale) with monthly paths |

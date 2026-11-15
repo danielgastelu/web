@@ -5,7 +5,7 @@ import { T } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
-const S = { lang: 'en', showRF: true, showReg: true, showComm: false, comm: null, layer: 'month', mode: 'sun', hour: 0, month: 0, mSun: 0, mRadio: 0, view: '2d', skyWide: true,
+const S = { lang: 'en', showRF: true, showReg: true, showComm: false, comm: null, layer: 'month', mode: 'sun', hour: 0, month: 0, mSun: 0, mRadio: 0, view: '2d', exag: 4 /* exageración vertical de la vista 3D, solo visual */, skyWide: true,
             level: null, sel: null, pins: [], sugg: null, suggList: [] };
 let META, EPH, NH, M, L = {}, FINE, RF = null;      // datos
 const hzCache = new Map(), serCache = new Map();
@@ -14,6 +14,10 @@ function announce(msg) { const a = $('announce'); a.textContent = ''; setTimeout
 
 // ---------- i18n ----------
 function t(k, vars) { let s = (T[S.lang] && T[S.lang][k]) ?? T.es[k] ?? k; if (vars) for (const v in vars) s = s.replace('{' + v + '}', vars[v]); return s; }
+function setLoading(txt) { // texto + tres puntos animados (decorativos; el lector de pantalla oye solo el texto)
+  $('loading').innerHTML = '<span></span><span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span>';
+  $('loading').firstChild.textContent = txt.replace(/(…|\.\.\.)$/, '');
+}
 function applyI18n() {
   document.documentElement.lang = S.lang;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
@@ -21,8 +25,8 @@ function applyI18n() {
   document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
   document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
   $('play').setAttribute('aria-label', playing() ? t('ariaPause') : t('ariaPlay'));
-  document.title = t('docTitle'); $('loading').textContent = t('loading');
-  $('viewBtn').textContent = S.view === '2d' ? t('view3d') : t('view2d');
+  document.title = t('docTitle'); setLoading(t('loading'));
+  $('viewBtn').textContent = S.view === '2d' ? t('view3d') : t('view2d'); exagNote();
   $('skyZoom').textContent = S.skyWide ? t('sky90') : t('sky360');
   $('infoBody').innerHTML = t('infoHtml');
   buildSiteList(); renderEclipses(); renderStories(); renderGlossList(); if (tourI >= 0) tourShow(tourI); $('maxNightV').textContent = $('maxNight').value + ' ' + t('d'); updateLegend(); updateTimeLabel(); refreshSite(); renderCompare(); renderSuggest(); if (S.level) checkLevel();
@@ -153,7 +157,6 @@ function pctOf(lv, i, m) {
 
 // ---------- escena 3D ----------
 let renderer, scene, camO, camP, cam, controls, terrain, overlayCanvas, overlayCtx, hexCanvas, overlayTex, reliefImg, TER, EXT, marks;
-const EXAG = 4;
 async function initScene() {
   const el = $('map');
   renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio));
@@ -192,10 +195,10 @@ function setExag(ex) {
 }
 function terrH(x, y) { // km en coordenadas de escena, según exageración actual
   const c = Math.round((x/1000 + EXT)/(2*EXT)*511), r = Math.round((EXT - y/1000)/(2*EXT)*511);
-  if (c < 0 || r < 0 || c > 511 || r > 511) return 0; return TER[r*512 + c]/1000*(S.view === '3d' ? EXAG : 1);
+  if (c < 0 || r < 0 || c > 511 || r > 511) return 0; return TER[r*512 + c]/1000*(S.view === '3d' ? S.exag : 1);
 }
 function setView(v) {
-  S.view = v; const ex = v === '3d' ? EXAG : 1; setExag(ex);
+  S.view = v; const ex = v === '3d' ? S.exag : 1; setExag(ex); $('exagBox').hidden = v !== '3d'; exagNote();
   if (controls) controls.dispose();
   if (v === '2d') { camO.up.set(0, 0, -1); camO.position.set(0, 1000, 0); }
   else { camP.up.set(0, 1, 0); camP.position.set(0, 180, 200); }
@@ -207,6 +210,15 @@ function setView(v) {
   $('viewBtn').textContent = v === '2d' ? t('view3d') : t('view2d');
   resize(); drawMarks(); checkLevel();
 }
+function exagNote() { $('exagNote').textContent = S.exag === 1 ? t('exagReal') : t('exagNote').replace('{x}', S.exag); }
+function setExagLevel(x) { S.exag = x; if (S.view === '3d') { setExag(x); drawMarks(); } exagNote(); }
+function zoomBy(f) { // botones + / − (alternativa a rueda, pellizco o arrastre)
+  if (!controls) return;
+  if (cam === camO) { camO.zoom = Math.max(0.8, Math.min(80, camO.zoom*f)); camO.updateProjectionMatrix(); }
+  else { const v = camP.position.clone().sub(controls.target), d = Math.max(4, Math.min(900, v.length()/f)); camP.position.copy(controls.target).add(v.setLength(d)); }
+  controls.update(); checkLevel();
+}
+function bindToggle(btn, body) { btn.onclick = () => { const ex = btn.getAttribute('aria-expanded') !== 'true'; btn.setAttribute('aria-expanded', ex); $(body).hidden = !ex; }; }
 function resize() {
   const el = $('map'), w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
   renderer.setSize(w, h); const a = w/h, hh = EXT*1.05;
@@ -214,7 +226,7 @@ function resize() {
   camP.aspect = a; camP.updateProjectionMatrix(); drawSky(); drawStrip();
 }
 function visibleKm() {
-  if (cam === camO) return (camO.top - camO.bottom)/camO.zoom;
+  if (cam === camO) return Math.min(camO.top - camO.bottom, camO.right - camO.left)/camO.zoom;   // lado menor: en celular vertical manda el ancho
   return cam.position.distanceTo(controls.target) * 0.9;
 }
 function checkLevel() {
@@ -256,17 +268,18 @@ function drawOverlay() {
       hc.fillStyle = color(pctOf(q, i, m) + mg); hc.beginPath();
       for (let k = 0; k < 6; k++) { const a = k*Math.PI/3; hc.lineTo(cx + rpx*Math.cos(a), cy + rpx*Math.sin(a)); }
       hc.fill(); } };
-  if (lv.extent && lv.extent < META.extent - 1) {   // fuera del alcance de este nivel se dibuja el anterior (más grueso)
+  const bare = S.layer === 'relief';   // capa «solo relieve»: sin hexágonos de color
+  if (!bare && lv.extent && lv.extent < META.extent - 1) {   // fuera del alcance de este nivel se dibuja el anterior (más grueso)
     const tags = META.levels.map(l => l.tag), C = L[tags[tags.indexOf(lv.tag) - 1]];
     hexes(C, i => Math.hypot(C.pts[i*6], C.pts[i*6+1]) > lv.extent + lv.diam/2);
   }
-  hexes(lv);
+  if (!bare) { hexes(lv);
   ctx.save(); ctx.beginPath(); ctx.arc(s/2, s/2, s/2, 0, 2*Math.PI); ctx.clip();
-  ctx.globalAlpha = 0.5; ctx.drawImage(hexCanvas, 0, 0); ctx.restore();
+  ctx.globalAlpha = 0.5; ctx.drawImage(hexCanvas, 0, 0); ctx.restore(); }
   ctx.strokeStyle = '#ffffff55'; ctx.lineWidth = s/1500; ctx.beginPath(); ctx.arc(s/2, s/2, s/2 - ctx.lineWidth, 0, 2*Math.PI); ctx.stroke();
   if (RF && S.showRF) {   // puntos refinados (40 m): rombos con borde blanco, color según la capa
     const r = s/700; ctx.lineWidth = s/1800; ctx.strokeStyle = '#ffffff';
-    for (let i = 0; i < RF.n; i++) { const [cx, cy] = cxy(RF.pts[i*6], RF.pts[i*6+1]); ctx.fillStyle = color(pctOf(RF, i, m) + mg);
+    for (let i = 0; i < RF.n; i++) { const [cx, cy] = cxy(RF.pts[i*6], RF.pts[i*6+1]); ctx.fillStyle = bare ? '#ffffff' : color(pctOf(RF, i, m) + mg);
       ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r, cy); ctx.closePath(); ctx.fill(); ctx.stroke(); }
   }
   if (S.showReg && META.regions) {   // contornos de las 9 regiones candidatas de Artemis III (USGS)
@@ -287,6 +300,8 @@ function drawOverlay() {
 function updateLegend() {
   if (!META || !S.level) return;
   const night = S.layer === 'night';
+  if (S.layer === 'relief') { $('lgTitle').textContent = t('lgRelief'); $('lgClasses').innerHTML = ''; $('lgClasses').hidden = true; $('lgNote').textContent = t('lgReliefNote'); return; }
+  $('lgClasses').hidden = false;
   $('lgTitle').textContent = night ? (S.mode === 'sun' ? t('lgNight') : t('lgBlack')) : S.layer === 'long' ? (S.mode === 'sun' ? t('lgSunLong') : t('lgEarthLong')) : (S.mode === 'sun' ? t('lgSun') : t('lgEarth'));
   const d = t('d'), pc = S.lang === 'es' ? ' %' : '%', lab = night ? [`> 26 ${d}`, `22–26 ${d}`, `18–22 ${d}`, `16–18 ${d}`, `≤ 16 ${d}`] : ['0–20', '21–40', '41–60', '61–80', '81–100'].map(r => r + pc);
   $('lgClasses').innerHTML = CLASSES.map(([, c], k) => `<li><span class="sw" style="background:${c}"></span>${lab[k]}</li>`).join('');
@@ -394,7 +409,7 @@ function drawSky() {
 function drawStrip() {
   const c = $('strip'), dpr = devicePixelRatio || 1, W = c.clientWidth, H = 70; c.width = W*dpr; c.height = H*dpr;
   const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.fillStyle = '#05070d'; x.fillRect(0, 0, W, H);
-  const ser = S.sel && serCache.get(S.sel.lv.tag + S.sel.i); if (!ser) { c.setAttribute('aria-label', ''); return; }
+  const ser = S.sel && serCache.get(S.sel.lv.tag + S.sel.i); if (!ser) { c.setAttribute('aria-label', t('ariaStripEmpty')); return; }
   const mo = META.months[S.month], n = mo.h1 - mo.h0 + 1, X = (k) => (k - mo.h0)/n*W;
   c.setAttribute('aria-label', t('ariaStrip', { s: vSun(S.sel.lv, S.sel.i, S.month), e: vEarth(S.sel.lv, S.sel.i, S.month), a: mo.start.slice(0, 10), b: mo.end.slice(0, 10) }));
   for (let k = mo.h0; k <= mo.h1; k++) {
@@ -758,6 +773,10 @@ function setMode(m) {
 function bindUI() {
   $('modeSun').onclick = () => setMode('sun'); $('modeEarth').onclick = () => setMode('earth');
   $('viewBtn').onclick = () => setView(S.view === '2d' ? '3d' : '2d');
+  document.querySelectorAll('input[name=exag]').forEach(r => r.onchange = () => setExagLevel(+r.value));
+  $('zIn').onclick = () => zoomBy(1.5); $('zOut').onclick = () => zoomBy(1/1.5); $('zReset').onclick = () => setView(S.view);
+  bindToggle($('layerTog'), 'layerBody'); bindToggle($('lgTog'), 'lgMore');
+  if (matchMedia('(max-width: 700px), (max-height: 520px)').matches) { $('layerTog').click(); $('lgTog').click(); } // pantallas chicas: paneles plegados
   $('skyZoom').onclick = () => { S.skyWide = !S.skyWide; $('skyZoom').textContent = S.skyWide ? t('sky90') : t('sky360'); drawSky(); };
   $('lang').onchange = (e) => { S.lang = e.target.value; try { localStorage.setItem('selenesight-lang', S.lang); } catch {} applyI18n(); };
   $('infoBtn').onclick = () => $('info').showModal();
@@ -792,7 +811,7 @@ function bindUI() {
 (async function main() {
   S.lang = 'en';   // inglés por defecto (jurado internacional); se recuerda la elección
   try { S.lang = localStorage.getItem('selenesight-lang') === 'es' ? 'es' : 'en'; } catch {}
-  $('lang').value = S.lang;
+  $('lang').value = S.lang; setLoading(t('loading'));
   let ui = 'explore'; try { ui = localStorage.getItem('selenesight-ui') || 'explore'; } catch {}
   const qs = new URLSearchParams(location.search), qm = (qs.get('modo') || qs.get('mode') || '').toLowerCase();
   const forced = ['planificar', 'plan'].includes(qm) ? 'plan' : ['explorar', 'explore'].includes(qm) ? 'explore' : null;

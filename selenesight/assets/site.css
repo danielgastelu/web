@@ -61,9 +61,11 @@ h1{font:600 clamp(2.6rem,6.4vw,5rem)/1.0 var(--display);letter-spacing:-.005em;m
 .horizon .sun-hid{stroke:var(--sun-hid);stroke-width:2.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .horizon .earth-vis{stroke:var(--earth);stroke-width:3.2;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .horizon .earth-hid{stroke:var(--earth-hid);stroke-width:2.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
-figcaption{font-size:1rem;line-height:1.55;color:var(--shade);margin-top:1rem}
+figcaption{font:500 1rem/1.4 var(--display);letter-spacing:.01em;color:var(--shade);margin-top:.8rem}
 figcaption > span{display:block;max-width:44rem}
 .hscroll{overflow-x:auto}
+.horizon-m{display:none}
+.horizon-m .el{font-size:22px}.horizon-m .az{font-size:28px}
 .hscroll:focus-visible{outline-offset:-3px}
 
 /* bloques */
@@ -91,6 +93,13 @@ td{font:600 1.35rem var(--display);white-space:nowrap;text-align:right}
 .foot p{max-width:46rem;margin:0 0 1rem}
 
 @media (max-width:640px){
+  html{font-size:1rem;line-height:1.55}
+  .lede{font-size:1.1rem}
+  h1{font-size:clamp(2.1rem,9vw,2.6rem)}
+  .horizon:not(.horizon-m){display:none}
+  .horizon.horizon-m{display:block;min-width:0;width:100%;height:auto}
+  .hscroll{overflow:visible}
+  figcaption{font-size:.95rem}
   .top{flex-wrap:wrap;gap:.5rem}
   .qs div{grid-template-columns:1fr}
   .quiet{margin-left:0;width:100%}
@@ -121,7 +130,7 @@ td{font:600 1.35rem var(--display);white-space:nowrap;text-align:right}
 #shackleton h3,#shackleton h2.sub{font:600 1.35rem/1.2 var(--display);margin:2.2rem 0 .6rem}
 #shackleton .photo{margin:1.6rem 0 1rem;max-width:56rem}
 #shackleton .photo img{display:block;width:100%;height:auto;background:#05070D;border-radius:2px}
-#shackleton figcaption,.nights figcaption{font-size:.92rem;color:var(--shade);max-width:42rem;margin-top:.5rem}
+#shackleton figcaption,.nights figcaption{color:var(--shade);max-width:42rem;margin-top:.5rem}
 .nights{margin:1.4rem 0 .5rem;max-width:56rem}
 .nights svg{display:block;width:100%;height:auto}
 .nights .g{stroke:var(--shade);stroke-opacity:.25;stroke-width:1}
@@ -167,7 +176,7 @@ td{font:600 1.35rem var(--display);white-space:nowrap;text-align:right}
 #comunicaciones h2.sub{font:600 1.35rem/1.2 var(--display);margin:2.2rem 0 .6rem}
 #comunicaciones .photo{margin:1.6rem 0 1rem;max-width:34rem}
 #comunicaciones .photo img{display:block;width:100%;height:auto;background:#05070D;border-radius:2px}
-#comunicaciones figcaption{font-size:.92rem;color:var(--shade);max-width:42rem;margin-top:.5rem}
+#comunicaciones figcaption{color:var(--shade);max-width:42rem;margin-top:.5rem}
 .relay{margin:1.6rem 0 1rem;max-width:56rem}
 .relay svg{display:block;width:100%;height:auto;background:#05070D;border-radius:2px}
 .relay .gnd{fill:#4A5566}

@@ -39,18 +39,27 @@
     <h2 id="mapTitle" class="sr" data-i18n="mapTitle">Mapa del polo sur lunar</h2>
     <div id="map" role="img" data-i18n-aria="ariaMap" aria-label="Mapa polar interactivo"></div>
     <div id="legend" aria-live="off">
-      <div class="lg-title" id="lgTitle"></div>
+      <button type="button" id="lgTog" class="ovl-tog" aria-expanded="true" aria-controls="lgMore"><span class="lg-title" id="lgTitle"></span><span class="chev" aria-hidden="true"></span></button>
       <ul class="lg-classes" id="lgClasses"></ul>
-      <div class="lg-note" id="lgNote"></div>
-      <p class="terms small"><button type="button" class="term" data-term="hexagon" data-i18n="g_hexagon_t"></button> · <button type="button" class="term" data-term="synodic" data-i18n="g_synodic_t"></button></p>
+      <div id="lgMore"><div class="lg-note" id="lgNote"></div>
+      <p class="terms small"><button type="button" class="term" data-term="hexagon" data-i18n="g_hexagon_t"></button> · <button type="button" class="term" data-term="synodic" data-i18n="g_synodic_t"></button></p></div>
     </div>
     <div id="hud" aria-hidden="true"></div>
-    <div id="layerBox"><label for="layer" data-i18n="layer">Capa</label>
-      <select id="layer"><option value="month" data-i18n="layerMonth">Mes del deslizador</option><option value="long" data-i18n="layerLong">Largo plazo: % de tiempo (en intervalo de 18,6 años)</option><option value="night" data-i18n="layerNight">Largo plazo: noche / apagón más largo</option></select>
+    <div id="layerBox"><button type="button" id="layerTog" class="ovl-tog" aria-expanded="true" aria-controls="layerBody"><span data-i18n="layersBtn">Capas</span><span class="chev" aria-hidden="true"></span></button>
+      <div id="layerBody"><label for="layer" data-i18n="layer">Capa</label>
+      <select id="layer"><option value="month" data-i18n="layerMonth">Mes del deslizador</option><option value="long" data-i18n="layerLong">Largo plazo: % de tiempo (en intervalo de 18,6 años)</option><option value="night" data-i18n="layerNight">Largo plazo: noche / apagón más largo</option><option value="relief" data-i18n="layerRelief">Solo relieve (sin colores)</option></select>
       <label class="chk"><input id="showRF" type="checkbox" checked> <span data-i18n="refinedShow">◆ Puntos 40 m</span></label>
       <label class="chk"><input id="showReg" type="checkbox" checked> <span data-i18n="regShow">Regiones Artemis III</span></label>
-      <label class="chk"><input id="showComm" type="checkbox"> <span data-i18n="commShow">○ Tierra siempre visible</span></label></div>
-    <div id="loading" data-i18n="loading">Cargando datos…</div>
+      <label class="chk"><input id="showComm" type="checkbox"> <span data-i18n="commShow">○ Tierra siempre visible</span></label>
+      <fieldset id="exagBox" class="exag" hidden><legend data-i18n="exagLegend">Altura del relieve</legend>
+      <div class="exag-opts"><label><input type="radio" name="exag" value="1"> 1×</label><label><input type="radio" name="exag" value="2"> 2×</label><label><input type="radio" name="exag" value="4" checked> 4×</label></div>
+      <p id="exagNote" class="exag-note" aria-live="polite"></p></fieldset></div></div>
+    <div id="zoomBox" role="group" data-i18n-aria="zGroup" aria-label="Zoom">
+      <button type="button" id="zIn" class="zbtn" data-i18n-aria="zIn" data-i18n-title="zIn" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      <button type="button" id="zOut" class="zbtn" data-i18n-aria="zOut" data-i18n-title="zOut" aria-label="Zoom out"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      <button type="button" id="zReset" class="zbtn" data-i18n-aria="zReset" data-i18n-title="zReset" aria-label="Reset view"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg></button>
+    </div>
+    <div id="loading" role="status"><span>Loading data</span><span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></div>
   </section>
 
   <aside id="side" tabindex="-1" data-i18n-aria="ariaSide" aria-label="Controles y resultados">
