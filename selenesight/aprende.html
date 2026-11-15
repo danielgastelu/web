@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-title-es="Glosario, juego y trivia · SeleneSight" data-title-en="Glossary, game and quiz · SeleneSight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary, game and quiz · SeleneSight</title>
+<meta name="description" content="SeleneSight: where there is sunlight, Earth in view and water at the Moon’s south pole. NASA Space Apps Challenge.">
+<meta name="theme-color" content="#E8EAEC">
+<link rel="icon" href="app/icons/icon-192.png">
+<link rel="preload" href="assets/fonts/barlow-condensed-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main"><span data-l="es">Saltar al contenido</span><span data-l="en" lang="en">Skip to content</span></a>
+<header class="top">
+  <a class="home" href="./"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22"><path d="M3 11.2 12 4l9 7.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.5V20h5v-6h3v6h5V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-l="es">Inicio</span><span data-l="en" lang="en">Home</span></a>
+  <a class="mark" href="./" aria-label="SeleneSight">SeleneSight</a>
+  <nav aria-label="Language" class="langs">
+    <button type="button" data-set="es" aria-pressed="false" lang="es">Español</button>
+    <button type="button" data-set="en" aria-pressed="true" lang="en">English</button>
+  </nav>
+  <a class="navlink" href="./#acerca"><span data-l="es">Acerca de</span><span data-l="en" lang="en">About</span></a>
+  <a class="open small" href="app/"><span data-l="es">Abrir la app</span><span data-l="en" lang="en">Open the app</span></a>
+</header>
+
+<main id="main">
+  <section class="wrap block page" id="glosario" aria-labelledby="gl">
+    <h1 id="gl" class="page-h"><span data-l="es">Glosario</span><span data-l="en" lang="en">Glossary</span></h1>
+    <div class="gloss-wrap">
+    <dl class="gloss">
+      <div><dt><span data-l="es">Horizonte real</span><span data-l="en" lang="en">True horizon</span></dt>
+      <dd><span data-l="es">La línea donde el terreno se junta con el cielo. En la Luna no hay aire que desvíe la luz, así que lo definen solo las montañas y la curvatura del suelo.</span><span data-l="en" lang="en">Where the ground meets the sky. The Moon has no air to bend light, so only mountains and the curve of the ground define it.</span></dd></div>
+      <div><dt><span data-l="es">Línea de visión</span><span data-l="en" lang="en">Line of sight</span></dt>
+      <dd><span data-l="es">Una línea recta sin obstáculos entre dos puntos. Un panel necesita línea de visión con el Sol para generar energía, y una antena la necesita con la Tierra para comunicarse directamente. De ahí viene el nombre SeleneSight.</span><span data-l="en" lang="en">A straight, unobstructed line between two points. A panel needs a line of sight to the Sun to generate power, and an antenna needs one to Earth to talk to it directly. That is where the name SeleneSight comes from.</span></dd></div>
+      <div><dt><span data-l="es">Elevación</span><span data-l="en" lang="en">Elevation</span></dt>
+      <dd><span data-l="es">Cuántos grados está algo por encima (o por debajo) del horizonte plano. En el polo mismo el Sol nunca pasa de un grado y medio; a 85° S llega a unos 6,5°.</span><span data-l="en" lang="en">How many degrees something is above (or below) the flat horizon. At the pole itself the Sun never gets past a degree and a half; at 85° S it reaches about 6.5°.</span></dd></div>
+      <div><dt><span data-l="es">Azimut</span><span data-l="en" lang="en">Azimuth</span></dt>
+      <dd><span data-l="es">La dirección en la que está algo, medida en grados desde el norte y girando hacia el este.</span><span data-l="en" lang="en">The direction something is in, measured in degrees from north, turning towards east.</span></dd></div>
+      <div><dt><span data-l="es">Paneles verticales</span><span data-l="en" lang="en">Vertical panels</span></dt>
+      <dd><span data-l="es">En el polo el Sol está casi en el horizonte: un panel acostado recibe la luz de canto (muy poca energía), mientras que uno vertical que gira siguiendo al Sol la recibe de frente. Potencia relativa = fracción del disco visible × coseno de la elevación (vertical) o × seno de la elevación (horizontal).</span><span data-l="en" lang="en">At the pole the Sun sits almost on the horizon: a flat panel catches the light edge-on (very little power), while a vertical panel that turns to follow the Sun faces it. Relative power = visible disk fraction × cosine of elevation (vertical) or × sine of elevation (horizontal).</span></dd></div>
+      <div><dt><span data-l="es">Mes sinódico</span><span data-l="en" lang="en">Synodic month</span></dt>
+      <dd><span data-l="es">El tiempo entre dos lunas nuevas: 29,5 días. Es lo que tarda el Sol en dar una vuelta completa al horizonte visto desde la Luna.</span><span data-l="en" lang="en">The time between two new moons: 29.5 days. It is how long the Sun takes to circle the horizon as seen from the Moon.</span></dd></div>
+      <div><dt><span data-l="es">Libración</span><span data-l="en" lang="en">Libration</span></dt>
+      <dd><span data-l="es">Un leve balanceo aparente de la Luna. Desde el polo hace que la Tierra suba y baje unos 7° en el cielo cada mes.</span><span data-l="en" lang="en">A slight apparent rocking of the Moon. From the pole it makes Earth rise and sink about 7° in the sky each month.</span></dd></div>
+      <div><dt><span data-l="es">Sombra permanente</span><span data-l="en" lang="en">Permanent shadow</span></dt>
+      <dd><span data-l="es">Lugares, casi siempre fondos de cráteres, donde el Sol no llega nunca. Son trampas frías: en algunas de las regiones de Artemis III la temperatura máxima del verano es de unos 93 K (−180 °C), y pueden guardar hielo de agua.</span><span data-l="en" lang="en">Places, usually crater floors, that sunlight never reaches. They are cold traps: in some Artemis III regions the maximum summer temperature is about 93 K (−180 °C), and they can hold water ice.</span></dd></div>
+      <div><dt><span data-l="es">Noche continua más larga</span><span data-l="en" lang="en">Longest continuous night</span></dt>
+      <dd><span data-l="es">El mayor tiempo seguido sin Sol en un intervalo de 18,6 años. Define cuántas baterías necesita una base.</span><span data-l="en" lang="en">The longest stretch without sunlight over an 18.6-year span. It sets how many batteries a base needs.</span></dd></div>
+      <div><dt><span data-l="es">Apagón de Tierra</span><span data-l="en" lang="en">Earth blackout</span></dt>
+      <dd><span data-l="es">El mayor tiempo seguido sin ver la Tierra. Mientras dura, no hay comunicación directa sin un satélite.</span><span data-l="en" lang="en">The longest stretch without seeing Earth. While it lasts there is no direct communication without a satellite.</span></dd></div>
+      <div><dt><span data-l="es">Eclipse visto desde la Luna</span><span data-l="en" lang="en">Eclipse seen from the Moon</span></dt>
+      <dd><span data-l="es">Cuando en la Tierra vemos un eclipse de Luna, desde la Luna la Tierra tapa al Sol. Oscurece toda la región al mismo tiempo.</span><span data-l="en" lang="en">When we see a lunar eclipse on Earth, from the Moon Earth is blocking the Sun. It darkens the whole region at once.</span></dd></div>
+      <div><dt><span data-l="es">UTC</span><span data-l="en" lang="en">UTC</span></dt>
+      <dd><span data-l="es">El horario universal que se usa en misiones espaciales. Uruguay está 3 horas detrás de UTC.</span><span data-l="en" lang="en">The universal time used in space missions. Uruguay is 3 hours behind UTC.</span></dd></div>
+      <div><dt><span data-l="es">Estaciones lunares</span><span data-l="en" lang="en">Lunar seasons</span></dt>
+      <dd><span data-l="es">El eje de la Luna está inclinado 1,5°, así que en el polo el Sol sube y baja esa cantidad en un ciclo de unos 346 días. En el “invierno” lunar las noches del polo son más largas.</span><span data-l="en" lang="en">The Moon’s axis is tilted 1.5°, so at the pole the Sun rises and sinks by that much over a cycle of about 346 days. In the lunar “winter”, nights at the pole are longer.</span></dd></div>
+      <div><dt><span data-l="es">Ciclo de 18,6 años</span><span data-l="en" lang="en">18.6-year cycle</span></dt>
+      <dd><span data-l="es">El tiempo que tarda el plano de la órbita lunar en dar una vuelta completa, como un trompo que cabecea. Cambia cuánto sube la Tierra en el cielo lunar y cómo coinciden las estaciones con el día lunar.</span><span data-l="en" lang="en">The time the plane of the lunar orbit takes to turn once, like a wobbling spinning top. It changes how high Earth rises in the lunar sky and how the seasons line up with the lunar day.</span></dd></div>
+    </dl>
+    <div class="ws" id="ws">
+      <h2 id="wsT" class="sub"><span data-l="es">Sopa de letras</span><span data-l="en" lang="en">Word search</span></h2>
+      <p class="ws-help" id="wsHelp"><span data-l="es">Encuentra las palabras del glosario. Están en horizontal, en vertical o en diagonal hacia abajo. Toca la primera letra y después la última. Con el teclado, muévete con las flechas y marca con Enter.</span><span data-l="en" lang="en">Find the glossary words. They run across, down or diagonally downwards. Tap the first letter and then the last one. With a keyboard, move with the arrow keys and mark with Enter.</span></p>
+      <div class="ws-grid" id="wsGrid" role="grid" aria-labelledby="wsT" aria-describedby="wsHelp"></div>
+      <ul class="ws-words" id="wsWords" aria-label="Palabras"></ul>
+      <p class="ws-status" id="wsStatus" role="status" aria-live="polite"></p>
+      <button type="button" class="ws-new" id="wsNew"><span data-l="es">Nueva sopa de letras</span><span data-l="en" lang="en">New word search</span></button>
+    </div>
+    </div>
+  </section>
+
+  <section class="wrap block" id="trivia" aria-labelledby="tv">
+    <h2 id="tv"><span data-l="es">Prueba lo que aprendiste</span><span data-l="en" lang="en">Test what you have learned</span></h2>
+    <p class="about"><span data-l="es">Siete preguntas sobre luz, sombras, línea de visión y eclipses en el polo sur de la Luna. Con 6 o más respuestas correctas puedes descargar un certificado de Planificador lunar acreditado con tu nombre. No hace falta registrarse y no se guarda ningún dato.</span><span data-l="en" lang="en">Seven questions about light, shadows, line of sight and eclipses at the Moon’s south pole. Get 6 or more right and you can download an Accredited Lunar Planner certificate with your name. No sign-up needed and no data is stored.</span></p>
+    <p class="actions"><button type="button" class="open" id="quizBtn" aria-haspopup="dialog"><span data-l="es">Empezar la trivia</span><span data-l="en" lang="en">Start the quiz</span></button></p>
+    <dialog id="quiz" aria-labelledby="qzH">
+      <h2 id="qzH" class="qz-h"><span data-l="es">Trivia: planificador lunar</span><span data-l="en" lang="en">Quiz: lunar planner</span></h2>
+      <div id="qzBody"></div>
+      <form method="dialog" class="dlg-actions"><button class="ws-new"><span data-l="es">Cerrar</span><span data-l="en" lang="en">Close</span></button></form>
+    </dialog>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p><span data-l="es">Proyecto para el NASA Space Apps Challenge, desafío <i>Lunar South Pole Landing Site Evaluation</i>.</span><span data-l="en" lang="en">Project for the NASA Space Apps Challenge, <i>Lunar South Pole Landing Site Evaluation</i> challenge.</span></p>
+  <p><span data-l="es">Datos: LOLA/LRO (NASA GSFC, PDS Geosciences Node). Efemérides: Astronomy Engine. Gráficos 3D: three.js. Tipografías: Barlow Condensed y Source Serif 4 (licencia SIL OFL).</span><span data-l="en" lang="en">Data: LOLA/LRO (NASA GSFC, PDS Geosciences Node). Ephemerides: Astronomy Engine. 3D graphics: three.js. Typefaces: Barlow Condensed and Source Serif 4 (SIL OFL license).</span></p>
+  <p><span data-l="es"><b>Uso de IA.</b> Ver la <a href="./#etica">nota ética sobre el uso de inteligencia artificial</a>.</span><span data-l="en" lang="en"><b>Use of AI.</b> See the <a href="./#etica">ethics note on the use of artificial intelligence</a>.</span></p>
+  <p><span data-l="es"><b>Accesibilidad.</b> Esta página sigue las pautas WCAG 2.2 nivel AA: contraste de al menos 4,5:1 en el texto, navegación completa con teclado y foco visible, enlace para saltar al contenido, textos alternativos, áreas táctiles de 44 px, idioma marcado en cada texto y respeto por la preferencia de movimiento reducido. La app ofrece todos los datos del mapa también como texto en la ficha del sitio.</span><span data-l="en" lang="en"><b>Accessibility.</b> This page follows WCAG 2.2 level AA: text contrast of at least 4.5:1, full keyboard navigation with visible focus, a skip link, text alternatives, 44 px touch targets, language marked on every text and respect for the reduced-motion preference. The app also gives every map value as text in the site card.</span></p>
+</footer>
+<script src="assets/wordsearch.js" defer></script>
+<script type="module" src="assets/quiz-page.js"></script>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SeleneSight · Lunar South Pole</title>
+<meta name="description" content="Evaluación de sitios de alunizaje en el polo sur lunar: Sol, Tierra y horizonte real (LOLA).">
+<meta name="theme-color" content="#E8EAEC">
+<link rel="preload" href="fonts/barlow-condensed-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">{"imports":{"three":"./lib/three.module.min.js"}}</script>
+</head>
+<body>
+<a class="skip" href="#side" data-i18n="skipCtl">Saltar a los controles</a>
+<div id="announce" class="sr" role="status" aria-live="polite"></div>
+<header>
+  <div class="brand"><span class="logo">◐</span><div><h1>SeleneSight</h1><small data-i18n="subtitle">Polo sur lunar · Sol, Tierra y horizonte real</small></div></div>
+  <div class="hdr-controls">
+    <div class="switch uimode" role="group" data-i18n-aria="ariaUiMode" aria-label="Modo de uso">
+      <button id="uiExplore" type="button" data-i18n="uiExplore" aria-pressed="true">Explorar</button>
+      <button id="uiPlan" type="button" data-i18n="uiPlan" aria-pressed="false">Planificar</button>
+    </div>
+    <div class="switch" role="group" data-i18n-aria="ariaMode" aria-label="Evaluar Sol o Tierra">
+      <button id="modeSun" type="button" data-i18n="sun" aria-pressed="true">☀ Sol</button>
+      <button id="modeEarth" type="button" data-i18n="earth" aria-pressed="false">🜨 Tierra</button>
+    </div>
+    <button id="viewBtn" type="button" class="btn" data-i18n="view3d">Vista 3D</button>
+    <button id="infoBtn" type="button" class="btn" aria-label="Ayuda" data-i18n-aria="aiNote" aria-haspopup="dialog">?</button>
+    <select id="lang" aria-label="Idioma / Language"><option value="es">ES</option><option value="en">EN</option></select>
+  </div>
+</header>
+
+<main>
+  <section id="mapWrap" aria-labelledby="mapTitle">
+    <h2 id="mapTitle" class="sr" data-i18n="mapTitle">Mapa del polo sur lunar</h2>
+    <div id="map" role="img" data-i18n-aria="ariaMap" aria-label="Mapa polar interactivo"></div>
+    <div id="legend" aria-live="off">
+      <div class="lg-title" id="lgTitle"></div>
+      <ul class="lg-classes" id="lgClasses"></ul>
+      <div class="lg-note" id="lgNote"></div>
+      <p class="terms small"><button type="button" class="term" data-term="hexagon" data-i18n="g_hexagon_t"></button> · <button type="button" class="term" data-term="synodic" data-i18n="g_synodic_t"></button></p>
+    </div>
+    <div id="hud" aria-hidden="true"></div>
+    <div id="layerBox"><label for="layer" data-i18n="layer">Capa</label>
+      <select id="layer"><option value="month" data-i18n="layerMonth">Mes del deslizador</option><option value="long" data-i18n="layerLong">Largo plazo: % de tiempo (en intervalo de 18,6 años)</option><option value="night" data-i18n="layerNight">Largo plazo: noche / apagón más largo</option></select>
+      <label class="chk"><input id="showRF" type="checkbox" checked> <span data-i18n="refinedShow">◆ Puntos 40 m</span></label>
+      <label class="chk"><input id="showReg" type="checkbox" checked> <span data-i18n="regShow">Regiones Artemis III</span></label>
+      <label class="chk"><input id="showComm" type="checkbox"> <span data-i18n="commShow">○ Tierra siempre visible</span></label></div>
+    <div id="loading" data-i18n="loading">Cargando datos…</div>
+  </section>
+
+  <aside id="side" tabindex="-1" data-i18n-aria="ariaSide" aria-label="Controles y resultados">
+    <div class="card explore-only" id="storyCard">
+      <h2 data-i18n="storiesTitle">Historias para empezar</h2>
+      <ul id="stories" class="stories"></ul>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2 data-i18n="skyTitle">Horizonte y cielo (0–30°)</h2>
+        <button id="skyZoom" type="button" class="btn sm" data-i18n="sky360">360°</button></div>
+      <canvas id="sky" height="230" role="img" aria-label=""></canvas>
+      <div class="sky-note" data-i18n="skyNote">Escala vertical ampliada en 0–10°. El terreno gris oculta al Sol y a la Tierra.</div>
+      <p class="terms small"><button type="button" class="term" data-term="horizon" data-i18n="g_horizon_t"></button> · <button type="button" class="term" data-term="libration" data-i18n="g_libration_t"></button></p>
+    </div>
+
+    <div class="card" id="siteCard">
+      <div class="card-h"><h2 data-i18n="site">Sitio</h2><button id="pinBtn" type="button" class="btn sm" data-i18n="pin">📌 Comparar</button></div>
+      <div id="siteInfo" class="muted" data-i18n="clickMap">Toca el mapa para elegir un sitio.</div>
+      <canvas id="strip" height="70" role="img" aria-label="Franja del mes: elige un sitio" data-i18n-aria="ariaStripEmpty"></canvas>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="goto">Ir a coordenadas / sitio</h2>
+      <div class="row">
+        <input id="inLat" type="number" step="0.001" placeholder="lat" data-i18n-ph="phLat" data-i18n-aria="lat" aria-label="Latitud">
+        <input id="inLon" type="number" step="0.001" placeholder="lon" data-i18n-ph="phLon" data-i18n-aria="lon" aria-label="Longitud">
+        <button id="goBtn" type="button" class="btn sm" data-i18n-aria="ariaGo" aria-label="Ir">↵</button>
+      </div>
+      <select id="sites" data-i18n-aria="sitesPh" aria-label="Sitios destacados"></select>
+    </div>
+
+    <div class="card plan-only">
+      <h2 data-i18n="margins">Márgenes de sombra</h2>
+      <label><span data-i18n="mSun">Sombra de radiación solar</span> <b id="mSunV">0%</b>
+        <input id="mSun" type="range" min="0" max="60" step="1" value="0"></label>
+      <label><span data-i18n="mRadio">Sombra de radio (Tierra)</span> <b id="mRadioV">0%</b>
+        <input id="mRadio" type="range" min="0" max="60" step="1" value="0"></label>
+      <p class="terms small"><button type="button" class="term" data-term="margin" data-i18n="g_margin_t"></button></p>
+      <div class="muted small" data-i18n="marginHelp">Un sitio con (100 − margen)% o más se considera aceptable y se pinta verde.</div>
+    </div>
+
+    <div class="card plan-only">
+      <h2 data-i18n="suggest">Sugeridor: energía · antena · hábitat · agua</h2>
+      <p class="muted small" data-i18n="suggestHelp">Busca 4 sitios conectados con la menor red posible (cables, caminos y ductos): la extracción de agua cerca de la energía, y tramos con pendientes transitables.</p>
+      <div class="grid2">
+        <label><span data-i18n="maxSlope">Pendiente máx. hábitat</span> <b id="slopeV">10°</b><input id="maxSlope" type="range" min="2" max="20" value="10"></label>
+        <label><span data-i18n="psrDist">Distancia máx. hábitat → hielo</span> <b id="psrV">10 km</b><input id="psrDist" type="range" min="2" max="40" value="10"></label>
+        <label><span data-i18n="maxRoute">Pendiente máx. de trayectos</span> <b id="maxRouteV">15°</b><input id="maxRoute" type="range" min="5" max="30" value="15"></label>
+        <label><span data-i18n="habSun">Sol mínimo hábitat</span> <b id="habSunV">40%</b><input id="habSun" type="range" min="0" max="90" step="5" value="40"></label>
+        <label><span data-i18n="maxNight">Noche continua máx. paneles</span> <b id="maxNightV">14 d</b><input id="maxNight" type="range" min="1" max="30" step="0.5" value="14"></label>
+        <label><span data-i18n="period">Período</span>
+          <select id="period"><option value="month" data-i18n="periodMonth">Mes del deslizador</option><option value="det" data-i18n="periodDet">2027–2030</option><option value="long" data-i18n="periodLong">18,6 años (2027–2045)</option></select></label>
+      </div>
+      <button id="suggestBtn" type="button" class="btn primary" data-i18n="run">Sugerir tríos</button>
+      <div id="suggestOut" aria-live="polite"></div>
+    </div>
+
+    <div class="card" id="commCard">
+      <h2 data-i18n="commTitle">Red de comunicaciones</h2>
+      <p class="muted small" data-i18n="commHelp">Para el sitio elegido como base, busca antenas que vean la Tierra siempre y, si no hay vista directa, repetidoras con línea de visión verificada.</p>
+      <button id="commBtn" type="button" class="btn primary" data-i18n="commBtn">Sugerir red para este sitio</button>
+      <div id="commOut" aria-live="polite"></div>
+    </div>
+
+    <div class="card plan-only" id="winCard">
+      <h2 data-i18n="winTitle">Ventanas de aterrizaje</h2>
+      <p class="muted small" data-i18n="winHelp">Fechas alternativas para el sitio elegido: períodos continuos con Sol (y Tierra, para comunicarse directo) de al menos la duración indicada.</p>
+      <div class="grid2">
+        <label><span data-i18n="winMinL">Duración mínima</span> <b id="winMinV">6,5 d</b><input id="winMin" type="range" min="1" max="14" step="0.5" value="6.5"></label>
+        <label><span data-i18n="winCritL">Condición</span>
+          <select id="winCrit"><option value="both" data-i18n="winBoth">Sol y Tierra</option><option value="sun" data-i18n="winSun">Solo Sol</option></select></label>
+      </div>
+      <div id="winOut" aria-live="polite"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="eclipses">Eclipses: la Tierra tapa al Sol</h2>
+      <ul id="eclList" class="ecl-list"></ul>
+      <p class="terms small"><button type="button" class="term" data-term="eclipse" data-i18n="g_eclipse_t"></button></p>
+      <div class="muted small" data-i18n="eclNote">Afectan a toda la estación a la vez. Toca uno para ir al momento del máximo.</div>
+    </div>
+
+    <div class="card" id="cmpCard" hidden>
+      <div class="card-h"><h2 data-i18n="compare">Comparación</h2><button id="cmpClear" type="button" class="btn sm" data-i18n-aria="ariaClear" aria-label="Borrar comparación">✕</button></div>
+      <div id="cmp"></div>
+    </div>
+
+    <div class="card">
+      <button id="offlineBtn" type="button" class="btn" data-i18n="offline">⬇ Guardar todo para usar sin conexión</button>
+      <div id="offlineMsg" class="muted small" role="status"></div>
+    </div>
+  </aside>
+</main>
+
+<footer id="timebar" data-i18n-aria="ariaTimebar" aria-label="Tiempo">
+  <button id="play" type="button" class="btn" aria-label="Reproducir">▶</button>
+  <input id="time" type="range" min="0" step="1" value="0" data-i18n-aria="ariaTime" aria-label="Fecha y hora (UTC), pasos de 6 horas">
+  <div class="tlabel"><b id="tUTC"></b><small id="tMonth"></small></div>
+  <button type="button" class="term" data-term="utc" data-i18n="g_utc_t"></button>
+  <input id="tInput" type="datetime-local" step="21600" data-i18n-aria="ariaTimeInput" aria-label="Ir a fecha y hora UTC">
+</footer>
+
+<dialog id="info" aria-labelledby="infoBody">
+  <div id="infoBody"></div>
+  <h3 data-i18n="glossTitle">Glosario</h3>
+  <dl id="glossList" class="gloss-list"></dl>
+  <form method="dialog" class="dlg-actions"><button type="button" id="tourAgain" class="btn" data-i18n="tourAgain">Ver el recorrido guiado</button><button class="btn primary" data-i18n="close">Cerrar</button></form>
+</dialog>
+
+<div id="tour" class="tour" role="dialog" aria-modal="false" aria-labelledby="tourTitle" hidden>
+  <p class="tour-step" id="tourStep"></p>
+  <h2 id="tourTitle"></h2>
+  <p id="tourText"></p>
+  <div class="tour-actions"><button type="button" id="tourSkip" class="btn sm" data-i18n="tourSkip">Saltear</button>
+    <span><button type="button" id="tourPrev" class="btn sm" data-i18n="tourPrev">Anterior</button>
+    <button type="button" id="tourNext" class="btn sm primary-sm" data-i18n="tourNext">Siguiente</button></span></div>
+</div>
+<div id="gloss" class="gloss" role="dialog" aria-modal="false" aria-labelledby="glossTerm" hidden>
+  <h2 id="glossTerm"></h2><p id="glossText"></p>
+  <button type="button" id="glossClose" class="btn sm" data-i18n="close">Cerrar</button>
+</div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

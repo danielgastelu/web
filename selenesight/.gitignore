@@ -1,0 +1,6 @@
+data/*.IMG
+data/*.crdownload
+pipeline/work/
+pipeline/__pycache__/
+pipeline/*.npy
+pipeline/work80/
