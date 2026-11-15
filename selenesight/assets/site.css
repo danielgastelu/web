@@ -211,3 +211,8 @@ button.open{border:0;cursor:pointer;font-family:var(--display)}
 #quiz .btn{font:600 1.05rem var(--display);color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:3px;min-height:44px;padding:0 14px;cursor:pointer}
 #quiz .btn.primary{background:var(--ink);color:#fff}
 #quiz .btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* Color discreto en títulos */
+h1,.page-h{color:#0b1730}
+h2,h3,.qs dt,.pages a b{color:#14264b}
+.pages-cta{max-width:42rem;margin:-1rem 0 1.5rem;color:var(--shade)}

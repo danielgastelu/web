@@ -142,9 +142,9 @@ python3 -c "import horizons as H; H.export_terrain('../data/LDEM_80S_40M.IMG', f
 
 **EN** — **The name.** Selene is the Moon in Greek mythology, and SeleneSight means “Selene’s sight”. The name combines that classical reference with the idea of line of sight, a core technical concept at the pole: a panel only generates power if it has a line of sight to the Sun, and an antenna only talks directly with Earth if it sees it above the terrain.
 
-**ES** — Daniel Gastelu (Uruguay). Maestro de Educación Media de Uruguay (ANEP-DGES) en las áreas de Astronomía e Informática. Proyecto para el NASA Space Apps Challenge 2026, sede global. Desarrollado con la asistencia de Gemini y Claude Code en la codificación y el testing.
+**ES** — Equipo Selenesight (Uruguay). Proyecto para el NASA Space Apps Challenge 2026, sede global. Desarrollado con la asistencia de Gemini y Claude Code en la codificación y el testing.
 
-**EN** — Daniel Gastelu (Uruguay). Secondary education teacher in Uruguay (ANEP-DGES) in Astronomy and Computer Science. Project for the NASA Space Apps Challenge 2026, global location. Built with the assistance of Gemini and Claude Code for coding and testing.
+**EN** — Selenesight Team (Uruguay). Project for the NASA Space Apps Challenge 2026, global location. Built with the assistance of Gemini and Claude Code for coding and testing.
 
 **ES** — Este proyecto participa en el NASA Space Apps Challenge 2026 y se rige por todos los términos y condiciones de las bases de participación: [2026 NASA Space Apps Participant Terms and Conditions](https://www.spaceappschallenge.org/legal/).
 
