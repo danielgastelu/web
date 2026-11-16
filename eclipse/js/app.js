@@ -124,8 +124,8 @@
 
     function applyLang() {
         document.documentElement.lang = lang;
-        updateTitle();
         document.querySelectorAll('[data-i18n], [data-i18n-aria], [data-i18n-title], [data-i18n-alt]').forEach(translateEl);
+        updateTitle();   // después de traducir: usa el título ya traducido de la sección
         // Los enlaces que abren otra pestaña lo avisan al lector de pantalla
         document.querySelectorAll('a[target="_blank"]').forEach(a => a.setAttribute('aria-describedby', 'sr-newtab'));
         $('app-version').textContent = t('cred.version', { v: APP_VERSION });

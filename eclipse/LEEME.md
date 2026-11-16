@@ -43,6 +43,22 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
   (TalkBack, VoiceOver, NVDA), que ninguna herramienta automática reemplaza.
 - Las cifras de Lighthouse de más abajo son de la versión 1.6 y no se volvieron a medir.
 
+## Versión 2.6 (noviembre de 2026): prueba en computadora
+- Probada en Google Chrome 153 y Mozilla Firefox 160 (Linux, sin pantalla) a 1366×768 y 1920×1080: las seis
+  secciones, iniciar/pausar/reanudar, cambio de lugar, vista previa con sonido, línea de tiempo con teclado, los
+  tres temas y el cambio de idioma, sin errores de JavaScript ni desbordes. No se probó el video del mapa (los
+  archivos de video no estaban en el entorno de prueba) ni Windows o macOS.
+- Corregido: al cambiar de idioma, el título de la pestaña quedaba con el nombre de la sección en el idioma
+  anterior. La barra de desplazamiento sigue ahora los colores del tema (se veía clara en modo noche en Firefox).
+
+## Versión 2.5 (noviembre de 2026)
+- **Íconos de la barra inferior:** más grandes (26 px), con sus trazos definidos en el propio ícono (no dependen
+  de la hoja de estilos) y un escudo con tilde para «Seguridad» en lugar de los anteojos, que no se distinguían.
+- **Actualizaciones sin desajustes:** `index.html` pide los estilos y scripts con un número de versión
+  (`styles.css?v=2.6`, etc.). Antes, en la primera visita después de publicar, podía mostrarse la página nueva
+  con estilos o scripts viejos guardados en el teléfono. **Al publicar cambios:** subir ese número en
+  `index.html` y en la lista `SHELL` de `sw.js` (deben coincidir), además de `CACHE_VERSION`.
+
 ## Versión 2.4 (noviembre de 2026): simplificación para personas ciegas y con baja visión
 - **Orden de lectura:** la barra de secciones va antes del contenido en el código (en pantalla sigue abajo), de
   modo que el lector de pantalla y el teclado la encuentran al principio; «Saltar al contenido» la evita.
@@ -113,7 +129,7 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
 
 ## Publicación
 - Debe servirse por **HTTPS** (por ejemplo, GitHub Pages). Abriendo el archivo con doble clic (`file://`) no se instala ni funciona sin conexión.
-- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v13`) para que los celulares reciban la actualización.
+- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v15`) para que los celulares reciban la actualización.
 - El GIF original (`2027_02_06_ASE_800px.gif`, 86 MB) ya no es necesario para la app y conviene no subirlo al repositorio.
 
 ## Simulación

@@ -198,6 +198,7 @@ select.header-control { padding-right: .4rem; }
 
 /* ---------- Contenido ---------- */
 main {
+    scrollbar-color: var(--control-line) var(--bg); /* barra de desplazamiento acorde al tema (Firefox y Chrome) */
     position: relative; /* contiene los textos ocultos visualmente: no alargan la página */
     flex: 1 1 auto;
     min-height: 0;
@@ -542,7 +543,7 @@ nav.tabbar button {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem;
 }
 nav.tabbar button:hover { color: var(--bar-fg); }
-nav.tabbar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+nav.tabbar svg { width: 26px; height: 26px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 nav.tabbar .nav-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 /* Sección actual: color, barra superior y subrayado (no solo color) */
 nav.tabbar button.active { color: var(--bar-active); border-top-color: var(--bar-active); }
@@ -601,7 +602,7 @@ nav.tabbar button.active .nav-txt { text-decoration: underline; text-underline-o
     body { display: block; overflow: visible; min-height: 100%; }
     main { overflow: visible; padding-bottom: 2rem; }
     nav.tabbar { position: static; flex-wrap: wrap; }
-    nav.tabbar button { min-height: 52px; flex: 1 1 30%; max-width: none; flex-direction: row; gap: .4rem; font-size: .9rem; }
+    nav.tabbar button { min-height: 48px; flex: 1 1 45%; max-width: none; flex-direction: row; gap: .4rem; font-size: .9rem; }
     .install-bar { position: static; margin: 8px; }
     body:has(#install-bar:not(.hidden)) main { padding-bottom: 2rem; }
 }

@@ -643,7 +643,7 @@ const I18N = {
    de la simulación, institución y notas «Acerca de esta app».
    ========================================================================= */
 const GALLERY_URL = 'https://spaceweathergallery.com/index.php';
-const APP_VERSION = '2.4';
+const APP_VERSION = '2.6';
 const I18N_EXTRA = {
   es: {
     'a11y.skip': 'Saltar al contenido principal',
@@ -1282,7 +1282,7 @@ const I18N_V2 = {
   es: {
     'nav.live': 'En vivo', 'nav.listen': 'Escuchar',
     'live.h': 'El eclipse en vivo',
-    'live.lead': 'El 6 de febrero de 2027, inicia la experiencia: el sonido baja a medida que la Luna cubre el Sol.',
+    'live.lead': 'El 6 de febrero de 2027, inicia la experiencia: el sonido cambia su tono a medida que la Luna cubre el Sol o lo va liberando.',
     'son.start': 'Iniciar la experiencia', 'son.active': 'Experiencia activa',
     'son.settings': 'Ajustes de sonido',
     'eco.h': 'Escuchar el eclipse en 1 minuto',
@@ -1304,7 +1304,7 @@ const I18N_V2 = {
   pt: {
     'nav.live': 'Ao vivo', 'nav.listen': 'Ouvir',
     'live.h': 'O eclipse ao vivo',
-    'live.lead': 'Em 6 de fevereiro de 2027, inicie a experiência: o som fica mais grave à medida que a Lua cobre o Sol.',
+    'live.lead': 'Em 6 de fevereiro de 2027, inicie a experiência: o som muda de tom à medida que a Lua cobre o Sol ou o vai descobrindo.',
     'son.start': 'Iniciar a experiência', 'son.active': 'Experiência ativa',
     'son.settings': 'Ajustes de som',
     'eco.h': 'Ouvir o eclipse em 1 minuto',
@@ -1326,7 +1326,7 @@ const I18N_V2 = {
   en: {
     'nav.live': 'Live', 'nav.listen': 'Listen',
     'live.h': 'The eclipse, live',
-    'live.lead': 'On 6 February 2027, start the experience: the sound gets lower as the Moon covers the Sun.',
+    'live.lead': 'On 6 February 2027, start the experience: the sound changes pitch as the Moon covers the Sun or uncovers it.',
     'son.start': 'Start the experience', 'son.active': 'Experience active',
     'son.settings': 'Sound settings',
     'eco.h': 'Listen to the eclipse in 1 minute',
@@ -1348,7 +1348,7 @@ const I18N_V2 = {
   fr: {
     'nav.live': 'En direct', 'nav.listen': 'Écouter',
     'live.h': 'L’éclipse en direct',
-    'live.lead': 'Le 6 février 2027, lancez l’expérience : le son devient plus grave à mesure que la Lune couvre le Soleil.',
+    'live.lead': 'Le 6 février 2027, lancez l’expérience : le son change de hauteur à mesure que la Lune couvre le Soleil ou le découvre.',
     'son.start': 'Démarrer l’expérience', 'son.active': 'Expérience active',
     'son.settings': 'Réglages du son',
     'eco.h': 'Écouter l’éclipse en 1 minute',
@@ -1370,7 +1370,7 @@ const I18N_V2 = {
   it: {
     'nav.live': 'In diretta', 'nav.listen': 'Ascolta',
     'live.h': 'L’eclissi in diretta',
-    'live.lead': 'Il 6 febbraio 2027, avvia l’esperienza: il suono si abbassa man mano che la Luna copre il Sole.',
+    'live.lead': 'Il 6 febbraio 2027, avvia l’esperienza: il suono cambia tono man mano che la Luna copre il Sole o lo scopre.',
     'son.start': 'Avvia l’esperienza', 'son.active': 'Esperienza attiva',
     'son.settings': 'Impostazioni del suono',
     'eco.h': 'Ascolta l’eclissi in 1 minuto',
@@ -1392,7 +1392,7 @@ const I18N_V2 = {
   de: {
     'nav.live': 'Live', 'nav.listen': 'Anhören',
     'live.h': 'Die Finsternis live',
-    'live.lead': 'Starte am 6. Februar 2027 das Erlebnis: Der Ton wird tiefer, je mehr der Mond die Sonne bedeckt.',
+    'live.lead': 'Starte am 6. Februar 2027 das Erlebnis: Der Ton ändert seine Höhe, während der Mond die Sonne bedeckt oder wieder freigibt.',
     'son.start': 'Erlebnis starten', 'son.active': 'Erlebnis aktiv',
     'son.settings': 'Toneinstellungen',
     'eco.h': 'Die Finsternis in 1 Minute anhören',
