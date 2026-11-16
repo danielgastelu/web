@@ -1,5 +1,5 @@
 /* =========================================================================
-   Sonificación Eclipse 2027 — lógica de la aplicación (PWA)
+   Sonificación Eclipse 2027 — lógica de la aplicación (PWA), versión 2.0
    ========================================================================= */
 (function () {
     'use strict';
@@ -19,12 +19,10 @@
        ===================================================================== */
     let lang = pickInitialLang();
 
+    /** Español por defecto; otro idioma solo si la persona lo eligió antes en la lista. */
     function pickInitialLang() {
         const saved = store.get('eclipse.lang');
-        if (saved && I18N[saved]) return saved;
-        const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'es';
-        const code = nav.slice(0, 2).toLowerCase();
-        return I18N[code] ? code : 'es';
+        return (saved && I18N[saved]) ? saved : 'es';
     }
 
     function langInfo() { return LANGS.find(l => l.code === lang) || LANGS[0]; }
@@ -35,22 +33,33 @@
         return s;
     }
 
-    /* Los emojis decorativos se ocultan a los lectores de pantalla
-       (si no, se leerían como «coche de policía», «marca de verificación», etc.). */
-    const EMOJI_RE = /(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*\uFE0F?)/gu;
-    const escapeHtml = (s) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    function hideEmojis(el) {
+    /* Estilo sobrio: los emojis decorativos de los textos no se muestran
+       (tampoco los leen los lectores de pantalla). Los textos de i18n.js quedan intactos. */
+    const EMOJI_RE = /\s*\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*️?\s*/gu;
+    function stripEmojis(el) {
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
         const nodes = [];
         const has = /\p{Extended_Pictographic}/u;
         while (walker.nextNode()) if (has.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
         nodes.forEach(n => {
-            EMOJI_RE.lastIndex = 0;
-            const span = document.createElement('span');
-            span.innerHTML = escapeHtml(n.nodeValue).replace(EMOJI_RE, '<span aria-hidden="true">$1</span>');
-            n.replaceWith(...span.childNodes);
+            const prev = n.previousSibling, next = n.nextSibling;
+            let v = n.nodeValue.replace(EMOJI_RE, ' ');
+            if (!prev) v = v.replace(/^\s+/, '');
+            if (!next) v = v.replace(/\s+$/, '');
+            n.nodeValue = v;
         });
-        EMOJI_RE.lastIndex = 0;
+    }
+
+    /** Escribe un texto solo si cambió (evita trabajo innecesario del navegador). */
+    function setText(el, txt) { if (el.textContent !== txt) el.textContent = txt; }
+
+    /* Formateadores de fecha y hora: se crean una vez por idioma y se reutilizan. */
+    const fmtCache = new Map();
+    function dtf(opts) {
+        const key = lang + JSON.stringify(opts);
+        let f = fmtCache.get(key);
+        if (!f) { f = new Intl.DateTimeFormat(langInfo().locale, opts); fmtCache.set(key, f); }
+        return f;
     }
 
     function translateEl(el) {
@@ -58,7 +67,7 @@
         if (key) {
             if (key.endsWith('_html')) el.innerHTML = t(key);
             else el.textContent = t(key);
-            hideEmojis(el);
+            stripEmojis(el);
         }
         const aria = el.getAttribute('data-i18n-aria');
         if (aria) el.setAttribute('aria-label', t(aria));
@@ -86,20 +95,24 @@
     function buildLangBar() {
         const bar = $('lang-bar');
         bar.innerHTML = '';
+        const label = document.createElement('label');
+        label.className = 'visually-hidden';
+        label.htmlFor = 'lang-select';
+        label.setAttribute('data-i18n', 'lang.label');
+        const sel = document.createElement('select');
+        sel.id = 'lang-select';
+        sel.className = 'header-control';
+        sel.setAttribute('autocomplete', 'off');
         LANGS.forEach(l => {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'lang-btn';
-            b.lang = l.code;
-            b.dataset.lang = l.code;
-            b.setAttribute('aria-pressed', String(l.code === lang));
-            // El nombre incluye el código visible (ES, PT…) para quien usa control por voz (WCAG 2.5.3)
-            b.setAttribute('aria-label', l.code.toUpperCase() + ', ' + l.name);
-            b.title = l.name;
-            b.innerHTML = '<img src="' + l.flag + '" alt="" width="26" height="18"><span>' + l.code.toUpperCase() + '</span>';
-            b.addEventListener('click', () => setLang(l.code));
-            bar.appendChild(b);
+            const o = document.createElement('option');
+            o.value = l.code;
+            o.lang = l.code;
+            o.textContent = l.name;
+            sel.appendChild(o);
         });
+        sel.value = lang;
+        sel.addEventListener('change', () => setLang(sel.value));
+        bar.append(label, sel);
     }
 
     function setLang(code) {
@@ -111,17 +124,16 @@
 
     function applyLang() {
         document.documentElement.lang = lang;
-        document.title = t('doc.title');
+        updateTitle();
         document.querySelectorAll('[data-i18n], [data-i18n-aria], [data-i18n-title], [data-i18n-alt]').forEach(translateEl);
         // Los enlaces que abren otra pestaña lo avisan al lector de pantalla
         document.querySelectorAll('a[target="_blank"]').forEach(a => a.setAttribute('aria-describedby', 'sr-newtab'));
         $('app-version').textContent = t('cred.version', { v: APP_VERSION });
-        document.querySelectorAll('.lang-btn').forEach(b =>
-            b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+        $('lang-select').value = lang;
 
         $('license-line').innerHTML = LICENSE_LINE_HTML;
         $('attr-animation').textContent = ATTR_ANIMATION;
-        updateContrastLabel();
+        updateThemeLabels();
         updateInstallText();
         renderSpeedOptions();
         sim.renderStatic();
@@ -129,7 +141,12 @@
         sim.renderPlayButton();
         sim.renderMoments();
         updateGallery();
-        if (isPlaying) renderSonification(lastEvalTime);
+        live.lastKey = '';
+        renderSonification(isPlaying ? lastEvalTime : Date.now());
+        renderLoc();
+        eco.renderStatic();
+        eco.render(true);
+        renderSunCredit();
     }
 
     /* =====================================================================
@@ -137,6 +154,13 @@
        ===================================================================== */
     const navButtons = document.querySelectorAll('nav.tabbar button');
     const tabContents = document.querySelectorAll('.tab-content');
+
+    /** El título de la pestaña del navegador nombra la sección abierta (WCAG 2.4.2). */
+    function updateTitle() {
+        const active = document.querySelector('.tab-content.active');
+        const h2 = active && active.id !== 'tab-sonificacion' ? active.querySelector('h2') : null;
+        document.title = h2 ? h2.textContent + ' — ' + t('app.title') : t('doc.title');
+    }
 
     function showTab(targetId, moveFocus) {
         navButtons.forEach(b => {
@@ -146,11 +170,14 @@
         });
         tabContents.forEach(c => c.classList.toggle('active', c.id === targetId));
         document.querySelector('main').scrollTop = 0;
+        window.scrollTo(0, 0);   // en pantallas bajas o con mucho zoom se desplaza la página entera
+        updateTitle();
         // Las portadas de los videos se cargan recién al abrir la pestaña (aliviana el inicio)
         if (targetId === 'tab-simulacion') document.querySelectorAll('video[data-poster]').forEach(v => {
             if (!v.getAttribute('poster')) v.setAttribute('poster', v.dataset.poster);
         });
         if (targetId === 'tab-simulacion') sim.activate(); else sim.pause();
+        if (targetId !== 'tab-escuchar' && eco.running) eco.stop(true);
         if (targetId !== 'tab-simulacion') { const tl = $('tl-video'); if (tl && !tl.paused) tl.pause(); }
         // Lleva el foco al título de la sección, para que el lector de pantalla anuncie el cambio
         if (moveFocus) {
@@ -160,19 +187,45 @@
     }
     navButtons.forEach(btn => btn.addEventListener('click', () => showTab(btn.getAttribute('data-target'), true)));
 
+    /* Apariencia. Dos controles independientes:
+       - «Modo noche / Modo claro»: alterna entre el tema claro y el nocturno.
+       - «Alto contraste»: tema para baja visión o sol intenso; al desactivarlo
+         se vuelve al tema claro o nocturno que estaba elegido.
+       El tema se aplica en <html data-theme="light|dark|hc"> (ver el script del <head>). */
+    const root = document.documentElement;
+    const btnTheme = $('btn-theme');
     const btnContrast = $('btn-contrast');
-    function updateContrastLabel() {
-        const hc = document.body.classList.contains('high-contrast');
-        btnContrast.textContent = hc ? t('contrast.toStd') : t('contrast.toHigh');
+    const THEME_COLOR = { light: '#0b1730', dark: '#0b1730', hc: '#000000' };
+    let themeBase = root.getAttribute('data-theme-base') === 'dark' ? 'dark' : 'light';
+    let highContrast = root.getAttribute('data-theme') === 'hc';
+
+    function applyTheme() {
+        const theme = highContrast ? 'hc' : themeBase;
+        root.setAttribute('data-theme', theme);
+        root.setAttribute('data-theme-base', themeBase);
         const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', hc ? '#000000' : '#0056b3');
+        if (meta) meta.setAttribute('content', THEME_COLOR[theme]);
+        updateThemeLabels();
     }
-    btnContrast.addEventListener('click', () => {
-        document.body.classList.toggle('high-contrast');
-        store.set('eclipse.hc', document.body.classList.contains('high-contrast') ? '1' : '0');
-        updateContrastLabel();
+    function updateThemeLabels() {
+        // Cada botón nombra lo que hará al pulsarlo
+        const toLight = !highContrast && themeBase === 'dark';
+        setI18n(btnTheme, toLight ? 'theme.toLight' : 'theme.toDark');
+        setI18n(btnContrast, highContrast ? 'contrast.toStd' : 'contrast.toHigh');
+    }
+    btnTheme.addEventListener('click', () => {
+        if (highContrast) { highContrast = false; themeBase = 'dark'; store.set('eclipse.hc', '0'); }
+        else themeBase = themeBase === 'dark' ? 'light' : 'dark';
+        store.set('eclipse.theme', themeBase);
+        applyTheme();
+        announce(t(themeBase === 'dark' ? 'theme.nowDark' : 'theme.nowLight'));
     });
-    if (store.get('eclipse.hc') === '1') document.body.classList.add('high-contrast');
+    btnContrast.addEventListener('click', () => {
+        highContrast = !highContrast;
+        store.set('eclipse.hc', highContrast ? '1' : '0');
+        applyTheme();
+        announce(t(highContrast ? 'theme.nowHc' : (themeBase === 'dark' ? 'theme.nowDark' : 'theme.nowLight')));
+    });
 
     /* =====================================================================
        3. INSTALACIÓN (PWA)
@@ -257,34 +310,206 @@
        4. SONIFICACIÓN
        ===================================================================== */
     const btnStart = $('btn-start');
-    const radioSource = document.getElementsByName('data-source');
-    const radioMode = document.getElementsByName('algo-mode');
-    const algoControls = $('algo-controls');
-    const simContainer = $('sim-container');
-    const timeSlider = $('time-slider');
-    const sensorMsg = $('sensor-msg');
     const voiceToggle = $('voice-toggle');
-    const statusOrientation = $('status-orientation');
+    const statusSound = $('status-sound');
     const displayTime = $('display-time');
     const displayCoverage = $('display-coverage');
     const displayPhase = $('display-phase');
 
-    /* Datos astronómicos — Punta del Este, Uruguay — 06/feb/2027 (UYT, UTC−3) */
+    /* Referencia publicada para Punta del Este (EclipseWise), en hora de Uruguay (UTC−3).
+       La usa la sección «Simulación» (mapa global), cuyos textos nombran esa ciudad. */
     const baseDate = '2027-02-06T';
-    const tC1  = new Date(baseDate + '10:52:56-03:00').getTime(); // inicio parcial
-    const tC2  = new Date(baseDate + '12:36:05-03:00').getTime(); // inicio anular
-    const tMax = new Date(baseDate + '12:38:49-03:00').getTime(); // máximo
-    const tC3  = new Date(baseDate + '12:41:34-03:00').getTime(); // fin anular
-    const tC4  = new Date(baseDate + '14:21:14-03:00').getTime(); // fin parcial
-    const maxCoverage = 93; // % aproximado cubierto en el máximo
+    const PDE = {
+        c1:  new Date(baseDate + '10:52:56-03:00').getTime(), // inicio parcial
+        c2:  new Date(baseDate + '12:36:05-03:00').getTime(), // inicio anular
+        max: new Date(baseDate + '12:38:49-03:00').getTime(), // máximo
+        c3:  new Date(baseDate + '12:41:34-03:00').getTime(), // fin anular
+        c4:  new Date(baseDate + '14:21:14-03:00').getTime()  // fin parcial
+    };
+    const GMT3 = 'Etc/GMT+3'; // zona fija UTC−3 (hora de Uruguay)
+    function pdePhase(ms) {
+        if (ms < PDE.c1) return 'phase.before';
+        if (ms < PDE.c2) return 'phase.partialIn';
+        if (ms <= PDE.c3) return 'phase.annular';
+        if (ms <= PDE.c4) return 'phase.partialOut';
+        return 'phase.after';
+    }
+
+    /* ---------------------------------------------------------------------
+       Lugar de observación
+       Las secciones «En vivo» y «Escuchar» calculan el eclipse para el lugar
+       elegido (js/eclipse.js, elementos besselianos). Se arranca en Punta del
+       Este; la persona puede tocar «Usar mi ubicación» o elegir una ciudad.
+       Ciudades: nombre local, país (código ISO), latitud, longitud (grados,
+       aproximadas al centro de la ciudad) y zona horaria.
+       --------------------------------------------------------------------- */
+    const CITIES = [
+        ['Punta del Este', 'UY', -34.96, -54.95, 'America/Montevideo'],
+        ['Maldonado', 'UY', -34.91, -54.96, 'America/Montevideo'],
+        ['Montevideo', 'UY', -34.90, -56.19, 'America/Montevideo'],
+        ['Canelones', 'UY', -34.52, -56.28, 'America/Montevideo'],
+        ['San José de Mayo', 'UY', -34.34, -56.71, 'America/Montevideo'],
+        ['Colonia del Sacramento', 'UY', -34.46, -57.84, 'America/Montevideo'],
+        ['Minas', 'UY', -34.37, -55.24, 'America/Montevideo'],
+        ['Rocha', 'UY', -34.48, -54.33, 'America/Montevideo'],
+        ['Florida', 'UY', -34.10, -56.21, 'America/Montevideo'],
+        ['Trinidad', 'UY', -33.52, -56.90, 'America/Montevideo'],
+        ['Durazno', 'UY', -33.38, -56.52, 'America/Montevideo'],
+        ['Treinta y Tres', 'UY', -33.23, -54.38, 'America/Montevideo'],
+        ['Mercedes', 'UY', -33.25, -58.03, 'America/Montevideo'],
+        ['Fray Bentos', 'UY', -33.13, -58.30, 'America/Montevideo'],
+        ['Melo', 'UY', -32.37, -54.17, 'America/Montevideo'],
+        ['Paysandú', 'UY', -32.32, -58.08, 'America/Montevideo'],
+        ['Tacuarembó', 'UY', -31.71, -55.98, 'America/Montevideo'],
+        ['Salto', 'UY', -31.38, -57.96, 'America/Montevideo'],
+        ['Rivera', 'UY', -30.90, -55.55, 'America/Montevideo'],
+        ['Artigas', 'UY', -30.40, -56.47, 'America/Montevideo'],
+        ['Buenos Aires', 'AR', -34.61, -58.38, 'America/Argentina/Buenos_Aires'],
+        ['La Plata', 'AR', -34.92, -57.95, 'America/Argentina/Buenos_Aires'],
+        ['Mar del Plata', 'AR', -38.00, -57.56, 'America/Argentina/Buenos_Aires'],
+        ['Tandil', 'AR', -37.32, -59.13, 'America/Argentina/Buenos_Aires'],
+        ['Azul', 'AR', -36.78, -59.86, 'America/Argentina/Buenos_Aires'],
+        ['Olavarría', 'AR', -36.89, -60.32, 'America/Argentina/Buenos_Aires'],
+        ['Bahía Blanca', 'AR', -38.72, -62.27, 'America/Argentina/Buenos_Aires'],
+        ['Santa Rosa', 'AR', -36.62, -64.29, 'America/Argentina/Buenos_Aires'],
+        ['Rosario', 'AR', -32.95, -60.65, 'America/Argentina/Buenos_Aires'],
+        ['Córdoba', 'AR', -31.42, -64.18, 'America/Argentina/Buenos_Aires'],
+        ['Mendoza', 'AR', -32.89, -68.84, 'America/Argentina/Buenos_Aires'],
+        ['Neuquén', 'AR', -38.95, -68.06, 'America/Argentina/Buenos_Aires'],
+        ['Viedma', 'AR', -40.81, -63.00, 'America/Argentina/Buenos_Aires'],
+        ['San Carlos de Bariloche', 'AR', -41.13, -71.31, 'America/Argentina/Buenos_Aires'],
+        ['Comodoro Rivadavia', 'AR', -45.86, -67.48, 'America/Argentina/Buenos_Aires'],
+        ['Salta', 'AR', -24.79, -65.41, 'America/Argentina/Buenos_Aires'],
+        ['Ushuaia', 'AR', -54.80, -68.30, 'America/Argentina/Buenos_Aires'],
+        ['Santiago', 'CL', -33.45, -70.67, 'America/Santiago'],
+        ['Valparaíso', 'CL', -33.05, -71.62, 'America/Santiago'],
+        ['Concepción', 'CL', -36.83, -73.05, 'America/Santiago'],
+        ['Temuco', 'CL', -38.74, -72.59, 'America/Santiago'],
+        ['Valdivia', 'CL', -39.81, -73.25, 'America/Santiago'],
+        ['Puerto Montt', 'CL', -41.47, -72.94, 'America/Santiago'],
+        ['Castro', 'CL', -42.48, -73.76, 'America/Santiago'],
+        ['Coyhaique', 'CL', -45.57, -72.07, 'America/Santiago'],
+        ['Punta Arenas', 'CL', -53.16, -70.91, 'America/Punta_Arenas'],
+        ['Chuí', 'BR', -33.69, -53.46, 'America/Sao_Paulo'],
+        ['Rio Grande', 'BR', -32.03, -52.10, 'America/Sao_Paulo'],
+        ['Pelotas', 'BR', -31.77, -52.34, 'America/Sao_Paulo'],
+        ['Porto Alegre', 'BR', -30.03, -51.23, 'America/Sao_Paulo'],
+        ['Florianópolis', 'BR', -27.60, -48.55, 'America/Sao_Paulo'],
+        ['Curitiba', 'BR', -25.43, -49.27, 'America/Sao_Paulo'],
+        ['São Paulo', 'BR', -23.55, -46.63, 'America/Sao_Paulo'],
+        ['Rio de Janeiro', 'BR', -22.91, -43.17, 'America/Sao_Paulo'],
+        ['Brasília', 'BR', -15.79, -47.88, 'America/Sao_Paulo'],
+        ['Salvador', 'BR', -12.97, -38.50, 'America/Bahia'],
+        ['Recife', 'BR', -8.05, -34.88, 'America/Recife'],
+        ['Asunción', 'PY', -25.28, -57.63, 'America/Asuncion'],
+        ['La Paz', 'BO', -16.50, -68.15, 'America/La_Paz'],
+        ['Lima', 'PE', -12.05, -77.04, 'America/Lima'],
+        ['Stanley', 'FK', -51.70, -57.85, 'Atlantic/Stanley'],
+        ['Dakar', 'SN', 14.69, -17.45, 'Africa/Dakar'],
+        ['Freetown', 'SL', 8.48, -13.23, 'Africa/Freetown'],
+        ['Monrovia', 'LR', 6.30, -10.80, 'Africa/Monrovia'],
+        ['Abidjan', 'CI', 5.35, -4.02, 'Africa/Abidjan'],
+        ['Accra', 'GH', 5.56, -0.20, 'Africa/Accra'],
+        ['Lomé', 'TG', 6.13, 1.22, 'Africa/Lome'],
+        ['Cotonou', 'BJ', 6.37, 2.42, 'Africa/Porto-Novo'],
+        ['Lagos', 'NG', 6.45, 3.39, 'Africa/Lagos'],
+        ['Kinshasa', 'CD', -4.32, 15.31, 'Africa/Kinshasa'],
+        ['Luanda', 'AO', -8.84, 13.23, 'Africa/Luanda'],
+        ['Cape Town', 'ZA', -33.92, 18.42, 'Africa/Johannesburg']
+    ];
+    const cityLabel = (c) => c[0] + ' (' + c[1] + ')';
+
+    let site = null;                       // { kind: 'city' | 'gps', city?, lat, lon, tz, obs }
+    let circ = null;                       // circunstancias locales (EclipseCalc.local)
+    let tC1, tC2, tMax, tC3, tC4;          // contactos del lugar elegido (ms UT; null si no ocurren)
+
+    /** Calcula el eclipse para un lugar y lo deja como lugar actual (sin tocar la pantalla). */
+    function computeSite(next) {
+        site = next;
+        circ = EclipseCalc.local(site.lat, site.lon);
+        site.obs = circ.obs;
+        tC1 = circ.c1; tC2 = circ.c2; tMax = circ.max; tC3 = circ.c3; tC4 = circ.c4;
+    }
+    const siteFromCity = (c) => ({ kind: 'city', city: c, lat: c[2], lon: c[3], tz: c[4] });
+
+    /** Ciudad de la lista más cercana a un punto y su distancia en km. */
+    function nearestCity(lat, lon) {
+        const rad = Math.PI / 180;
+        let best = null, bestKm = Infinity;
+        CITIES.forEach(c => {
+            const dLat = (c[2] - lat) * rad, dLon = (c[3] - lon) * rad;
+            const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat * rad) * Math.cos(c[2] * rad) * Math.sin(dLon / 2) ** 2;
+            const km = 12742 * Math.asin(Math.sqrt(h));
+            if (km < bestKm) { bestKm = km; best = c; }
+        });
+        return { city: best, km: bestKm };
+    }
+
+    // Lugar guardado de una visita anterior, o Punta del Este
+    (function restoreSite() {
+        let saved = null;
+        try { saved = JSON.parse(store.get('eclipse.site') || 'null'); } catch (e) { /* dato inválido */ }
+        if (saved && saved.kind === 'gps' && isFinite(saved.lat) && isFinite(saved.lon)) {
+            computeSite({ kind: 'gps', lat: +saved.lat, lon: +saved.lon, tz: undefined });
+        } else {
+            const c = saved && saved.kind === 'city' && CITIES.find(x => cityLabel(x) === saved.name);
+            computeSite(siteFromCity(c || CITIES[0]));
+        }
+    })();
+
+    /* Vista del Sol: la posición y el tamaño de la Luna salen del mismo cálculo
+       (js/eclipse.js) y se dibujan como se ven en el cielo del lugar, con el cenit
+       hacia arriba. Fuera de las horas del eclipse solo se dibuja el Sol. */
+    const ECLIPSE_T0 = EclipseCalc.elements.t0;
+
+    /* Imagen real del Sol (SDO/HMI, luz visible). Las imágenes de SDO traen el norte
+       solar hacia arriba; aquí se giran para mostrarlas como se ve el Sol en el cielo
+       del lugar elegido (arriba = cenit): giro = ángulo paraláctico − ángulo P.
+       P ≈ −13,6° es la inclinación del eje solar el 6 de febrero (valor aproximado). */
+    const SUN_P_ANGLE = -13.6;
+    const SUN_LIVE_URL = 'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg';
+    const SUN_LIVE_RATIO = 0.941;          // radio del disco / mitad del ancho en la imagen de 1024 px (febrero)
+    const SUN_BUNDLED_DATE = Date.UTC(2026, 10, 16, 16, 10); // fecha de la imagen incluida en la app
+    const sunImage = { live: false };
+    function drawDisc(svg, ms) {
+        const img = svg.querySelector('.sun-img');
+        const moon = svg.querySelector('.moon');
+        const during = Math.abs(ms - ECLIPSE_T0) < 5 * 3600000;   // los elementos solo valen cerca del eclipse
+        const v = during ? EclipseCalc.view(site.obs, ms) : null;
+        const q = v ? v.q : sunAltAz(ms).q;
+        if (img) img.setAttribute('transform', 'rotate(' + (q - SUN_P_ANGLE).toFixed(1) + ')');
+        if (!v) { moon.setAttribute('cx', '-400'); moon.setAttribute('cy', '0'); return; }
+        // Ángulo de posición de la Luna (desde el norte hacia el este) llevado a «cenit arriba»
+        const dist = Math.min(4, Math.hypot(v.east, v.north));
+        const ang = (Math.atan2(v.east, v.north) * 180 / Math.PI - v.q) * Math.PI / 180;
+        moon.setAttribute('r', (100 * v.ratio).toFixed(2));
+        moon.setAttribute('cx', (-Math.sin(ang) * dist * 100).toFixed(2));
+        moon.setAttribute('cy', (-Math.cos(ang) * dist * 100).toFixed(2));
+    }
+
+    /* Altura y acimut del Sol en el lugar elegido (fórmulas de baja precisión del
+       Astronomical Almanac, error menor que 0,1°; suficiente para mostrar grados enteros). */
+    function sunAltAz(ms) {
+        const rad = Math.PI / 180;
+        const d = ms / 86400000 - 10957.5;                      // días desde J2000.0
+        const g = (357.529 + 0.98560028 * d) * rad;
+        const L = (280.459 + 0.98564736 * d + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * rad;
+        const e = (23.439 - 0.00000036 * d) * rad;
+        const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+        const dec = Math.asin(Math.sin(e) * Math.sin(L));
+        const gmst = (18.697374558 + 24.06570982441908 * d) * 15; // grados
+        const ha = (gmst + site.lon) * rad - ra;
+        const lat = site.lat * rad;
+        const alt = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(ha));
+        const az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(lat) - Math.sin(lat) * Math.cos(ha));
+        // Ángulo paraláctico: giro del norte celeste respecto de la vertical del lugar
+        const q = Math.atan2(Math.sin(ha), Math.tan(lat) * Math.cos(dec) - Math.sin(dec) * Math.cos(ha));
+        return { alt: alt / rad, az: ((az / rad) % 360 + 360) % 360, q: q / rad };
+    }
 
     let audioCtx;
-    let isPlaying = false;
-    let isDeviceFlat = false;
-    let currentSource = 'algo';
-    let currentAlgoMode = 'real';
-    let lightSensorInstance = null;
-    let sensorLux = null;
+    let isPlaying = false;   // la experiencia en vivo está iniciada
+    let isPaused = false;    // iniciada, pero con el sonido en pausa
     let lastAnnouncedPercent = -1;
     let lastAnnouncedPhase = '';
     let lastEvalTime = Date.now();
@@ -384,7 +609,7 @@
             });
         },
 
-        /** Dos notas breves: ascendentes al apoyar el teléfono, descendentes al levantarlo. */
+        /** Dos notas breves: ascendentes al reanudar el sonido, descendentes al pausarlo. */
         earcon(up) {
             if (!audioCtx) return;
             const t0 = audioCtx.currentTime;
@@ -426,38 +651,6 @@
     /** Frecuencia base: 110 Hz (grave/oscuro) a 880 Hz (agudo/claro). */
     const freqFromLight = (lightFactor) => 110 + lightFactor * 770;
 
-    let gotOrientation = false;   // ¿llegó al menos una lectura real de inclinación?
-    let noTiltTimer = null;
-
-    /** Computadoras y equipos sin sensor de inclinación: no hay forma de «apoyar» el
-        equipo, así que se reproduce siempre y se avisa en el indicador. */
-    function enableNoTiltMode() {
-        if (gotOrientation) return;
-        isDeviceFlat = true;
-        statusOrientation.dataset.init = '1';
-        setI18n(statusOrientation, 'son.noTilt');
-        statusOrientation.className = 'status-indicator status-good';
-    }
-
-    function handleOrientation(event) {
-        const beta = event.beta, gamma = event.gamma;
-        if (beta !== null && gamma !== null) {
-            if (!gotOrientation) { gotOrientation = true; clearTimeout(noTiltTimer); }
-            // ±15° para pasar a «apoyado» y ±20° para volver a «inclinado» (evita avisos repetidos)
-            const limit = isDeviceFlat ? 20 : 15;
-            const flat = Math.abs(beta) < limit && Math.abs(gamma) < limit;
-            if (flat !== isDeviceFlat || !statusOrientation.dataset.init) {
-                // Aviso sonoro breve al apoyar (sube) o levantar (baja) el teléfono,
-                // útil sobre todo con el relato por voz desactivado.
-                if (statusOrientation.dataset.init && isPlaying && !preview.running) sound.earcon(flat);
-                isDeviceFlat = flat;
-                statusOrientation.dataset.init = '1';
-                setI18n(statusOrientation, flat ? 'son.flat' : 'son.tilted');
-                statusOrientation.className = 'status-indicator ' + (flat ? 'status-good' : 'status-bad');
-            }
-        }
-    }
-
     function getCountdownText(nowMs, targetMs) {
         const diff = targetMs - nowMs;
         if (diff <= 0) return t('cd.starting');
@@ -476,190 +669,180 @@
         return t('cd.left', { x: parts.join(', ') });
     }
 
+    /** Fase y porcentaje del área del Sol cubierta, en el lugar elegido. */
     function calculateAstronomicalData(timeMs) {
-        let coverage = 0, phaseKey;
-        if (timeMs < tC1) { phaseKey = 'phase.before'; }
-        else if (timeMs < tC2) { coverage = ((timeMs - tC1) / (tC2 - tC1)) * maxCoverage; phaseKey = 'phase.partialIn'; }
-        else if (timeMs <= tC3) { coverage = maxCoverage; phaseKey = 'phase.annular'; }
-        else if (timeMs <= tC4) { coverage = maxCoverage - ((timeMs - tC3) / (tC4 - tC3)) * maxCoverage; phaseKey = 'phase.partialOut'; }
-        else { phaseKey = 'phase.after'; }
+        if (circ.type === 'none') return { coverage: 0, phaseKey: 'phase.none' };
+        if (timeMs < tC1) return { coverage: 0, phaseKey: 'phase.before' };
+        if (timeMs > tC4) return { coverage: 0, phaseKey: 'phase.after' };
+        const coverage = EclipseCalc.view(site.obs, timeMs).obscuration * 100;
+        let phaseKey;
+        if (circ.type === 'annular' && timeMs >= tC2 && timeMs <= tC3) phaseKey = 'phase.annular';
+        else phaseKey = timeMs < tMax ? 'phase.partialIn' : 'phase.partialOut';
         return { coverage, phaseKey };
     }
 
-    function getEvalTime() {
-        if (currentAlgoMode === 'sim' && currentSource === 'algo') {
-            const startTime = tC1 - 30 * 60000; // 30 min antes
-            const endTime = tC4 + 30 * 60000;   // 30 min después
-            return startTime + (endTime - startTime) * (parseInt(timeSlider.value, 10) / 1000);
-        }
-        return Date.now();
+    const getEvalTime = () => Date.now();
+
+    /** Línea de crédito bajo la vista del Sol. */
+    function renderSunCredit() {
+        const txt = sunImage.live
+            ? t('sky.credit.live')
+            : t('sky.credit', { d: dtf({ day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(SUN_BUNDLED_DATE) });
+        document.querySelectorAll('.sun-credit').forEach(el => setText(el, txt));
+    }
+    // Si la imagen no carga (archivo faltante), se oculta y queda el disco liso
+    document.querySelectorAll('.sun-img').forEach(img =>
+        img.addEventListener('error', () => { img.style.display = 'none'; }));
+
+    /* El día del eclipse (6 de febrero de 2027, hora de Uruguay), si hay conexión, se
+       reemplaza la imagen incluida por la más reciente de SDO y se vuelve a pedir cada
+       15 minutos. Si la descarga falla, queda la imagen que ya estaba. */
+    const ECLIPSE_DAY_START = Date.UTC(2027, 1, 6, 3, 0, 0);
+    const ECLIPSE_DAY_END = ECLIPSE_DAY_START + 86400000;
+    function refreshSunImage() {
+        const now = Date.now();
+        if (now < ECLIPSE_DAY_START || now >= ECLIPSE_DAY_END || navigator.onLine === false) return;
+        const url = SUN_LIVE_URL + '?t=' + Math.floor(now / 900000);
+        const probe = new Image();
+        probe.onload = () => {
+            const size = (2 * 100.6 / SUN_LIVE_RATIO).toFixed(1);
+            document.querySelectorAll('.sun-img').forEach(img => {
+                img.setAttribute('href', url);
+                ['width', 'height'].forEach(a => img.setAttribute(a, size));
+                ['x', 'y'].forEach(a => img.setAttribute(a, (-size / 2).toFixed(1)));
+                img.style.display = '';
+            });
+            sunImage.live = true;
+            renderSunCredit();
+        };
+        probe.src = url;
+    }
+    refreshSunImage();
+    setInterval(refreshSunImage, 900000);
+    window.addEventListener('online', refreshSunImage);
+
+    const live = { disc: $('live-disc'), lastKey: '' };
+    const fmtClock = (ms) => dtf({ timeZone: site.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).format(ms);
+    const fmtHM = (ms, tz) => dtf({ timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
+
+    /** Dónde está el Sol, en palabras: «Sol: hacia el noreste, a 57° de altura». */
+    const COMPASS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+    function sunLine(ms) {
+        const sun = sunAltAz(ms);
+        if (sun.alt < 0) return t('sky.sun.down');
+        return t('sky.sun', { dir: t('dir.' + COMPASS[Math.round(sun.az / 45) % 8]), alt: Math.round(sun.alt) });
     }
 
-    function updateSliderText() {
-        const startTime = tC1 - 30 * 60000, endTime = tC4 + 30 * 60000;
-        const ms = startTime + (endTime - startTime) * (parseInt(timeSlider.value, 10) / 1000);
-        const hhmm = new Date(ms).toLocaleTimeString(langInfo().locale, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-        timeSlider.setAttribute('aria-valuetext', t('son.slider.value', { t: hhmm }) + '. ' + t(calculateAstronomicalData(ms).phaseKey));
-    }
-    timeSlider.addEventListener('input', updateSliderText);
-
+    /** Panel «En vivo»: se redibuja como mucho una vez por segundo. */
     function renderSonification(evalTime) {
         const astro = calculateAstronomicalData(evalTime);
-        displayTime.textContent = new Date(evalTime).toLocaleTimeString(langInfo().locale,
-            { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
-        displayCoverage.textContent = Math.round(astro.coverage) + '%';
-        if (currentAlgoMode === 'real' && evalTime < tC1) {
-            displayPhase.innerHTML = '';
-            displayPhase.append(t('phase.before'));
-            const span = document.createElement('span');
-            span.className = 'countdown-text';
-            span.textContent = getCountdownText(evalTime, tC1);
-            displayPhase.appendChild(span);
+        const key = Math.floor(evalTime / 1000) + lang;
+        if (key === live.lastKey) return astro;
+        live.lastKey = key;
+        setText(displayTime, fmtClock(evalTime));
+        setText(displayCoverage, Math.round(astro.coverage) + '%');
+        drawDisc(live.disc, evalTime);
+        setText($('live-sun'), sunLine(evalTime));
+        if (circ.type !== 'none' && evalTime < tC1) {
+            const cd = getCountdownText(evalTime, tC1);
+            const span = displayPhase.querySelector('.countdown-text');
+            if (!span || displayPhase.firstChild.nodeValue !== t('phase.before')) {
+                displayPhase.textContent = t('phase.before');
+                const s = document.createElement('span');
+                s.className = 'countdown-text';
+                s.textContent = cd;
+                displayPhase.appendChild(s);
+            } else setText(span, cd);
         } else {
-            displayPhase.textContent = t(astro.phaseKey);
+            setText(displayPhase, t(astro.phaseKey));
         }
         return astro;
     }
+    // El reloj y la cuenta regresiva se ven siempre, aunque no se haya iniciado el sonido
+    setInterval(() => { if (!isPlaying && !document.hidden) renderSonification(Date.now()); }, 1000);
 
     function updateLoop() {
         if (!isPlaying) return;
-        if (preview.running) { requestAnimationFrame(updateLoop); return; } // la vista previa usa el sonido
+        if (eco.busy() && !isPaused) { requestAnimationFrame(updateLoop); return; } // la vista previa usa el sonido
         const evalTime = getEvalTime();
         lastEvalTime = evalTime;
         const astro = renderSonification(evalTime);
         const covRound = Math.round(astro.coverage);
 
-        // Relato por voz: solo momentos clave (cambios de fase y 25 %, 50 %, 75 % de cobertura).
-        // El resto lo pide la persona cuando quiere con el botón «¿Cómo va el eclipse?».
-        if (astro.phaseKey !== lastAnnouncedPhase) {
-            if (astro.phaseKey === 'phase.before') speak(t('speak.waiting'));
-            else speak(t('speak.phase', { phase: t(astro.phaseKey) }));
-            if (lastAnnouncedPhase) buzz(PHASE_BUZZ[astro.phaseKey]);
-            lastAnnouncedPhase = astro.phaseKey;
+        // En pausa solo se actualiza la pantalla: ni sonido ni relato. Al reanudar,
+        // si la fase cambió mientras tanto, se anuncia en ese momento.
+        if (!isPaused) {
+            // Relato por voz: solo momentos clave (cambios de fase y 25 %, 50 %, 75 % de cobertura).
+            // El resto lo pide la persona cuando quiere con el botón «¿Cómo va el eclipse?».
+            if (astro.phaseKey !== lastAnnouncedPhase) {
+                if (astro.phaseKey === 'phase.none') speak(t('how.none'));
+                else if (astro.phaseKey === 'phase.before') speak(t('speak.waiting'));
+                else speak(t('speak.phase', { phase: t(astro.phaseKey) }));
+                if (lastAnnouncedPhase) buzz(PHASE_BUZZ[astro.phaseKey]);
+                lastAnnouncedPhase = astro.phaseKey;
+            }
+            if (COVERAGE_MILESTONES.includes(covRound) && covRound !== lastAnnouncedPercent) {
+                speak(t('speak.coverage', { n: covRound }));
+                lastAnnouncedPercent = covRound;
+            } else if (lastAnnouncedPercent > 0 && Math.abs(covRound - lastAnnouncedPercent) > 5) {
+                lastAnnouncedPercent = -1; // permite anunciar tanto al subir como al bajar
+            }
         }
-        if (COVERAGE_MILESTONES.includes(covRound) && covRound !== lastAnnouncedPercent) {
-            speak(t('speak.coverage', { n: covRound }));
-            lastAnnouncedPercent = covRound;
-        } else if (lastAnnouncedPercent > 0 && Math.abs(covRound - lastAnnouncedPercent) > 5) {
-            lastAnnouncedPercent = -1; // permite anunciar tanto al subir como al bajar
-        }
-
-        let lightFactor;
-        if (currentSource === 'sensor' && sensorLux !== null) lightFactor = Math.min(sensorLux / 1000, 1.0);
-        else lightFactor = 1 - astro.coverage / 100;
-        const active = isDeviceFlat;
-        sound.update(freqFromLight(lightFactor), active);
-        sound.annular(astro.phaseKey === 'phase.annular', active, 4000);
+        sound.update(freqFromLight(1 - astro.coverage / 100), !isPaused);
+        sound.annular(astro.phaseKey === 'phase.annular', !isPaused, 4000);
         requestAnimationFrame(updateLoop);
     }
 
-    btnStart.addEventListener('click', async () => {
+    /* Mantiene la pantalla encendida durante la experiencia: si el teléfono se
+       bloquea, el navegador detiene el sonido. (Donde no existe la función, no pasa nada.) */
+    let wakeLock = null;
+    async function keepScreenOn() {
+        if (!('wakeLock' in navigator) || wakeLock) return;
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => { wakeLock = null; });
+        } catch (e) { /* batería baja o permiso denegado */ }
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (isPlaying && !isPaused && document.visibilityState === 'visible') keepScreenOn();
+    });
+
+    /** Refleja el estado en el botón principal y en el indicador. */
+    function renderLiveState() {
+        setI18n(btnStart, !isPlaying ? 'son.start' : (isPaused ? 'son.resume' : 'son.pause'));
+        btnStart.classList.toggle('is-active', isPlaying && !isPaused);
+        statusSound.classList.toggle('hidden', !isPlaying);
+        setI18n(statusSound, isPaused ? 'son.paused' : 'son.on');
+        statusSound.className = 'status-indicator ' + (isPaused ? 'status-bad' : 'status-good') + (isPlaying ? '' : ' hidden');
+    }
+
+    /* Un solo botón: inicia la experiencia y, después, pausa o reanuda el sonido.
+       El sonido no depende de la posición del teléfono. */
+    btnStart.addEventListener('click', () => {
         ensureAudio();
-        if (preview.running) preview.stop(false);
-
-        const wasPlaying = isPlaying;
-        isPlaying = true;
-        setI18n(btnStart, 'son.active');
-        btnStart.classList.add('is-active');
-        btnStart.setAttribute('data-i18n-aria', 'son.active.aria');
-        translateEl(btnStart);
-        displayPhase.removeAttribute('data-i18n');
-        if (wasPlaying) return;
-
-        speak(t('speak.started'));
-
-        // Permisos del acelerómetro (iOS y navegadores modernos)
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try {
-                const perm = await DeviceOrientationEvent.requestPermission();
-                if (perm === 'granted') window.addEventListener('deviceorientation', handleOrientation);
-            } catch (e) { console.error(e); }
+        if (eco.running) eco.stop(false);
+        if (!isPlaying) {
+            isPlaying = true;
+            isPaused = false;
+            renderLiveState();
+            keepScreenOn();
+            speak(t('speak.started'));
+            requestAnimationFrame(updateLoop);
+            return;
+        }
+        isPaused = !isPaused;
+        renderLiveState();
+        if (isPaused) {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            sound.silenceTone();
+            sound.earcon(false);
+            if (wakeLock) wakeLock.release().catch(() => {});
+            announce(t('son.paused'));
         } else {
-            window.addEventListener('deviceorientation', handleOrientation);
+            sound.earcon(true);
+            keepScreenOn();
+            announce(t('son.on'));
         }
-        // Si en 1,5 s no llega ninguna lectura de inclinación (laptop, PC, permiso denegado),
-        // se reproduce sin exigir que el equipo esté apoyado.
-        noTiltTimer = setTimeout(enableNoTiltMode, 1500);
-        requestAnimationFrame(updateLoop);
-    });
-
-    /* ---------------------------------------------------------------------
-       Disponibilidad del sensor de luz
-       En PC/laptop no hay sensor de luz ambiental, y muchos navegadores de
-       celular tampoco dan acceso a él. En esos casos la opción se muestra
-       desactivada (en gris) con el motivo escrito dentro del propio botón:
-       - El lector de pantalla la anuncia como «Sensor de luz no disponible en
-         PC/laptop, botón de opción, no disponible».
-       - Como Tab y las flechas saltan las opciones desactivadas, el motivo
-         también se asocia al grupo (aria-describedby) para que se escuche al
-         entrar en «Fuente de datos» con el teclado.
-       --------------------------------------------------------------------- */
-    function isDesktop() {
-        const uad = navigator.userAgentData;
-        if (uad) {
-            if (/android|ios/i.test(uad.platform || '')) return false; // incluye tablets Android
-            if (typeof uad.mobile === 'boolean') return !uad.mobile;
-        }
-        const ua = navigator.userAgent || '';
-        if (/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(ua)) return false;
-        if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return false; // iPad con iPadOS
-        return true;
-    }
-
-    function setupSensorAvailability() {
-        const srcSensor = $('src-sensor');
-        const reasonEl = $('src-sensor-na');
-        let reasonKey = null;
-        if (isDesktop()) reasonKey = 'son.src.na.pc';
-        else if (!('AmbientLightSensor' in window)) reasonKey = 'son.src.na.browser';
-        if (!reasonKey) return;
-
-        srcSensor.disabled = true;
-        if (srcSensor.checked) { srcSensor.checked = false; $('src-algo').checked = true; }
-        reasonEl.hidden = false;
-        setI18n(reasonEl, reasonKey);
-        $('src-group').setAttribute('aria-describedby', 'src-sensor-name src-sensor-na');
-    }
-    setupSensorAvailability();
-
-    radioSource.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            currentSource = e.target.value;
-            if (currentSource === 'sensor') {
-                algoControls.classList.add('hidden');
-                sensorMsg.classList.remove('hidden');
-                if ('AmbientLightSensor' in window) {
-                    try {
-                        lightSensorInstance = new AmbientLightSensor();
-                        lightSensorInstance.onreading = () => { sensorLux = lightSensorInstance.illuminance; };
-                        lightSensorInstance.onerror = () => { setI18n(sensorMsg, 'sensor.blocked'); sensorLux = null; };
-                        lightSensorInstance.start();
-                        setI18n(sensorMsg, 'sensor.ok');
-                    } catch (err) {
-                        setI18n(sensorMsg, 'sensor.noBrowser');
-                    }
-                } else {
-                    setI18n(sensorMsg, 'sensor.noDevice');
-                }
-            } else {
-                algoControls.classList.remove('hidden');
-                sensorMsg.classList.add('hidden');
-                if (lightSensorInstance) { lightSensorInstance.stop(); sensorLux = null; }
-            }
-        });
-    });
-
-    radioMode.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            currentAlgoMode = e.target.value;
-            if (currentAlgoMode === 'sim') {
-                simContainer.classList.remove('hidden');
-                speak(t('speak.simOn'));
-            } else {
-                simContainer.classList.add('hidden');
-                speak(t('speak.realOn'));
-            }
-        });
     });
 
     /* ---------------------------------------------------------------------
@@ -674,27 +857,31 @@
     });
 
     /* ---------------------------------------------------------------------
-       «Escuchar el eclipse en 1 minuto»: todo el eclipse comprimido para
-       aprender a reconocer los sonidos antes del día real. No exige apoyar
-       el teléfono (sirve también en PC/laptop). El tiempo no se comprime de
-       forma uniforme: la anularidad dura 5 minutos de un total de casi 3,5 h,
-       así que se le da más tiempo para que se escuche la campanita.
+       Sección «Escuchar»: el eclipse en 1 minuto, con la vista del Sol
+       Todo el eclipse comprimido para aprender a reconocer los sonidos antes
+       del día real. No exige apoyar el teléfono (sirve también en PC/laptop).
+       El tiempo no se comprime de forma uniforme: la anularidad dura 5 minutos
+       de un total de casi 3,5 h, así que se le da más tiempo para que se
+       escuche la campanita. La línea de tiempo permite además detenerse en
+       cualquier momento: al moverla suena y se dibuja ese instante.
        --------------------------------------------------------------------- */
     const btnPreview = $('btn-preview');
-    const preview = {
+    const eco = {
         running: false,
         timers: [],
-        // [segundo de la vista previa, instante real del eclipse]
-        map: [
-            [0,  tC1 - 10 * 60000],
-            [8,  tC1],
-            [28, tC2],
-            [36, tC3],
-            [56, tC4],
-            [62, tC4 + 10 * 60000]
-        ],
+        // [segundo de la vista previa, instante real del eclipse]; lo arma rebuild()
+        map: [],
+        pos: 0,          // segundo actual de la vista previa
         t0: 0,
         lastPhase: '',
+        scrubUntil: 0,
+        scrubTimer: 0,
+        range: $('eco-range'),
+        disc: $('eco-disc'),
+        get end() { return this.map[this.map.length - 1][0]; },
+
+        /** ¿Está usando el sonido? (el bucle «En vivo» espera mientras tanto) */
+        busy() { return this.running || performance.now() < this.scrubUntil; },
 
         eclipseTimeAt(sec) {
             const m = this.map;
@@ -706,21 +893,74 @@
             }
             return m[m.length - 1][1];
         },
+        secAt(ms) {
+            const m = this.map;
+            for (let i = 1; i < m.length; i++) {
+                if (ms <= m[i][1]) {
+                    const f = (ms - m[i - 1][1]) / (m[i][1] - m[i - 1][1]);
+                    return Math.max(0, m[i - 1][0] + f * (m[i][0] - m[i - 1][0]));
+                }
+            }
+            return this.end;
+        },
+
+        /** Reparte el minuto según los contactos del lugar elegido. */
+        rebuild() {
+            const m10 = 10 * 60000;
+            if (circ.type === 'annular') {
+                this.map = [[0, tC1 - m10], [8, tC1], [28, tC2], [36, tC3], [56, tC4], [62, tC4 + m10]];
+            } else if (circ.type === 'partial') {
+                this.map = [[0, tC1 - m10], [8, tC1], [32, tMax], [56, tC4], [62, tC4 + m10]];
+            } else {  // sin eclipse en este lugar: se recorre igual el horario de referencia
+                this.map = [[0, PDE.c1 - m10], [62, PDE.c4 + m10]];
+            }
+            this.pos = 0;
+            this.lastKey = '';
+        },
+
+        renderStatic() {
+            $('eco-tick-start').textContent = fmtHM(this.map[0][1], site.tz);
+            $('eco-tick-end').textContent = fmtHM(this.map[this.map.length - 1][1], site.tz);
+        },
+
+        /** Dibuja el instante actual. El Sol se mueve en cada cuadro; los textos, solo si cambian. */
+        render() {
+            const ms = this.eclipseTimeAt(this.pos);
+            const astro = calculateAstronomicalData(ms);
+            drawDisc(this.disc, ms);
+            const hhmm = fmtHM(ms, site.tz);
+            const cov = Math.round(astro.coverage);
+            const key = hhmm + cov + astro.phaseKey + lang;
+            if (key !== this.lastKey) {
+                this.lastKey = key;
+                setText($('eco-time'), hhmm);
+                setText($('eco-sun'), sunLine(ms));
+                setText($('eco-coverage'), cov + '%');
+                setText($('eco-phase'), t(astro.phaseKey));
+                this.range.setAttribute('aria-valuetext',
+                    hhmm + '. ' + t(astro.phaseKey) + '. ' + t('speak.coverage', { n: cov }));
+            }
+            const v = String(Math.round(this.pos * 10));
+            if (this.range.value !== v) this.range.value = v;
+            return astro;
+        },
 
         start() {
             ensureAudio();
+            clearTimeout(this.scrubTimer);
+            if (this.pos >= this.end - 0.05) this.pos = 0;
             this.running = true;
             this.lastPhase = '';
             setI18n(btnPreview, 'prev.stop');
             btnPreview.classList.add('is-running');
-            displayPhase.removeAttribute('data-i18n');
-            // Primero la explicación; los sonidos empiezan cuando termina (o a los 9 s como máximo).
             const begin = () => {
                 if (!this.running || this.t0) return;
-                this.t0 = performance.now();
+                this.t0 = performance.now() - this.pos * 1000;
                 requestAnimationFrame(() => this.loop());
             };
             this.t0 = 0;
+            if (this.pos > 0.05) { begin(); return; } // se retoma desde donde estaba, sin introducción
+            // Primero la explicación; los sonidos empiezan cuando termina (o a los 9 s como máximo).
             if (voiceToggle.checked && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(t('prev.intro'));
@@ -737,15 +977,15 @@
         loop() {
             if (!this.running) return;
             const sec = (performance.now() - this.t0) / 1000;
-            const end = this.map[this.map.length - 1][0];
-            if (sec >= end) { this.stop(false); speak(t('prev.end')); return; }
-            const time = this.eclipseTimeAt(sec);
-            this.currentTime = time;
-            const astro = calculateAstronomicalData(time);
-            displayTime.textContent = new Date(time).toLocaleTimeString(langInfo().locale,
-                { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'America/Montevideo' });
-            displayCoverage.textContent = Math.round(astro.coverage) + '%';
-            displayPhase.textContent = t(astro.phaseKey);
+            if (sec >= this.end) {
+                this.pos = this.end;
+                this.render();
+                this.stop(false);
+                speak(t('prev.end'));
+                return;
+            }
+            this.pos = sec;
+            const astro = this.render();
             if (astro.phaseKey !== this.lastPhase) {
                 if (this.lastPhase) { speak(t(astro.phaseKey)); buzz(PHASE_BUZZ[astro.phaseKey]); } // relato breve: solo el nombre de la fase
                 this.lastPhase = astro.phaseKey;
@@ -755,8 +995,9 @@
             requestAnimationFrame(() => this.loop());
         },
 
-        /** Detiene la vista previa. «byUser»: se avisa que se detuvo. */
+        /** Detiene la vista previa en el punto actual. «byUser»: se avisa que se detuvo. */
         stop(byUser) {
+            const was = this.running;
             this.running = false;
             this.t0 = 0;
             this.timers.forEach(clearTimeout); this.timers = [];
@@ -764,25 +1005,45 @@
             sound.annular(false, false, 0);
             setI18n(btnPreview, 'prev.btn');
             btnPreview.classList.remove('is-running');
-            if (!isPlaying) {               // vuelve el panel a su estado inicial
-                displayTime.textContent = '--:--:--';
-                displayCoverage.textContent = '0%';
-                setI18n(displayPhase, 'son.waiting');
-            }
-            if (byUser) {
+            if (byUser && was) {
                 if ('speechSynthesis' in window) window.speechSynthesis.cancel();
                 announce(t('prev.stopped'));
             }
+        },
+
+        /** Lleva la vista a un segundo dado y hace sonar brevemente ese instante. */
+        seek(sec) {
+            if (this.running) { this.stop(false); if ('speechSynthesis' in window) window.speechSynthesis.cancel(); }
+            this.pos = Math.max(0, Math.min(this.end, sec));
+            const astro = this.render();
+            ensureAudio();
+            this.scrubUntil = performance.now() + 900;
+            sound.update(freqFromLight(1 - astro.coverage / 100), true);
+            if (astro.phaseKey === 'phase.annular') sound.annular(true, true, 1500);
+            else sound.annular(false, false, 0);
+            clearTimeout(this.scrubTimer);
+            this.scrubTimer = setTimeout(() => { if (!this.running && audioCtx) sound.silenceTone(); }, 700);
+            return astro;
+        },
+
+        /** Botones «Inicio», «Máximo» y «Fin»: saltan y lo avisan al lector de pantalla. */
+        jump(ms) {
+            const astro = this.seek(this.secAt(ms));
+            announce(fmtHM(ms, site.tz) + '. ' + t(astro.phaseKey) + '. ' + t('speak.coverage', { n: Math.round(astro.coverage) }));
         }
     };
     btnPreview.addEventListener('click', () => {
-        if (preview.running) preview.stop(true); else preview.start();
+        if (eco.running) eco.stop(true); else eco.start();
     });
+    eco.range.addEventListener('input', () => eco.seek(parseInt(eco.range.value, 10) / 10));
+    eco.rebuild();
+    $('eco-go-start').addEventListener('click', () => eco.jump(tC1 || PDE.c1));
+    $('eco-go-max').addEventListener('click', () => eco.jump(tMax || PDE.max));
+    $('eco-go-end').addEventListener('click', () => eco.jump(tC4 || PDE.c4));
 
     /* ---------------------------------------------------------------------
        «¿Cómo va el eclipse?»: estado actual a pedido (fase, cobertura y
-       cuánto falta para el próximo momento clave). Usa la hora real, la del
-       simulador o la de la vista previa, según lo que esté en curso.
+       cuánto falta para el próximo momento clave), según la hora real.
        --------------------------------------------------------------------- */
     function spokenDuration(ms) {
         if (ms < 60000) return t('u.lessMin');
@@ -801,18 +1062,137 @@
     }
 
     function statusReport() {
-        const now = preview.running && preview.currentTime ? preview.currentTime : getEvalTime();
+        const now = getEvalTime();
         const astro = calculateAstronomicalData(now);
         const n = Math.round(astro.coverage);
         switch (astro.phaseKey) {
             case 'phase.before':     return t('how.before', { d: spokenDuration(tC1 - now) });
-            case 'phase.partialIn':  return t('how.partialIn', { n, d: spokenDuration(tC2 - now) });
+            case 'phase.none':       return t('how.none');
+            case 'phase.partialIn':  return circ.type === 'annular'
+                ? t('how.partialIn', { n, d: spokenDuration(tC2 - now) })
+                : t('how.partialIn.max', { n, d: spokenDuration(tMax - now) });
             case 'phase.annular':    return t('how.annular', { n, d: spokenDuration(tC3 - now) });
             case 'phase.partialOut': return t('how.partialOut', { n, d: spokenDuration(tC4 - now) });
             default:                 return t('how.after');
         }
     }
     $('btn-how').addEventListener('click', () => speak(statusReport()));
+
+    /* ---------------------------------------------------------------------
+       Lugar: resumen, horarios, «Usar mi ubicación» y lista de ciudades
+       --------------------------------------------------------------------- */
+    const locCity = $('loc-city');
+    const locMsg = $('loc-msg');
+
+    function siteLabel() {
+        if (site.kind === 'city') return cityLabel(site.city);
+        const near = nearestCity(site.lat, site.lon);
+        return near.km <= 300 ? t('loc.near', { c: cityLabel(near.city) }) : t('loc.mine');
+    }
+    /** Nombre corto de la zona horaria del lugar (por ejemplo «GMT−3»). */
+    function tzName() {
+        try {
+            const part = dtf({ timeZone: site.tz, hour: '2-digit', timeZoneName: 'short' })
+                .formatToParts(tMax || PDE.max).find(x => x.type === 'timeZoneName');
+            return part ? part.value : '';
+        } catch (e) { return ''; }
+    }
+
+    function buildCityList() {
+        locCity.innerHTML = '';
+        const first = document.createElement('option');
+        first.value = '';
+        first.setAttribute('data-i18n', 'loc.mine');
+        locCity.appendChild(first);
+        CITIES.forEach((c, i) => {
+            const o = document.createElement('option');
+            o.value = String(i);
+            o.textContent = cityLabel(c);
+            locCity.appendChild(o);
+        });
+    }
+
+    function renderLoc() {
+        const label = siteLabel();
+        setText($('loc-name'), label);
+        setText($('eco-place'), label);
+        const n = Math.round(circ.obscuration * 100);
+        const hm = (ms) => fmtHM(ms, site.tz);
+        setText($('loc-summary'), circ.type === 'none'
+            ? t('loc.type.none')
+            : t(circ.type === 'annular' ? 'loc.type.annular' : 'loc.type.partial', { t: hm(tMax), n }));
+
+        const dl = $('loc-times');
+        dl.innerHTML = '';
+        const rows = circ.type === 'none' ? [] : [
+            ['loc.ev.c1', tC1, circ.below.c1], ['loc.ev.c2', tC2], ['loc.ev.max', tMax, circ.below.max],
+            ['loc.ev.c3', tC3], ['loc.ev.c4', tC4, circ.below.c4]
+        ].filter(r => r[1] != null && (circ.type === 'annular' || (r[0] !== 'loc.ev.c2' && r[0] !== 'loc.ev.c3')));
+        rows.forEach(([key, ms, below]) => {
+            const dt = document.createElement('dt');
+            dt.textContent = t(key);
+            const dd = document.createElement('dd');
+            dd.className = 'num';
+            dd.textContent = hm(ms) + (below ? ' (' + t('loc.below') + ')' : '');
+            dl.append(dt, dd);
+        });
+        dl.classList.toggle('hidden', !rows.length);
+
+        const tz = t('loc.tz', { tz: tzName() });
+        setText($('loc-tz'), tz);
+        setText($('live-tz'), tz);
+        setText($('eco-tz'), tz);
+        locCity.value = site.kind === 'city' ? String(CITIES.indexOf(site.city)) : '';
+    }
+
+    /** Cambia el lugar, recalcula todo y lo avisa. */
+    function applySite(next) {
+        if (eco.running) eco.stop(false);
+        computeSite(next);
+        store.set('eclipse.site', JSON.stringify(site.kind === 'gps'
+            ? { kind: 'gps', lat: site.lat, lon: site.lon }
+            : { kind: 'city', name: cityLabel(site.city) }));
+        eco.rebuild();
+        lastAnnouncedPhase = '';
+        lastAnnouncedPercent = -1;
+        live.lastKey = '';
+        renderLoc();
+        renderSonification(Date.now());
+        eco.renderStatic();
+        eco.render();
+        announce(siteLabel() + '. ' + $('loc-summary').textContent);
+    }
+
+    locCity.addEventListener('change', () => {
+        const c = CITIES[parseInt(locCity.value, 10)];
+        if (!c) { renderLoc(); return; }           // «Mi ubicación» se elige con el botón
+        setText(locMsg, '');
+        applySite(siteFromCity(c));
+    });
+
+    $('btn-locate').addEventListener('click', () => {
+        if (!('geolocation' in navigator)) { setText(locMsg, t('loc.denied')); return; }
+        setText(locMsg, t('loc.asking'));
+        navigator.geolocation.getCurrentPosition((pos) => {
+            setText(locMsg, '');
+            // Dos decimales (≈ 1 km) alcanzan para el cálculo y evitan guardar la posición exacta
+            applySite({
+                kind: 'gps',
+                lat: Math.round(pos.coords.latitude * 100) / 100,
+                lon: Math.round(pos.coords.longitude * 100) / 100,
+                tz: undefined   // hora del propio dispositivo
+            });
+        }, () => setText(locMsg, t('loc.denied')), { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+    });
+
+    // Desde «Escuchar»: lleva al panel de lugar de «En vivo»
+    $('btn-change-place').addEventListener('click', () => {
+        showTab('tab-sonificacion', false);
+        const fold = $('loc-fold');
+        fold.open = true;
+        fold.querySelector('summary').focus();
+        fold.scrollIntoView({ block: 'nearest' });
+    });
 
     /* =====================================================================
        5. SIMULACIÓN (animación global de Espenak & Zeiler)
@@ -826,16 +1206,15 @@
     const SIM_FPS = 10;
     const SIM_START_UT = Date.UTC(2027, 1, 6, 12, 58, 0);
     const SIM_STEP_MS = 60 * 1000;
-    const GMT3 = 'Etc/GMT+3'; // zona fija UTC−3 (hora de Uruguay)
     // Momentos clave (hora UT exacta de EclipseWise / datos de Punta del Este)
     const ut = (h, m, s) => Date.UTC(2027, 1, 6, h, m, s);
     const MOMENTS = [
         { key: 'm.p1',     at: ut(12, 57, 34) },
-        { key: 'm.pde1',   at: tC1 },
+        { key: 'm.pde1',   at: PDE.c1 },
         { key: 'm.u1',     at: ut(14, 3, 53) },
-        { key: 'm.pdemax', at: tMax },
+        { key: 'm.pdemax', at: PDE.max },
         { key: 'm.max',    at: ut(15, 59, 35) },
-        { key: 'm.pde4',   at: tC4 },
+        { key: 'm.pde4',   at: PDE.c4 },
         { key: 'm.u4',     at: ut(17, 55, 24) },
         { key: 'm.p4',     at: ut(19, 1, 37) }
     ];
@@ -852,8 +1231,7 @@
         let rafId = 0;
 
         const frameTime = (i) => SIM_START_UT + i * SIM_STEP_MS;
-        const locale = () => langInfo().locale;
-        const fmt = (opts) => new Intl.DateTimeFormat(locale(), opts);
+        const fmt = (opts) => dtf(opts);
         const fmtTime = (ms, tz) => fmt({ timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
         const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -862,14 +1240,14 @@
             $('sim-date').textContent = cap(fmt({ timeZone: GMT3, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(ms));
             $('sim-time').textContent = fmtTime(ms, GMT3);
             $('sim-ut').textContent = t('sim.ut', { t: fmtTime(ms, 'UTC') });
-            range.setAttribute('aria-valuetext', fmtTime(ms, GMT3) + ', ' + t('sim.tz') + '. Punta del Este: ' + t(calculateAstronomicalData(ms).phaseKey));
+            range.setAttribute('aria-valuetext', fmtTime(ms, GMT3) + ', ' + t('sim.tz') + '. Punta del Este: ' + t(pdePhase(ms)));
         }
 
         function renderStatic() {
             $('sim-tick-start').textContent = fmtTime(frameTime(0), GMT3);
             $('sim-tick-end').textContent = fmtTime(frameTime(SIM_FRAMES - 1), GMT3);
             $('sim-ref').textContent = t('sim.ref', {
-                c1: fmtTime(tC1, GMT3), max: fmtTime(tMax, GMT3), c4: fmtTime(tC4, GMT3)
+                c1: fmtTime(PDE.c1, GMT3), max: fmtTime(PDE.max, GMT3), c4: fmtTime(PDE.c4, GMT3)
             });
             if (failed) showMessage(failKey());
         }
@@ -887,7 +1265,7 @@
                 const shown = Math.round(m.at / 60000) * 60000; // misma hora que muestra el reloj de la animación
                 time.textContent = fmtTime(shown, GMT3);
                 const txt = document.createElement('span');
-                txt.textContent = t(m.key, { a: fmtTime(tC2, GMT3), b: fmtTime(tC3, GMT3) });
+                txt.textContent = t(m.key, { a: fmtTime(PDE.c2, GMT3), b: fmtTime(PDE.c3, GMT3) });
                 b.append(time, ' ', txt);
                 b.addEventListener('click', () => {
                     pause();
@@ -905,14 +1283,14 @@
         /** Texto para el lector de pantalla: hora y qué ocurre en Punta del Este. */
         function describeFrame() {
             const ms = frameTime(frame);
-            return t('sim.announce', { t: fmtTime(ms, GMT3), phase: t(calculateAstronomicalData(ms).phaseKey) });
+            return t('sim.announce', { t: fmtTime(ms, GMT3), phase: t(pdePhase(ms)) });
         }
 
         function isVideoPlaying() { return !video.paused && !video.ended; }
 
         function renderPlayButton() {
             const playing = isVideoPlaying();
-            btnPlay.innerHTML = '<span aria-hidden="true">' + (playing ? '⏸' : '▶') + '</span>';
+            btnPlay.innerHTML = '<span aria-hidden="true">' + (playing ? '⏸\uFE0E' : '▶\uFE0E') + '</span>';
             btnPlay.setAttribute('aria-label', t(playing ? 'sim.pause' : 'sim.play'));
             btnPlay.title = t(playing ? 'sim.pause' : 'sim.play');
         }
@@ -973,7 +1351,7 @@
             // mantienen los «Momentos clave» y la descripción textual.
             failed = true;
             ready = false;
-            ['sim-first', 'sim-prev', 'sim-play', 'sim-next', 'sim-last', 'sim-speed', 'sim-range']
+            ['sim-prev', 'sim-play', 'sim-next', 'sim-speed', 'sim-range']
                 .forEach(id => { $(id).disabled = true; });
             showMessage(failKey());
             announce(t(failKey()));
@@ -1017,8 +1395,6 @@
         btnPlay.addEventListener('click', togglePlay);
         $('sim-prev').addEventListener('click', () => { pause(); setFrame(frame - 1, false, true); });
         $('sim-next').addEventListener('click', () => { pause(); setFrame(frame + 1, false, true); });
-        $('sim-first').addEventListener('click', () => { pause(); setFrame(0, false, true); });
-        $('sim-last').addEventListener('click', () => { pause(); setFrame(SIM_FRAMES - 1, false, true); });
         range.addEventListener('input', () => { pause(); setFrame(parseInt(range.value, 10)); });
         $('sim-speed').addEventListener('change', (e) => { video.playbackRate = parseFloat(e.target.value) || 1; });
 
@@ -1041,7 +1417,7 @@
 
     /* Galería de fotos: se muestra cuando el eclipse ya terminó */
     function updateGallery() {
-        $('gallery-card').classList.toggle('hidden', Date.now() <= tC4);
+        $('gallery-card').classList.toggle('hidden', Date.now() <= PDE.c4);
     }
     setInterval(updateGallery, 60000);
 
@@ -1056,6 +1432,8 @@
        6. INICIO
        ===================================================================== */
     buildLangBar();
+    buildCityList();
+    applyTheme();
     applyLang();
     // Textos ya traducidos: se muestra la página (ver el script del <head> en index.html)
     document.documentElement.classList.remove('i18n-wait');

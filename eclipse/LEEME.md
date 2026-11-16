@@ -1,23 +1,119 @@
-# Sonificación Eclipse 2027 (PWA)
+# Eclipse sonoro 2027 (PWA)
 
 Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero de 2027.
 
 ## Estructura
-- `index.html`: la aplicación (secciones: Sonido, Simulación, Técnica, Seguridad, Créditos).
-- `css/styles.css`: estilos (modo estándar y alto contraste).
+- `index.html`: la aplicación (secciones: En vivo, Escuchar, Simulación, Ayuda, Seguridad, Créditos).
+- `css/styles.css`: estilos (modo claro, modo noche y alto contraste).
 - `js/i18n.js`: textos en español, portugués, inglés, francés, italiano y alemán.
 - `js/app.js`: lógica (idiomas, sonificación, simulación, instalación).
+- `js/eclipse.js`: cálculo del eclipse para cualquier lugar (elementos besselianos).
 - `sw.js`: service worker (funcionamiento sin conexión).
 - `manifest.webmanifest`, `icons/`: datos e íconos de la app instalada.
 - `assets/`: animación global de Espenak & Zeiler en MP4 y WebM (mismo contenido que el GIF original, sin alteraciones; ~4 MB cada uno, el navegador descarga solo uno) y la imagen de portada.
 - `img/logos/`: logotipo ANEP · Educación Secundaria · Espacio de Educación y TIC (archivo oficial del sitio de EDyTIC, versión en blanco para fondo oscuro) y logotipo de EDyTIC con contraste ajustado (oscuro para fondo claro y claro para alto contraste).
 - `img/fotos/` y `assets/timelapse-anular-2019.*`: fotografías y time-lapse de Wikimedia Commons (créditos y licencias en la sección Créditos de la app). El time-lapse (CC BY-SA 4.0) está recortado alrededor del Sol y recodificado, y se distribuye con la misma licencia.
-- `fonts/`: tipografía Source Sans 3 (licencia SIL OFL, `fonts/OFL.txt`), indicada por el manual de identidad de ANEP.
+- `fonts/`: tipografías Bricolage Grotesque (títulos) y Atkinson Hyperlegible (texto), las mismas del portal «Astronomía para todos»; ambas con licencia SIL OFL (`fonts/OFL-*.txt`). Los archivos `source-sans-3-*` y `OFL.txt` son de la versión anterior y ya no se usan: se pueden borrar.
+- `legacy/v1.6/`: copia de la versión 1.6 completa (HTML, CSS y scripts) tal como estaba antes del rediseño.
 - `eclipse2027.html`: redirige a `index.html` (el archivo anterior quedó en `legacy/`).
+
+## Versión 2.0 (noviembre de 2026)
+- **Diseño:** paleta y tipografías del portal «Astronomía para todos», menos elementos por pantalla, secciones
+  plegables en Simulación, Técnica y Créditos, íconos lineales en lugar de emojis (los emojis de `js/i18n.js`
+  se quitan al mostrar los textos; no hace falta editarlos).
+- **Apariencia:** botón «Modo noche / Modo claro» y botón «Alto contraste» (para baja visión o sol intenso).
+  Si no hay nada guardado se respeta la preferencia del sistema (tema oscuro o más contraste).
+- **Sección «Escuchar»:** la vista previa «el eclipse en 1 minuto» pasó a una sección propia, con una vista
+  del Sol que la Luna va cubriendo, hora, acimut y altura del Sol en Punta del Este, línea de tiempo y botones
+  «Inicio», «Máximo» y «Fin». Al mover la línea de tiempo suena y se dibuja ese instante (reemplaza al antiguo
+  modo «Simulador» de la pestaña Sonido).
+- **Sección «En vivo»:** la misma vista del Sol, reloj y cuenta regresiva visibles desde el inicio; los ajustes
+  (tipo de sonido, relato por voz, fuente de datos) quedaron en «Ajustes de sonido». La pantalla se mantiene
+  encendida durante la experiencia (Wake Lock, donde el navegador lo permite).
+- **Vista del Sol:** es esquemática. La Luna (0,928 diámetros solares) cruza en línea recta de izquierda a
+  derecha, ajustada a los contactos C1–C4 de Punta del Este; no representa la inclinación real de la
+  trayectoria. Las constantes están en `js/app.js` (`MOON_RATIO`, `moonTrack`, `SITE`).
+- **Contacto:** `recursosastronomia@uruguayeduca.edu.uy`, asunto «Eclipse 2027» (constantes `CONTACT_MAIL` y
+  `CONTACT_SUBJECT` al final de `js/i18n.js`).
+- **Rendimiento:** el panel en vivo se redibuja una vez por segundo (antes, en cada cuadro) y los
+  formateadores de fecha y hora se reutilizan.
+- **Accesibilidad:** verificado con axe-core (reglas WCAG 2.0, 2.1 y 2.2, niveles A y AA) en las seis secciones
+  y los tres temas, sin infracciones; sin desplazamiento horizontal a 320 px. Los estados (opción elegida,
+  sección actual, teléfono apoyado) no dependen solo del color. Falta la prueba manual con lector de pantalla
+  (TalkBack, VoiceOver, NVDA), que ninguna herramienta automática reemplaza.
+- Las cifras de Lighthouse de más abajo son de la versión 1.6 y no se volvieron a medir.
+
+## Versión 2.4 (noviembre de 2026): simplificación para personas ciegas y con baja visión
+- **Orden de lectura:** la barra de secciones va antes del contenido en el código (en pantalla sigue abajo), de
+  modo que el lector de pantalla y el teclado la encuentran al principio; «Saltar al contenido» la evita.
+- **Menos repetición para el lector de pantalla:** la vista del Sol es solo un apoyo visual (`aria-hidden`); la
+  hora, la cobertura y la fase ya están en texto al lado. Se quitaron las líneas de crédito bajo cada imagen
+  (siguen en Créditos).
+- **Posición del Sol en palabras** («Sol: hacia el noreste, a 55° de altura») en lugar de acimut y altura en
+  grados; sirve para orientarse hacia el Sol.
+- **Menos controles:** el reproductor del mapa quedó con anterior, reproducir y siguiente (inicio y fin se
+  alcanzan con la línea de tiempo o con «Momentos clave»). La sección «Técnica» se llama ahora «Ayuda».
+- **Lectura:** texto base de 18 px; aviso de seguridad sin mayúsculas sostenidas.
+- **Zoom de 400 % y pantallas bajas (WCAG 1.4.10):** por debajo de 520 px de alto, el encabezado y la barra de
+  secciones dejan de estar fijos y se desplaza la página entera; antes quedaban unos 60 px para leer.
+- **Otros criterios:** el título de la pestaña nombra la sección abierta (2.4.2); las atribuciones en inglés
+  llevan `lang="en"` (3.1.2); estilos para el modo de colores forzados de Windows; corregido un desborde de
+  página en Créditos a 320 px.
+- **Verificación:** axe-core (WCAG 2.0, 2.1, 2.2 A y AA, más buenas prácticas) sin infracciones en las seis
+  secciones y los tres temas; sin desplazamiento horizontal a 320 px; orden de tabulación revisado. Las
+  herramientas automáticas detectan solo una parte de los problemas: falta la prueba con TalkBack, VoiceOver y
+  NVDA, y con personas usuarias.
+
+## Versión 2.3 (noviembre de 2026)
+- **Horarios según el lugar:** «En vivo» y «Escuchar» calculan el eclipse para el lugar elegido. La app arranca en
+  Punta del Este; en el panel «Lugar» se puede tocar «Usar mi ubicación» (pide permiso al navegador) o elegir una
+  de las ciudades de la lista (`CITIES` en `js/app.js`: nombre, país, latitud, longitud y zona horaria). Para
+  agregar una ciudad basta sumar una línea a esa lista.
+- **Cálculo:** `js/eclipse.js` usa los elementos besselianos del eclipse (EclipseWise / NASA) y el método de Meeus.
+  Verificado contra EclipseWise: en el punto de eclipse máximo da 15:59:35 UT y 470,8 s de anillo (publicado:
+  15:59:35,1 y 470,9 s); en el punto de mayor duración, 15:41:47 UT y 473,4 s (publicado: 15:41:47,8 y 473,5 s).
+  Usa ΔT = 72,6 s (previsión de EclipseWise); si el valor real difiere, las horas se corren esos mismos segundos
+  (`deltaT` en `js/eclipse.js`).
+- **Cobertura real:** el porcentaje es ahora el área del disco solar cubierta en cada instante (antes, una recta
+  hasta 93 %, que era la magnitud). En la franja del anillo el máximo ronda el 86 %.
+- **Tipo de eclipse por lugar:** dentro de la franja se anuncia el anillo; fuera, «eclipse parcial» con su máximo;
+  donde no se ve, se dice. Si el Sol está bajo el horizonte en algún momento, se indica junto a la hora.
+- **Vista del Sol:** la Luna se dibuja con su tamaño y trayectoria reales para el lugar, con el cenit arriba.
+- **Horas:** se muestran en la hora local del lugar elegido (la del dispositivo si se usa la ubicación).
+- **Simulación (mapa global):** sin cambios; sigue con la referencia publicada para Punta del Este (`PDE`). Para las
+  coordenadas de Punta del Este de la lista, el cálculo propio da unos 10 s antes que esos valores publicados.
+- **Privacidad:** la ubicación no sale del dispositivo; se guarda en el navegador redondeada a ≈ 1 km.
+
+## Versión 2.2 (noviembre de 2026)
+- **Una sola forma de vivir el eclipse:** se quitó la opción «Fuente de datos» (sensor de luz). El sensor no está
+  disponible en casi ningún navegador y, a pleno día, la lectura superaba el tope previsto, de modo que el tono
+  no habría cambiado. El sonido sigue siempre el cálculo por la hora.
+- **Pausa con botón:** ya no hace falta apoyar el teléfono. El botón principal inicia la experiencia y después
+  pausa o reanuda el sonido (dos notas que bajan al pausar, dos que suben al reanudar). En pausa no hay sonido
+  ni relato; el reloj y la vista del Sol siguen actualizándose.
+- La app ya no usa sensores (inclinación ni luz); se actualizaron los textos de Técnica y de Privacidad.
+- Las claves `son.tilted`, `son.flat`, `son.noTilt`, `son.src.*`, `sensor.*` y `tech.p.motion_html` de
+  `js/i18n.js` quedaron sin uso.
+
+## Versión 2.1 (noviembre de 2026)
+- **Nombre:** «Eclipse sonoro 2027» (encabezado, título de la página, manifiesto y los seis idiomas). El nombre
+  corto del ícono instalado sigue siendo «Eclipse 2027». Antes se llamaba «Sonificación Eclipse 2027».
+- **Idioma:** la app abre siempre en español; los demás idiomas se eligen en la lista desplegable del encabezado
+  (ya no se usa el idioma del navegador) y la elección queda guardada.
+- **Imagen real del Sol:** `img/sol/sdo-hmi-2026-11-16.jpg` es la imagen en luz visible de SDO/HMI (NASA) del
+  16 de noviembre de 2026, recortada al disco (512 px). Se ve en «En vivo» y «Escuchar», en modo claro y noche;
+  en alto contraste se mantiene el disco liso. Para actualizarla más cerca del eclipse, reemplazar el archivo
+  (mismo recorte: disco centrado, 1 % de margen) y la fecha `SUN_BUNDLED_DATE` en `js/app.js`.
+- **Día del eclipse:** el 6 de febrero de 2027 (hora de Uruguay), si hay conexión, la app pide la imagen más
+  reciente a `sdo.gsfc.nasa.gov` cada 15 minutos (`SUN_LIVE_URL`). Si SDO cambia esa dirección o no responde,
+  queda la imagen incluida. La app no puede leer la hora exacta de esa imagen, así que solo indica «de hoy».
+- **Orientación:** las imágenes de SDO traen el norte solar arriba; la app las gira según el ángulo paraláctico
+  de Punta del Este y el ángulo P del Sol (≈ −13,6° el 6 de febrero, `SUN_P_ANGLE`). Es una aproximación.
+- Crédito exigido por SDO en Créditos → Imágenes, y aviso de la descarga en Privacidad.
 
 ## Publicación
 - Debe servirse por **HTTPS** (por ejemplo, GitHub Pages). Abriendo el archivo con doble clic (`file://`) no se instala ni funciona sin conexión.
-- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (por ejemplo `eclipse2027-v2`) para que los celulares reciban la actualización.
+- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v13`) para que los celulares reciban la actualización.
 - El GIF original (`2027_02_06_ASE_800px.gif`, 86 MB) ya no es necesario para la app y conviene no subirlo al repositorio.
 
 ## Simulación
@@ -45,7 +141,7 @@ accesibilidad, buenas prácticas y SEO; computadora 100 en todo.
   español allí, conviene cambiarlo también en `index.html` (si no, se ve el anterior por un instante).
 - Si el idioma no es español, un script breve en el `<head>` oculta la página hasta traducirla (máx. 3 s),
   para que no «salte».
-- Fuente de respaldo con el mismo ancho que Source Sans 3 y precarga de las variantes 400 y 700.
+- Precarga de las dos fuentes principales (Atkinson Hyperlegible 400 y Bricolage Grotesque).
 - Las portadas de los videos se cargan al abrir la pestaña Simulación; los logotipos de Créditos, al verlos.
 - El aviso «Instalar la app» flota sobre la barra inferior y no desplaza el contenido.
 - Pendientes que dependen del alojamiento y no del código: tiempos de caché del servidor (GitHub Pages usa

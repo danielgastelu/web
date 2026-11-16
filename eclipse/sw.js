@@ -1,23 +1,22 @@
-/* Service worker — Sonificación Eclipse 2027
+/* Service worker — Eclipse sonoro 2027
    Cambiar CACHE_VERSION cada vez que se publiquen cambios en los archivos. */
-const CACHE_VERSION = 'eclipse2027-v7';
+const CACHE_VERSION = 'eclipse2027-v13';
 const SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/styles.css',
   './js/i18n.js',
+  './js/eclipse.js',
   './js/app.js',
   './img/cc-by-nd.svg',
-  './img/flags/uy.svg', './img/flags/br.svg', './img/flags/gb.svg',
-  './img/flags/fr.svg', './img/flags/it.svg', './img/flags/de.svg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png', './icons/favicon-48.png',
-  './assets/poster.jpg',
+  './assets/poster.jpg', './img/sol/sdo-hmi-2026-11-16.jpg',
   './img/fotos/anillo-hinode-2011.jpg', './img/fotos/observadores-lentes-2023.jpg', './img/fotos/timelapse-poster.jpg', './img/fotos/anillo-edzna-2023.jpg',
   './img/logos/anep-dges-edytic.png', './img/logos/edytic-claro.png', './img/logos/edytic-oscuro.png',
-  './fonts/source-sans-3-latin-400-normal.woff2', './fonts/source-sans-3-latin-400-italic.woff2',
-  './fonts/source-sans-3-latin-600-normal.woff2', './fonts/source-sans-3-latin-700-normal.woff2'
+  './fonts/atkinson-hyperlegible-latin-400-normal.woff2', './fonts/atkinson-hyperlegible-latin-400-italic.woff2',
+  './fonts/atkinson-hyperlegible-latin-700-normal.woff2', './fonts/bricolage-grotesque-latin-wght-normal.woff2'
 ];
 /* Los videos (MP4 o WebM, ≈4 MB) no se precargan aquí: la página pide el formato
    que el navegador puede reproducir y el service worker lo guarda al primer uso. */

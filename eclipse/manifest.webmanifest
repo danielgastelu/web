@@ -1,14 +1,14 @@
 {
-  "name": "Eclipse solar 2027 — Sonificación",
+  "name": "Eclipse sonoro 2027",
   "short_name": "Eclipse 2027",
-  "description": "Sonificación accesible del eclipse solar anular del 6 de febrero de 2027, con simulación global del eclipse.",
+  "description": "Eclipse sonoro 2027: sonificación accesible del eclipse solar anular del 6 de febrero de 2027, con simulación global del eclipse.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f4f4f9",
-  "theme_color": "#0056b3",
+  "background_color": "#f1f3f6",
+  "theme_color": "#0b1730",
   "lang": "es",
   "categories": ["education", "science"],
   "icons": [

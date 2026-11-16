@@ -17,7 +17,7 @@ const LANGS = [
 
 /* Textos que no se traducen (atribuciones textuales exigidas por las fuentes) */
 const ATTR_PREDICTIONS_HTML =
-  '“Eclipse Predictions by Fred Espenak, <a href="https://www.EclipseWise.com" target="_blank" rel="noopener">www.EclipseWise.com</a>”';
+  '<span lang="en">“Eclipse Predictions by Fred Espenak, <a href="https://www.EclipseWise.com" target="_blank" rel="noopener">www.EclipseWise.com</a>”</span>';
 const ATTR_ANIMATION =
   '“Global Map Animation of Eclipse courtesy of Michael Zeiler (GreatAmericanEclipse.com) and Fred Espenak (EclipseWise.com)”';
 const LICENSE_LINE_HTML =
@@ -75,7 +75,7 @@ const I18N = {
     'speak.waiting': 'Esperando el inicio del eclipse solar.',
     'speak.phase': 'Atención. Inicia la fase: {phase}',
     'speak.coverage': 'Cobertura del {n} por ciento',
-    'speak.started': 'Sonificación iniciada. Apoya el teléfono plano, con la pantalla hacia arriba, para escuchar.',
+    'speak.started': 'Sonificación iniciada.',
     'speak.simOn': 'Modo simulador activado. Usa el deslizador.',
     'speak.realOn': 'Modo tiempo real activado.',
 
@@ -99,7 +99,7 @@ const I18N = {
     'tech.h.motion': 'El movimiento del teléfono',
     'tech.p.motion_html': 'Tu celular detecta la gravedad. La aplicación requiere que coloques el teléfono completamente <strong>horizontal (apoyado sobre una mesa o en la palma de la mano)</strong>. Si levantas el teléfono, el sonido se pausa. Así controlas cuándo escuchar la experiencia.',
     'tech.h.sound': 'El sonido y la luz',
-    'tech.p.sound': 'El sonido cambia según la cantidad de luz solar (calculada por el reloj o medida por el sensor de tu celular):',
+    'tech.p.sound': 'El sonido cambia según la cantidad de luz solar, calculada a partir de la hora:',
     'tech.li1_html': '<strong>Antes y después del eclipse:</strong> hay mucha luz. Escucharás tonos altos (agudos).',
     'tech.li2_html': '<strong>Durante el avance:</strong> a medida que la Luna cubre el Sol, el tono desciende gradualmente.',
     'tech.li3_html': '<strong>En el momento máximo:</strong> al llegar a la máxima cobertura, el tono será profundo y grave. Luego, a medida que el Sol vuelve a asomarse, el tono subirá hasta ser cada vez más agudo.',
@@ -176,7 +176,7 @@ const I18N = {
     'speak.waiting': 'Aguardando o início do eclipse solar.',
     'speak.phase': 'Atenção. Começa a fase: {phase}',
     'speak.coverage': 'Cobertura de {n} por cento',
-    'speak.started': 'Sonificação iniciada. Apoie o celular na horizontal, com a tela para cima, para ouvir.',
+    'speak.started': 'Sonificação iniciada.',
     'speak.simOn': 'Modo simulador ativado. Use o controle deslizante.',
     'speak.realOn': 'Modo tempo real ativado.',
 
@@ -200,7 +200,7 @@ const I18N = {
     'tech.h.motion': 'O movimento do celular',
     'tech.p.motion_html': 'Seu celular detecta a gravidade. O aplicativo exige que o celular fique completamente <strong>na horizontal (apoiado sobre uma mesa ou na palma da mão)</strong>. Se você levantar o celular, o som é pausado. Assim você controla quando ouvir a experiência.',
     'tech.h.sound': 'O som e a luz',
-    'tech.p.sound': 'O som muda conforme a quantidade de luz solar (calculada pelo relógio ou medida pelo sensor do celular):',
+    'tech.p.sound': 'O som muda conforme a quantidade de luz solar, calculada a partir da hora:',
     'tech.li1_html': '<strong>Antes e depois do eclipse:</strong> há muita luz. Você ouvirá tons altos (agudos).',
     'tech.li2_html': '<strong>Durante o avanço:</strong> à medida que a Lua cobre o Sol, o tom desce gradualmente.',
     'tech.li3_html': '<strong>No momento máximo:</strong> ao atingir a cobertura máxima, o tom será profundo e grave. Depois, à medida que o Sol reaparece, o tom vai subindo e ficando cada vez mais agudo.',
@@ -277,7 +277,7 @@ const I18N = {
     'speak.waiting': 'Waiting for the solar eclipse to begin.',
     'speak.phase': 'Attention. Starting phase: {phase}',
     'speak.coverage': '{n} percent coverage',
-    'speak.started': 'Sonification started. Lay the phone flat, screen up, to listen.',
+    'speak.started': 'Sonification started.',
     'speak.simOn': 'Simulator mode on. Use the slider.',
     'speak.realOn': 'Real-time mode on.',
 
@@ -301,7 +301,7 @@ const I18N = {
     'tech.h.motion': 'Phone movement',
     'tech.p.motion_html': 'Your phone senses gravity. The app needs the phone to be completely <strong>flat (resting on a table or on the palm of your hand)</strong>. If you lift the phone, the sound pauses. This lets you control when you listen.',
     'tech.h.sound': 'Sound and light',
-    'tech.p.sound': 'The sound changes with the amount of sunlight (calculated from the clock or measured by your phone’s sensor):',
+    'tech.p.sound': 'The sound changes with the amount of sunlight, calculated from the time:',
     'tech.li1_html': '<strong>Before and after the eclipse:</strong> there is plenty of light. You will hear high-pitched tones.',
     'tech.li2_html': '<strong>As it progresses:</strong> as the Moon covers the Sun, the pitch gradually falls.',
     'tech.li3_html': '<strong>At maximum:</strong> at greatest coverage the tone is deep and low. Then, as the Sun reappears, the pitch rises and becomes higher and higher.',
@@ -378,7 +378,7 @@ const I18N = {
     'speak.waiting': 'En attente du début de l’éclipse solaire.',
     'speak.phase': 'Attention. Début de la phase : {phase}',
     'speak.coverage': 'Couverture de {n} pour cent',
-    'speak.started': 'Sonification lancée. Posez le téléphone à plat, écran vers le haut, pour écouter.',
+    'speak.started': 'Sonification lancée.',
     'speak.simOn': 'Mode simulateur activé. Utilisez le curseur.',
     'speak.realOn': 'Mode temps réel activé.',
 
@@ -402,7 +402,7 @@ const I18N = {
     'tech.h.motion': 'Le mouvement du téléphone',
     'tech.p.motion_html': 'Votre téléphone détecte la gravité. L’appli exige que le téléphone soit parfaitement <strong>à plat (posé sur une table ou dans la paume de la main)</strong>. Si vous le soulevez, le son se met en pause. Vous contrôlez ainsi le moment de l’écoute.',
     'tech.h.sound': 'Le son et la lumière',
-    'tech.p.sound': 'Le son varie selon la quantité de lumière solaire (calculée par l’horloge ou mesurée par le capteur du téléphone) :',
+    'tech.p.sound': 'Le son varie selon la quantité de lumière solaire, calculée à partir de l’heure :',
     'tech.li1_html': '<strong>Avant et après l’éclipse :</strong> la lumière est abondante. Vous entendrez des sons aigus.',
     'tech.li2_html': '<strong>Pendant la progression :</strong> à mesure que la Lune couvre le Soleil, le son devient progressivement plus grave.',
     'tech.li3_html': '<strong>Au maximum :</strong> à la couverture maximale, le son est profond et grave. Ensuite, à mesure que le Soleil réapparaît, le son remonte et devient de plus en plus aigu.',
@@ -479,7 +479,7 @@ const I18N = {
     'speak.waiting': 'In attesa dell’inizio dell’eclissi solare.',
     'speak.phase': 'Attenzione. Inizia la fase: {phase}',
     'speak.coverage': 'Copertura del {n} per cento',
-    'speak.started': 'Sonificazione avviata. Appoggia il telefono in piano, con lo schermo verso l’alto, per ascoltare.',
+    'speak.started': 'Sonificazione avviata.',
     'speak.simOn': 'Modalità simulatore attivata. Usa il cursore.',
     'speak.realOn': 'Modalità tempo reale attivata.',
 
@@ -503,7 +503,7 @@ const I18N = {
     'tech.h.motion': 'Il movimento del telefono',
     'tech.p.motion_html': 'Il telefono rileva la gravità. L’app richiede che il telefono sia completamente <strong>orizzontale (appoggiato su un tavolo o sul palmo della mano)</strong>. Se lo sollevi, il suono va in pausa. Così decidi tu quando ascoltare.',
     'tech.h.sound': 'Il suono e la luce',
-    'tech.p.sound': 'Il suono cambia in base alla quantità di luce solare (calcolata dall’orologio o misurata dal sensore del telefono):',
+    'tech.p.sound': 'Il suono cambia in base alla quantità di luce solare, calcolata a partire dall’ora:',
     'tech.li1_html': '<strong>Prima e dopo l’eclissi:</strong> c’è molta luce. Sentirai toni alti (acuti).',
     'tech.li2_html': '<strong>Durante l’avanzamento:</strong> man mano che la Luna copre il Sole, il tono scende gradualmente.',
     'tech.li3_html': '<strong>Al momento massimo:</strong> alla copertura massima il tono sarà profondo e grave. Poi, mentre il Sole riappare, il tono salirà diventando sempre più acuto.',
@@ -580,7 +580,7 @@ const I18N = {
     'speak.waiting': 'Warte auf den Beginn der Sonnenfinsternis.',
     'speak.phase': 'Achtung. Es beginnt: {phase}',
     'speak.coverage': '{n} Prozent Bedeckung',
-    'speak.started': 'Sonifikation gestartet. Lege das Telefon flach hin, Bildschirm nach oben, um zuzuhören.',
+    'speak.started': 'Sonifikation gestartet.',
     'speak.simOn': 'Simulatormodus aktiviert. Benutze den Schieberegler.',
     'speak.realOn': 'Echtzeitmodus aktiviert.',
 
@@ -604,7 +604,7 @@ const I18N = {
     'tech.h.motion': 'Die Bewegung des Telefons',
     'tech.p.motion_html': 'Dein Telefon erkennt die Schwerkraft. Die App verlangt, dass das Telefon vollkommen <strong>waagerecht liegt (auf einem Tisch oder auf der Handfläche)</strong>. Hebst du es an, wird der Ton pausiert. So bestimmst du selbst, wann du zuhörst.',
     'tech.h.sound': 'Klang und Licht',
-    'tech.p.sound': 'Der Klang ändert sich mit der Menge des Sonnenlichts (von der Uhr berechnet oder vom Sensor des Telefons gemessen):',
+    'tech.p.sound': 'Der Klang ändert sich mit der Menge des Sonnenlichts, berechnet aus der Uhrzeit:',
     'tech.li1_html': '<strong>Vor und nach der Finsternis:</strong> Es ist sehr hell. Du hörst hohe Töne.',
     'tech.li2_html': '<strong>Im Verlauf:</strong> Während der Mond die Sonne bedeckt, sinkt die Tonhöhe allmählich.',
     'tech.li3_html': '<strong>Im Maximum:</strong> Bei größter Bedeckung ist der Ton tief und dunkel. Wenn die Sonne wieder hervorkommt, steigt der Ton und wird immer höher.',
@@ -643,7 +643,7 @@ const I18N = {
    de la simulación, institución y notas «Acerca de esta app».
    ========================================================================= */
 const GALLERY_URL = 'https://spaceweathergallery.com/index.php';
-const APP_VERSION = '1.6';
+const APP_VERSION = '2.4';
 const I18N_EXTRA = {
   es: {
     'a11y.skip': 'Saltar al contenido principal',
@@ -681,7 +681,7 @@ const I18N_EXTRA = {
     'cred.install.h': 'Instalar la app para usarla sin conexión',
     'cred.install': 'Una vez instalada, la app funciona completa sin conexión a internet, incluida la simulación: ideal para el día del eclipse, al aire libre. En Android o en una computadora, usa el botón «Instalar la app» o el menú del navegador. En iPhone o iPad, abre el menú Compartir y elige «Agregar a pantalla de inicio». Conviene abrirla una vez con conexión y entrar a la sección Simulación para que la animación quede guardada.',
     'cred.privacy.h': 'Privacidad',
-    'cred.privacy': 'La app no pide ningún dato a quien la usa y no tiene cuentas ni formularios. Para saber cuántas personas la usan, cuenta las visitas de forma anónima con GoatCounter, un servicio sin cookies que no guarda datos personales ni sigue a nadie entre sitios. Los cálculos del eclipse vienen incluidos y se hacen en el propio dispositivo. Los sensores de movimiento y de luz solo se usan mientras la experiencia está activa, y sus lecturas no salen del dispositivo. En el navegador se guardan únicamente el idioma, el modo de contraste y el tipo de sonido elegidos. Los sitios externos solo se abren si se toca un enlace.',
+    'cred.privacy': 'La app no pide ningún dato a quien la usa y no tiene cuentas ni formularios. Para saber cuántas personas la usan, cuenta las visitas de forma anónima con GoatCounter, un servicio sin cookies que no guarda datos personales ni sigue a nadie entre sitios. Los cálculos del eclipse vienen incluidos y se hacen en el propio dispositivo. La app no usa los sensores del teléfono. En el navegador se guardan únicamente el idioma, la apariencia (modo claro, noche o alto contraste), el tipo de sonido y el lugar elegidos. Los sitios externos solo se abren si se toca un enlace.',
     'ai.h': 'Nota ética sobre el uso de inteligencia artificial',
     'ai.lead': 'Este proyecto se hizo con la asistencia de herramientas de inteligencia artificial (IA), que participaron como coautoras y como soporte técnico. Queremos decirlo de forma clara.',
     'ai.did.h': 'Qué hizo la IA',
@@ -731,7 +731,7 @@ const I18N_EXTRA = {
     'cred.install.h': 'Instale o app para usá-lo off-line',
     'cred.install': 'Depois de instalado, o app funciona completo sem internet, inclusive a simulação: ideal para o dia do eclipse, ao ar livre. No Android ou no computador, use o botão “Instalar o app” ou o menu do navegador. No iPhone ou iPad, abra o menu Compartilhar e escolha “Adicionar à Tela de Início”. Convém abri-lo uma vez com conexão e entrar na seção Simulação para que a animação fique salva.',
     'cred.privacy.h': 'Privacidade',
-    'cred.privacy': 'O app não pede nenhum dado a quem o usa e não tem contas nem formulários. Para saber quantas pessoas o usam, conta as visitas de forma anônima com o GoatCounter, um serviço sem cookies que não guarda dados pessoais nem segue ninguém entre sites. Os cálculos do eclipse vêm incluídos e são feitos no próprio dispositivo. Os sensores de movimento e de luz só são usados enquanto a experiência está ativa, e suas leituras não saem do dispositivo. No navegador ficam salvos apenas o idioma, o modo de contraste e o tipo de som escolhidos. Sites externos só são abertos se você tocar em um link.',
+    'cred.privacy': 'O app não pede nenhum dado a quem o usa e não tem contas nem formulários. Para saber quantas pessoas o usam, conta as visitas de forma anônima com o GoatCounter, um serviço sem cookies que não guarda dados pessoais nem segue ninguém entre sites. Os cálculos do eclipse vêm incluídos e são feitos no próprio dispositivo. O app não usa os sensores do celular. No navegador ficam salvos apenas o idioma, a aparência (modo claro, noite ou alto contraste), o tipo de som e o lugar escolhidos. Sites externos só são abertos se você tocar em um link.',
     'ai.h': 'Nota ética sobre o uso de inteligência artificial',
     'ai.lead': 'Este projeto foi feito com a ajuda de ferramentas de inteligência artificial (IA), que participaram como coautoras e como suporte técnico. Queremos dizer isso com clareza.',
     'ai.did.h': 'O que a IA fez',
@@ -781,7 +781,7 @@ const I18N_EXTRA = {
     'cred.install.h': 'Install the app to use it offline',
     'cred.install': 'Once installed, the app works fully without an internet connection, including the simulation: ideal for eclipse day outdoors. On Android or a computer, use the “Install the app” button or the browser menu. On iPhone or iPad, open the Share menu and choose “Add to Home Screen”. Open it once while online and visit the Simulation section so the animation is saved.',
     'cred.privacy.h': 'Privacy',
-    'cred.privacy': 'The app asks users for no data at all and has no accounts or forms. To know how many people use it, it counts visits anonymously with GoatCounter, a cookie-free service that stores no personal data and does not track anyone across sites. The eclipse calculations are built in and run on the device itself. The motion and light sensors are only used while the experience is active, and their readings never leave the device. The browser stores only the chosen language, contrast mode and sound type. External sites open only if you tap a link.',
+    'cred.privacy': 'The app asks users for no data at all and has no accounts or forms. To know how many people use it, it counts visits anonymously with GoatCounter, a cookie-free service that stores no personal data and does not track anyone across sites. The eclipse calculations are built in and run on the device itself. The app does not use the phone’s sensors. The browser stores only the chosen language, appearance (light, night or high-contrast mode), sound type and place. External sites open only if you tap a link.',
     'ai.h': 'Ethics note on the use of artificial intelligence',
     'ai.lead': 'This project was made with the assistance of artificial intelligence (AI) tools, which took part as co-authors and as technical support. We want to say so plainly.',
     'ai.did.h': 'What the AI did',
@@ -831,7 +831,7 @@ const I18N_EXTRA = {
     'cred.install.h': 'Installer l’appli pour l’utiliser hors ligne',
     'cred.install': 'Une fois installée, l’appli fonctionne entièrement sans connexion Internet, simulation comprise : idéal pour le jour de l’éclipse, en plein air. Sur Android ou sur un ordinateur, utilisez le bouton « Installer l’appli » ou le menu du navigateur. Sur iPhone ou iPad, ouvrez le menu Partager et choisissez « Sur l’écran d’accueil ». Ouvrez-la une fois avec une connexion et allez dans la section Simulation pour que l’animation soit enregistrée.',
     'cred.privacy.h': 'Confidentialité',
-    'cred.privacy': 'L’appli ne demande aucune donnée et n’a ni comptes ni formulaires. Pour savoir combien de personnes l’utilisent, elle compte les visites de façon anonyme avec GoatCounter, un service sans cookies qui ne conserve aucune donnée personnelle et ne suit personne d’un site à l’autre. Les calculs de l’éclipse sont intégrés et effectués sur l’appareil lui-même. Les capteurs de mouvement et de lumière ne sont utilisés que pendant l’expérience, et leurs mesures ne quittent jamais l’appareil. Le navigateur enregistre uniquement la langue, le mode de contraste et le type de son choisis. Les sites externes ne s’ouvrent que si vous touchez un lien.',
+    'cred.privacy': 'L’appli ne demande aucune donnée et n’a ni comptes ni formulaires. Pour savoir combien de personnes l’utilisent, elle compte les visites de façon anonyme avec GoatCounter, un service sans cookies qui ne conserve aucune donnée personnelle et ne suit personne d’un site à l’autre. Les calculs de l’éclipse sont intégrés et effectués sur l’appareil lui-même. L’appli n’utilise pas les capteurs du téléphone. Le navigateur enregistre uniquement la langue, l’apparence (mode clair, nuit ou contraste élevé), le type de son et le lieu choisis. Les sites externes ne s’ouvrent que si vous touchez un lien.',
     'ai.h': 'Note éthique sur l’usage de l’intelligence artificielle',
     'ai.lead': 'Ce projet a été réalisé avec l’aide d’outils d’intelligence artificielle (IA), qui ont participé comme coautrices et comme soutien technique. Nous voulons le dire clairement.',
     'ai.did.h': 'Ce qu’a fait l’IA',
@@ -881,7 +881,7 @@ const I18N_EXTRA = {
     'cred.install.h': 'Installa l’app per usarla offline',
     'cred.install': 'Una volta installata, l’app funziona completamente senza connessione, simulazione inclusa: ideale per il giorno dell’eclissi, all’aperto. Su Android o su un computer, usa il pulsante «Installa l’app» o il menu del browser. Su iPhone o iPad, apri il menu Condividi e scegli «Aggiungi alla schermata Home». Conviene aprirla una volta con la connessione ed entrare nella sezione Simulazione perché l’animazione venga salvata.',
     'cred.privacy.h': 'Privacy',
-    'cred.privacy': 'L’app non chiede alcun dato a chi la usa e non ha account né moduli. Per sapere quante persone la usano, conta le visite in modo anonimo con GoatCounter, un servizio senza cookie che non conserva dati personali e non segue nessuno tra un sito e l’altro. I calcoli dell’eclissi sono inclusi e avvengono sul dispositivo stesso. I sensori di movimento e di luce si usano solo mentre l’esperienza è attiva e le loro letture non lasciano il dispositivo. Il browser salva soltanto la lingua, la modalità di contrasto e il tipo di suono scelti. I siti esterni si aprono solo se tocchi un link.',
+    'cred.privacy': 'L’app non chiede alcun dato a chi la usa e non ha account né moduli. Per sapere quante persone la usano, conta le visite in modo anonimo con GoatCounter, un servizio senza cookie che non conserva dati personali e non segue nessuno tra un sito e l’altro. I calcoli dell’eclissi sono inclusi e avvengono sul dispositivo stesso. L’app non usa i sensori del telefono. Il browser salva soltanto la lingua, l’aspetto (modalità chiara, notte o alto contrasto), il tipo di suono e il luogo scelti. I siti esterni si aprono solo se tocchi un link.',
     'ai.h': 'Nota etica sull’uso dell’intelligenza artificiale',
     'ai.lead': 'Questo progetto è stato realizzato con l’assistenza di strumenti di intelligenza artificiale (IA), che hanno partecipato come coautrici e come supporto tecnico. Vogliamo dirlo in modo chiaro.',
     'ai.did.h': 'Cosa ha fatto l’IA',
@@ -931,7 +931,7 @@ const I18N_EXTRA = {
     'cred.install.h': 'App installieren, um sie offline zu nutzen',
     'cred.install': 'Nach der Installation funktioniert die App vollständig ohne Internet, einschließlich der Simulation: ideal für den Tag der Finsternis im Freien. Unter Android oder am Computer nutzt du die Schaltfläche „App installieren“ oder das Browsermenü. Auf iPhone oder iPad öffnest du das Teilen-Menü und wählst „Zum Home-Bildschirm“. Öffne sie einmal mit Verbindung und rufe den Bereich Simulation auf, damit die Animation gespeichert wird.',
     'cred.privacy.h': 'Datenschutz',
-    'cred.privacy': 'Die App fragt keinerlei Daten ab und hat keine Konten oder Formulare. Um zu wissen, wie viele Menschen sie nutzen, zählt sie Besuche anonym mit GoatCounter, einem Dienst ohne Cookies, der keine personenbezogenen Daten speichert und niemanden über Websites hinweg verfolgt. Die Finsternisberechnungen sind enthalten und laufen auf dem Gerät selbst. Bewegungs- und Lichtsensor werden nur während des Erlebnisses genutzt, und ihre Messwerte verlassen das Gerät nie. Im Browser werden nur die gewählte Sprache, der Kontrastmodus und die Klangart gespeichert. Externe Seiten öffnen sich nur, wenn du auf einen Link tippst.',
+    'cred.privacy': 'Die App fragt keinerlei Daten ab und hat keine Konten oder Formulare. Um zu wissen, wie viele Menschen sie nutzen, zählt sie Besuche anonym mit GoatCounter, einem Dienst ohne Cookies, der keine personenbezogenen Daten speichert und niemanden über Websites hinweg verfolgt. Die Finsternisberechnungen sind enthalten und laufen auf dem Gerät selbst. Die App nutzt die Sensoren des Telefons nicht. Im Browser werden nur die gewählte Sprache, das Erscheinungsbild (heller Modus, Nachtmodus oder hoher Kontrast), die Klangart und der gewählte Ort gespeichert. Externe Seiten öffnen sich nur, wenn du auf einen Link tippst.',
     'ai.h': 'Ethikhinweis zum Einsatz künstlicher Intelligenz',
     'ai.lead': 'Dieses Projekt entstand mit Unterstützung von Werkzeugen der künstlichen Intelligenz (KI), die als Mitautorinnen und als technische Hilfe beteiligt waren. Das wollen wir klar sagen.',
     'ai.did.h': 'Was die KI getan hat',
@@ -1072,7 +1072,7 @@ const I18N_SON = {
     'son.src.na.browser': 'no disponible en este navegador',
     'son.noTilt': 'Equipo sin sensor de inclinación: reproduciendo',
     'tech.son.h': '¿Qué es la sonificación?',
-    'tech.son.p': 'Sonificar es convertir datos en sonido. Así como un gráfico o un mapa nos permite «ver» la información, la sonificación nos permite «escucharla»: en lugar de mirar una línea que sube o baja, oímos un sonido que cambia. En esta experiencia, la luz del ambiente que mide el sensor del celular se transforma en un tono que varía: con más luz el sonido es más agudo y con menos luz, más grave.',
+    'tech.son.p': 'Sonificar es convertir datos en sonido. Así como un gráfico o un mapa nos permite «ver» la información, la sonificación nos permite «escucharla»: en lugar de mirar una línea que sube o baja, oímos un sonido que cambia. En esta experiencia, la cantidad de Sol que queda a la vista, calculada para cada instante del eclipse, se transforma en un tono que varía: con más luz el sonido es más agudo y con menos luz, más grave.',
     'tech.ls.h': 'Un antecedente: LightSound',
     'tech.ls.p': 'Esta idea ya tiene un antecedente: LightSound, un proyecto de código abierto creado en 2017 en la Universidad de Harvard. Sus instrucciones públicas permiten construir un pequeño aparato que sigue el eclipse a través del sonido, pensado para que las personas ciegas o con baja visión puedan vivirlo: un sensor mide la luz del Sol y la convierte en notas que cambian a medida que la Luna lo cubre. Esta app toma el mismo principio, pero prescinde del aparato físico (el hardware): no hay que comprar piezas ni armar nada, porque usa el celular, un dispositivo que ya está en manos de gran parte de la población (ver Créditos).',
     'cred.more.son_html': '<strong>Sonificación:</strong> para profundizar en esta técnica, que transforma datos en sonido del mismo modo que un gráfico los transforma en imagen, ver ' + SON_BOOK + ' (T. Hermann, A. Hunt y J. G. Neuhoff, eds., Logos, Berlín, 2011), libro de acceso abierto.',
@@ -1083,7 +1083,7 @@ const I18N_SON = {
     'son.src.na.browser': 'indisponível neste navegador',
     'son.noTilt': 'Aparelho sem sensor de inclinação: reproduzindo',
     'tech.son.h': 'O que é a sonificação?',
-    'tech.son.p': 'Sonificar é converter dados em som. Assim como um gráfico ou um mapa nos permite «ver» a informação, a sonificação nos permite «ouvi-la»: em vez de olhar uma linha que sobe ou desce, ouvimos um som que muda. Nesta experiência, a luz do ambiente medida pelo sensor do celular é transformada em um tom que varia: com mais luz o som é mais agudo e, com menos luz, mais grave.',
+    'tech.son.p': 'Sonificar é converter dados em som. Assim como um gráfico ou um mapa nos permite «ver» a informação, a sonificação nos permite «ouvi-la»: em vez de olhar uma linha que sobe ou desce, ouvimos um som que muda. Nesta experiência, a parte do Sol que fica à vista, calculada para cada instante do eclipse, é transformada em um tom que varia: com mais luz o som é mais agudo e, com menos luz, mais grave.',
     'tech.ls.h': 'Um antecedente: LightSound',
     'tech.ls.p': 'Esta ideia já tem um antecedente: LightSound, um projeto de código aberto criado em 2017 na Universidade Harvard. Suas instruções públicas permitem construir um pequeno aparelho que acompanha o eclipse por meio do som, pensado para que pessoas cegas ou com baixa visão possam vivê-lo: um sensor mede a luz do Sol e a converte em notas que mudam à medida que a Lua o cobre. Este app usa o mesmo princípio, mas dispensa o aparelho físico (o hardware): não é preciso comprar peças nem montar nada, porque usa o celular, um dispositivo que já está nas mãos de grande parte da população (ver Créditos).',
     'cred.more.son_html': '<strong>Sonificação:</strong> para se aprofundar nesta técnica, que transforma dados em som da mesma forma que um gráfico os transforma em imagem, ver ' + SON_BOOK + ' (T. Hermann, A. Hunt e J. G. Neuhoff, orgs., Logos, Berlim, 2011), livro de acesso aberto.',
@@ -1094,7 +1094,7 @@ const I18N_SON = {
     'son.src.na.browser': 'not available in this browser',
     'son.noTilt': 'No tilt sensor on this device: playing',
     'tech.son.h': 'What is sonification?',
-    'tech.son.p': 'To sonify is to turn data into sound. Just as a chart or a map lets us “see” information, sonification lets us “hear” it: instead of watching a line go up or down, we hear a sound that changes. In this experience, the ambient light measured by the phone’s sensor is turned into a tone that varies: more light gives a higher sound, less light a lower one.',
+    'tech.son.p': 'To sonify is to turn data into sound. Just as a chart or a map lets us “see” information, sonification lets us “hear” it: instead of watching a line go up or down, we hear a sound that changes. In this experience, the share of the Sun left uncovered, calculated for each moment of the eclipse, is turned into a tone that varies: more light gives a higher sound, less light a lower one.',
     'tech.ls.h': 'A precedent: LightSound',
     'tech.ls.p': 'This idea has a precedent: LightSound, an open-source project created in 2017 at Harvard University. Its public instructions let anyone build a small device that follows the eclipse through sound, designed so that blind and low-vision people can experience it: a sensor measures sunlight and turns it into notes that change as the Moon covers the Sun. This app uses the same principle but does without the physical device (the hardware): there are no parts to buy or assemble, because it uses the mobile phone, a device already in the hands of a large part of the population (see Credits).',
     'cred.more.son_html': '<strong>Sonification:</strong> to learn more about this technique, which turns data into sound just as a chart turns it into an image, see ' + SON_BOOK + ' (T. Hermann, A. Hunt and J. G. Neuhoff, eds., Logos, Berlin, 2011), an open-access book.',
@@ -1105,7 +1105,7 @@ const I18N_SON = {
     'son.src.na.browser': 'indisponible dans ce navigateur',
     'son.noTilt': 'Appareil sans capteur d’inclinaison : lecture en cours',
     'tech.son.h': 'Qu’est-ce que la sonification ?',
-    'tech.son.p': 'Sonifier, c’est transformer des données en son. De même qu’un graphique ou une carte nous permet de « voir » l’information, la sonification nous permet de l’« entendre » : au lieu de regarder une courbe qui monte ou descend, on écoute un son qui change. Dans cette expérience, la lumière ambiante mesurée par le capteur du téléphone est transformée en une tonalité variable : plus de lumière donne un son plus aigu, moins de lumière un son plus grave.',
+    'tech.son.p': 'Sonifier, c’est transformer des données en son. De même qu’un graphique ou une carte nous permet de « voir » l’information, la sonification nous permet de l’« entendre » : au lieu de regarder une courbe qui monte ou descend, on écoute un son qui change. Dans cette expérience, la part du Soleil encore visible, calculée pour chaque instant de l’éclipse, est transformée en une tonalité variable : plus de lumière donne un son plus aigu, moins de lumière un son plus grave.',
     'tech.ls.h': 'Un précédent : LightSound',
     'tech.ls.p': 'Cette idée a un précédent : LightSound, un projet open source créé en 2017 à l’université Harvard. Ses instructions publiques permettent de fabriquer un petit appareil qui suit l’éclipse par le son, conçu pour que les personnes aveugles ou malvoyantes puissent la vivre : un capteur mesure la lumière du Soleil et la convertit en notes qui changent à mesure que la Lune le couvre. Cette appli reprend le même principe, mais se passe de l’appareil physique (le matériel) : rien à acheter ni à monter, car elle utilise le téléphone portable, un appareil déjà entre les mains d’une grande partie de la population (voir Crédits).',
     'cred.more.son_html': '<strong>Sonification :</strong> pour approfondir cette technique, qui transforme des données en son comme un graphique les transforme en image, voir ' + SON_BOOK + ' (T. Hermann, A. Hunt et J. G. Neuhoff, dir., Logos, Berlin, 2011), livre en libre accès.',
@@ -1116,7 +1116,7 @@ const I18N_SON = {
     'son.src.na.browser': 'non disponibile in questo browser',
     'son.noTilt': 'Dispositivo senza sensore di inclinazione: in riproduzione',
     'tech.son.h': 'Che cos’è la sonificazione?',
-    'tech.son.p': 'Sonificare significa trasformare dati in suono. Come un grafico o una mappa ci permette di «vedere» le informazioni, la sonificazione ci permette di «ascoltarle»: invece di guardare una linea che sale o scende, sentiamo un suono che cambia. In questa esperienza la luce ambientale misurata dal sensore del telefono viene trasformata in un tono variabile: con più luce il suono è più acuto, con meno luce più grave.',
+    'tech.son.p': 'Sonificare significa trasformare dati in suono. Come un grafico o una mappa ci permette di «vedere» le informazioni, la sonificazione ci permette di «ascoltarle»: invece di guardare una linea che sale o scende, sentiamo un suono che cambia. In questa esperienza la parte di Sole che resta visibile, calcolata per ogni istante dell’eclissi, viene trasformata in un tono variabile: con più luce il suono è più acuto, con meno luce più grave.',
     'tech.ls.h': 'Un precedente: LightSound',
     'tech.ls.p': 'Questa idea ha un precedente: LightSound, un progetto open source nato nel 2017 all’Università di Harvard. Le sue istruzioni pubbliche permettono di costruire un piccolo apparecchio che segue l’eclissi attraverso il suono, pensato perché le persone cieche o ipovedenti possano viverla: un sensore misura la luce del Sole e la converte in note che cambiano man mano che la Luna lo copre. Questa app adotta lo stesso principio, ma fa a meno dell’apparecchio fisico (l’hardware): non servono pezzi da comprare né da montare, perché usa il cellulare, un dispositivo già nelle mani di gran parte della popolazione (vedi Crediti).',
     'cred.more.son_html': '<strong>Sonificazione:</strong> per approfondire questa tecnica, che trasforma i dati in suono così come un grafico li trasforma in immagine, vedi ' + SON_BOOK + ' (T. Hermann, A. Hunt e J. G. Neuhoff, a cura di, Logos, Berlino, 2011), libro ad accesso aperto.',
@@ -1127,7 +1127,7 @@ const I18N_SON = {
     'son.src.na.browser': 'in diesem Browser nicht verfügbar',
     'son.noTilt': 'Gerät ohne Neigungssensor: Wiedergabe läuft',
     'tech.son.h': 'Was ist Sonifikation?',
-    'tech.son.p': 'Sonifizieren heißt, Daten in Klang zu verwandeln. So wie ein Diagramm oder eine Karte Informationen „sichtbar“ macht, macht die Sonifikation sie „hörbar“: Statt eine Linie steigen oder fallen zu sehen, hören wir einen Klang, der sich verändert. In diesem Erlebnis wird das Umgebungslicht, das der Sensor des Handys misst, in einen veränderlichen Ton umgewandelt: Mehr Licht ergibt einen höheren, weniger Licht einen tieferen Ton.',
+    'tech.son.p': 'Sonifizieren heißt, Daten in Klang zu verwandeln. So wie ein Diagramm oder eine Karte Informationen „sichtbar“ macht, macht die Sonifikation sie „hörbar“: Statt eine Linie steigen oder fallen zu sehen, hören wir einen Klang, der sich verändert. In diesem Erlebnis wird der sichtbare Anteil der Sonne, für jeden Augenblick der Finsternis berechnet, in einen veränderlichen Ton umgewandelt: Mehr Licht ergibt einen höheren, weniger Licht einen tieferen Ton.',
     'tech.ls.h': 'Ein Vorläufer: LightSound',
     'tech.ls.p': 'Diese Idee hat einen Vorläufer: LightSound, ein Open-Source-Projekt, das 2017 an der Harvard University entstand. Mit seiner öffentlichen Anleitung lässt sich ein kleines Gerät bauen, das die Finsternis hörbar macht, damit blinde und sehbehinderte Menschen sie erleben können: Ein Sensor misst das Sonnenlicht und wandelt es in Töne um, die sich verändern, während der Mond die Sonne bedeckt. Diese App nutzt dasselbe Prinzip, verzichtet aber auf das physische Gerät (die Hardware): Es müssen keine Teile gekauft oder zusammengebaut werden, denn sie nutzt das Handy, ein Gerät, das ein großer Teil der Bevölkerung bereits besitzt (siehe Credits).',
     'cred.more.son_html': '<strong>Sonifikation:</strong> Wer diese Technik vertiefen möchte, die Daten in Klang verwandelt, so wie ein Diagramm sie in ein Bild verwandelt, findet mehr in ' + SON_BOOK + ' (T. Hermann, A. Hunt und J. G. Neuhoff, Hrsg., Logos, Berlin, 2011), einem frei zugänglichen Buch.',
@@ -1144,7 +1144,7 @@ const I18N_UX = {
   es: {
     'prev.btn': '🎧 Escuchar el eclipse en 1 minuto',
     'prev.stop': '⏹️ Detener la vista previa',
-    'prev.hint': 'Todo el eclipse comprimido en un minuto, para reconocer los sonidos antes del día real. No hace falta apoyar el teléfono.',
+    'prev.hint': 'Todo el eclipse comprimido en un minuto, para reconocer los sonidos antes del día real.',
     'prev.intro': 'Vista previa del eclipse en un minuto. Agudo es mucha luz; grave, cuando la Luna tapa el Sol. Las campanitas marcan el anillo de fuego.',
     'prev.end': 'Fin de la vista previa. Así sonará el eclipse el 6 de febrero.',
     'prev.stopped': 'Vista previa detenida.',
@@ -1153,7 +1153,7 @@ const I18N_UX = {
     'son.snd.tone': 'Tono continuo',
     'son.snd.hint': 'Las notas melódicas son más musicales; el tono continuo permite seguir mejor los cambios suaves.',
     'tech.li4_html': '<strong>Durante el anillo de fuego:</strong> además del tono grave suenan campanitas suaves, para que el momento culminante sea inconfundible.',
-    'tech.li5_html': '<strong>Señales al tacto y al oído:</strong> en los teléfonos que lo permiten, el celular vibra en cada cambio de fase (con un patrón más largo en el anillo de fuego). Al apoyar el teléfono suenan dos notas que suben y, al levantarlo, dos que bajan.',
+    'tech.li5_html': '<strong>Señales al tacto y al oído:</strong> en los teléfonos que lo permiten, el celular vibra en cada cambio de fase (con un patrón más largo en el anillo de fuego). Al reanudar el sonido suenan dos notas que suben y, al pausarlo, dos que bajan.',
     'how.btn': '🗣️ ¿Cómo va el eclipse?',
     'how.before': 'El eclipse todavía no empezó. Faltan {d} para el inicio.',
     'how.partialIn': 'Fase parcial creciente. La Luna cubre el {n} por ciento del Sol. Faltan {d} para el anillo de fuego.',
@@ -1165,7 +1165,7 @@ const I18N_UX = {
   pt: {
     'prev.btn': '🎧 Ouvir o eclipse em 1 minuto',
     'prev.stop': '⏹️ Parar a prévia',
-    'prev.hint': 'Todo o eclipse comprimido em um minuto, para reconhecer os sons antes do dia real. Não é preciso apoiar o celular.',
+    'prev.hint': 'Todo o eclipse comprimido em um minuto, para reconhecer os sons antes do dia real.',
     'prev.intro': 'Prévia do eclipse em um minuto. Agudo é muita luz; grave, quando a Lua cobre o Sol. Os sininhos marcam o anel de fogo.',
     'prev.end': 'Fim da prévia. Assim soará o eclipse em 6 de fevereiro.',
     'prev.stopped': 'Prévia interrompida.',
@@ -1174,7 +1174,7 @@ const I18N_UX = {
     'son.snd.tone': 'Tom contínuo',
     'son.snd.hint': 'As notas melódicas são mais musicais; o tom contínuo permite acompanhar melhor as mudanças suaves.',
     'tech.li4_html': '<strong>Durante o anel de fogo:</strong> além do tom grave, tocam sininhos suaves, para que o momento culminante seja inconfundível.',
-    'tech.li5_html': '<strong>Sinais pelo tato e pela audição:</strong> nos celulares que permitem, o aparelho vibra a cada mudança de fase (com um padrão mais longo no anel de fogo). Ao apoiar o celular tocam duas notas que sobem e, ao levantá-lo, duas que descem.',
+    'tech.li5_html': '<strong>Sinais pelo tato e pela audição:</strong> nos celulares que permitem, o aparelho vibra a cada mudança de fase (com um padrão mais longo no anel de fogo). Ao retomar o som tocam duas notas que sobem e, ao pausá-lo, duas que descem.',
     'how.btn': '🗣️ Como está o eclipse?',
     'how.before': 'O eclipse ainda não começou. Faltam {d} para o início.',
     'how.partialIn': 'Fase parcial crescente. A Lua cobre {n} por cento do Sol. Faltam {d} para o anel de fogo.',
@@ -1186,7 +1186,7 @@ const I18N_UX = {
   en: {
     'prev.btn': '🎧 Hear the eclipse in 1 minute',
     'prev.stop': '⏹️ Stop the preview',
-    'prev.hint': 'The whole eclipse compressed into one minute, so you can learn the sounds before the real day. No need to lay the phone flat.',
+    'prev.hint': 'The whole eclipse compressed into one minute, so you can learn the sounds before the real day.',
     'prev.intro': 'One-minute eclipse preview. High pitch means lots of light; low pitch, when the Moon covers the Sun. The chimes mark the ring of fire.',
     'prev.end': 'End of the preview. This is how the eclipse will sound on 6 February.',
     'prev.stopped': 'Preview stopped.',
@@ -1195,7 +1195,7 @@ const I18N_UX = {
     'son.snd.tone': 'Continuous tone',
     'son.snd.hint': 'Melodic notes are more musical; the continuous tone makes gentle changes easier to follow.',
     'tech.li4_html': '<strong>During the ring of fire:</strong> soft chimes play on top of the low tone, so the climax is unmistakable.',
-    'tech.li5_html': '<strong>Touch and sound cues:</strong> on phones that allow it, the phone vibrates at each phase change (with a longer pattern for the ring of fire). Laying the phone flat plays two rising notes; lifting it plays two falling notes.',
+    'tech.li5_html': '<strong>Touch and sound cues:</strong> on phones that allow it, the phone vibrates at each phase change (with a longer pattern for the ring of fire). Resuming the sound plays two rising notes; pausing it plays two falling notes.',
     'how.btn': '🗣️ How is the eclipse going?',
     'how.before': 'The eclipse has not started yet. {d} to go until it begins.',
     'how.partialIn': 'Growing partial phase. The Moon covers {n} percent of the Sun. {d} to go until the ring of fire.',
@@ -1207,7 +1207,7 @@ const I18N_UX = {
   fr: {
     'prev.btn': '🎧 Écouter l’éclipse en 1 minute',
     'prev.stop': '⏹️ Arrêter l’aperçu',
-    'prev.hint': 'Toute l’éclipse condensée en une minute, pour reconnaître les sons avant le jour J. Inutile de poser le téléphone à plat.',
+    'prev.hint': 'Toute l’éclipse condensée en une minute, pour reconnaître les sons avant le jour J.',
     'prev.intro': 'Aperçu de l’éclipse en une minute. Aigu, c’est beaucoup de lumière ; grave, quand la Lune cache le Soleil. Les clochettes marquent l’anneau de feu.',
     'prev.end': 'Fin de l’aperçu. Voici comment sonnera l’éclipse le 6 février.',
     'prev.stopped': 'Aperçu arrêté.',
@@ -1216,7 +1216,7 @@ const I18N_UX = {
     'son.snd.tone': 'Son continu',
     'son.snd.hint': 'Les notes mélodiques sont plus musicales ; le son continu permet de mieux suivre les changements doux.',
     'tech.li4_html': '<strong>Pendant l’anneau de feu :</strong> en plus du son grave, de douces clochettes retentissent, pour que le moment culminant soit reconnaissable entre tous.',
-    'tech.li5_html': '<strong>Signaux au toucher et à l’oreille :</strong> sur les téléphones qui le permettent, l’appareil vibre à chaque changement de phase (avec un motif plus long pour l’anneau de feu). Poser le téléphone à plat fait entendre deux notes qui montent ; le soulever, deux notes qui descendent.',
+    'tech.li5_html': '<strong>Signaux au toucher et à l’oreille :</strong> sur les téléphones qui le permettent, l’appareil vibre à chaque changement de phase (avec un motif plus long pour l’anneau de feu). Reprendre le son fait entendre deux notes qui montent ; le mettre en pause, deux notes qui descendent.',
     'how.btn': '🗣️ Où en est l’éclipse ?',
     'how.before': 'L’éclipse n’a pas encore commencé. Début dans {d}.',
     'how.partialIn': 'Phase partielle croissante. La Lune couvre {n} pour cent du Soleil. L’anneau de feu dans {d}.',
@@ -1228,7 +1228,7 @@ const I18N_UX = {
   it: {
     'prev.btn': '🎧 Ascolta l’eclissi in 1 minuto',
     'prev.stop': '⏹️ Ferma l’anteprima',
-    'prev.hint': 'Tutta l’eclissi compressa in un minuto, per riconoscere i suoni prima del giorno vero. Non serve appoggiare il telefono.',
+    'prev.hint': 'Tutta l’eclissi compressa in un minuto, per riconoscere i suoni prima del giorno vero.',
     'prev.intro': 'Anteprima dell’eclissi in un minuto. Acuto è tanta luce; grave, quando la Luna copre il Sole. I campanelli segnano l’anello di fuoco.',
     'prev.end': 'Fine dell’anteprima. Così suonerà l’eclissi il 6 febbraio.',
     'prev.stopped': 'Anteprima fermata.',
@@ -1237,7 +1237,7 @@ const I18N_UX = {
     'son.snd.tone': 'Tono continuo',
     'son.snd.hint': 'Le note melodiche sono più musicali; il tono continuo permette di seguire meglio i cambiamenti lievi.',
     'tech.li4_html': '<strong>Durante l’anello di fuoco:</strong> oltre al tono grave suonano dolci campanelli, perché il momento culminante sia inconfondibile.',
-    'tech.li5_html': '<strong>Segnali al tatto e all’udito:</strong> sui telefoni che lo consentono, il dispositivo vibra a ogni cambio di fase (con uno schema più lungo per l’anello di fuoco). Appoggiando il telefono suonano due note che salgono; sollevandolo, due che scendono.',
+    'tech.li5_html': '<strong>Segnali al tatto e all’udito:</strong> sui telefoni che lo consentono, il dispositivo vibra a ogni cambio di fase (con uno schema più lungo per l’anello di fuoco). Riprendendo il suono suonano due note che salgono; mettendolo in pausa, due che scendono.',
     'how.btn': '🗣️ A che punto è l’eclissi?',
     'how.before': 'L’eclissi non è ancora iniziata. Mancano {d} all’inizio.',
     'how.partialIn': 'Fase parziale crescente. La Luna copre il {n} per cento del Sole. Mancano {d} all’anello di fuoco.',
@@ -1249,7 +1249,7 @@ const I18N_UX = {
   de: {
     'prev.btn': '🎧 Die Finsternis in 1 Minute hören',
     'prev.stop': '⏹️ Vorschau beenden',
-    'prev.hint': 'Die ganze Finsternis in einer Minute, um die Klänge vor dem echten Tag kennenzulernen. Das Handy muss nicht flach liegen.',
+    'prev.hint': 'Die ganze Finsternis in einer Minute, um die Klänge vor dem echten Tag kennenzulernen.',
     'prev.intro': 'Vorschau der Finsternis in einer Minute. Hoch bedeutet viel Licht, tief, wenn der Mond die Sonne bedeckt. Die Glöckchen markieren den Feuerring.',
     'prev.end': 'Ende der Vorschau. So wird die Finsternis am 6. Februar klingen.',
     'prev.stopped': 'Vorschau beendet.',
@@ -1258,7 +1258,7 @@ const I18N_UX = {
     'son.snd.tone': 'Dauerton',
     'son.snd.hint': 'Melodische Töne klingen musikalischer; mit dem Dauerton lassen sich sanfte Veränderungen besser verfolgen.',
     'tech.li4_html': '<strong>Während des Feuerrings:</strong> Zusätzlich zum tiefen Ton erklingen sanfte Glöckchen, damit der Höhepunkt unverwechselbar ist.',
-    'tech.li5_html': '<strong>Signale zum Fühlen und Hören:</strong> Auf Handys, die es erlauben, vibriert das Gerät bei jedem Phasenwechsel (mit einem längeren Muster beim Feuerring). Beim Hinlegen erklingen zwei aufsteigende Töne, beim Hochheben zwei absteigende.',
+    'tech.li5_html': '<strong>Signale zum Fühlen und Hören:</strong> Auf Handys, die es erlauben, vibriert das Gerät bei jedem Phasenwechsel (mit einem längeren Muster beim Feuerring). Beim Fortsetzen erklingen zwei aufsteigende Töne, beim Pausieren zwei absteigende.',
     'how.btn': '🗣️ Wie steht die Finsternis?',
     'how.before': 'Die Finsternis hat noch nicht begonnen. Noch {d} bis zum Beginn.',
     'how.partialIn': 'Zunehmende partielle Phase. Der Mond bedeckt {n} Prozent der Sonne. Noch {d} bis zum Feuerring.',
@@ -1269,3 +1269,408 @@ const I18N_UX = {
   }
 };
 for (const l in I18N_UX) Object.assign(I18N[l], I18N_UX[l]);
+
+/* =========================================================================
+   Textos agregados en la versión 2.0: secciones «En vivo» y «Escuchar»,
+   vista del Sol, modo noche y contacto. Algunas claves anteriores se
+   redefinen aquí con un estilo más sobrio (sin mayúsculas sostenidas).
+   ========================================================================= */
+const CONTACT_MAIL = 'recursosastronomia@uruguayeduca.edu.uy';
+const CONTACT_SUBJECT = 'Eclipse 2027';
+const CONTACT_LINK = '<a href="mailto:' + CONTACT_MAIL + '?subject=' + encodeURIComponent(CONTACT_SUBJECT) + '">' + CONTACT_MAIL + '</a>';
+const I18N_V2 = {
+  es: {
+    'nav.live': 'En vivo', 'nav.listen': 'Escuchar',
+    'live.h': 'El eclipse en vivo',
+    'live.lead': 'El 6 de febrero de 2027, inicia la experiencia: el sonido baja a medida que la Luna cubre el Sol.',
+    'son.start': 'Iniciar la experiencia', 'son.active': 'Experiencia activa',
+    'son.settings': 'Ajustes de sonido',
+    'eco.h': 'Escuchar el eclipse en 1 minuto',
+    'eco.place': 'Punta del Este (Uruguay)',
+    'eco.slider': 'Momento del eclipse',
+    'eco.jump': 'Ir a un momento',
+    'eco.hint': 'Mueve la línea de tiempo para oír y ver cualquier momento del eclipse.',
+    'prev.stop': 'Detener',
+    'sky.time': 'Hora', 'sky.az': 'Acimut', 'sky.alt': 'Altura',
+    'sky.start': 'Inicio', 'sky.max': 'Máximo', 'sky.end': 'Fin',
+    'sky.note': 'Vista esquemática. Nunca mires al Sol sin protección.',
+    'sky.img': 'Vista del Sol a las {t}. {phase}. La Luna cubre el {n} % del Sol.',
+    'theme.toDark': 'Modo noche', 'theme.toLight': 'Modo claro',
+    'theme.nowDark': 'Modo noche activado.', 'theme.nowLight': 'Modo claro activado.', 'theme.nowHc': 'Alto contraste activado.',
+    'contrast.toStd': 'Contraste normal',
+    'cred.h.contact': 'Contacto',
+    'cred.contact_html': 'Para avisar de fallas, correcciones o sugerencias, escribe a ' + CONTACT_LINK + '.'
+  },
+  pt: {
+    'nav.live': 'Ao vivo', 'nav.listen': 'Ouvir',
+    'live.h': 'O eclipse ao vivo',
+    'live.lead': 'Em 6 de fevereiro de 2027, inicie a experiência: o som fica mais grave à medida que a Lua cobre o Sol.',
+    'son.start': 'Iniciar a experiência', 'son.active': 'Experiência ativa',
+    'son.settings': 'Ajustes de som',
+    'eco.h': 'Ouvir o eclipse em 1 minuto',
+    'eco.place': 'Punta del Este (Uruguai)',
+    'eco.slider': 'Momento do eclipse',
+    'eco.jump': 'Ir para um momento',
+    'eco.hint': 'Mova a linha do tempo para ouvir e ver qualquer momento do eclipse.',
+    'prev.stop': 'Parar',
+    'sky.time': 'Hora', 'sky.az': 'Azimute', 'sky.alt': 'Altura',
+    'sky.start': 'Início', 'sky.max': 'Máximo', 'sky.end': 'Fim',
+    'sky.note': 'Vista esquemática. Nunca olhe para o Sol sem proteção.',
+    'sky.img': 'Vista do Sol às {t}. {phase}. A Lua cobre {n} % do Sol.',
+    'theme.toDark': 'Modo noite', 'theme.toLight': 'Modo claro',
+    'theme.nowDark': 'Modo noite ativado.', 'theme.nowLight': 'Modo claro ativado.', 'theme.nowHc': 'Alto contraste ativado.',
+    'contrast.toStd': 'Contraste normal',
+    'cred.h.contact': 'Contato',
+    'cred.contact_html': 'Para avisar sobre falhas, correções ou sugestões, escreva para ' + CONTACT_LINK + '.'
+  },
+  en: {
+    'nav.live': 'Live', 'nav.listen': 'Listen',
+    'live.h': 'The eclipse, live',
+    'live.lead': 'On 6 February 2027, start the experience: the sound gets lower as the Moon covers the Sun.',
+    'son.start': 'Start the experience', 'son.active': 'Experience active',
+    'son.settings': 'Sound settings',
+    'eco.h': 'Listen to the eclipse in 1 minute',
+    'eco.place': 'Punta del Este (Uruguay)',
+    'eco.slider': 'Moment of the eclipse',
+    'eco.jump': 'Go to a moment',
+    'eco.hint': 'Move the timeline to hear and see any moment of the eclipse.',
+    'prev.stop': 'Stop',
+    'sky.time': 'Time', 'sky.az': 'Azimuth', 'sky.alt': 'Altitude',
+    'sky.start': 'Start', 'sky.max': 'Maximum', 'sky.end': 'End',
+    'sky.note': 'Schematic view. Never look at the Sun without protection.',
+    'sky.img': 'View of the Sun at {t}. {phase}. The Moon covers {n}% of the Sun.',
+    'theme.toDark': 'Night mode', 'theme.toLight': 'Light mode',
+    'theme.nowDark': 'Night mode on.', 'theme.nowLight': 'Light mode on.', 'theme.nowHc': 'High contrast on.',
+    'contrast.toStd': 'Normal contrast',
+    'cred.h.contact': 'Contact',
+    'cred.contact_html': 'To report problems, corrections or suggestions, write to ' + CONTACT_LINK + '.'
+  },
+  fr: {
+    'nav.live': 'En direct', 'nav.listen': 'Écouter',
+    'live.h': 'L’éclipse en direct',
+    'live.lead': 'Le 6 février 2027, lancez l’expérience : le son devient plus grave à mesure que la Lune couvre le Soleil.',
+    'son.start': 'Démarrer l’expérience', 'son.active': 'Expérience active',
+    'son.settings': 'Réglages du son',
+    'eco.h': 'Écouter l’éclipse en 1 minute',
+    'eco.place': 'Punta del Este (Uruguay)',
+    'eco.slider': 'Moment de l’éclipse',
+    'eco.jump': 'Aller à un moment',
+    'eco.hint': 'Déplacez la ligne du temps pour entendre et voir n’importe quel moment de l’éclipse.',
+    'prev.stop': 'Arrêter',
+    'sky.time': 'Heure', 'sky.az': 'Azimut', 'sky.alt': 'Hauteur',
+    'sky.start': 'Début', 'sky.max': 'Maximum', 'sky.end': 'Fin',
+    'sky.note': 'Vue schématique. Ne regardez jamais le Soleil sans protection.',
+    'sky.img': 'Vue du Soleil à {t}. {phase}. La Lune couvre {n} % du Soleil.',
+    'theme.toDark': 'Mode nuit', 'theme.toLight': 'Mode clair',
+    'theme.nowDark': 'Mode nuit activé.', 'theme.nowLight': 'Mode clair activé.', 'theme.nowHc': 'Contraste élevé activé.',
+    'contrast.toStd': 'Contraste normal',
+    'cred.h.contact': 'Contact',
+    'cred.contact_html': 'Pour signaler des erreurs, des corrections ou des suggestions, écrivez à ' + CONTACT_LINK + '.'
+  },
+  it: {
+    'nav.live': 'In diretta', 'nav.listen': 'Ascolta',
+    'live.h': 'L’eclissi in diretta',
+    'live.lead': 'Il 6 febbraio 2027, avvia l’esperienza: il suono si abbassa man mano che la Luna copre il Sole.',
+    'son.start': 'Avvia l’esperienza', 'son.active': 'Esperienza attiva',
+    'son.settings': 'Impostazioni del suono',
+    'eco.h': 'Ascolta l’eclissi in 1 minuto',
+    'eco.place': 'Punta del Este (Uruguay)',
+    'eco.slider': 'Momento dell’eclissi',
+    'eco.jump': 'Vai a un momento',
+    'eco.hint': 'Sposta la linea del tempo per ascoltare e vedere qualsiasi momento dell’eclissi.',
+    'prev.stop': 'Ferma',
+    'sky.time': 'Ora', 'sky.az': 'Azimut', 'sky.alt': 'Altezza',
+    'sky.start': 'Inizio', 'sky.max': 'Massimo', 'sky.end': 'Fine',
+    'sky.note': 'Vista schematica. Non guardare mai il Sole senza protezione.',
+    'sky.img': 'Vista del Sole alle {t}. {phase}. La Luna copre il {n} % del Sole.',
+    'theme.toDark': 'Modalità notte', 'theme.toLight': 'Modalità chiara',
+    'theme.nowDark': 'Modalità notte attivata.', 'theme.nowLight': 'Modalità chiara attivata.', 'theme.nowHc': 'Alto contrasto attivato.',
+    'contrast.toStd': 'Contrasto normale',
+    'cred.h.contact': 'Contatto',
+    'cred.contact_html': 'Per segnalare errori, correzioni o suggerimenti, scrivi a ' + CONTACT_LINK + '.'
+  },
+  de: {
+    'nav.live': 'Live', 'nav.listen': 'Anhören',
+    'live.h': 'Die Finsternis live',
+    'live.lead': 'Starte am 6. Februar 2027 das Erlebnis: Der Ton wird tiefer, je mehr der Mond die Sonne bedeckt.',
+    'son.start': 'Erlebnis starten', 'son.active': 'Erlebnis aktiv',
+    'son.settings': 'Toneinstellungen',
+    'eco.h': 'Die Finsternis in 1 Minute anhören',
+    'eco.place': 'Punta del Este (Uruguay)',
+    'eco.slider': 'Zeitpunkt der Finsternis',
+    'eco.jump': 'Zu einem Zeitpunkt springen',
+    'eco.hint': 'Bewege die Zeitleiste, um jeden Moment der Finsternis zu hören und zu sehen.',
+    'prev.stop': 'Stoppen',
+    'sky.time': 'Uhrzeit', 'sky.az': 'Azimut', 'sky.alt': 'Höhe',
+    'sky.start': 'Beginn', 'sky.max': 'Maximum', 'sky.end': 'Ende',
+    'sky.note': 'Schematische Ansicht. Schau niemals ohne Schutz in die Sonne.',
+    'sky.img': 'Ansicht der Sonne um {t}. {phase}. Der Mond bedeckt {n} % der Sonne.',
+    'theme.toDark': 'Nachtmodus', 'theme.toLight': 'Heller Modus',
+    'theme.nowDark': 'Nachtmodus aktiviert.', 'theme.nowLight': 'Heller Modus aktiviert.', 'theme.nowHc': 'Hoher Kontrast aktiviert.',
+    'contrast.toStd': 'Normaler Kontrast',
+    'cred.h.contact': 'Kontakt',
+    'cred.contact_html': 'Um Fehler, Korrekturen oder Vorschläge zu melden, schreibe an ' + CONTACT_LINK + '.'
+  }
+};
+for (const l in I18N_V2) Object.assign(I18N[l], I18N_V2[l]);
+
+/* =========================================================================
+   Versión 2.1: nombre «Eclipse sonoro 2027» e imagen real del Sol (SDO/HMI).
+   La línea de cortesía de SDO se mantiene textual (en inglés) en todos los idiomas.
+   ========================================================================= */
+const SDO_COURTESY = '<span lang="en">“Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.”</span>';
+const SDO_LINK = a_('https://sdo.gsfc.nasa.gov/data/', 'sdo.gsfc.nasa.gov');
+const I18N_V21 = {
+  es: {
+    'app.title': 'Eclipse sonoro 2027',
+    'sky.credit': 'Imagen del Sol: SDO/HMI (NASA), {d}.',
+    'sky.credit.live': 'Imagen del Sol de hoy: SDO/HMI (NASA).',
+    'cred.img4_html': 'Imagen del Sol en luz visible: Solar Dynamics Observatory (SDO), instrumento HMI. ' + SDO_COURTESY + ' En esta app se usa recortada al disco solar y girada según la hora. El día del eclipse, si hay conexión, se muestra la imagen más reciente publicada en ' + SDO_LINK + '.',
+    'cred.privacy.sdo': 'El día del eclipse, la app descarga además la imagen más reciente del Sol desde el sitio de SDO (NASA). Esa descarga no incluye ningún dato de quien usa la app.'
+  },
+  pt: {
+    'app.title': 'Eclipse sonoro 2027',
+    'sky.credit': 'Imagem do Sol: SDO/HMI (NASA), {d}.',
+    'sky.credit.live': 'Imagem do Sol de hoje: SDO/HMI (NASA).',
+    'cred.img4_html': 'Imagem do Sol em luz visível: Solar Dynamics Observatory (SDO), instrumento HMI. ' + SDO_COURTESY + ' Neste app ela é usada recortada no disco solar e girada conforme a hora. No dia do eclipse, se houver conexão, é mostrada a imagem mais recente publicada em ' + SDO_LINK + '.',
+    'cred.privacy.sdo': 'No dia do eclipse, o app também baixa a imagem mais recente do Sol do site do SDO (NASA). Esse download não inclui nenhum dado de quem usa o app.'
+  },
+  en: {
+    'app.title': 'Sound Eclipse 2027',
+    'sky.credit': 'Image of the Sun: SDO/HMI (NASA), {d}.',
+    'sky.credit.live': 'Today’s image of the Sun: SDO/HMI (NASA).',
+    'cred.img4_html': 'Visible-light image of the Sun: Solar Dynamics Observatory (SDO), HMI instrument. ' + SDO_COURTESY + ' In this app it is cropped to the solar disc and rotated according to the time. On eclipse day, if there is a connection, the latest image published at ' + SDO_LINK + ' is shown.',
+    'cred.privacy.sdo': 'On eclipse day, the app also downloads the latest image of the Sun from the SDO (NASA) website. That download includes no data about the person using the app.'
+  },
+  fr: {
+    'app.title': 'Éclipse sonore 2027',
+    'sky.credit': 'Image du Soleil : SDO/HMI (NASA), {d}.',
+    'sky.credit.live': 'Image du Soleil d’aujourd’hui : SDO/HMI (NASA).',
+    'cred.img4_html': 'Image du Soleil en lumière visible : Solar Dynamics Observatory (SDO), instrument HMI. ' + SDO_COURTESY + ' Dans cette appli, elle est recadrée sur le disque solaire et tournée selon l’heure. Le jour de l’éclipse, s’il y a une connexion, l’image la plus récente publiée sur ' + SDO_LINK + ' est affichée.',
+    'cred.privacy.sdo': 'Le jour de l’éclipse, l’appli télécharge aussi l’image la plus récente du Soleil depuis le site de SDO (NASA). Ce téléchargement ne contient aucune donnée sur la personne qui utilise l’appli.'
+  },
+  it: {
+    'app.title': 'Eclissi sonora 2027',
+    'sky.credit': 'Immagine del Sole: SDO/HMI (NASA), {d}.',
+    'sky.credit.live': 'Immagine del Sole di oggi: SDO/HMI (NASA).',
+    'cred.img4_html': 'Immagine del Sole in luce visibile: Solar Dynamics Observatory (SDO), strumento HMI. ' + SDO_COURTESY + ' In questa app è ritagliata sul disco solare e ruotata in base all’ora. Il giorno dell’eclissi, se c’è connessione, viene mostrata l’immagine più recente pubblicata su ' + SDO_LINK + '.',
+    'cred.privacy.sdo': 'Il giorno dell’eclissi, l’app scarica anche l’immagine più recente del Sole dal sito di SDO (NASA). Questo download non include alcun dato di chi usa l’app.'
+  },
+  de: {
+    'app.title': 'Klingende Finsternis 2027',
+    'sky.credit': 'Bild der Sonne: SDO/HMI (NASA), {d}.',
+    'sky.credit.live': 'Heutiges Bild der Sonne: SDO/HMI (NASA).',
+    'cred.img4_html': 'Bild der Sonne im sichtbaren Licht: Solar Dynamics Observatory (SDO), Instrument HMI. ' + SDO_COURTESY + ' In dieser App ist es auf die Sonnenscheibe zugeschnitten und je nach Uhrzeit gedreht. Am Tag der Finsternis wird bei bestehender Verbindung das neueste auf ' + SDO_LINK + ' veröffentlichte Bild gezeigt.',
+    'cred.privacy.sdo': 'Am Tag der Finsternis lädt die App außerdem das neueste Bild der Sonne von der SDO-Website (NASA). Dieser Download enthält keine Daten über die Person, die die App nutzt.'
+  }
+};
+for (const l in I18N_V21) {
+  Object.assign(I18N[l], I18N_V21[l]);
+  // Título de la página: nombre de la app + fecha del eclipse (primera parte del título anterior)
+  I18N[l]['doc.title'] = I18N[l]['app.title'] + ' — ' + I18N[l]['doc.title'].split(' — ')[0];
+}
+
+/* =========================================================================
+   Versión 2.2: una sola forma de vivir el eclipse (cálculo por la hora) y
+   botón de pausa en lugar de apoyar o levantar el teléfono.
+   ========================================================================= */
+const I18N_V22 = {
+  es: {
+    'son.pause': 'Pausar el sonido', 'son.resume': 'Reanudar el sonido',
+    'son.on': 'Sonido activo', 'son.paused': 'Sonido en pausa',
+    'tech.h.pause': 'Pausar y reanudar',
+    'tech.p.pause': 'Después de iniciar la experiencia, el sonido sigue al eclipse en cualquier posición del teléfono: en la mano, en un bolsillo o sobre una mesa. El mismo botón sirve para pausar el sonido y para reanudarlo. Mientras la experiencia está activa, la pantalla se mantiene encendida.'
+  },
+  pt: {
+    'son.pause': 'Pausar o som', 'son.resume': 'Retomar o som',
+    'son.on': 'Som ativo', 'son.paused': 'Som em pausa',
+    'tech.h.pause': 'Pausar e retomar',
+    'tech.p.pause': 'Depois de iniciar a experiência, o som acompanha o eclipse em qualquer posição do celular: na mão, no bolso ou sobre uma mesa. O mesmo botão serve para pausar o som e para retomá-lo. Enquanto a experiência está ativa, a tela permanece ligada.'
+  },
+  en: {
+    'son.pause': 'Pause the sound', 'son.resume': 'Resume the sound',
+    'son.on': 'Sound on', 'son.paused': 'Sound paused',
+    'tech.h.pause': 'Pause and resume',
+    'tech.p.pause': 'Once the experience has started, the sound follows the eclipse whatever the position of the phone: in your hand, in a pocket or on a table. The same button pauses the sound and resumes it. While the experience is active, the screen stays on.'
+  },
+  fr: {
+    'son.pause': 'Mettre le son en pause', 'son.resume': 'Reprendre le son',
+    'son.on': 'Son actif', 'son.paused': 'Son en pause',
+    'tech.h.pause': 'Pause et reprise',
+    'tech.p.pause': 'Une fois l’expérience lancée, le son suit l’éclipse quelle que soit la position du téléphone : dans la main, dans une poche ou sur une table. Le même bouton sert à mettre le son en pause et à le reprendre. Tant que l’expérience est active, l’écran reste allumé.'
+  },
+  it: {
+    'son.pause': 'Metti in pausa il suono', 'son.resume': 'Riprendi il suono',
+    'son.on': 'Suono attivo', 'son.paused': 'Suono in pausa',
+    'tech.h.pause': 'Pausa e ripresa',
+    'tech.p.pause': 'Dopo aver avviato l’esperienza, il suono segue l’eclissi in qualsiasi posizione del telefono: in mano, in tasca o su un tavolo. Lo stesso pulsante serve per mettere in pausa il suono e per riprenderlo. Finché l’esperienza è attiva, lo schermo resta acceso.'
+  },
+  de: {
+    'son.pause': 'Ton pausieren', 'son.resume': 'Ton fortsetzen',
+    'son.on': 'Ton aktiv', 'son.paused': 'Ton pausiert',
+    'tech.h.pause': 'Pausieren und fortsetzen',
+    'tech.p.pause': 'Nach dem Start des Erlebnisses folgt der Ton der Finsternis in jeder Lage des Telefons: in der Hand, in der Tasche oder auf dem Tisch. Mit derselben Taste lässt sich der Ton pausieren und fortsetzen. Solange das Erlebnis aktiv ist, bleibt der Bildschirm eingeschaltet.'
+  }
+};
+for (const l in I18N_V22) Object.assign(I18N[l], I18N_V22[l]);
+
+/* =========================================================================
+   Versión 2.3: horarios y cobertura calculados para el lugar elegido
+   (ubicación del dispositivo o ciudad de la lista).
+   ========================================================================= */
+const I18N_V23 = {
+  es: {
+    'loc.label': 'Lugar', 'loc.use': 'Usar mi ubicación', 'loc.city': 'O elegir una ciudad', 'loc.change': 'Cambiar de lugar',
+    'loc.mine': 'Mi ubicación', 'loc.near': 'Mi ubicación, cerca de {c}',
+    'loc.asking': 'Buscando tu ubicación…',
+    'loc.denied': 'No se pudo obtener la ubicación. Puedes elegir una ciudad de la lista.',
+    'loc.type.annular': 'Desde aquí se ve el anillo de fuego. Máximo a las {t}: la Luna cubre el {n} % del Sol.',
+    'loc.type.partial': 'Desde aquí el eclipse es parcial: no se ve el anillo. Máximo a las {t}: la Luna cubre el {n} % del Sol.',
+    'loc.type.none': 'Desde este lugar no se ve el eclipse.',
+    'loc.ev.c1': 'Comienza el eclipse', 'loc.ev.c2': 'Comienza el anillo', 'loc.ev.max': 'Máximo', 'loc.ev.c3': 'Termina el anillo', 'loc.ev.c4': 'Termina el eclipse',
+    'loc.below': 'Sol bajo el horizonte',
+    'loc.tz': 'Hora local del lugar ({tz})',
+    'phase.none': 'Eclipse no visible desde este lugar',
+    'how.partialIn.max': 'Fase parcial creciente. La Luna cubre el {n} por ciento del Sol. Faltan {d} para el máximo.',
+    'how.none': 'Desde este lugar no se ve el eclipse.',
+    'sky.note': 'Vista simulada desde el lugar elegido. Nunca mires al Sol sin protección.',
+    'cred.place2': 'En las secciones En vivo y Escuchar puedes usar tu ubicación o elegir otra ciudad.',
+    'cred.privacy.loc': 'Si tocas «Usar mi ubicación», el navegador te pide permiso y la app usa tu posición solo para calcular los horarios del eclipse, en el propio dispositivo. La ubicación no se envía a ningún servidor; queda guardada en el navegador, redondeada a un kilómetro, hasta que elijas otro lugar.'
+  },
+  pt: {
+    'loc.label': 'Lugar', 'loc.use': 'Usar minha localização', 'loc.city': 'Ou escolher uma cidade', 'loc.change': 'Mudar de lugar',
+    'loc.mine': 'Minha localização', 'loc.near': 'Minha localização, perto de {c}',
+    'loc.asking': 'Procurando sua localização…',
+    'loc.denied': 'Não foi possível obter a localização. Você pode escolher uma cidade da lista.',
+    'loc.type.annular': 'Daqui se vê o anel de fogo. Máximo às {t}: a Lua cobre {n} % do Sol.',
+    'loc.type.partial': 'Daqui o eclipse é parcial: não se vê o anel. Máximo às {t}: a Lua cobre {n} % do Sol.',
+    'loc.type.none': 'Deste lugar não se vê o eclipse.',
+    'loc.ev.c1': 'Começa o eclipse', 'loc.ev.c2': 'Começa o anel', 'loc.ev.max': 'Máximo', 'loc.ev.c3': 'Termina o anel', 'loc.ev.c4': 'Termina o eclipse',
+    'loc.below': 'Sol abaixo do horizonte',
+    'loc.tz': 'Hora local do lugar ({tz})',
+    'phase.none': 'Eclipse não visível deste lugar',
+    'how.partialIn.max': 'Fase parcial crescente. A Lua cobre {n} por cento do Sol. Faltam {d} para o máximo.',
+    'how.none': 'Deste lugar não se vê o eclipse.',
+    'sky.note': 'Vista simulada a partir do lugar escolhido. Nunca olhe para o Sol sem proteção.',
+    'cred.place2': 'Nas seções Ao vivo e Ouvir você pode usar sua localização ou escolher outra cidade.',
+    'cred.privacy.loc': 'Se você tocar em «Usar minha localização», o navegador pede permissão e o app usa sua posição apenas para calcular os horários do eclipse, no próprio dispositivo. A localização não é enviada a nenhum servidor; fica salva no navegador, arredondada a um quilômetro, até você escolher outro lugar.'
+  },
+  en: {
+    'loc.label': 'Place', 'loc.use': 'Use my location', 'loc.city': 'Or choose a city', 'loc.change': 'Change place',
+    'loc.mine': 'My location', 'loc.near': 'My location, near {c}',
+    'loc.asking': 'Finding your location…',
+    'loc.denied': 'Your location could not be found. You can choose a city from the list.',
+    'loc.type.annular': 'The ring of fire is visible from here. Maximum at {t}: the Moon covers {n}% of the Sun.',
+    'loc.type.partial': 'From here the eclipse is partial: the ring is not visible. Maximum at {t}: the Moon covers {n}% of the Sun.',
+    'loc.type.none': 'The eclipse is not visible from this place.',
+    'loc.ev.c1': 'Eclipse begins', 'loc.ev.c2': 'Ring begins', 'loc.ev.max': 'Maximum', 'loc.ev.c3': 'Ring ends', 'loc.ev.c4': 'Eclipse ends',
+    'loc.below': 'Sun below the horizon',
+    'loc.tz': 'Local time of the place ({tz})',
+    'phase.none': 'Eclipse not visible from this place',
+    'how.partialIn.max': 'Increasing partial phase. The Moon covers {n} percent of the Sun. {d} to go until maximum.',
+    'how.none': 'The eclipse is not visible from this place.',
+    'sky.note': 'Simulated view from the chosen place. Never look at the Sun without protection.',
+    'cred.place2': 'In the Live and Listen sections you can use your location or choose another city.',
+    'cred.privacy.loc': 'If you tap “Use my location”, the browser asks for permission and the app uses your position only to calculate the eclipse times, on the device itself. The location is not sent to any server; it is kept in the browser, rounded to one kilometre, until you choose another place.'
+  },
+  fr: {
+    'loc.label': 'Lieu', 'loc.use': 'Utiliser ma position', 'loc.city': 'Ou choisir une ville', 'loc.change': 'Changer de lieu',
+    'loc.mine': 'Ma position', 'loc.near': 'Ma position, près de {c}',
+    'loc.asking': 'Recherche de votre position…',
+    'loc.denied': 'Impossible d’obtenir la position. Vous pouvez choisir une ville dans la liste.',
+    'loc.type.annular': 'D’ici, on voit l’anneau de feu. Maximum à {t} : la Lune couvre {n} % du Soleil.',
+    'loc.type.partial': 'D’ici, l’éclipse est partielle : on ne voit pas l’anneau. Maximum à {t} : la Lune couvre {n} % du Soleil.',
+    'loc.type.none': 'L’éclipse n’est pas visible depuis ce lieu.',
+    'loc.ev.c1': 'Début de l’éclipse', 'loc.ev.c2': 'Début de l’anneau', 'loc.ev.max': 'Maximum', 'loc.ev.c3': 'Fin de l’anneau', 'loc.ev.c4': 'Fin de l’éclipse',
+    'loc.below': 'Soleil sous l’horizon',
+    'loc.tz': 'Heure locale du lieu ({tz})',
+    'phase.none': 'Éclipse non visible depuis ce lieu',
+    'how.partialIn.max': 'Phase partielle croissante. La Lune couvre {n} pour cent du Soleil. Encore {d} avant le maximum.',
+    'how.none': 'L’éclipse n’est pas visible depuis ce lieu.',
+    'sky.note': 'Vue simulée depuis le lieu choisi. Ne regardez jamais le Soleil sans protection.',
+    'cred.place2': 'Dans les sections En direct et Écouter, vous pouvez utiliser votre position ou choisir une autre ville.',
+    'cred.privacy.loc': 'Si vous touchez « Utiliser ma position », le navigateur demande l’autorisation et l’appli utilise votre position uniquement pour calculer les horaires de l’éclipse, sur l’appareil lui-même. La position n’est envoyée à aucun serveur ; elle reste enregistrée dans le navigateur, arrondie à un kilomètre, jusqu’à ce que vous choisissiez un autre lieu.'
+  },
+  it: {
+    'loc.label': 'Luogo', 'loc.use': 'Usa la mia posizione', 'loc.city': 'Oppure scegli una città', 'loc.change': 'Cambia luogo',
+    'loc.mine': 'La mia posizione', 'loc.near': 'La mia posizione, vicino a {c}',
+    'loc.asking': 'Ricerca della posizione…',
+    'loc.denied': 'Non è stato possibile ottenere la posizione. Puoi scegliere una città dall’elenco.',
+    'loc.type.annular': 'Da qui si vede l’anello di fuoco. Massimo alle {t}: la Luna copre il {n} % del Sole.',
+    'loc.type.partial': 'Da qui l’eclissi è parziale: l’anello non si vede. Massimo alle {t}: la Luna copre il {n} % del Sole.',
+    'loc.type.none': 'Da questo luogo l’eclissi non si vede.',
+    'loc.ev.c1': 'Inizia l’eclissi', 'loc.ev.c2': 'Inizia l’anello', 'loc.ev.max': 'Massimo', 'loc.ev.c3': 'Finisce l’anello', 'loc.ev.c4': 'Finisce l’eclissi',
+    'loc.below': 'Sole sotto l’orizzonte',
+    'loc.tz': 'Ora locale del luogo ({tz})',
+    'phase.none': 'Eclissi non visibile da questo luogo',
+    'how.partialIn.max': 'Fase parziale crescente. La Luna copre il {n} per cento del Sole. Mancano {d} al massimo.',
+    'how.none': 'Da questo luogo l’eclissi non si vede.',
+    'sky.note': 'Vista simulata dal luogo scelto. Non guardare mai il Sole senza protezione.',
+    'cred.place2': 'Nelle sezioni In diretta e Ascolta puoi usare la tua posizione o scegliere un’altra città.',
+    'cred.privacy.loc': 'Se tocchi «Usa la mia posizione», il browser chiede il permesso e l’app usa la tua posizione solo per calcolare gli orari dell’eclissi, sul dispositivo stesso. La posizione non viene inviata a nessun server; resta salvata nel browser, arrotondata a un chilometro, finché non scegli un altro luogo.'
+  },
+  de: {
+    'loc.label': 'Ort', 'loc.use': 'Meinen Standort verwenden', 'loc.city': 'Oder eine Stadt wählen', 'loc.change': 'Ort ändern',
+    'loc.mine': 'Mein Standort', 'loc.near': 'Mein Standort, nahe {c}',
+    'loc.asking': 'Standort wird gesucht…',
+    'loc.denied': 'Der Standort konnte nicht ermittelt werden. Du kannst eine Stadt aus der Liste wählen.',
+    'loc.type.annular': 'Von hier aus ist der Feuerring zu sehen. Maximum um {t}: Der Mond bedeckt {n} % der Sonne.',
+    'loc.type.partial': 'Von hier aus ist die Finsternis partiell: Der Ring ist nicht zu sehen. Maximum um {t}: Der Mond bedeckt {n} % der Sonne.',
+    'loc.type.none': 'Von diesem Ort aus ist die Finsternis nicht zu sehen.',
+    'loc.ev.c1': 'Beginn der Finsternis', 'loc.ev.c2': 'Beginn des Rings', 'loc.ev.max': 'Maximum', 'loc.ev.c3': 'Ende des Rings', 'loc.ev.c4': 'Ende der Finsternis',
+    'loc.below': 'Sonne unter dem Horizont',
+    'loc.tz': 'Ortszeit ({tz})',
+    'phase.none': 'Finsternis von diesem Ort aus nicht sichtbar',
+    'how.partialIn.max': 'Zunehmende partielle Phase. Der Mond bedeckt {n} Prozent der Sonne. Noch {d} bis zum Maximum.',
+    'how.none': 'Von diesem Ort aus ist die Finsternis nicht zu sehen.',
+    'sky.note': 'Simulierte Ansicht vom gewählten Ort. Schau niemals ohne Schutz in die Sonne.',
+    'cred.place2': 'In den Bereichen Live und Anhören kannst du deinen Standort verwenden oder eine andere Stadt wählen.',
+    'cred.privacy.loc': 'Wenn du auf „Meinen Standort verwenden“ tippst, fragt der Browser um Erlaubnis, und die App nutzt deine Position nur, um die Zeiten der Finsternis auf dem Gerät selbst zu berechnen. Der Standort wird an keinen Server gesendet; er bleibt, auf einen Kilometer gerundet, im Browser gespeichert, bis du einen anderen Ort wählst.'
+  }
+};
+for (const l in I18N_V23) Object.assign(I18N[l], I18N_V23[l]);
+
+/* =========================================================================
+   Versión 2.4: interfaz y textos más simples para personas ciegas o con baja
+   visión (posición del Sol en palabras, aviso de seguridad sin mayúsculas
+   sostenidas, sección «Ayuda»).
+   ========================================================================= */
+const I18N_V24 = {
+  es: {
+    'nav.tech': 'Ayuda',
+    'sky.sun': 'Sol: hacia el {dir}, a {alt}° de altura', 'sky.sun.down': 'El Sol está bajo el horizonte',
+    'dir.n': 'norte', 'dir.ne': 'noreste', 'dir.e': 'este', 'dir.se': 'sureste', 'dir.s': 'sur', 'dir.sw': 'suroeste', 'dir.w': 'oeste', 'dir.nw': 'noroeste',
+    'safe.alert_html': '<strong>Nunca mires directamente al Sol sin la protección adecuada.</strong> Puede causar daños graves y permanentes en la vista.'
+  },
+  pt: {
+    'nav.tech': 'Ajuda',
+    'sky.sun': 'Sol: para o {dir}, a {alt}° de altura', 'sky.sun.down': 'O Sol está abaixo do horizonte',
+    'dir.n': 'norte', 'dir.ne': 'nordeste', 'dir.e': 'leste', 'dir.se': 'sudeste', 'dir.s': 'sul', 'dir.sw': 'sudoeste', 'dir.w': 'oeste', 'dir.nw': 'noroeste',
+    'safe.alert_html': '<strong>Nunca olhe diretamente para o Sol sem a proteção adequada.</strong> Isso pode causar danos graves e permanentes à visão.'
+  },
+  en: {
+    'nav.tech': 'Help',
+    'sky.sun': 'Sun: to the {dir}, {alt}° above the horizon', 'sky.sun.down': 'The Sun is below the horizon',
+    'dir.n': 'north', 'dir.ne': 'north-east', 'dir.e': 'east', 'dir.se': 'south-east', 'dir.s': 'south', 'dir.sw': 'south-west', 'dir.w': 'west', 'dir.nw': 'north-west',
+    'safe.alert_html': '<strong>Never look directly at the Sun without proper protection.</strong> It can cause serious and permanent damage to your eyesight.'
+  },
+  fr: {
+    'nav.tech': 'Aide',
+    'sky.sun': 'Soleil : direction {dir}, à {alt}° de hauteur', 'sky.sun.down': 'Le Soleil est sous l’horizon',
+    'dir.n': 'nord', 'dir.ne': 'nord-est', 'dir.e': 'est', 'dir.se': 'sud-est', 'dir.s': 'sud', 'dir.sw': 'sud-ouest', 'dir.w': 'ouest', 'dir.nw': 'nord-ouest',
+    'safe.alert_html': '<strong>Ne regardez jamais directement le Soleil sans protection adaptée.</strong> Cela peut causer des lésions graves et permanentes des yeux.'
+  },
+  it: {
+    'nav.tech': 'Aiuto',
+    'sky.sun': 'Sole: verso {dir}, a {alt}° di altezza', 'sky.sun.down': 'Il Sole è sotto l’orizzonte',
+    'dir.n': 'nord', 'dir.ne': 'nord-est', 'dir.e': 'est', 'dir.se': 'sud-est', 'dir.s': 'sud', 'dir.sw': 'sud-ovest', 'dir.w': 'ovest', 'dir.nw': 'nord-ovest',
+    'safe.alert_html': '<strong>Non guardare mai direttamente il Sole senza una protezione adeguata.</strong> Può causare danni gravi e permanenti alla vista.'
+  },
+  de: {
+    'nav.tech': 'Hilfe',
+    'sky.sun': 'Sonne: Richtung {dir}, {alt}° hoch', 'sky.sun.down': 'Die Sonne steht unter dem Horizont',
+    'dir.n': 'Norden', 'dir.ne': 'Nordosten', 'dir.e': 'Osten', 'dir.se': 'Südosten', 'dir.s': 'Süden', 'dir.sw': 'Südwesten', 'dir.w': 'Westen', 'dir.nw': 'Nordwesten',
+    'safe.alert_html': '<strong>Schau niemals ohne geeigneten Schutz direkt in die Sonne.</strong> Das kann die Augen schwer und dauerhaft schädigen.'
+  }
+};
+for (const l in I18N_V24) Object.assign(I18N[l], I18N_V24[l]);
