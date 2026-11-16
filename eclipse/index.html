@@ -19,7 +19,7 @@
 
     <link rel="preload" href="fonts/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="css/styles.css?v=2.5">
+    <link rel="stylesheet" href="css/styles.css?v=2.8">
     <!-- Si el idioma guardado no es español, se oculta la página por un
          instante hasta que el script cambia los textos: así no «salta» al traducirse.
          Límite de seguridad: se muestra igual a los 3 segundos. -->
@@ -100,6 +100,8 @@
                 <details class="fold area-loc" id="loc-fold">
                     <summary><h3><span data-i18n="loc.label">Lugar</span>: <span id="loc-name">Punta del Este (UY)</span></h3></summary>
                     <div class="fold-body">
+                        <!-- Solo con «Usar mi ubicación»: coordenadas completas a la vista; el lector de pantalla dice los grados -->
+                        <p id="loc-coords" class="note loc-coords hidden"><span id="loc-coords-v" aria-hidden="true"></span><span id="loc-coords-sr" class="visually-hidden"></span></p>
                         <p id="loc-summary"></p>
                         <dl class="readouts" id="loc-times"></dl>
                         <p class="note" id="loc-tz"></p>
@@ -513,9 +515,9 @@
         </section>
     </main>
 
-    <script src="js/i18n.js?v=2.5"></script>
-    <script src="js/eclipse.js?v=2.5"></script>
-    <script src="js/app.js?v=2.5"></script>
+    <script src="js/i18n.js?v=2.8"></script>
+    <script src="js/eclipse.js?v=2.8"></script>
+    <script src="js/app.js?v=2.8"></script>
     <!-- Estadísticas de uso anónimas (GoatCounter: sin cookies ni datos personales).
          Se carga de forma asíncrona, sin frenar la app; sin conexión simplemente no cuenta. -->
     <script data-goatcounter="https://danielgastelu.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

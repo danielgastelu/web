@@ -348,6 +348,7 @@
         ['Maldonado', 'UY', -34.91, -54.96, 'America/Montevideo'],
         ['Montevideo', 'UY', -34.90, -56.19, 'America/Montevideo'],
         ['Canelones', 'UY', -34.52, -56.28, 'America/Montevideo'],
+        ['Pando', 'UY', -34.72, -55.96, 'America/Montevideo'],
         ['San José de Mayo', 'UY', -34.34, -56.71, 'America/Montevideo'],
         ['Colonia del Sacramento', 'UY', -34.46, -57.84, 'America/Montevideo'],
         ['Minas', 'UY', -34.37, -55.24, 'America/Montevideo'],
@@ -1112,7 +1113,30 @@
         });
     }
 
+    /** Grados, minutos y segundos con su letra: 34° 36′ 13″ S */
+    function dms(value, pos, neg) {
+        const abs = Math.abs(value);
+        let d = Math.floor(abs), m = Math.floor((abs - d) * 60), sec = Math.round(((abs - d) * 60 - m) * 60);
+        if (sec === 60) { sec = 0; m += 1; }
+        if (m === 60) { m = 0; d += 1; }
+        return d + '° ' + String(m).padStart(2, '0') + '′ ' + String(sec).padStart(2, '0') + '″ ' + (value < 0 ? neg : pos);
+    }
+    /** Coordenadas de «Mi ubicación». En pantalla, completas; el lector de pantalla
+        dice solo los grados enteros, sin minutos ni segundos. */
+    function renderCoords() {
+        const box = $('loc-coords');
+        const gps = site.kind === 'gps';
+        box.classList.toggle('hidden', !gps);
+        if (!gps) return;
+        setText($('loc-coords-v'), t('loc.coords') + ': ' + dms(site.lat, 'N', 'S') + ', ' + dms(site.lon, 'E', 'W'));
+        setText($('loc-coords-sr'), t('loc.coords.sr', {
+            lat: Math.floor(Math.abs(site.lat)), ns: t(site.lat < 0 ? 'dir.s' : 'dir.n'),
+            lon: Math.floor(Math.abs(site.lon)), ew: t(site.lon < 0 ? 'dir.w' : 'dir.e')
+        }));
+    }
+
     function renderLoc() {
+        renderCoords();
         const label = siteLabel();
         setText($('loc-name'), label);
         setText($('eco-place'), label);
@@ -1150,7 +1174,8 @@
         if (eco.running) eco.stop(false);
         computeSite(next);
         store.set('eclipse.site', JSON.stringify(site.kind === 'gps'
-            ? { kind: 'gps', lat: site.lat, lon: site.lon }
+            // En el navegador solo queda guardada con dos decimales (≈ 1 km)
+            ? { kind: 'gps', lat: Math.round(site.lat * 100) / 100, lon: Math.round(site.lon * 100) / 100 }
             : { kind: 'city', name: cityLabel(site.city) }));
         eco.rebuild();
         lastAnnouncedPhase = '';
@@ -1175,11 +1200,11 @@
         setText(locMsg, t('loc.asking'));
         navigator.geolocation.getCurrentPosition((pos) => {
             setText(locMsg, '');
-            // Dos decimales (≈ 1 km) alcanzan para el cálculo y evitan guardar la posición exacta
+            // Se calcula y se muestra con la posición recibida; al guardarla se redondea (ver applySite)
             applySite({
                 kind: 'gps',
-                lat: Math.round(pos.coords.latitude * 100) / 100,
-                lon: Math.round(pos.coords.longitude * 100) / 100,
+                lat: pos.coords.latitude,
+                lon: pos.coords.longitude,
                 tz: undefined   // hora del propio dispositivo
             });
         }, () => setText(locMsg, t('loc.denied')), { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });

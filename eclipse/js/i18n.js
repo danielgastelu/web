@@ -643,7 +643,7 @@ const I18N = {
    de la simulación, institución y notas «Acerca de esta app».
    ========================================================================= */
 const GALLERY_URL = 'https://spaceweathergallery.com/index.php';
-const APP_VERSION = '2.6';
+const APP_VERSION = '2.8';
 const I18N_EXTRA = {
   es: {
     'a11y.skip': 'Saltar al contenido principal',
@@ -1674,3 +1674,14 @@ const I18N_V24 = {
   }
 };
 for (const l in I18N_V24) Object.assign(I18N[l], I18N_V24[l]);
+
+/* Versión 2.8: coordenadas de «Mi ubicación» (el lector de pantalla dice solo los grados). */
+const I18N_V28 = {
+  es: { 'loc.coords': 'Ubicación', 'loc.coords.sr': 'Ubicación: latitud {lat} grados {ns}, longitud {lon} grados {ew}.' },
+  pt: { 'loc.coords': 'Localização', 'loc.coords.sr': 'Localização: latitude {lat} graus {ns}, longitude {lon} graus {ew}.' },
+  en: { 'loc.coords': 'Location', 'loc.coords.sr': 'Location: latitude {lat} degrees {ns}, longitude {lon} degrees {ew}.' },
+  fr: { 'loc.coords': 'Position', 'loc.coords.sr': 'Position : latitude {lat} degrés {ns}, longitude {lon} degrés {ew}.' },
+  it: { 'loc.coords': 'Posizione', 'loc.coords.sr': 'Posizione: latitudine {lat} gradi {ns}, longitudine {lon} gradi {ew}.' },
+  de: { 'loc.coords': 'Standort', 'loc.coords.sr': 'Standort: Breite {lat} Grad {ns}, Länge {lon} Grad {ew}.' }
+};
+for (const l in I18N_V28) Object.assign(I18N[l], I18N_V28[l]);

@@ -1,15 +1,15 @@
 /* Service worker — Eclipse sonoro 2027
    Cambiar CACHE_VERSION cada vez que se publiquen cambios en los archivos.
    El número ?v= de estilos y scripts debe ser el mismo que en index.html. */
-const CACHE_VERSION = 'eclipse2027-v15';
+const CACHE_VERSION = 'eclipse2027-v17';
 const SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './css/styles.css?v=2.6',
-  './js/i18n.js?v=2.6',
-  './js/eclipse.js?v=2.6',
-  './js/app.js?v=2.6',
+  './css/styles.css?v=2.8',
+  './js/i18n.js?v=2.8',
+  './js/eclipse.js?v=2.8',
+  './js/app.js?v=2.8',
   './img/cc-by-nd.svg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png', './icons/favicon-48.png',

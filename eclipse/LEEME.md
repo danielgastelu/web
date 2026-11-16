@@ -43,6 +43,14 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
   (TalkBack, VoiceOver, NVDA), que ninguna herramienta automática reemplaza.
 - Las cifras de Lighthouse de más abajo son de la versión 1.6 y no se volvieron a medir.
 
+## Versión 2.8 (noviembre de 2026)
+- Se agregó Pando (UY) a la lista de ciudades (versión 2.7).
+- Con «Usar mi ubicación», el panel «Lugar» muestra en letra pequeña las coordenadas en grados, minutos y segundos
+  con N/S y E/W. El lector de pantalla dice solo los grados enteros («latitud 34 grados sur, longitud 58 grados
+  oeste»). Al elegir una ciudad, ese texto se oculta.
+- El cálculo usa la posición tal como la entrega el dispositivo; en el navegador se guarda redondeada a ≈ 1 km,
+  de modo que al volver a abrir la app los segundos mostrados corresponden a ese valor redondeado.
+
 ## Versión 2.6 (noviembre de 2026): prueba en computadora
 - Probada en Google Chrome 153 y Mozilla Firefox 160 (Linux, sin pantalla) a 1366×768 y 1920×1080: las seis
   secciones, iniciar/pausar/reanudar, cambio de lugar, vista previa con sonido, línea de tiempo con teclado, los
@@ -55,7 +63,7 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
 - **Íconos de la barra inferior:** más grandes (26 px), con sus trazos definidos en el propio ícono (no dependen
   de la hoja de estilos) y un escudo con tilde para «Seguridad» en lugar de los anteojos, que no se distinguían.
 - **Actualizaciones sin desajustes:** `index.html` pide los estilos y scripts con un número de versión
-  (`styles.css?v=2.6`, etc.). Antes, en la primera visita después de publicar, podía mostrarse la página nueva
+  (`styles.css?v=2.8`, etc.). Antes, en la primera visita después de publicar, podía mostrarse la página nueva
   con estilos o scripts viejos guardados en el teléfono. **Al publicar cambios:** subir ese número en
   `index.html` y en la lista `SHELL` de `sw.js` (deben coincidir), además de `CACHE_VERSION`.
 
@@ -129,7 +137,7 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
 
 ## Publicación
 - Debe servirse por **HTTPS** (por ejemplo, GitHub Pages). Abriendo el archivo con doble clic (`file://`) no se instala ni funciona sin conexión.
-- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v15`) para que los celulares reciban la actualización.
+- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v17`) para que los celulares reciban la actualización.
 - El GIF original (`2027_02_06_ASE_800px.gif`, 86 MB) ya no es necesario para la app y conviene no subirlo al repositorio.
 
 ## Simulación
