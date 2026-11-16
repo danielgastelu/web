@@ -43,7 +43,55 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
   (TalkBack, VoiceOver, NVDA), que ninguna herramienta automática reemplaza.
 - Las cifras de Lighthouse de más abajo son de la versión 1.6 y no se volvieron a medir.
 
+## Versión 3.0 (noviembre de 2026): revisión general, carga y teléfonos antiguos
+**Fallas corregidas**
+- Con la experiencia en vivo en pausa, la vista previa de «Escuchar» en tono continuo quedaba muda (el bucle en
+  vivo seguía apagando el tono). Ahora, en pausa, el bucle no toca el sonido.
+- En navegadores antiguos el archivo `app.js` no llegaba a ejecutarse por tres construcciones modernas: el
+  operador `??`, las expresiones `\p{Extended_Pictographic}` y `**` (en `eclipse.js`). Se reemplazaron; el código
+  es ahora ES2017 (verificado con el analizador acorn).
+- Una zona horaria desconocida para el teléfono (por ejemplo `America/Punta_Arenas` en Android viejo) hacía
+  fallar el cambio de ciudad; ahora se usa la hora del dispositivo.
+- En la lista de ciudades, elegir «Mi ubicación» no hacía nada; ahora equivale al botón.
+- El service worker no se instalaba si faltaba cualquier imagen; ahora solo son imprescindibles la página, los
+  estilos y los scripts.
+- Con la app en segundo plano o la pantalla apagada, el tono continuo quedaba sonando fijo; ahora se silencia.
+
+**Carga y consumo**
+- El sonido en vivo se actualiza 10 veces por segundo (antes 60) y solo envía órdenes al motor de audio cuando
+  algo cambia.
+- La descarga anticipada de los videos (≈ 5 MB) no se hace con «ahorro de datos» ni en conexiones 2G/3G.
+- El service worker ya no guarda los íconos de la app (≈ 240 KB) ni una foto que no se usaba (95 KB).
+- `observadores-lentes-2023.jpg` pasó de 262 KB a 140 KB (960 px de ancho). El original quedó en
+  `legacy/fotos-originales/`.
+- Pesos con compresión gzip (GitHub Pages la aplica): HTML 13 KB, CSS 8 KB, `i18n.js` 49 KB, `app.js` 22 KB,
+  `eclipse.js` 3 KB. Pendiente posible: cargar `i18n.js` por idioma (hoy trae los seis; es el archivo más pesado).
+
+**Teléfonos antiguos** (objetivo: Chrome 60+ en Android y Safari 11+ en iPhone)
+- Separaciones con márgenes donde el navegador no admite `gap` en flexbox (clase `.no-flexgap`, la pone `app.js`),
+  `grid-gap`, recuadro cuadrado del mapa sin `aspect-ratio`, medidas sin `min()`, relleno inferior sin `env()`,
+  aro de foco en las opciones sin `:focus-visible`, `xlink:href` en la imagen del Sol, horas con `hour12: false`.
+- Sin Wake Lock (Chrome < 84, Safari < 16.4) la pantalla puede apagarse y el sonido se detiene: la sección Ayuda
+  indica desactivar el bloqueo automático. En iPhone el sonido no se oye con el interruptor de silencio.
+- En celulares de 360–420 px de ancho el encabezado ocupa dos filas en lugar de tres.
+- **No probado en teléfonos reales antiguos:** las correcciones surgen de revisar el código contra las tablas de
+  compatibilidad y de simular la falta de `gap`; conviene probar en al menos un Android y un iPhone viejos.
+
+## Versión 2.9 (noviembre de 2026)
+- **Créditos:** «Datos iniciales para: Punta del Este»; aviso de que las circunstancias horarias difieren entre
+  ciudades; y un párrafo nuevo en «Agradecimientos y fuentes» con los dos orígenes de los elementos besselianos
+  y el algoritmo (método de Bessel en la formulación de Meeus, *Elements of Solar Eclipses 1951–2200*).
+- **Qué se tomó de cada origen:** de NASA (`SEdata.php?Ecl=20270206`), los coeficientes de orden 0 y 1, tan f1 y
+  tan f2; de EclipseWise, los de orden 2 y 3 y ΔT = 72,6 s. La tabla completa de NASA no se pudo leer (la página
+  devolvía un error el 16/11/2026); si se obtiene, conviene reemplazar las filas 2 y 3 en `js/eclipse.js`.
+  NASA usa ΔT = 75,7 s, unos 3 s más que EclipseWise.
+
 ## Versión 2.8 (noviembre de 2026)
+- **Barra clara bajo la app instalada (Android):** es la barra de navegación del sistema, que la app instalada
+  pinta con los colores del manifiesto. `background_color` pasó de `#f1f3f6` (gris azulado claro) a `#0b1730`,
+  el mismo color de la barra de secciones; también es el fondo de la pantalla de inicio de la app. Una app ya
+  instalada toma el manifiesto nuevo recién cuando Chrome lo actualiza (suele tardar hasta un día) o al
+  desinstalarla y volver a instalarla. No se pudo verificar en un teléfono.
 - Se agregó Pando (UY) a la lista de ciudades (versión 2.7).
 - Con «Usar mi ubicación», el panel «Lugar» muestra en letra pequeña las coordenadas en grados, minutos y segundos
   con N/S y E/W. El lector de pantalla dice solo los grados enteros («latitud 34 grados sur, longitud 58 grados
@@ -63,7 +111,7 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
 - **Íconos de la barra inferior:** más grandes (26 px), con sus trazos definidos en el propio ícono (no dependen
   de la hoja de estilos) y un escudo con tilde para «Seguridad» en lugar de los anteojos, que no se distinguían.
 - **Actualizaciones sin desajustes:** `index.html` pide los estilos y scripts con un número de versión
-  (`styles.css?v=2.8`, etc.). Antes, en la primera visita después de publicar, podía mostrarse la página nueva
+  (`styles.css?v=3.0`, etc.). Antes, en la primera visita después de publicar, podía mostrarse la página nueva
   con estilos o scripts viejos guardados en el teléfono. **Al publicar cambios:** subir ese número en
   `index.html` y en la lista `SHELL` de `sw.js` (deben coincidir), además de `CACHE_VERSION`.
 
@@ -137,7 +185,7 @@ Aplicación web instalable (PWA) sobre el eclipse solar anular del 6 de febrero 
 
 ## Publicación
 - Debe servirse por **HTTPS** (por ejemplo, GitHub Pages). Abriendo el archivo con doble clic (`file://`) no se instala ni funciona sin conexión.
-- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v17`) para que los celulares reciban la actualización.
+- Cada vez que se modifique algún archivo, cambiar `CACHE_VERSION` en `sw.js` (hoy es `eclipse2027-v20`) para que los celulares reciban la actualización.
 - El GIF original (`2027_02_06_ASE_800px.gif`, 86 MB) ya no es necesario para la app y conviene no subirlo al repositorio.
 
 ## Simulación

@@ -5,10 +5,18 @@
    máximo y la parte del Sol cubierta en cada instante, a partir de los
    elementos besselianos del eclipse anular del 6 de febrero de 2027.
 
-   Fuente de los elementos: «Eclipse Predictions by Fred Espenak,
-   www.EclipseWise.com» y NASA Eclipse Web Site (mismos elementos; las filas
-   n = 0 y 1 con más decimales en NASA, las filas 2 y 3 con 5 decimales en
-   EclipseWise). Método: J. Meeus, «Elements of Solar Eclipses 1951–2200».
+   Fuentes de los elementos (predicciones de Fred Espenak):
+   1) NASA Eclipse Web Site, «Besselian Elements – Annular Solar Eclipse of 2027
+      February 06»: https://eclipse.gsfc.nasa.gov/SEsearch/SEdata.php?Ecl=20270206
+      De allí: coeficientes de orden 0 y 1 (7 decimales), tan f1 y tan f2.
+      «Eclipse Predictions by Fred Espenak, NASA's GSFC».
+   2) EclipseWise.com, «Annular Solar Eclipse of 2027 Feb 06»:
+      https://eclipsewise.com/solar/SEprime/2001-2100/SE2027Feb06Aprime.html
+      De allí: coeficientes de orden 2 y 3 (5 decimales) y ΔT = 72,6 s.
+      «Eclipse Predictions by Fred Espenak, www.EclipseWise.com».
+   Algoritmo: método de los elementos besselianos (Bessel) para circunstancias
+   locales, según J. Meeus, «Elements of Solar Eclipses 1951–2200»
+   (Willmann-Bell, 1989).
 
    Todo el cálculo se hace en el dispositivo; no se envía nada a ningún sitio.
    ========================================================================= */
@@ -67,7 +75,7 @@ const EclipseCalc = (function () {
     /** Área común de dos círculos de radios r1 y r2 con centros a distancia s. */
     function lensArea(r1, r2, s) {
         if (s >= r1 + r2) return 0;
-        if (s <= Math.abs(r1 - r2)) return Math.PI * Math.min(r1, r2) ** 2;
+        if (s <= Math.abs(r1 - r2)) return Math.PI * Math.pow(Math.min(r1, r2), 2);
         const a1 = Math.acos((s * s + r1 * r1 - r2 * r2) / (2 * s * r1));
         const a2 = Math.acos((s * s + r2 * r2 - r1 * r1) / (2 * s * r2));
         return r1 * r1 * (a1 - Math.sin(2 * a1) / 2) + r2 * r2 * (a2 - Math.sin(2 * a2) / 2);

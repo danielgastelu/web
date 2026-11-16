@@ -1,23 +1,33 @@
 /* Service worker — Eclipse sonoro 2027
    Cambiar CACHE_VERSION cada vez que se publiquen cambios en los archivos.
    El número ?v= de estilos y scripts debe ser el mismo que en index.html. */
-const CACHE_VERSION = 'eclipse2027-v17';
+const CACHE_VERSION = 'eclipse2027-v20';
+/* Imprescindibles: si alguno falla, la instalación se reintenta en la próxima visita. */
 const SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './css/styles.css?v=2.8',
-  './js/i18n.js?v=2.8',
-  './js/eclipse.js?v=2.8',
-  './js/app.js?v=2.8',
+  './css/styles.css?v=3.0',
+  './js/i18n.js?v=3.0',
+  './js/eclipse.js?v=3.0',
+  './js/app.js?v=3.0'
+];
+/* Complementarios (fuentes e imágenes): si alguno falta o falla, la app se instala igual.
+   Los íconos de la app no se guardan aquí: el navegador los obtiene del manifiesto al instalar. */
+const EXTRAS = [
   './img/cc-by-nd.svg',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png', './icons/favicon-48.png',
-  './assets/poster.jpg', './img/sol/sdo-hmi-2026-11-16.jpg',
-  './img/fotos/anillo-hinode-2011.jpg', './img/fotos/observadores-lentes-2023.jpg', './img/fotos/timelapse-poster.jpg', './img/fotos/anillo-edzna-2023.jpg',
-  './img/logos/anep-dges-edytic.png', './img/logos/edytic-claro.png', './img/logos/edytic-oscuro.png',
-  './fonts/atkinson-hyperlegible-latin-400-normal.woff2', './fonts/atkinson-hyperlegible-latin-400-italic.woff2',
-  './fonts/atkinson-hyperlegible-latin-700-normal.woff2', './fonts/bricolage-grotesque-latin-wght-normal.woff2'
+  './assets/poster.jpg',
+  './img/sol/sdo-hmi-2026-11-16.jpg',
+  './img/fotos/anillo-hinode-2011.jpg',
+  './img/fotos/observadores-lentes-2023.jpg',
+  './img/fotos/timelapse-poster.jpg',
+  './img/logos/anep-dges-edytic.png',
+  './img/logos/edytic-claro.png',
+  './img/logos/edytic-oscuro.png',
+  './fonts/atkinson-hyperlegible-latin-400-normal.woff2',
+  './fonts/atkinson-hyperlegible-latin-400-italic.woff2',
+  './fonts/atkinson-hyperlegible-latin-700-normal.woff2',
+  './fonts/bricolage-grotesque-latin-wght-normal.woff2'
 ];
 /* Los videos (MP4 o WebM, ≈4 MB) no se precargan aquí: la página pide el formato
    que el navegador puede reproducir y el service worker lo guarda al primer uso. */
@@ -26,6 +36,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_VERSION);
     await cache.addAll(SHELL);
+    await Promise.all(EXTRAS.map((url) => cache.add(url).catch(() => null)));
     self.skipWaiting();
   })());
 });

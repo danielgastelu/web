@@ -643,7 +643,7 @@ const I18N = {
    de la simulación, institución y notas «Acerca de esta app».
    ========================================================================= */
 const GALLERY_URL = 'https://spaceweathergallery.com/index.php';
-const APP_VERSION = '2.8';
+const APP_VERSION = '3.0';
 const I18N_EXTRA = {
   es: {
     'a11y.skip': 'Saltar al contenido principal',
@@ -1479,37 +1479,37 @@ const I18N_V22 = {
     'son.pause': 'Pausar el sonido', 'son.resume': 'Reanudar el sonido',
     'son.on': 'Sonido activo', 'son.paused': 'Sonido en pausa',
     'tech.h.pause': 'Pausar y reanudar',
-    'tech.p.pause': 'Después de iniciar la experiencia, el sonido sigue al eclipse en cualquier posición del teléfono: en la mano, en un bolsillo o sobre una mesa. El mismo botón sirve para pausar el sonido y para reanudarlo. Mientras la experiencia está activa, la pantalla se mantiene encendida.'
+    'tech.p.pause': 'Después de iniciar la experiencia, el sonido sigue al eclipse en cualquier posición del teléfono: en la mano, en un bolsillo o sobre una mesa. El mismo botón sirve para pausar el sonido y para reanudarlo. Mientras la experiencia está activa, la app intenta mantener la pantalla encendida; en teléfonos antiguos conviene desactivar el bloqueo automático de pantalla. En iPhone, el sonido no se oye con el interruptor de silencio activado.'
   },
   pt: {
     'son.pause': 'Pausar o som', 'son.resume': 'Retomar o som',
     'son.on': 'Som ativo', 'son.paused': 'Som em pausa',
     'tech.h.pause': 'Pausar e retomar',
-    'tech.p.pause': 'Depois de iniciar a experiência, o som acompanha o eclipse em qualquer posição do celular: na mão, no bolso ou sobre uma mesa. O mesmo botão serve para pausar o som e para retomá-lo. Enquanto a experiência está ativa, a tela permanece ligada.'
+    'tech.p.pause': 'Depois de iniciar a experiência, o som acompanha o eclipse em qualquer posição do celular: na mão, no bolso ou sobre uma mesa. O mesmo botão serve para pausar o som e para retomá-lo. Enquanto a experiência está ativa, o app tenta manter a tela ligada; em celulares antigos convém desativar o bloqueio automático da tela. No iPhone, o som não é ouvido com o botão de silêncio ativado.'
   },
   en: {
     'son.pause': 'Pause the sound', 'son.resume': 'Resume the sound',
     'son.on': 'Sound on', 'son.paused': 'Sound paused',
     'tech.h.pause': 'Pause and resume',
-    'tech.p.pause': 'Once the experience has started, the sound follows the eclipse whatever the position of the phone: in your hand, in a pocket or on a table. The same button pauses the sound and resumes it. While the experience is active, the screen stays on.'
+    'tech.p.pause': 'Once the experience has started, the sound follows the eclipse whatever the position of the phone: in your hand, in a pocket or on a table. The same button pauses the sound and resumes it. While the experience is active, the app tries to keep the screen on; on older phones it helps to turn off automatic screen lock. On iPhone, there is no sound while the silent switch is on.'
   },
   fr: {
     'son.pause': 'Mettre le son en pause', 'son.resume': 'Reprendre le son',
     'son.on': 'Son actif', 'son.paused': 'Son en pause',
     'tech.h.pause': 'Pause et reprise',
-    'tech.p.pause': 'Une fois l’expérience lancée, le son suit l’éclipse quelle que soit la position du téléphone : dans la main, dans une poche ou sur une table. Le même bouton sert à mettre le son en pause et à le reprendre. Tant que l’expérience est active, l’écran reste allumé.'
+    'tech.p.pause': 'Une fois l’expérience lancée, le son suit l’éclipse quelle que soit la position du téléphone : dans la main, dans une poche ou sur une table. Le même bouton sert à mettre le son en pause et à le reprendre. Tant que l’expérience est active, l’appli essaie de garder l’écran allumé ; sur les téléphones anciens, mieux vaut désactiver le verrouillage automatique. Sur iPhone, le son est coupé quand le mode silencieux est activé.'
   },
   it: {
     'son.pause': 'Metti in pausa il suono', 'son.resume': 'Riprendi il suono',
     'son.on': 'Suono attivo', 'son.paused': 'Suono in pausa',
     'tech.h.pause': 'Pausa e ripresa',
-    'tech.p.pause': 'Dopo aver avviato l’esperienza, il suono segue l’eclissi in qualsiasi posizione del telefono: in mano, in tasca o su un tavolo. Lo stesso pulsante serve per mettere in pausa il suono e per riprenderlo. Finché l’esperienza è attiva, lo schermo resta acceso.'
+    'tech.p.pause': 'Dopo aver avviato l’esperienza, il suono segue l’eclissi in qualsiasi posizione del telefono: in mano, in tasca o su un tavolo. Lo stesso pulsante serve per mettere in pausa il suono e per riprenderlo. Finché l’esperienza è attiva, l’app cerca di tenere acceso lo schermo; sui telefoni più vecchi conviene disattivare il blocco automatico. Su iPhone il suono non si sente con l’interruttore del silenzioso attivo.'
   },
   de: {
     'son.pause': 'Ton pausieren', 'son.resume': 'Ton fortsetzen',
     'son.on': 'Ton aktiv', 'son.paused': 'Ton pausiert',
     'tech.h.pause': 'Pausieren und fortsetzen',
-    'tech.p.pause': 'Nach dem Start des Erlebnisses folgt der Ton der Finsternis in jeder Lage des Telefons: in der Hand, in der Tasche oder auf dem Tisch. Mit derselben Taste lässt sich der Ton pausieren und fortsetzen. Solange das Erlebnis aktiv ist, bleibt der Bildschirm eingeschaltet.'
+    'tech.p.pause': 'Nach dem Start des Erlebnisses folgt der Ton der Finsternis in jeder Lage des Telefons: in der Hand, in der Tasche oder auf dem Tisch. Mit derselben Taste lässt sich der Ton pausieren und fortsetzen. Solange das Erlebnis aktiv ist, versucht die App, den Bildschirm eingeschaltet zu lassen; bei älteren Telefonen empfiehlt es sich, die automatische Bildschirmsperre auszuschalten. Auf dem iPhone ist bei aktiviertem Stummschalter kein Ton zu hören.'
   }
 };
 for (const l in I18N_V22) Object.assign(I18N[l], I18N_V22[l]);
@@ -1685,3 +1685,52 @@ const I18N_V28 = {
   de: { 'loc.coords': 'Standort', 'loc.coords.sr': 'Standort: Breite {lat} Grad {ns}, Länge {lon} Grad {ew}.' }
 };
 for (const l in I18N_V28) Object.assign(I18N[l], I18N_V28[l]);
+
+/* =========================================================================
+   Versión 2.9: textos de Créditos sobre el lugar inicial y las fuentes del
+   cálculo de los horarios (elementos besselianos de NASA y de EclipseWise).
+   ========================================================================= */
+const BESSEL_NASA_URL = 'https://eclipse.gsfc.nasa.gov/SEsearch/SEdata.php?Ecl=20270206';
+const BESSEL_NASA = a_(BESSEL_NASA_URL, 'NASA Eclipse Web Site — Besselian Elements, Annular Solar Eclipse of 2027 February 06');
+const BESSEL_EW = a_(TECH_URL, 'EclipseWise — Annular Solar Eclipse of 2027 Feb 06');
+const BESSEL_ACK = '<span lang="en">“Eclipse Predictions by Fred Espenak, NASA’s GSFC”</span>';
+const MEEUS = '<cite lang="en">Elements of Solar Eclipses 1951–2200</cite> (Jean Meeus, Willmann-Bell, 1989)';
+const I18N_V29 = {
+  es: {
+    'cred.place': 'Datos iniciales para: Punta del Este, Uruguay.',
+    'cred.place2': 'En las secciones «En vivo» y «Escuchar» puedes usar tu ubicación o elegir otra ciudad. Las circunstancias horarias locales difieren entre ciudades.',
+    'cred.region': 'Los horarios de cada lugar se calculan en el propio dispositivo con los elementos besselianos del eclipse publicados por NASA y por EclipseWise. La sección Simulación muestra cómo la sombra de la Luna se desplaza sobre América del Sur y el océano Atlántico.',
+    'cred.calc_html': '<strong>Cálculo de los horarios de cada localidad.</strong> Se usan los elementos besselianos polinómicos del eclipse, tomados de dos orígenes: (1) ' + BESSEL_NASA + ': coeficientes de orden 0 y 1 y los valores tan f1 y tan f2; ' + BESSEL_ACK + '. (2) ' + BESSEL_EW + ': coeficientes de orden 2 y 3 y el valor de ΔT (72,6 s). Algoritmo: método de los elementos besselianos (método de Bessel) para las circunstancias locales de un eclipse, en la formulación de ' + MEEUS + '.'
+  },
+  pt: {
+    'cred.place': 'Dados iniciais para: Punta del Este, Uruguai.',
+    'cred.place2': 'Nas seções «Ao vivo» e «Ouvir» você pode usar sua localização ou escolher outra cidade. As circunstâncias horárias locais diferem entre as cidades.',
+    'cred.region': 'Os horários de cada lugar são calculados no próprio dispositivo com os elementos besselianos do eclipse publicados pela NASA e pelo EclipseWise. A seção Simulação mostra como a sombra da Lua se desloca sobre a América do Sul e o oceano Atlântico.',
+    'cred.calc_html': '<strong>Cálculo dos horários de cada localidade.</strong> São usados os elementos besselianos polinomiais do eclipse, obtidos de duas origens: (1) ' + BESSEL_NASA + ': coeficientes de ordem 0 e 1 e os valores tan f1 e tan f2; ' + BESSEL_ACK + '. (2) ' + BESSEL_EW + ': coeficientes de ordem 2 e 3 e o valor de ΔT (72,6 s). Algoritmo: método dos elementos besselianos (método de Bessel) para as circunstâncias locais de um eclipse, na formulação de ' + MEEUS + '.'
+  },
+  en: {
+    'cred.place': 'Initial data for: Punta del Este, Uruguay.',
+    'cred.place2': 'In the “Live” and “Listen” sections you can use your location or choose another city. Local eclipse times differ from city to city.',
+    'cred.region': 'The times for each place are calculated on the device itself from the Besselian elements of the eclipse published by NASA and by EclipseWise. The Simulation section shows how the Moon’s shadow moves across South America and the Atlantic Ocean.',
+    'cred.calc_html': '<strong>Calculation of the times for each place.</strong> The app uses the polynomial Besselian elements of the eclipse, taken from two sources: (1) ' + BESSEL_NASA + ': coefficients of order 0 and 1 and the values tan f1 and tan f2; ' + BESSEL_ACK + '. (2) ' + BESSEL_EW + ': coefficients of order 2 and 3 and the value of ΔT (72.6 s). Algorithm: the Besselian elements method (Bessel’s method) for the local circumstances of an eclipse, as formulated in ' + MEEUS + '.'
+  },
+  fr: {
+    'cred.place': 'Données initiales pour : Punta del Este, Uruguay.',
+    'cred.place2': 'Dans les sections « En direct » et « Écouter », vous pouvez utiliser votre position ou choisir une autre ville. Les circonstances horaires locales diffèrent d’une ville à l’autre.',
+    'cred.region': 'Les horaires de chaque lieu sont calculés sur l’appareil lui-même à partir des éléments de Bessel de l’éclipse publiés par la NASA et par EclipseWise. La section Simulation montre comment l’ombre de la Lune se déplace sur l’Amérique du Sud et l’océan Atlantique.',
+    'cred.calc_html': '<strong>Calcul des horaires de chaque localité.</strong> L’appli utilise les éléments de Bessel polynomiaux de l’éclipse, issus de deux sources : (1) ' + BESSEL_NASA + ' : coefficients d’ordre 0 et 1 et valeurs tan f1 et tan f2 ; ' + BESSEL_ACK + '. (2) ' + BESSEL_EW + ' : coefficients d’ordre 2 et 3 et valeur de ΔT (72,6 s). Algorithme : méthode des éléments de Bessel pour les circonstances locales d’une éclipse, dans la formulation de ' + MEEUS + '.'
+  },
+  it: {
+    'cred.place': 'Dati iniziali per: Punta del Este, Uruguay.',
+    'cred.place2': 'Nelle sezioni «In diretta» e «Ascolta» puoi usare la tua posizione o scegliere un’altra città. Le circostanze orarie locali cambiano da una città all’altra.',
+    'cred.region': 'Gli orari di ogni luogo sono calcolati sul dispositivo stesso con gli elementi besseliani dell’eclissi pubblicati dalla NASA e da EclipseWise. La sezione Simulazione mostra come l’ombra della Luna si sposta sull’America del Sud e sull’oceano Atlantico.',
+    'cred.calc_html': '<strong>Calcolo degli orari di ogni località.</strong> Si usano gli elementi besseliani polinomiali dell’eclissi, presi da due fonti: (1) ' + BESSEL_NASA + ': coefficienti di ordine 0 e 1 e i valori tan f1 e tan f2; ' + BESSEL_ACK + '. (2) ' + BESSEL_EW + ': coefficienti di ordine 2 e 3 e il valore di ΔT (72,6 s). Algoritmo: metodo degli elementi besseliani (metodo di Bessel) per le circostanze locali di un’eclissi, nella formulazione di ' + MEEUS + '.'
+  },
+  de: {
+    'cred.place': 'Ausgangsdaten für: Punta del Este, Uruguay.',
+    'cred.place2': 'In den Bereichen „Live“ und „Anhören“ kannst du deinen Standort verwenden oder eine andere Stadt wählen. Die örtlichen Zeiten der Finsternis unterscheiden sich von Stadt zu Stadt.',
+    'cred.region': 'Die Zeiten für jeden Ort werden auf dem Gerät selbst mit den Besselschen Elementen der Finsternis berechnet, die von der NASA und von EclipseWise veröffentlicht wurden. Der Bereich Simulation zeigt, wie der Mondschatten über Südamerika und den Atlantik zieht.',
+    'cred.calc_html': '<strong>Berechnung der Zeiten für jeden Ort.</strong> Verwendet werden die polynomialen Besselschen Elemente der Finsternis aus zwei Quellen: (1) ' + BESSEL_NASA + ': Koeffizienten der Ordnung 0 und 1 sowie die Werte tan f1 und tan f2; ' + BESSEL_ACK + '. (2) ' + BESSEL_EW + ': Koeffizienten der Ordnung 2 und 3 sowie der Wert von ΔT (72,6 s). Algorithmus: Methode der Besselschen Elemente für die örtlichen Umstände einer Finsternis, in der Formulierung von ' + MEEUS + '.'
+  }
+};
+for (const l in I18N_V29) Object.assign(I18N[l], I18N_V29[l]);

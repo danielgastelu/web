@@ -5,6 +5,18 @@
     'use strict';
 
     const $ = (id) => document.getElementById(id);
+
+    (function detectFlexGap() {
+        try {
+            const box = document.createElement('div');
+            box.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
+            box.appendChild(document.createElement('div'));
+            box.appendChild(document.createElement('div'));
+            document.body.appendChild(box);
+            if (box.scrollHeight !== 1) document.documentElement.classList.add('no-flexgap');
+            document.body.removeChild(box);
+        } catch (e) { /* sin cambios */ }
+    })();
     const store = {
         get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
         set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* sin almacenamiento */ } }
@@ -28,19 +40,27 @@
     function langInfo() { return LANGS.find(l => l.code === lang) || LANGS[0]; }
 
     function t(key, vars) {
-        let s = (I18N[lang] && I18N[lang][key]) ?? I18N.es[key] ?? key;
+        let s = I18N[lang] && I18N[lang][key];
+        if (s == null) s = I18N.es[key];
+        if (s == null) s = key;
         if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
         return s;
     }
 
     /* Estilo sobrio: los emojis decorativos de los textos no se muestran
        (tampoco los leen los lectores de pantalla). Los textos de i18n.js quedan intactos. */
-    const EMOJI_RE = /\s*\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*️?\s*/gu;
+    // Las expresiones se crean con «new RegExp» dentro de try: en navegadores antiguos que no
+    // conocen \p{Extended_Pictographic}, un literal haría fallar todo el archivo al cargarlo.
+    let EMOJI_RE = null, EMOJI_TEST = null;
+    try {
+        EMOJI_RE = new RegExp('\\s*\\p{Extended_Pictographic}(?:\\uFE0F|\\u200D\\p{Extended_Pictographic})*\\uFE0F?\\s*', 'gu');
+        EMOJI_TEST = new RegExp('\\p{Extended_Pictographic}', 'u');
+    } catch (e) { /* sin soporte: los emojis de los textos se dejan como están */ }
     function stripEmojis(el) {
-        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        if (!EMOJI_RE) return;
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
         const nodes = [];
-        const has = /\p{Extended_Pictographic}/u;
-        while (walker.nextNode()) if (has.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
+        while (walker.nextNode()) if (EMOJI_TEST.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
         nodes.forEach(n => {
             const prev = n.previousSibling, next = n.nextSibling;
             let v = n.nodeValue.replace(EMOJI_RE, ' ');
@@ -58,7 +78,16 @@
     function dtf(opts) {
         const key = lang + JSON.stringify(opts);
         let f = fmtCache.get(key);
-        if (!f) { f = new Intl.DateTimeFormat(langInfo().locale, opts); fmtCache.set(key, f); }
+        if (!f) {
+            try { f = new Intl.DateTimeFormat(langInfo().locale, opts); }
+            catch (e) {
+                // Teléfonos antiguos no conocen todas las zonas horarias: se usa la hora del dispositivo
+                const safe = Object.assign({}, opts);
+                delete safe.timeZone;
+                f = new Intl.DateTimeFormat(langInfo().locale, safe);
+            }
+            fmtCache.set(key, f);
+        }
         return f;
     }
 
@@ -280,10 +309,13 @@
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW:', err));
-            // Deja guardado el video de la simulación para usarlo sin conexión
+            // Deja guardado el video de la simulación para usarlo sin conexión (≈ 5 MB). No se hace con
+            // «ahorro de datos» ni con conexiones 2G/3G: ahí el video se baja al abrir «Simulación».
             const warmUp = () => {
                 const srcs = ['#sim-video', '#tl-video'].map(pickVideoSrc).filter(Boolean);
-                if (srcs.length && navigator.onLine !== false) {
+                const conn = navigator.connection || {};
+                const slow = conn.saveData === true || /(^|-)2g$|^3g$/.test(conn.effectiveType || '');
+                if (srcs.length && navigator.onLine !== false && !slow) {
                     const go = async () => {
                         for (const src of srcs) { try { await (await fetch(src)).blob(); } catch (e) { /* se reintentará */ } }
                     };
@@ -547,6 +579,8 @@
         mode: store.get('eclipse.soundMode') === 'tone' ? 'tone' : 'notes',
         lastNote: 0,
         lastChime: 0,
+        lastFreq: 0,
+        lastActive: null,
         toneOsc: null,
         toneGain: null,
 
@@ -555,9 +589,16 @@
             if (!audioCtx) return;
             if (this.mode === 'tone') {
                 this.ensureTone();
+                // Solo se envía una orden cuando algo cambió (ahorra trabajo en teléfonos lentos)
                 const now = audioCtx.currentTime;
-                this.toneOsc.frequency.setTargetAtTime(freq, now, 0.25);
-                this.toneGain.gain.setTargetAtTime(active ? 0.09 : 0, now, active ? 0.15 : 0.08);
+                if (Math.abs(freq - this.lastFreq) > 0.5) {
+                    this.toneOsc.frequency.setTargetAtTime(freq, now, 0.25);
+                    this.lastFreq = freq;
+                }
+                if (active !== this.lastActive) {
+                    this.toneGain.gain.setTargetAtTime(active ? 0.09 : 0, now, active ? 0.15 : 0.08);
+                    this.lastActive = active;
+                }
             } else {
                 this.silenceTone();
                 if (active && Date.now() - this.lastNote > 400) {
@@ -591,7 +632,9 @@
         },
 
         silenceTone() {
-            if (this.toneGain) this.toneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.08);
+            if (!this.toneGain || this.lastActive === false) return;
+            this.lastActive = false;
+            this.toneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.08);
         },
 
         /** Campanita suave (dos parciales tipo campana con caída lenta). */
@@ -709,6 +752,7 @@
             const size = (2 * 100.6 / SUN_LIVE_RATIO).toFixed(1);
             document.querySelectorAll('.sun-img').forEach(img => {
                 img.setAttribute('href', url);
+                img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);   // navegadores antiguos
                 ['width', 'height'].forEach(a => img.setAttribute(a, size));
                 ['x', 'y'].forEach(a => img.setAttribute(a, (-size / 2).toFixed(1)));
                 img.style.display = '';
@@ -723,8 +767,8 @@
     window.addEventListener('online', refreshSunImage);
 
     const live = { disc: $('live-disc'), lastKey: '' };
-    const fmtClock = (ms) => dtf({ timeZone: site.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).format(ms);
-    const fmtHM = (ms, tz) => dtf({ timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
+    const fmtClock = (ms) => dtf({ timeZone: site.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(ms);
+    const fmtHM = (ms, tz) => dtf({ timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(ms);
 
     /** Dónde está el Sol, en palabras: «Sol: hacia el noreste, a 57° de altura». */
     const COMPASS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
@@ -747,7 +791,7 @@
         if (circ.type !== 'none' && evalTime < tC1) {
             const cd = getCountdownText(evalTime, tC1);
             const span = displayPhase.querySelector('.countdown-text');
-            if (!span || displayPhase.firstChild.nodeValue !== t('phase.before')) {
+            if (!span || !displayPhase.firstChild || displayPhase.firstChild.nodeValue !== t('phase.before')) {
                 displayPhase.textContent = t('phase.before');
                 const s = document.createElement('span');
                 s.className = 'countdown-text';
@@ -762,9 +806,12 @@
     // El reloj y la cuenta regresiva se ven siempre, aunque no se haya iniciado el sonido
     setInterval(() => { if (!isPlaying && !document.hidden) renderSonification(Date.now()); }, 1000);
 
+    const LIVE_TICK = 100;   // ms entre actualizaciones del sonido en vivo
+    let liveTimer = 0;
     function updateLoop() {
+        clearTimeout(liveTimer);
         if (!isPlaying) return;
-        if (eco.busy() && !isPaused) { requestAnimationFrame(updateLoop); return; } // la vista previa usa el sonido
+        if (eco.busy()) { liveTimer = setTimeout(updateLoop, LIVE_TICK); return; } // la vista previa usa el sonido
         const evalTime = getEvalTime();
         lastEvalTime = evalTime;
         const astro = renderSonification(evalTime);
@@ -788,10 +835,10 @@
             } else if (lastAnnouncedPercent > 0 && Math.abs(covRound - lastAnnouncedPercent) > 5) {
                 lastAnnouncedPercent = -1; // permite anunciar tanto al subir como al bajar
             }
+            sound.update(freqFromLight(1 - astro.coverage / 100), true);
+            sound.annular(astro.phaseKey === 'phase.annular', true, 4000);
         }
-        sound.update(freqFromLight(1 - astro.coverage / 100), !isPaused);
-        sound.annular(astro.phaseKey === 'phase.annular', !isPaused, 4000);
-        requestAnimationFrame(updateLoop);
+        liveTimer = setTimeout(updateLoop, LIVE_TICK);
     }
 
     /* Mantiene la pantalla encendida durante la experiencia: si el teléfono se
@@ -806,6 +853,9 @@
     }
     document.addEventListener('visibilitychange', () => {
         if (isPlaying && !isPaused && document.visibilityState === 'visible') keepScreenOn();
+        // Con la pantalla apagada o la app en segundo plano el navegador frena los cálculos:
+        // se calla el tono continuo para que no quede sonando una nota que ya no corresponde.
+        if (document.hidden && audioCtx) sound.silenceTone();
     });
 
     /** Refleja el estado en el botón principal y en el indicador. */
@@ -828,7 +878,7 @@
             renderLiveState();
             keepScreenOn();
             speak(t('speak.started'));
-            requestAnimationFrame(updateLoop);
+            updateLoop();
             return;
         }
         isPaused = !isPaused;
@@ -1190,7 +1240,7 @@
 
     locCity.addEventListener('change', () => {
         const c = CITIES[parseInt(locCity.value, 10)];
-        if (!c) { renderLoc(); return; }           // «Mi ubicación» se elige con el botón
+        if (!c) { renderLoc(); $('btn-locate').click(); return; }   // «Mi ubicación»: igual que el botón
         setText(locMsg, '');
         applySite(siteFromCity(c));
     });
@@ -1257,7 +1307,7 @@
 
         const frameTime = (i) => SIM_START_UT + i * SIM_STEP_MS;
         const fmt = (opts) => dtf(opts);
-        const fmtTime = (ms, tz) => fmt({ timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
+        const fmtTime = (ms, tz) => fmt({ timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(ms);
         const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
         function renderClock() {

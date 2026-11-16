@@ -205,6 +205,7 @@ main {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 1.25rem 1rem;
+    padding-bottom: calc(var(--nav-h) + 2rem);   /* navegadores sin env() */
     padding-bottom: calc(var(--nav-h) + 2rem + env(safe-area-inset-bottom));
     scroll-padding-bottom: calc(var(--nav-h) + 1rem); /* el foco no queda tapado por la barra (WCAG 2.4.11) */
 }
@@ -270,7 +271,7 @@ h2[tabindex="-1"]:focus { outline: none; }
 .sky-data dd { margin: 0; font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
 .sky-tz { color: var(--sky-label); font-size: .9rem; margin: .25rem 0 0; }
 .sky-sun { font-size: 1rem; margin: .15rem 0 0; }
-.sky-disc { display: block; width: min(72%, 250px); height: auto; margin: .5rem auto 0; }
+.sky-disc { display: block; width: 72%; max-width: 250px; height: auto; margin: .5rem auto 0; }
 .sky-disc .sun { fill: var(--sun); }
 .sky-disc .moon { fill: var(--sky-bg); }
 /* Alto contraste: disco liso, sin la fotografía (más nítido para baja visión) */
@@ -366,6 +367,9 @@ details.fold > summary:hover h3, details.fold > summary:hover h4 { text-decorati
 .segmented-control input[type="radio"]:checked + .seg-face { background: var(--selected-bg); color: var(--selected-fg); }
 /* La opción elegida se distingue también por una marca, no solo por el color */
 .segmented-control input[type="radio"]:checked + .seg-face::before { content: "✓"; }
+/* :focus para navegadores sin :focus-visible; en los actuales el aro solo aparece con el teclado */
+.segmented-control input[type="radio"]:focus + .seg-face { outline: 3px solid var(--focus); outline-offset: -5px; }
+.segmented-control input[type="radio"]:focus:not(:focus-visible) + .seg-face { outline: none; }
 .segmented-control input[type="radio"]:focus-visible + .seg-face { outline: 3px solid var(--focus); outline-offset: -5px; }
 .segmented-control input[type="radio"]:checked:focus-visible + .seg-face { outline-color: #ffffff; }
 :root[data-theme="dark"] .segmented-control input[type="radio"]:checked:focus-visible + .seg-face { outline-color: #0b1730; }
@@ -389,7 +393,7 @@ input[type="checkbox"] { width: 24px; height: 24px; margin: 0; flex: 0 0 auto; a
 .readouts dd.num { color: var(--num); font-variant-numeric: tabular-nums; }
 
 /* ---------- Simulación global (mapa) ---------- */
-.contact-card a { font-weight: 700; overflow-wrap: anywhere; }
+.contact-card a { font-weight: 700; word-break: break-word; overflow-wrap: anywhere; }
 
 .sim-stage {
     position: relative;
@@ -402,7 +406,7 @@ input[type="checkbox"] { width: 24px; height: 24px; margin: 0; flex: 0 0 auto; a
     border: 1px solid var(--line);
 }
 .sim-stage video { width: 100%; height: 100%; display: block; object-fit: contain; background: #fff; }
-.sim-loading { position: absolute; inset: auto 0 0 0; padding: .4rem .6rem; background: rgba(11,23,48,.92); color: #fff; font-size: .9rem; text-align: center; }
+.sim-loading { position: absolute; left: 0; right: 0; bottom: 0; padding: .4rem .6rem; background: rgba(11,23,48,.92); color: #fff; font-size: .9rem; text-align: center; }
 
 .sim-clock { text-align: center; }
 .sim-clock .sim-date { font-weight: 700; }
@@ -486,14 +490,14 @@ input[type="checkbox"] { width: 24px; height: 24px; margin: 0; flex: 0 0 auto; a
 .inst-band { background: #000; padding: 1.25rem 1rem; display: flex; justify-content: center; align-items: center; }
 .inst-lockup { height: 44px; width: auto; max-width: 100%; display: block; }
 .inst-body { padding: 1.25rem 1rem; }
-.logo-edytic { width: min(300px, 80%); height: auto; display: block; margin: 0 auto .9rem; }
+.logo-edytic { width: 80%; max-width: 300px; height: auto; display: block; margin: 0 auto .9rem; }
 .logo-on-dark { display: none; }
 :root[data-theme="hc"] .logo-on-light, :root[data-theme="dark"] .logo-on-light { display: none; }
 :root[data-theme="hc"] .logo-on-dark, :root[data-theme="dark"] .logo-on-dark { display: block; }
 :root[data-theme="hc"] .inst-band { border-bottom: 2px solid #fff; }
 .credits-org { font-weight: 700; line-height: 1.5; margin: 0 0 .6rem; }
 .ai-cols { display: grid; gap: .25rem 1.25rem; }
-blockquote.attribution { margin: .6rem 0; padding: .6rem .8rem; border-left: 4px solid var(--line); font-style: italic; overflow-wrap: anywhere; }
+blockquote.attribution { margin: .6rem 0; padding: .6rem .8rem; border-left: 4px solid var(--line); font-style: italic; word-break: break-word; overflow-wrap: anywhere; }
 .license-row { display: flex; gap: .75rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: .9rem; }
 .license-row img { width: 88px; height: 31px; flex: 0 0 auto; }
 .license-row p { flex: 1 1 220px; margin: 0; font-size: .94rem; }
@@ -509,6 +513,7 @@ blockquote.attribution { margin: .6rem 0; padding: .6rem .8rem; border-left: 4px
     /* Flota sobre la barra inferior: al aparecer no desplaza el contenido */
     position: fixed;
     left: 8px; right: 8px;
+    bottom: calc(var(--nav-h) + 8px);
     bottom: calc(var(--nav-h) + 8px + env(safe-area-inset-bottom));
     z-index: 90;
     border-radius: var(--radius);
@@ -574,7 +579,7 @@ nav.tabbar button.active .nav-txt { text-decoration: underline; text-underline-o
 @media (min-width: 900px) {
     #tab-simulacion { max-width: 1040px; }
     .sim-layout { display: grid; grid-template-columns: minmax(0, auto) minmax(280px, 1fr); gap: 1.5rem; align-items: center; }
-    .sim-stage { width: min(540px, calc(100dvh - 320px)); min-width: 340px; margin: 0; }
+    .sim-stage { width: 480px; width: min(540px, calc(100vh - 320px)); width: min(540px, calc(100dvh - 320px)); min-width: 340px; margin: 0; }
     /* El Sol a la izquierda y los controles a la derecha */
     #tab-escuchar, #tab-sonificacion { max-width: 900px; }
     .sky-layout {
@@ -585,7 +590,12 @@ nav.tabbar button.active .nav-txt { text-decoration: underline; text-underline-o
     .area-sky { grid-area: sky; margin-bottom: 0; }
     .area-more { grid-area: more; }
     .area-loc { grid-area: loc; }
-    .sky-disc { width: min(80%, 320px); }
+    .sky-disc { width: 80%; max-width: 320px; }
+}
+/* Celulares angostos: los tres controles del encabezado entran en una sola fila */
+@media (max-width: 420px) {
+    .header-control { font-size: .8rem; padding: .3rem .45rem; }
+    .header-tools { gap: .3rem; }
 }
 /* Pantallas muy angostas o con zoom alto (reflow a 320 px, WCAG 1.4.10) */
 @media (max-width: 359px) {
@@ -613,4 +623,39 @@ nav.tabbar button.active .nav-txt { text-decoration: underline; text-underline-o
     .sky-disc .moon { fill: Canvas; }
     .sun-img { display: none; }
     .btn, .header-control, .seg-face, details.fold, .card, .sky { border: 1px solid CanvasText; }
+}
+
+/* ---------- Compatibilidad con navegadores antiguos ----------
+   Sin «gap» en flexbox (Chrome < 84, Safari < 14.1): app.js lo detecta y pone la clase
+   .no-flexgap en <html>; la separación se logra entonces con márgenes. */
+.no-flexgap .header-row > * { margin-top: .15rem; margin-bottom: .15rem; }
+.no-flexgap header h1 { margin-right: 1rem; }
+.no-flexgap .header-tools > * { margin-right: .4rem; }
+.no-flexgap .btn-row .btn { margin: 0 .25rem .5rem; }
+.no-flexgap .sky-data div { margin: 0 .6rem; }
+.no-flexgap .sky-data dt { margin-right: .4rem; }
+.no-flexgap .status-indicator::before { margin-right: .5rem; }
+.no-flexgap details.fold > summary::after { margin-left: .75rem; }
+.no-flexgap .segmented-control input[type="radio"]:checked + .seg-face::before { margin-right: .3rem; }
+.no-flexgap label.checkbox-label input { margin-right: .75rem; }
+.no-flexgap .sim-controls > * { margin: .25rem; }
+.no-flexgap .sim-speed select { margin-left: .4rem; }
+.no-flexgap .moment-time { margin-right: .75rem; }
+.no-flexgap .license-row img { margin: 0 .75rem .5rem 0; }
+.no-flexgap .install-bar > * + * { margin-left: .6rem; }
+.no-flexgap nav.tabbar svg { margin-bottom: .2rem; }
+/* Rejillas en navegadores que solo conocen «grid-gap» (Safari 10–11, Chrome 57–65) */
+@supports not (gap: 1px) {
+    .actions { grid-gap: .6rem; }
+    .readouts { grid-gap: .25rem 1.25rem; }
+    .moments { grid-gap: .5rem; }
+    .ai-cols { grid-gap: .25rem 1.25rem; }
+    .sim-layout { grid-gap: 1.5rem; }
+    .sky-layout { grid-column-gap: 1.25rem; }
+}
+/* Sin «aspect-ratio» (Chrome < 88, Safari < 15): el recuadro del mapa conserva su forma cuadrada */
+@supports not (aspect-ratio: 1 / 1) {
+    .sim-stage::before { content: ""; display: block; padding-top: 100%; }
+    .sim-stage video { position: absolute; top: 0; left: 0; }
+    .timelapse video { height: auto; }
 }
